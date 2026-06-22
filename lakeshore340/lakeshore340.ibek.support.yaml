@@ -53,9 +53,10 @@ entity_models:
         # this is equivalent to {P: '{{P}}', PORT: '{{PORT}}', ADDR: '{{ADDR}}', SCAN: '{{SCAN}}', TEMPSCAN: '{{TEMPSCAN}}', name: '{{name}}', LOOP: '{{LOOP}}'}
         args:
           .*:
-    pvi:
-      yaml_path: lakeshore340.pvi.device.yaml
-      ui_macros:
-        lakeshore340: "{{ P }}{{ name }}"
-      pv: true
-      pv_prefix: "{{ P }}{{ name }}"
+
+    # pvi:
+    #   yaml_path: lakeshore340.pvi.device.yaml
+    #   ui_macros:
+    #     lakeshore340: "{{ P }}{{ name }}"
+    #   pv: true
+    #   pv_prefix: "{{ P }}{{ name }}"
