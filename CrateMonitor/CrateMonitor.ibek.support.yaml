@@ -1,5 +1,11 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
 
+# Imported from DLS production support module: CrateMonitor Rx-y
+# Source: /dls_sw/prod/R3.14.12.7/support/CrateMonitor/Rx-y
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/CrateMonitor/ release.
+
 module: CrateMonitor
 
 entity_models:
