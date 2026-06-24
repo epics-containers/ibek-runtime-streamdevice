@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: VCH10Light
+
+entity_models:
+  - name: VCH10Light
+    description: |-
+      Template database for a VCH-10 Light Controller.  Typically used on End Stations to illuminate one or more vacuum chambers.  All the lights are turned on/off together.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Mandatory.  Device prefix
+      port:
+        type: str
+        description: |-
+          Mandatory.  Asyn serial port
+      description:
+        type: str
+        description: |-
+          Optional.   Defaults to ES Chamber Lights.  Description of the controller for use on GUI - e.g. chambers illuminated.
+        default: ES Chamber Lights
+      shortdesc:
+        type: str
+        description: |-
+          Optional.   Defaults to Lights.             Short description to appear in GUI text.
+        default: Lights
+      name:
+        type: id
+        description: |-
+          Optional.   Defaults to VCH-10.             Object name and associated gui name.
+    databases:
+      - file: VCH10Light.template
+        args:
+          .*:

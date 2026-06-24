@@ -1,0 +1,24 @@
+ReadTimeout = 10;
+#LockTimeout = 1000;
+#ReplyTimeout = 200;
+MaxInput = 6;
+
+reset {
+    out 0 0 0 0 0 0;
+}
+
+getPosition {
+    out $1 60 0 0 0 0;
+    in $1 60 "%#4r";
+}
+
+moveAbsolute {
+    out $1 20 "%#.4r";
+    @init { getPosition; }
+    @replytimeout { getPosition; }
+}
+
+arbitraryCommand {
+    out $1 "%(\$2:COMMAND)s%(\$2:DATA)#.4r";
+    in $1 "%(\$2:COMMAND)s%(\$2:DATA:RBV)#4r";
+}

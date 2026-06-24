@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: thorlabsMcls1
+
+entity_models:
+  - name: thorlabsMcls1
+    description: |-
+      Thorlabs MCLS1 laser source
+    parameters:
+      name:
+        type: id
+        description: |-
+          Name
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      BLUE:
+        type: str
+        description: |-
+          Blue channel name
+      RED:
+        type: str
+        description: |-
+          Red channel name
+      VRED:
+        type: str
+        description: |-
+          Very red channel name
+      IRED:
+        type: str
+        description: |-
+          (Near) infrared channel name
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      desc:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: thorlabsMcls1.template
+        args:
+          .*:

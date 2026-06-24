@@ -1,0 +1,179 @@
+##############################################################
+# Protocol file for SPECS X-ray Source Power Supply (XRC 1000)
+# Diamond Light Source, June 2019
+##############################################################
+
+##############################################################
+# General
+##############################################################
+
+# RS 232 parameters
+# Baud rate:	9600
+# Parity:    	none
+# Bits:	    	8
+# No cross-over
+
+OutTerminator = CR LF;
+InTerminator = CR;
+
+# Commands maximum of 80 bytes long (incl. CR, LF)
+# Ended by CR and/or LF
+
+# Inquiry commands must contain a question mark (e.g. SCN?)
+# Answer includes parameter, value, CR, LF (e.g. "SCN1.2e3\n\r")
+
+# Successfull recognition of a command line - ">" must be returned;
+# otherwise:
+# "Remote Locked !" "Not in Remote !" etc.
+
+# Command List (lowercase letters ignored)
+# ------------------------------------------
+
+# SERNO ?	Query internal serial number (14 digits hexidecimal)
+
+# REMote	Switches into remote mode
+# LOCal	  	Switches into the local mode
+# REMote ?" 	0 = local; 2 = remote
+
+# OFF	 	Switch off
+# OPErate	Cooling on, voltage anode on, filament on
+# STANdby	Cooling on, preheat filament
+# OPErate ?"	0 = off; 1 = cooling on; 2 = preheating; 3 = anode voltage; 4 = on
+
+# STAT ?  	Inquiry status (6 digits hexidecimal): 5,4 - remote status; 3,2 - operate status; 1,0 - error code
+#      		e.g (?) 020300 020200 020100 5,4: status REMOTE, 3,2: operate assorted modes, 1,0: no error
+# IFI ?	  	Query filament current
+# UFI ?		Query filament voltage
+# PAN ?		Query anode power
+
+# ANOde 1 / ANOde 2   Selects Anode 1 / Selects Anode 2
+# ANOde ?   	0 = off or cooling; 1 = anode 1; 2 = anode 2
+
+# UAN ?		Query anode voltage
+# UAN 10e3	Sets anode voltage to e.g. 10e3 V
+
+# IEM ?		Query emission current
+# IEM 20e-3	Sets emission current to e.g. 20mA
+
+# IHV ?		Query total value of current
+
+############################################################
+# Get functions
+############################################################
+
+# getErrorStatus {
+#    out "STAT ?";
+#    in "STAT:*%04r%02r";
+#    @mismatch {
+#       in "%(\$1:MESSAGE)39c";
+#    } 
+# }
+
+getRemote {
+   out "REM ?";
+   in "REMOTE: %{0|1|2}";
+   @mismatch {
+      in "%(\$1:MESSAGE)39c";  
+   }
+}
+
+getOperatingStatus {
+   out "OPE ?";
+   in "OPERATE: %{0|1|2|3|4}";
+   @mismatch {
+      in "%(\$1:MESSAGE)39c";
+   }
+}
+
+getFilamentCurrent {
+   out "IFI ?";
+   in "IFI: %e";
+   @mismatch {
+      in "%(\$1:MESSAGE)39c";
+   }
+}
+
+getFilamentVoltage {
+   out "UFI ?";
+   in "UFI: %e";
+   @mismatch {
+      in "%(\$1:MESSAGE)39c";
+   }
+}
+
+getAnodePower {
+   out "PAN ?";
+   in "PAN: %e";
+   @mismatch {
+      in "%(\$1:MESSAGE)39c";
+   }
+}
+
+getAnode {
+   out "ANO ?";	
+   in "ANODE: %{0|1|2}";
+   @mismatch {
+      in "%(\$1:MESSAGE)39c";  
+   }
+}
+
+getAnodeVoltage {
+   out "UAN ?";	
+   in "UAN: %e";
+   @mismatch {
+     in "%(\$1:MESSAGE)39c";
+   }
+}
+
+getEmissionCurrent {
+   out "IEM ?";
+   in "IEM: %e";
+   @mismatch {
+     in "%(\$1:MESSAGE)39c";
+   }
+}
+
+##################################################
+# Set functions
+##################################################
+
+setRemote {
+  out "%{LOC|REM}";
+  in ">";
+  @mismatch {
+     in "%(\$1:MESSAGE)39c";
+  }
+}
+
+setOperatingStatus {
+  out "%{OFF|COOL|STAN|UAON|OPE}";
+  in ">";
+  @mismatch {
+     in "%(\$1:MESSAGE)39c";
+  }
+
+}
+
+setAnode {
+  out "%{ANO 1|ANO 2}";
+  in ">";
+  @mismatch {
+     in "%(\$1:MESSAGE)39c";
+  }
+}
+
+setAnodeVoltage {
+  out "UAN %f";
+  in ">";
+  @mismatch {
+     in "%(\$1:MESSAGE)39c";
+  }
+}
+
+setEmissionCurrent {
+   out "IEM %f";
+   in ">";
+   @mismatch {
+     in "%(\$1:MESSAGE)39c";
+   }
+}

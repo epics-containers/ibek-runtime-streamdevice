@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: strainGauge
+
+entity_models:
+  - name: strainGaugeOmegaPt
+    description: |-
+      Controls Omega Pt series controllers
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      port:
+        type: str
+        description: |-
+          Asyn port to connect to
+      HL_NAL:
+        type: int
+        description: |-
+          The OmegaPt alarm for high limit, 1 or 2 (default is 2)
+        default: 2
+      LL_NAL:
+        type: int
+        description: |-
+          The OmegaPt alarm for low limit, 1 or 2 (default is 1)
+        default: 1
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: strainGaugeOmegaPt.template
+        args:
+          .*:
+  - name: strainGauge
+    description: |-
+      Support for the Newport strain gauge
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      bus:
+        type: str
+        description: |-
+          Asyn port to connect to
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: strainGauge.template
+        args:
+          .*:

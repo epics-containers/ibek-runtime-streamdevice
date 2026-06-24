@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: agilent33220A
+
+entity_models:
+  - name: agilent33220A
+    description: |-
+      Agilent 33220A function/arbitrary waveform generator
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      name:
+        type: id
+        description: |-
+          Name to export to gda as
+    databases:
+      - file: agilent33220A.template
+        args:
+          .*:

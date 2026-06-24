@@ -1,0 +1,181 @@
+# Protocol file for Daylight Solutions QCL
+# Benjamin Bradnick
+# 07/09/2017
+
+InTerminator = LF CR;
+OutTerminator = LF;
+
+ReplyTimeout = 1000;
+WriteTimeout = 200;
+ReadTimeout = 200;
+
+# Laser current (milliAmps)
+getLaserCurrent {
+    out ":LASER:CURR?";
+    in "%i%*s";
+}
+setLaserCurrent {
+    out ":LASER:CURR %i";
+}
+getMeasuredLaserCurrent {
+    out ":LASER:CURR:SENSE?";
+    in "%f%*s";
+}
+getMeasuredLaserTecCurrent {
+    out ":LASER:TEC:CURR?";
+    in "%f%*s";
+}
+
+# Interlock
+getInterlockStatus {
+    out ":LASER:ILOCK?";
+    in "%i";
+}
+
+# Temperatures
+getCaseTemp {
+    out ":LASER:TEMP:CASE?";
+    in "%f%*s";
+}
+getLaserTemp {
+    out ":LASER:TEMP:SENSE?";
+    in "%f%*s";
+}
+getLaserTempSetpoint {
+    out ":LASER:TEMP:REL?";
+    in "%f";
+}
+setLaserTempSetpoint {
+    out ":LASER:TEMP:REL";
+}
+
+# Laser properties
+getLaserWavelength {
+    out ":LASER:SET?";
+    in "%f%*s";
+}
+setLaserWavelength {
+    out ":LASER:SET %f";
+}
+getMeasuredLaserWavelength {
+    out ":LASER:POS?";
+    in "%f%*s";
+}
+getLaserOutput {
+    out ":LASER:OUTP?";
+    in "%i";
+}
+setLaserOutput {
+    out ":LASER:OUTP %i";
+}
+getLaserTrigDelay {
+    out ":LASER:TRIG:DELAY?";
+    in "%f%*s";
+}
+
+# Pulse operation
+getPulseMode {
+    out ":PULSE:MODE?";
+    in "%i";
+}
+setPulseMode {
+    out ":PULSE:MODE %i";
+}
+getPulseWidth {
+    out ":PULSE:WIDTH?";
+    in "%f%*s";
+}
+setPulseWidth {
+    out ":PULSE:WIDTH %f";
+}
+getPulseFrequency {
+    out ":PULSE:FREQ?";
+    in "%f%*s";
+}
+setPulseFrequency {
+    out ":PULSE:FREQ %f";
+}
+getPulseDutyCycle {
+    out ":PULSE:DUTY?";
+    in "%f%*s";
+}
+setPulseDutyCycle {
+    out ":PULSE:DUTY %f";
+}
+
+# Scan operation
+getScanMode {
+    out ":SCAN:MODE?";
+    in "%i";
+}
+setScanMode {
+    out ":SCAN:MODE %i";
+}
+getScanStart {
+    out ":SCAN:START?";
+    in "%f%*s"
+}
+setScanStart {
+    out ":SCAN:START %f";
+}
+getScanStop {
+    out ":SCAN:STOP?";
+    in "%f%*s";
+}
+setScanStop {
+    out ":SCAN:STOP %f";
+}
+getScanStep {
+    out ":SCAN:STEP?";
+    in "%f%*s";
+}
+setScanStep {
+    out ":SCAN:STEP %f";
+}
+getScanNextStep {
+    out ":SCAN:STEP:NEXT?";
+    in "%i";
+}
+setScanNextStep {
+    out ":SCAN:STEP:NEXT";
+}
+getScanPauseTime {
+    out ":SCAN:PAUSE?";
+    in "%f%*s";
+}
+setScanPauseTime {
+    out ":SCAN:PAUSE %f";
+}
+getScanCycles {
+    out ":SCAN:CYCLES?";
+    in "%i";
+}
+setScanCycles {
+    out ":SCAN:CYCLES %i";
+}
+getScanRate {
+    out ":SCAN:RATE?";
+    in "%i";
+}
+setScanRate {
+    out ":SCAN:RATE %i";
+}
+setScanRun {
+    out ":SCAN:RUN %i";
+}
+getScanCount {
+    out ":SCAN:COUNT?";
+    in "%i";
+}
+getLastScanSweepTime {
+    out ":SCAN:SWEEP:TIME?";
+    in "%f%*s";
+}
+
+getDisplayUnits {
+    out ":DISP:UNIT?";
+    in "%i";
+}
+setDisplayUnits {
+    out ":DISP:UNIT %i";
+}

@@ -1,0 +1,109 @@
+# Template to provide the records required for an input.
+# This makes use of the macros required by lakeshore224.template
+# but also requires macros to specify the input channel and index.
+# The index is to provide a way for the developer to use a different
+# channel naming scheme.
+#
+# Macros:
+# % macro, TNAME, Number of Temperature Sensor
+# % macro, INDEX, Channel A, B or C1-C5, or D1-D5
+# % macro, P, Prefix for PV name. $(P):DISABLE_POLL used for SDIS
+# % macro, PORT, Bus/Port Address (eg. ASYN Port).
+# % macro, ADDR, Address on the bus (optional)
+# % macro, TEMPSCAN, SCAN rate for the temperature/voltage readings
+# % macro, TADEL, (optional) - Archive deadband for temperatures
+# % macro, TMDEL, (optional) - Monitor deadband for temperatures
+# % macro, VADEL, (optional) - Archive deadband for voltages
+# % macro, VMDEL, (optional) - Monitor deadband for voltages
+
+
+##
+## Read the temperature on channel $(INDEX) in Kelvin.
+##
+#% archiver 1 Monitor
+record(ai, "$(TNAME)") {
+  alias("$(P):K:$(INDEX)")
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE_POLL")
+  field(DESC, "Channel $(INDEX) Temperature")
+  field(INP, "@lakeshore224.proto getKRDG($(INDEX)) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "K")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"1")
+  field(LOLO,"0")
+  field(ADEL, "$(TADEL=0.1)")
+  field(MDEL, "$(TMDEL=0.01)")
+  info(INTEREST, "HIGH")
+
+}
+
+##
+## Read the temperature on channel $(INDEX) in Celsius.
+##
+record(ai, "$(P):C:$(INDEX)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE_POLL")
+  field(DESC, "Channel $(INDEX) Temperature")
+  field(INP, "@lakeshore224.proto getCRDG($(INDEX)) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "C")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"-274")
+  field(LOLO,"-274")
+  field(ADEL, "$(TADEL=0.1)")
+  field(MDEL, "$(TMDEL=0.01)")
+  info(INTEREST, "HIGH")
+}
+
+##
+## Read the raw voltage on channel $(INDEX).
+##
+#% archiver 1 Monitor
+record(ai, "$(P):V:$(INDEX)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE_POLL")
+  field(DESC, "Channel $(INDEX) Voltage")
+  field(INP, "@lakeshore224.proto getSRDG($(INDEX)) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "V")
+  field(ADEL, "$(VADEL=1)")
+  field(MDEL, "$(VMDEL=1)")
+}
+
+##
+## Set sensor $(INDEX) name
+##
+record(stringout, "$(P):INNAME_SET:$(INDEX)") {
+  field(DESC, "Input $(INDEX) Name")
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE_POLL")
+  field(OUT, "@lakeshore224.proto setINNAME($(INDEX)) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):INNAME:$(INDEX).PROC CA")
+}
+
+##
+## Read input sensor $(INDEX) name
+##
+record(stringin, "$(P):INNAME:$(INDEX)") {
+  field(DTYP, "stream")
+ # field(SDIS, "$(P):DISABLE_POLL")
+  field(INP, "@lakeshore224.proto getINNAME($(INDEX)) $(PORT) $(ADDR)")
+  field(PINI, "YES")
+  field(SCAN, "Passive")
+}

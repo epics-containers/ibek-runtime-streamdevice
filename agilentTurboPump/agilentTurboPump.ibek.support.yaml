@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: agilentTurboPump
+
+entity_models:
+  - name: twisTorr305IC
+    description: |-
+      Agilent TwisTorr 305 turbo pump with integrated controller (IC)
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device prefix 1
+      R:
+        type: str
+        description: |-
+          Device prefix 2
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      DISABLED:
+        type: int
+        description: |-
+          Optional.  Whether to enable EPICS scanning the pump on boot.	0 Enabled, 1 Disabled
+        default: 0
+      COOLING_FAN:
+        type: int
+        description: |-
+          Optional. Whether a cooling fan is mounted on the pump.		0 No fan, 1 Fan present
+        default: 0
+      VENT_VALVE:
+        type: int
+        description: |-
+          Optional. Whether a vent valve is attached to the pump.		0 No valve, 1 Valve present
+        default: 0
+    databases:
+      - file: agilentTwisTorr305-IC.template
+        args:
+          .*:
+  - name: twisTorr305FS
+    description: |-
+      Agilent TwisTorr 305 turbo pump with free-standing controller (FS)
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device prefix 1
+      R:
+        type: str
+        description: |-
+          Device prefix 2
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      DISABLED:
+        type: int
+        description: |-
+          Optional. Whether to enable EPICS scanning the pump on boot.	0 Enabled, 1 Disabled
+        default: 0
+      COOLING_FAN:
+        type: int
+        description: |-
+          Optional. Whether a cooling fan is connected to the controller.	0 No fan, 1 Fan present
+        default: 0
+      VENT_VALVE:
+        type: int
+        description: |-
+          Optional. Whether a vent valve is connected to the controller.	0 No valve, 1 Valve present
+        default: 0
+      GAUGE:
+        type: int
+        description: |-
+          Optional. Wheteher a gauge is connected to the controller.	0 No gauge, 1 Gauge present
+        default: 0
+    databases:
+      - file: agilentTwisTorr305-FS.template
+        args:
+          .*:

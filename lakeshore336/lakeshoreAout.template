@@ -1,0 +1,14 @@
+# record to read heater output for outputs 3 and 4
+# This overwrites the record generated in lakeshore336loop.template
+## 
+## Read the heater output value.
+##
+record(ai, "$(P):HTR$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getAOUT($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "1")
+  field(EGU, "%")
+  field(FLNK, "$(P):MOUT:TRACKCLC$(LOOP)")
+}

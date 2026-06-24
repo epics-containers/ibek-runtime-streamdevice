@@ -1,0 +1,60 @@
+################################################################################################
+# Protocol file for:
+#
+# mks Multi Gas Controller Type 647C
+#
+# Serial configuration: 9600 baud, no parity, 8 data bits, 1 stop bit.
+#
+################################################################################################
+
+Terminator = LF;
+
+LockTimeout = 5000;
+ReplyTimeout = 4000;
+ReadTimeout = 2000;
+ExtraInput = Ignore;
+
+##################
+# Commands
+
+# Select gas menu
+# Cmd: 'GM [0..5]\r' Resp: '[0..5]\r' (1..5 for predefined setup, 0 for manual setup)
+setGM { out "GM %{0|1|2|3|4|5}\r"; in"\r"; }
+
+# Get gas menu selected
+# Cmd: 'GM R\r' Resp: '[0..5]\r' (1..5 for predefined setup, 0 for manual setup)
+# Example response from controller '2\r\n' 
+getGM { out "GM R\r"; in"%{0|1|2|3|4|5}\r"; }
+
+# Get channel actual flow 
+# Cmd: 'FL [1..8]\r' Resp: '[0..1100]\r' (represents 0 to 110.0% to 1 decimal place)
+# Example response from controller '00288\r\n' 
+getFL { out "FL \$1\r"; in "%d\r"; }
+
+# Set channel flow setpoint 
+# Cmd: 'FS [1..8] [0..1100]\r' Resp: '\r' (represents 0 to 110.0% to 1 decimal place)
+setFS { out "FS \$1 %d\r"; in "\r"; }
+
+# get channel flow setpoint 
+# Cmd: 'FS [1..8] R\r' Resp: '[0..1100]\r' (represents 0 to 110.0% to 1 decimal place)
+getFS { out "FS \$1 R\r"; in "%d\r"; }
+
+# Get channel range
+# Cmd: 'RA [1..8] R\r' Resp: '[0..39]\r' (one of 40 possible ranges)
+# Example response from controller '06\r\n' 
+getRA { out "RA \$1 R\r"; in "%d\r"; }
+
+# Set channel on or off
+# Cmd: 'ON [0..8]\r' Resp: '\r' (0->all channels)
+# Cmd: 'OF [0..8]\r' Resp: '\r'
+setON { out "O%{F|N} \$1\r"; in "\r" }
+
+# Get channel status
+# Cmd: 'ST [1..8]\r' Resp: '[0..FFFFH]\r' (returns a bunch of bit flags)
+# Example response from controller '00016\r\n' 
+getST { out "ST \$1\r"; in "%d\r"; }
+
+
+# Get gas correlation factor 
+# Cmd: 'GC [1..8] R\r' Resp: '00059\r\n' (returns percent, 0-100)
+getGC { out "GC \$1 R\r"; in "%d\r"; }

@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: keysightLCR
+
+entity_models:
+  - name: keysightLCR
+    description: |-
+      Keysight LCR meter
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      Q:
+        type: str
+        description: |-
+          Suffix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port)
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters
+    databases:
+      - file: keysightLCR.template
+        args:
+          .*:

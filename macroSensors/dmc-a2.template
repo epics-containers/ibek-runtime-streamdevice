@@ -1,0 +1,112 @@
+# dmc-a2.template
+#
+# Support for the macro sensors dual channel LVDT reader.
+# The raw readings are available in the ':LVDT' PVs.
+# A linear translation function is also applied with the
+# result available in the ':VAL' PCs.
+# Jonathan Thompson, September 2011
+#              revised, October 2012
+#
+# Parameters:
+# P       - Prefix
+# R       - Suffix
+# CHAN    - 1 or 2
+# PORT    - Asyn port
+# ADDR    - Address of device (normally 1)
+# OFF     - Conversion offset
+# GRAD    - Conversion factor
+# EGU     - The engineering units of the translated value
+# PREC    - The desired precision of the translated value
+# ENABLE2 - Enable the second translation
+# OFF2    - Conversion offset for second translation
+# GRAD2   - Conversion factor for second translation
+# EGU2    - The engineering units of the second translated value
+# PREC2   - The desired precision of the second translated value
+# 
+
+# The current reading of the channel
+#% archiver 10 Monitor
+record(ai, "$(P)$(R):LVDT") 
+{
+  field(SCAN, ".1 second")
+  field(DTYP, "stream")
+  field(INP, "@dmc-a2.proto getChan$(CHAN)($(ADDR)) $(PORT)")
+  field(PINI, "YES")
+  field(FLNK, "$(P)$(R):VAL")
+}
+
+# The offset
+#% autosave 1 VAL
+#% archiver 10 Monitor
+record(ao, "$(P)$(R):OFF")
+{
+  field(VAL, "$(OFF)")
+  field(FLNK, "$(P)$(R):VAL")
+}
+
+# The gradient
+#% autosave 1 VAL
+#% archiver 10 Monitor
+record(ao, "$(P)$(R):GRAD")
+{
+  field(VAL, "$(GRAD)")
+  field(FLNK, "$(P)$(R):VAL")
+}
+
+# The calculation
+#% archiver 10 Monitor
+#% autosave 1 EGU
+record(calc, "$(P)$(R):VAL")
+{
+  field(INPA, "$(P)$(R):OFF")
+  field(INPB, "$(P)$(R):GRAD")
+  field(INPC, "$(P)$(R):LVDT")
+  field(CALC, "B*C+A")
+  field(EGU,  "$(EGU)")
+  field(PREC, "$(PREC)")
+}
+
+# Is the second translation active?
+# This record does not actually prevent the calculation
+# but it is used by the GUI to decide whether to show
+# the second translation widgets.
+#% autosave 1 VAL
+#% archiver 10 Monitor
+record(bo, "$(P)$(R):ENABLE2")
+{
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(VAL, "$(ENABLE2)")
+}
+
+# The offset for an optional second translation
+#% autosave 1 VAL
+#% archiver 10 Monitor
+record(ao, "$(P)$(R):OFF2")
+{
+  field(VAL, "$(OFF2)")
+  field(FLNK, "$(P)$(R):VAL2")
+}
+
+# The gradient for an optional second translation
+#% autosave 1 VAL
+#% archiver 10 Monitor
+record(ao, "$(P)$(R):GRAD2")
+{
+  field(VAL, "$(GRAD2)")
+  field(FLNK, "$(P)$(R):VAL2")
+}
+
+# The calculation for an optional second translation
+#% archiver 10 Monitor
+#% autosave 1 EGU
+record(calc, "$(P)$(R):VAL2")
+{
+  field(INPA, "$(P)$(R):OFF2")
+  field(INPB, "$(P)$(R):GRAD2")
+  field(INPC, "$(P)$(R):LVDT")
+  field(CALC, "B*C+A")
+  field(EGU,  "$(EGU2)")
+  field(PREC, "$(PREC2)")
+}
+

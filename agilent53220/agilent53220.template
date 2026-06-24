@@ -1,0 +1,235 @@
+################################
+#
+# Template for Agilent 53220 
+# frequency analyser.
+#
+# Based on Agilent33220A support
+#
+# Matthew Pearson 4 May 2012
+#
+################################
+
+#################################################################################
+# Read records (for frequency parameters)
+
+# % gdatag,template,agilent33220A,$(name=),$(gda_desc=)
+# % gdatag,pv,ro,$(name=),FREQ1RBV
+# % archiver 1 Monitor
+# % autosave 1 LOLO LOW HIGH HIHI
+record(ai, "$(P)$(Q):FREQ1:RBV") {
+  field(DESC, "Freq Readback Chan 1")
+  field(DTYP, "stream")
+  field(INP, "@agilent53220.proto read_float(READ1) $(PORT)")
+  field(PREC, "8")
+  field(EGU, "Hz")
+  field(SCAN, "Passive")
+  field(HHSV, "MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV, "MAJOR")
+  field(VAL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# % gdatag,pv,ro,$(name=),FREQ2RBV
+# % archiver 1 Monitor
+# % autosave 1 LOLO LOW HIGH HIHI
+record(ai, "$(P)$(Q):FREQ2:RBV") {
+  field(DESC, "Freq Readback Chan 2")
+  field(DTYP, "stream")
+  field(INP, "@agilent53220.proto read_float(READ2) $(PORT)")
+  field(PREC, "8")
+  field(EGU, "Hz")
+  field(SCAN, "Passive")
+  field(HHSV, "MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV, "MAJOR")
+  field(VAL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# % gdatag,pv,ro,$(name=),PHASERBV
+# % archiver 1 Monitor
+# % autosave 1 LOLO LOW HIGH HIHI
+record(ai, "$(P)$(Q):PHASE:RBV") {
+  field(DESC, "Chan 1 and 2 Phase")
+  field(DTYP, "stream")
+  field(INP, "@agilent53220.proto read_float(MEAS:PHAS) $(PORT)")
+  field(PREC, "8")
+  field(EGU, "Deg")
+  field(SCAN, "Passive")
+  field(HHSV, "MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV, "MAJOR")
+  field(VAL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+#############################################################################
+
+#############################################################################
+# Set records for the threshold settings
+
+# % gdatag,pv,rw,$(name=),LEVEL1
+# % autosave 1 VAL
+record(ao, "$(P)$(Q):LEVEL1") {
+  field(DESC, "Thres 1 Level Chan 1")
+  field(DTYP, "stream")
+  field(OUT, "@agilent53220.proto write_thresh(1) $(PORT)")
+  field(PREC, "3")
+  field(EGU, "V")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(FLNK, "$(P)$(Q):UPDATE.PROC")
+}
+
+# % gdatag,pv,rw,$(name=),LEVEL2
+# % autosave 1 VAL
+record(ao, "$(P)$(Q):LEVEL2") {
+  field(DESC, "Thres 1 Level Chan 2")
+  field(DTYP, "stream")
+  field(OUT, "@agilent53220.proto write_thresh(2) $(PORT)")
+  field(PREC, "3")
+  field(EGU, "V")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(FLNK, "$(P)$(Q):UPDATE.PROC")
+}
+
+#% gdatag,mbbinary,rw,$(name=),AUTOLEVEL1
+record(mbbo, "$(P)$(Q):AUTOLEVEL1") {
+  field(DESC, "Set autolevel for chan1")
+  field(DTYP, "stream")
+  field(OUT, "@agilent53220.proto write_int(INP1:LEV1:AUTO) $(PORT)")
+  field(ZRST, "OFF")
+  field(ONST, "ON")                                         
+  field(ZRVL, "0")
+  field(ONVL, "1")                                    
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(FLNK, "$(P)$(Q):UPDATE.PROC")
+}
+
+#% gdatag,mbbinary,rw,$(name=),AUTOLEVEL2
+record(mbbo, "$(P)$(Q):AUTOLEVEL2") {
+  field(DESC, "Set autolevel for chan2")
+  field(DTYP, "stream")
+  field(OUT, "@agilent53220.proto write_int(INP2:LEV1:AUTO) $(PORT)")
+  field(ZRST, "OFF")
+  field(ONST, "ON")                                         
+  field(ZRVL, "0")
+  field(ONVL, "1")                                    
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(FLNK, "$(P)$(Q):UPDATE.PROC")
+}
+
+#################################################################################
+# Read records (for the non-frequency parameters)
+
+record(bo, "$(P)$(Q):UPDATE_PROC") {
+  field(DESC, "Process update")
+  field(VAL, "1")
+  field(OUT, "$(P)$(Q):UPDATE.PROC")
+  field(SCAN, "2 second")
+}
+
+# Seq record to update non-freq parameters.
+# % autosave 1 SCAN
+record(seq, "$(P)$(Q):UPDATE") {
+  field(DESC, "Update Params")
+  field(DOL1, "1")
+  field(DOL2, "1")
+  field(DOL3, "1")
+  field(DOL4, "1")
+  field(LNK1, "$(P)$(Q):LEVEL1:RBV.PROC")
+  field(LNK2, "$(P)$(Q):LEVEL2:RBV.PROC")
+  field(LNK3, "$(P)$(Q):AUTOLEVEL1:RBV.PROC")
+  field(LNK4, "$(P)$(Q):AUTOLEVEL2:RBV.PROC")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+}
+
+
+# % gdatag,pv,ro,$(name=),LEVEL1RBV
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):LEVEL1:RBV") {
+  field(DESC, "Thres 1 Level Chan 1")
+  field(DTYP, "stream")
+  field(INP, "@agilent53220.proto read_float(INP1:LEV1) $(PORT)")
+  field(PREC, "3")
+  field(EGU, "V")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# % gdatag,pv,ro,$(name=),LEVEL2RBV
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):LEVEL2:RBV") {
+  field(DESC, "Thres 1 Level Chan 2")
+  field(DTYP, "stream")
+  field(INP, "@agilent53220.proto read_float(INP2:LEV1) $(PORT)")
+  field(PREC, "3")
+  field(EGU, "V")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# % gdatag,mbbinary,ro,$(name=),AUTOLEVEL1RBV
+# % archiver 10 Monitor
+record(mbbi, "$(P)$(Q):AUTOLEVEL1:RBV") {
+  field(DESC, "Auto level for chan 1")
+  field(DTYP, "stream")
+  field(INP, "@agilent53220.proto read_int(INP1:LEV1:AUTO) $(PORT)")
+  field(ZRST, "OFF")
+  field(ONST, "ON")                                          
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# % gdatag,mbbinary,ro,$(name=),AUTOLEVEL2RBV
+# % archiver 10 Monitor
+record(mbbi, "$(P)$(Q):AUTOLEVEL2:RBV") {
+  field(DESC, "Auto level for chan 2")
+  field(DTYP, "stream")
+  field(INP, "@agilent53220.proto read_int(INP2:LEV1:AUTO) $(PORT)")
+  field(ZRST, "OFF")
+  field(ONST, "ON")                                          
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+######################################################################################
+
+######################################################################################
+# Read ID string every 10s to check comms.
+
+record(waveform, "$(P)$(Q):IDN:RBV") {
+  field(DESC, "Agilent Device ID")
+  field(DTYP, "stream")
+  field(INP, "@agilent53220.proto read_string(*IDN) $(PORT)")
+  field(SCAN, "10 second")
+  field(PINI, "YES")
+  field(FTVL, "CHAR")
+  field(NELM, "256")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+#####################################################################################
+
+record(bo, "$(P)$(Q):DISABLE") {
+  field(DESC, "Disable comms")
+  field(VAL, "1")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+record(asyn, "$(P)$(Q):ASYN") {
+  field(PORT, "$(PORT)")
+  field(OEOS, "\n")
+  field(IEOS, "\n")  
+}
+

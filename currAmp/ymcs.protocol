@@ -1,0 +1,57 @@
+# This file covers the stream device protocols for both types
+# of current amplifiers (ymcs0012 and ymcs0009)
+# Original author: Igor Verstovsek (Cosylab)
+# Additional authors: Denis Ivanic, Rok Sabjan (Cosylab)
+# Last change: 2005-07-28
+#
+# Changelog:
+# 2005-07-28 (rs): Additional function added for ymcs0009
+
+InTerminator = LF;
+OutTerminator = LF;
+replytimeout = 1000;
+readtimeout  = 1000;
+locktimeout = 60000;
+
+# Reset the device
+reset { out "*RST\$1"; in "\6"; InTerminator = ""; }
+
+# Read as a long in the range [0..2^20=1048576]
+readCurr { out ":READ\$1:CURR\$2?"; in "\6%d"; }
+
+# Read as a double
+readPos { out ":READ\$1:POS\$2?"; in "\6%f"; }
+
+# Read range number
+readRang {out ":CONF\$1:CURR:RANG?"; in "\6%d"; }
+setRang {out ":CONF\$1:CURR:RANG %d"; in "\6"; InTerminator = "";
+	@init {out ":CONF\$1:CURR:RANG?"; in "\6%d" LF; }
+	}
+
+# Gain parameters
+readGL {out ":CONF\$1:\$2?"; in "\6%d"; }
+setGL  {out ":CONF\$1:\$2 %d"; in "\6"; InTerminator = ""; 
+	@init {out ":CONF\$1:\$2?"; in "\6%d" LF; }
+	}
+
+readGF {out ":CONF\$1:\$2?"; in "\6%f"; }
+setGF  {out ":CONF\$1:\$2 %f"; in "\6"; InTerminator = ""; 
+	@init {out ":CONF\$1:\$2?"; in "\6%f" LF; }
+	}
+
+# Averaging and filtering
+readMode {out ":CONF\$1:MODE?"; in "\6%d"; }
+setSingle { out ":CONF\$1:SINGLE"; in "\6"; InTerminator = ""; }
+setAvg {out ":CONF\$1:AVGCURR %d"; in "\6"; InTerminator = ""; }
+setWdw {out ":CONF\$1:WDWCURR %d"; in "\6"; InTerminator = ""; }
+
+# Reading and setting the high voltage (ymcs0009 only)
+
+setHV { out ":CONF\$1:VOLT %d"; InTerminator = "";
+        @init { out ":CONF\$1:VOLT?"; in "\6%d" LF; }
+	}
+getHV { out ":CONF\$1:VOLT?"; in "\6%d"; }
+
+# Reading the channels for reading a-d values (ymcs0009 only)
+getChannel { out ":READ\$1:\$2?"; in "\6%s"; }
+

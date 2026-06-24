@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: SierraInstMassFlowMeters
+
+entity_models:
+  - name: SierraInstMassFlowMeters
+    description: |-
+      Sierra Instruments mass flow meter / controller support.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix 1
+      Q:
+        type: str
+        description: |-
+          Device PV prefix 2
+      PORT:
+        type: str
+        description: |-
+          Asyn port name for connection with device
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: SierraInstMassFlowMeters.template
+        args:
+          .*:

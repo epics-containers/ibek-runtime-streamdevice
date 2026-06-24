@@ -1,0 +1,283 @@
+# dlsCAENels_group.template
+#
+# This is the intermediate-level template representing a group of channels on a
+# CAENels HV-Adaptos power supply. It defines those records that are instantiated
+# once per channel group.
+#
+# 2015 - Nicoletta De Maio
+#
+
+# Parameters:
+# % macro,  P,       EPICS name prefix
+# % macro,  GR,      Channel group number
+# % macro,  PORT,    asyn port
+# % macro,  BUSYIN,  letter indicating the input link on a calc record
+# % macro,  name,    object and gui association name
+# % gui, $(name=), edm, dlsCAENels.edl, P=$(P),GR=$(GR)
+
+# A record to show the current status of the group: states are 0 = "Idle" and
+# 1 = "Busy"
+record(bi, "$(P):GROUP$(GR):STATUS") {
+    field(DESC, "current status of the group")
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto grGetBinInp($(P),$(GR),STATUS) $(PORT)")
+    field(ZNAM, "Idle")
+    field(ONAM, "Busy")
+    field(FLNK, "$(P):GROUP$(GR):STATUSREDIR PP")
+}
+
+# A re-direction record that sends the status on to the busy record
+record(bo, "$(P):GROUP$(GR):STATUSREDIR") {
+    field(DESC, "redirect status flag")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(P):GROUP$(GR):STATUS")
+    field(OUT, "$(P):BUSYCALC.$(BUSYIN) PP")
+}
+
+# A record to set the operating mode of the group: defined values are 0 = "HI"
+# (high-resolution), 1 = "NORMAL" and 2 = "FAST"
+record(mbbo, "$(P):GROUP$(GR):MODE") {
+    field(DESC, "demand op mode for group")
+    field(DTYP, "stream")
+    field(OUT, "@dlsCAENels.proto grSetMode($(P),$(GR)) $(PORT)")
+    field(ZRST, "HI")
+    field(ONST, "NORMAL")
+    field(TWST, "FAST")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# A record to read back the current operating mode of the group: should read
+# one of "HI", "NORMAL" or "FAST"
+record(stringin, "$(P):GROUP$(GR):MODE_RBV") {
+    field(DESC, "group op mode readback")
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto grGetMode($(P),$(GR)) $(PORT)")
+}
+
+# A record to retrieve the last error status of the group: should read either
+# 0 = "NO ERROR" or 1 = "ERROR/ALARM"
+record(bi, "$(P):GROUP$(GR):LASTERROR") {
+    field(DESC, "most recent response")
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto grGetBinInp($(P),$(GR),ERR) $(PORT)")
+    field(ZNAM, "NO ERROR")
+    field(ONAM, "ERROR/ALARM")
+}
+
+# Resets the alarm condition for the group
+record(bo, "$(P):GROUP$(GR):RESETERROR") {
+    field(DESC, "reset last error")
+    field(DTYP, "stream")
+    field(OUT, "@dlsCAENels.proto grSetCmd($(P),$(GR),RESETERR) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# Turns all channels in the group on
+record(bo, "$(P):GROUP$(GR):ALLON") {
+    field(DESC, "turn all channels on")
+    field(DTYP, "stream")
+    field(OUT, "@dlsCAENels.proto grOnOff($(P),$(GR),ON) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# Turns all channels in the group off
+record(bo, "$(P):GROUP$(GR):ALLOFF") {
+    field(DESC, "turn all channels off")
+    field(DTYP, "stream")
+    field(OUT, "@dlsCAENels.proto grOnOff($(P),$(GR),OFF) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# Sets the demand voltage for all channels in the group (absolute value)
+record(ao, "$(P):GROUP$(GR):VOUT") {
+    field(DESC, "voltage for group (absolute value)")
+    field(DTYP, "stream")
+    field(OUT, "@dlsCAENels.proto grSetV($(P),$(GR),VOLT) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# Sets the target voltage for all channels in the group (absolute values)
+record(bo, "$(P):GROUP$(GR):TARGET") {
+    field(DESC, "target for group (absolute values)")
+    field(DTYP, "stream")
+    field(OUT, "@dlsCAENels.proto grSetCmd($(P),$(GR),ALLTRGT) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# Shifts the demand voltage for all channels in the group (relative value)
+record(ao, "$(P):GROUP$(GR):SHIFT") {
+    field(DESC, "shift for group (relative value)")
+    field(DTYP, "stream")
+    field(OUT, "@dlsCAENels.proto grSetV($(P),$(GR),SHIFT) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# A record to read back the board temperatures of the group
+record(stringin, "$(P):GROUP$(GR):TEMPS") {
+    field(DESC, "board temperatures")
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto grGetTemp($(P),$(GR)) $(PORT)")
+}
+
+# A record to retrieve the number of channels within the group
+record(ai, "$(P):GROUP$(GR):CHANNELS") {
+    field(DESC, "number of channels in group")
+    field(DTYP, "stream")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto grGetChs($(P),$(GR)) $(PORT)")
+}
+
+# TARGET APPLY TO BOTH MIRRORS
+record(seq, "$(P):TRGTAPPLY") {
+    field(SCAN, "Passive")
+    field(SELM, "All")
+    field(DLY1, "0.0")
+    field(DOL1, "1")
+    field(LNK1, "$(P):GROUP0:TARGETAPPLY.PROC")
+    field(DLY2, "1")
+    field(DOL2, "1")
+    field(LNK2, "$(P):GROUP1:TARGETAPPLY.PROC")
+}
+
+record(waveform, "$(P):GROUP$(GR):TARGETLISTCMD") {
+    field(DTYP, "stream")
+    field(FTVL, "STRING")
+    field(NELM, "10")
+    field(INP, "@dlsCAENels.proto grGetTL($(P),$(GR)) $(PORT)")
+}
+
+record(mbbo, "$(P):GROUP$(GR):TARGETC") {
+    field(ZRST, "empty")
+    field(ONST, "empty")
+    field(TWST, "empty")
+    field(THST, "empty")
+    field(FRST, "empty")
+    field(FVST, "empty")
+    field(SXST, "empty")
+    field(SVST, "empty")
+}
+
+record(stringout, "$(P):GROUP$(GR):TARGETAPPLY") {
+    field(DTYP, "stream")
+    field(OMSL, "closed_loop")
+    field(DOL,  "$(P):GROUP$(GR):TARGETC")
+    field(OUT,  "@dlsCAENels.proto grSetTrgt($(P),$(GR)) $(PORT)")
+}
+
+record(genSub, "$(P):GROUP$(GR):TARGETWIPE") {
+    field(SNAM, "wipeStates")
+    field(NOA,  "1")
+    field(FTA,  "STRING")
+    field(OUTA, "$(P):GROUP$(GR):TARGETC.ZRST")
+    field(NOB,  "1")
+    field(FTB,  "STRING")
+    field(OUTB, "$(P):GROUP$(GR):TARGETC.ONST")
+    field(NOC,  "1")
+    field(FTC,  "STRING")
+    field(OUTC, "$(P):GROUP$(GR):TARGETC.TWST")
+    field(NOD,  "1")
+    field(FTD,  "STRING")
+    field(OUTD, "$(P):GROUP$(GR):TARGETC.THST")
+    field(NOE,  "1")
+    field(FTE,  "STRING")
+    field(OUTE, "$(P):GROUP$(GR):TARGETC.FRST")
+    field(NOF,  "1")
+    field(FTF,  "STRING")
+    field(OUTF, "$(P):GROUP$(GR):TARGETC.FVST")
+    field(NOG,  "1")
+    field(FTG,  "STRING")
+    field(OUTG, "$(P):GROUP$(GR):TARGETC.SXST")
+    field(NOH,  "1")
+    field(FTH,  "STRING")
+    field(OUTH, "$(P):GROUP$(GR):TARGETC.SVST")
+}
+
+# CREEP KILLER APPLY TO BOTH MIRRORS
+record(seq, "$(P):KILLERAPPLY") {
+    field(SCAN, "Passive")
+    field(SELM, "All")
+    field(DLY1, "0")
+    field(DOL1, "1")
+    field(LNK1, "$(P):GROUP0:KILLERAPPLY.PROC")
+    field(DLY2, "1")
+    field(DOL2, "1")
+    field(LNK2, "$(P):GROUP1:KILLERAPPLY.PROC")
+}
+
+# CREEP KILLER STOP TO BOTH MIRRORS
+record(seq, "$(P):KILLERSTOP") {
+    field(SCAN, "Passive")
+    field(SELM, "All")
+    field(DLY1, "0")
+    field(DOL1, "1")
+    field(LNK1, "$(P):GROUP0:KILLERSTOP.PROC")
+    field(DLY2, "1")
+    field(DOL2, "1")
+    field(LNK2, "$(P):GROUP1:KILLERSTOP.PROC")
+}
+
+record(waveform, "$(P):GROUP$(GR):KILLERLISTCMD") {
+    field(DTYP, "stream")
+    field(FTVL, "STRING")
+    field(NELM, "10")
+    field(INP, "@dlsCAENels.proto grGetKL($(P),$(GR)) $(PORT)")
+}
+
+record(mbbo, "$(P):GROUP$(GR):KILLERC") {
+    field(ZRST, "empty")
+    field(ONST, "empty")
+    field(TWST, "empty")
+    field(THST, "empty")
+    field(FRST, "empty")
+    field(FVST, "empty")
+    field(SXST, "empty")
+    field(SVST, "empty")
+}
+
+record(stringout, "$(P):GROUP$(GR):KILLERAPPLY") {
+    field(DTYP, "stream")
+    field(OMSL, "closed_loop")
+    field(DOL,  "$(P):GROUP$(GR):KILLERC")
+    field(OUT,  "@dlsCAENels.proto grSetKiller($(P),$(GR)) $(PORT)")
+}
+
+record(stringout, "$(P):GROUP$(GR):KILLERSTOP") {
+    field(DTYP, "stream")
+    field(OUT,  "@dlsCAENels.proto grStopKiller($(P),$(GR)) $(PORT)")
+}
+
+record(genSub, "$(P):GROUP$(GR):KILLERWIPE") {
+    field(SNAM, "wipeStates")
+    field(NOA,  "1")
+    field(FTA,  "STRING")
+    field(OUTA, "$(P):GROUP$(GR):KILLERC.ZRST")
+    field(NOB,  "1")
+    field(FTB,  "STRING")
+    field(OUTB, "$(P):GROUP$(GR):KILLERC.ONST")
+    field(NOC,  "1")
+    field(FTC,  "STRING")
+    field(OUTC, "$(P):GROUP$(GR):KILLERC.TWST")
+    field(NOD,  "1")
+    field(FTD,  "STRING")
+    field(OUTD, "$(P):GROUP$(GR):KILLERC.THST")
+    field(NOE,  "1")
+    field(FTE,  "STRING")
+    field(OUTE, "$(P):GROUP$(GR):KILLERC.FRST")
+    field(NOF,  "1")
+    field(FTF,  "STRING")
+    field(OUTF, "$(P):GROUP$(GR):KILLERC.FVST")
+    field(NOG,  "1")
+    field(FTG,  "STRING")
+    field(OUTG, "$(P):GROUP$(GR):KILLERC.SXST")
+    field(NOH,  "1")
+    field(FTH,  "STRING")
+    field(OUTH, "$(P):GROUP$(GR):KILLERC.SVST")
+}

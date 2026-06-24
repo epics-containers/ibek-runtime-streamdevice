@@ -1,0 +1,72 @@
+################################################################################################
+# Protocol file for:
+#
+# Alicat P PC PCR PCD PC3 series digital pressure and vacuum gauge controllers
+#
+################################################################################################
+
+Terminator = CR;
+
+LockTimeout = 3000;
+ReplyTimeout = 5000;
+ReadTimeout = 5000;
+ExtraInput = Ignore;
+
+
+##################
+# generic commands
+
+# get data command
+# e.g. cmd: 'A<cr>' Resp: 'A +014.60 011.72<cr>' (i.e. actualPressure requiredPressure)
+#                or Resp: 'A +014.60 011.72 HLD<cr>' (if in hold mode)
+# NB *@=A -> set unit address to 'A'
+
+recv = "\$1 %f %(\$2.VAL)f";
+
+getData 
+{
+	out "\$1";
+	in $recv;
+	@init { out "*@=\$1"; in $recv; }
+}
+
+recv = "\$1 %*f %*f";
+getDataMode
+{
+    out "\$1";
+    in "\$1 %39c";
+}
+
+
+##################
+# Controller only command
+
+# Read register
+# e.g. AR22 - address unit A and read register 22
+#      Read proportional gain Cmd: '*R21<cr>' Resp: 'A  021 = 65000<cr> (max 65535)
+#      Read differential gain Cmd: '*R22<cr>' Resp: 'A  022 = 05000<cr> (max 65535)
+#getReg { out "*R\$2"; in "\$1 0\$2 =%u"; }
+getReg { out "*R\$2"; in "\$1 %*d = %u"; }
+
+# Set Register
+# e.g. set proportional gain Cmd: '*W21=600<cr>' Resp: 'A  021 = 600<cr>' (max 65535)
+#      set differential gain Cmd: '*W22=100<cr>' Resp: 'A  022 = 100<cr>' (max 65535)
+setReg { out "*W\$2=%u"; in "\$1"; }
+
+# Set pressure
+# 0-65535 where 64000 = full scale (so can go a little over)
+# e.g. Cmd: 'A64000<cr>" Resp: 'A +014.60 011.72[ HLD]<cr>'
+setPress { out "\$1%u"; in "\$1"; }
+
+# Set Mode
+# e.g. Set hold mode Cmd: 'A$$H<cr>' Resp: 'A +014.60 030.00 HLD<cr>'
+#      Set control mode Cmd: 'A$$C<cr>' Resp: 'A +014.60 030.00<cr>'
+setMode { out "%{A$$C|A$$H}"; in "\$1"; }
+ 
+##################
+# Gauge only commands
+
+# Tare (set zero) - gauges only - ***not tested***
+# e.g. Cmd: 'A$$P<cr>' Resp: ???
+#setTare { out "\$1$$P"; }
+

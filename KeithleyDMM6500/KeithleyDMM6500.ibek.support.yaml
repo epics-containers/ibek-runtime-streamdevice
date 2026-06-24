@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: KeithleyDMM6500
+
+entity_models:
+  - name: dmm6500
+    description: |-
+      Device to control Keithley DMM6500 Multimeter
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device prefix 1
+      R:
+        type: str
+        description: |-
+          Device prefix 2
+      PORT:
+        type: str
+        description: |-
+          Asyn PORT name
+    databases:
+      - file: dmm6500.template
+        args:
+          .*:

@@ -1,0 +1,234 @@
+# gen3300w.template
+#
+# A template for the TDK Lambda 3300W power supply
+#
+# 2016 - Jonathan Thompson
+#
+
+# Parameters:
+# % macro,  P,       EPICS name prefix
+# % macro,  PORT,    asyn port
+# % macro,  CMDSET,  Command set: use 'R' for RS232(default) or 'S' for SCPI(Ethernet)
+# % macro,  name,    object and gui association name
+
+# % gui, $(name=), edm, gen3300w-full.edl, P=$(P)
+# % gui, $(name=), edmembed, gen3300w-embed.edl, P=$(P)
+
+# The device model
+record(stringin, "$(P):MODEL") {
+    field(DESC, "Device model")
+    field(DTYP, "stream")
+    field(SCAN, "10 second")
+    field(INP,  "@gen3300w.proto getIdentity$(CMDSET=R) $(PORT)")
+    field(FLNK, "$(P):SWVERSION")
+}
+
+# The software version
+record(stringin, "$(P):SWVERSION") {
+    field(DESC, "Software version")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(INP,  "@gen3300w.proto getSwVersion$(CMDSET=R) $(PORT)")
+    field(FLNK, "$(P):SERIALNUMBER")
+}
+
+# The serial number
+record(stringin, "$(P):SERIALNUMBER") {
+    field(DESC, "Serial number")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(INP,  "@gen3300w.proto getSerialNumber$(CMDSET=R) $(PORT)")
+    field(FLNK, "$(P):TESTDATE")
+}
+
+# The date the device was last tested
+record(stringin, "$(P):TESTDATE") {
+    field(DESC, "Test date")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(INP,  "@gen3300w.proto getLastTestDate$(CMDSET=R) $(PORT)")
+}
+
+# The demand voltage
+record(ao, "$(P):DEMAND:VOLTAGE") {
+    field(DESC, "Demand Voltage")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@gen3300w.proto setDemandVoltage$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "V")
+    field(PINI, "1")
+}
+record(ai, "$(P):DEMAND:VOLTAGE_RBV") {
+    field(DESC, "Demand voltage read back")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getDemandVoltage$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "V")
+}
+ 
+# The demand current
+record(ao, "$(P):DEMAND:CURRENT") {
+    field(DESC, "Demand Current")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@gen3300w.proto setDemandCurrent$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "A")
+    field(PINI, "1")
+}
+record(ai, "$(P):DEMAND:CURRENT_RBV") {
+    field(DESC, "Demand current read back")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getDemandCurrent$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "A")
+}
+
+# Actual voltage
+record(ai, "$(P):ACTUAL:VOLTAGE") {
+    field(DESC, "Actual voltage")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getActualVoltage$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "V")
+}
+
+# Actual current
+record(ai, "$(P):ACTUAL:CURRENT") {
+    field(DESC, "Actual current")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getActualCurrent$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "A")
+}
+
+# Output state
+record(bo, "$(P):OUTPUT") {
+    field(DESC, "Output state")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@gen3300w.proto setOutputState$(CMDSET=R) $(PORT)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(PINI, "1")
+}
+record(bi, "$(P):OUTPUT_RBV") {
+    field(DESC, "Output state")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getOutputState$(CMDSET=R) $(PORT)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+
+# Foldback protection
+record(bo, "$(P):FOLDBACK") {
+    field(DESC, "Foldback protection")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@gen3300w.proto setFoldbackProtection$(CMDSET=R) $(PORT)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(PINI, "1")
+}
+record(bi, "$(P):FOLDBACK_RBV") {
+    field(DESC, "Output state")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getFoldbackProtection$(CMDSET=R) $(PORT)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+
+# Over voltage protection limit
+record(ao, "$(P):OVER:VOLTAGE:PROT") {
+    field(DESC, "Over Voltage Protection Limit")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@gen3300w.proto setOverVoltageProtection$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "V")
+    field(PINI, "1")
+}
+record(ai, "$(P):OVER:VOLTAGE:PROT_RBV") {
+    field(DESC, "Under voltage Protection limit")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getOverVoltageProtection$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "V")
+}
+
+# Undervoltage limit
+record(ao, "$(P):UNDER:VOLTAGE") {
+    field(DESC, "Under Voltage Limit")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@gen3300w.proto setUnderVoltageLimit$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "V")
+    field(PINI, "1")
+}
+record(ai, "$(P):UNDER:VOLTAGE_RBV") {
+    field(DESC, "Under voltage limit")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getUnderVoltageLimit$(CMDSET=R) $(PORT)")
+    field(PREC, "4")
+    field(EGU, "V")
+}
+
+# Autorestart mode
+record(bo, "$(P):AUTO:RESTART") {
+    field(DESC, "Auto restart mode")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@gen3300w.proto setAutoRestartMode$(CMDSET=R) $(PORT)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(PINI, "1")
+}
+record(bi, "$(P):AUTO:RESTART_RBV") {
+    field(DESC, "Auto restart mode")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getAutoRestartMode$(CMDSET=R) $(PORT)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+
+# Current operating mode
+record(mbbi, "$(P):MODE") {
+    field(DESC, "Operating mode")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getOperatingMode$(CMDSET=R) $(PORT)")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(ZRST, "Off")
+    field(ONST, "Voltage")
+    field(TWST, "Current")
+}
+
+# Set the address
+record(longout, "$(P):SETADDRESS") {
+    field(VAL, "6")
+    field(DESC, "Set the device address")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@gen3300w.proto onConnect$(CMDSET=R) $(PORT)")
+    field(PINI, "1")
+}
+
+record(mbbiDirect, "$(P):FAULT:EVENT:REG") {
+    field(DESC, "Read fault reg")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@gen3300w.proto getFaultEventReg$(CMDSET=R) $(PORT)")
+}

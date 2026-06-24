@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: ttiCPX
+
+entity_models:
+  - name: ttiCPX
+    description: |-
+      TTi CPX Power Supply
+    parameters:
+      P:
+        type: str
+        description: |-
+          The prefix name
+      PORT:
+        type: str
+        description: |-
+          The asyn port
+      device:
+        type: str
+        description: |-
+          device name
+    databases:
+      - file: ttiCPX_general.template
+        args:
+          .*:

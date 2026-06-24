@@ -1,0 +1,131 @@
+## 
+## \file azuraV2-1S.template 
+## \brief Template to communicate with Knauer Azura V 2.1S valve drive
+## \details Requires an instance of connectionManagement.template to manage connection and polling
+##
+##
+##
+## \author Andrew Wilson
+##
+
+# % macro, P, Device prefix
+# % macro, R, Device suffix
+# % macro, PORT, Asyn Port for communication with device
+# % macro, name, object and gui association name
+# # gui, $(name=), edm, azuraV2-1S.edl, device=$(P)$(R)
+# % gui, $(name=), boydetail, knauerApp_opi/azuraV2-1S.opi, device=$(device),valve=$(valve)
+
+
+######
+# Interface for connectionManagement.templaate
+######
+## \brief Poll the device.
+## \details Scanning controlled in connectionManagement.template
+record(seq, "$(P)$(R):POLL"){
+	field(DESC, "Records polled regularly")
+    field(DO1, "1")
+    field(LNK1, "$(P)$(R):IDENTIFY.PROC")
+    field(DLY2, "0.5")
+    field(DO2, "1")
+    field(LNK2, "$(P)$(R):GETPOSITION.PROC")
+}
+record(seq, "$(P)$(R):INIT"){
+	field(DESC, "Actions on connection startup")
+# Do nothing for now
+}
+record(longout, "$(P)$(R):HEALTH"){
+	field(DESC, "Reflect health of connection")
+	field(DOL, "$(P)$(R):IDENTIFY.SEVR NPP")
+	field(OMSL, "closed_loop")
+}
+######
+
+record(bo, "$(P)$(R):IDENTIFY"){
+    field(DESC, "Ping device")
+	field(DTYP, "stream")
+	field(OUT, "@azuraV2-1S.proto identify($(P)$(R)) $(PORT)")
+    field(VAL, "0")
+}
+record(stringin, "$(P)$(R):VALVETYPE"){
+	field(DESC, "Valve type")
+}
+record(stringin, "$(P)$(R):SERIALNUM"){
+	field(DESC, "Instrument serial number")
+	field(VAL, "( Unknown )")
+}
+record(stringin, "$(P)$(R):FWAREVHI"){
+    field(DESC, "Firmware version high component")
+	field(VAL, "( Unknown )")
+}
+record(stringin, "$(P)$(R):FWAREVLOW"){
+    field(DESC, "Firmware version low component")
+	field(VAL, "( Unknown )")
+}
+record(longout, "$(P)$(R):GOTO"){
+    field(DESC, "Go to numbered position")
+	field(DRVL, "1")
+	field(DRVH, "6")
+	field(DTYP, "stream")
+	field(OUT, "@azuraV2-1S.proto goTo($(P)$(R)) $(PORT)")
+}
+record(bo, "$(P)$(R):HOME"){
+   	field(DESC, "Go to home position")
+	field(DTYP, "stream")
+	field(OUT, "@azuraV2-1S.proto home($(P)$(R)) $(PORT)")
+}
+record(longin, "$(P)$(R):GETPOSITION"){
+   	field(DESC, "Get current position")
+	field(DTYP, "stream")
+	field(INP, "@azuraV2-1S.proto currentPosition($(P)$(R)) $(PORT)")
+	field(FLNK, "$(P)$(R):GEPOSITION:CALC PP")
+}
+record(mbbo, "$(P)$(R):POSMENU"){
+	field(DESC, "Select an output stream")
+	field(VAL, "0")
+	field(ZRVL, "1")
+	field(ZRST, "1")
+	field(ONVL, "2")
+	field(ONST, "2")
+	field(TWVL, "3")
+	field(TWST, "3")
+	field(THVL, "4")
+	field(THST, "4")
+	field(FRVL, "5")
+	field(FRST, "5")
+	field(FVVL, "6")
+	field(FVST, "6")
+	field(FLNK, "$(P)$(R):GOTO:CALC PP")
+}
+record(calcout, "$(P)$(R):GOTO:CALC") {
+	field(DESC, "Convert menu index to position")
+	field(INPA, "$(P)$(R):POSMENU NPP")
+	field(CALC, "A+1")
+	field(OOPT, "Every Time")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):GOTO PP")
+}
+record(calcout, "$(P)$(R):GEPOSITION:CALC") {
+	field(DESC, "Convert position to menu index")
+	field(INPA, "$(P)$(R):GETPOSITION NPP")
+	field(CALC, "A-1")
+	field(OOPT, "Every Time")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):POSMENU:RBV PP")
+}
+
+record(mbbi, "$(P)$(R):POSMENU:RBV"){
+	field(DESC, "Output stream feedback")
+	field(ZRVL, "1")
+	field(ZRST, "1")
+	field(ONVL, "2")
+	field(ONST, "2")
+	field(TWVL, "3")
+	field(TWST, "3")
+	field(THVL, "4")
+	field(THST, "4")
+	field(FRVL, "5")
+	field(FRST, "5")
+	field(FVVL, "6")
+	field(FVST, "6")
+	field(INP, "$(P)$(R):GETPOSITION:CALC NPP")
+}

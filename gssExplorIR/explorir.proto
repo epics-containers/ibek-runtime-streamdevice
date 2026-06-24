@@ -1,0 +1,31 @@
+###############################################################################
+# Protocol file for:
+#
+# GSS ExplorIR-M-100 C02 Sensor
+#
+# Serial Specs: 9600 baud, 8-bit data, 1 stop bit, Parity None
+# ASCII
+#
+###############################################################################
+
+InTerminator = "\r\n";
+OutTerminator = "\r\n";
+ReplyTimeout = 1000;
+ReadTimeout = 1000;
+
+read {
+    out "\$1";
+    in "%*[ .a-zA-Z ]%5d";
+}
+
+write_get_rbv {
+    out "\$1";
+    in "%*[ .a-zA-Z ]%(\$2.VAL)d";
+    ExtraInput = Ignore
+}
+
+write_value_get_rbv {
+    out "\$1 %(\$2.VAL)d";
+    in "%*[ .a-zA-Z ]%(\$2_RBV.VAL)d";
+    ExtraInput = Ignore
+}

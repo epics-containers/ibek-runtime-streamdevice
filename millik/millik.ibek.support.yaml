@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: millik
+
+entity_models:
+  - name: millik
+    description: |-
+      milliK precision temperature measurement device
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      R:
+        type: str
+        description: |-
+          Device Suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port name
+      PREC:
+        type: int
+        description: |-
+          Precision. Default is 4
+        default: 4
+    databases:
+      - file: millik.template
+        args:
+          .*:

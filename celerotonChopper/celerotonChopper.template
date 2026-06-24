@@ -1,0 +1,532 @@
+# % macro, P,      PV name prefix
+# % macro, Q,      PV name suffix
+# % macro, PORT,   asyn port
+
+# % gui, $(name=), edm, celerotonChopper.edl, P=$(P),Q=$(Q)
+
+
+# ==========================================================
+# CONTROL SIGNALS (START/STOP)
+# ==========================================================
+
+record(bo, "$(P)$(Q):START")
+{
+    field(DESC, "Chopper start")
+    field(DTYP, "stream")
+    field(ZNAM, "0")
+    field(ONAM, "1")
+    field(OUT, "@celerotonChopper.proto start $(PORT)")
+}
+
+record(bo, "$(P)$(Q):STOP")
+{
+    field(DESC, "Chopper stop")
+    field(DTYP, "stream")
+    field(ZNAM, "0")
+    field(ONAM, "1")
+    field(OUT, "@celerotonChopper.proto stop $(PORT)")
+}
+
+record(ai, "$(P)$(Q):GET_STATUS")
+{
+    field(DESC, "Get Status")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@celerotonChopper.proto getStatus($(P)$(Q)) $(PORT)")
+}
+
+record(longin, "$(P)$(Q):ERROR_CODE_1")
+{
+    field(DESC, "Error Code 1")
+    field(DTYP, "Soft Channel")
+}
+
+record(longin, "$(P)$(Q):ERROR_CODE_2")
+{
+    field(DESC, "Error Code 2")
+    field(DTYP, "Soft Channel")
+}
+
+record(calc, "$(P)$(Q):ERROR_CODE")
+{
+    field(DESC, "Bitwise sum of both error codes")
+    field(CALC, "A|B")
+    field(SCAN, "1 second")
+    field(INPA, "$(P)$(Q):ERROR_CODE_1")
+    field(INPB, "$(P)$(Q):ERROR_CODE_2")
+}
+
+
+record(longin, "$(P)$(Q):WARNING_CODE")
+{
+    field(DESC, "Warning code")
+    field(DTYP, "Soft Channel")
+}
+
+record(longin, "$(P)$(Q):INFO_CODE")
+{
+    field(DESC, "Info code")
+    field(DTYP, "Soft Channel")
+}
+
+
+record(bo, "$(P)$(Q):ACK_ERRORS")
+{
+    field(DESC, "Acknowledge errors")
+    field(DTYP, "stream")
+    field(ZNAM, "0")
+    field(ONAM, "1")
+    field(OUT, "@celerotonChopper.proto ackErrors($(P)$(Q)) $(PORT)")
+}
+
+
+
+# ==========================================================
+# READ/WRITE VARIABLES
+# ==========================================================
+
+record(ai, "$(P)$(Q):REF_SPEED")
+{
+    field(DESC, "Reference Speed")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm")
+    field(INP, "@celerotonChopper.proto getReferenceSpeed $(PORT)")
+}
+
+record(ao, "$(P)$(Q):REF_SPEED_SP")
+{
+    field(DESC, "Set Reference Speed")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setReferenceSpeed $(PORT)")
+}
+
+record(ai, "$(P)$(Q):REF_SPEED:TWV") 
+{
+  field(VAL, "1")
+  field(DRVH, "10000")
+  field(DRVL, "0")
+  field(PREC, "1")
+  field(EGU, "rpm")
+}
+
+record(calcout, "$(P)$(Q):REF_SPEED:TWF") 
+{
+  field(INPA, "$(P)$(Q):REF_SPEED_SP NPP NMS")
+  field(INPB, "$(P)$(Q):REF_SPEED:TWV NPP NMS")
+  field(CALC, "A+B")
+  field(OUT, "$(P)$(Q):REF_SPEED_SP PP")
+}
+
+record(calcout, "$(P)$(Q):REF_SPEED:TWR") 
+{
+  field(INPA, "$(P)$(Q):REF_SPEED_SP NPP NMS")
+  field(INPB, "$(P)$(Q):REF_SPEED:TWV NPP NMS")
+  field(CALC, "A-B")
+  field(OUT, "$(P)$(Q):REF_SPEED_SP PP")
+}
+
+record(ai, "$(P)$(Q):PHASE_INDUCTANCE")
+{
+    field(DESC, "Phase inductance")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "H")
+    field(INP, "@celerotonChopper.proto getPhaseInductance $(PORT)")
+}
+
+record(ao, "$(P)$(Q):PHASE_INDUCTANCE_SP")
+{
+    field(DESC, "Set Phase inductance")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setPhaseInductance $(PORT)")
+}
+
+record(mbbo,"$(P)$(Q):POLE_PAIRS_SP") 
+{
+    field(DESC, "Set Pole Pairs")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setPolePairs $(PORT)")
+    field(ZRST, "0")
+    field(ONST, "1")
+    field(TWST, "2")
+    field(ZRVL, 0)
+    field(ONVL, 1)
+    field(TWVL, 2)
+}
+
+record(mbbi, "$(P)$(Q):POLE_PAIRS")
+{
+    field(DESC, "Pole pairs")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@celerotonChopper.proto getPolePairs $(PORT)")
+    field(ZRST, "0")
+    field(ONST, "1")
+    field(TWST, "2")
+    field(ZRVL, 0)
+    field(ONVL, 1)
+    field(TWVL, 2)
+}
+
+record(ai, "$(P)$(Q):MAX_PHASE_CURR")
+{
+    field(DESC, "Max. phase current")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "mA")
+    field(INP, "@celerotonChopper.proto getMaxPhaseCurrent $(PORT)")
+}
+
+record(ao, "$(P)$(Q):MAX_PHASE_CURR_SP")
+{
+    field(DESC, "Set Max. phase current")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setMaxPhaseCurrent $(PORT)")
+}
+
+record(ai, "$(P)$(Q):MAX_ROT_SPEED")
+{
+    field(DESC, "Max. rotational speed")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm")
+    field(INP, "@celerotonChopper.proto getMaxRotationalSpeed $(PORT)")
+}
+
+record(ao, "$(P)$(Q):MAX_ROT_SPEED_SP")
+{
+    field(DESC, "Set Max. rotational speed")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setMaxRotationalSpeed $(PORT)")
+}
+
+record(ai, "$(P)$(Q):SYNC_CURRENT")
+{
+    field(DESC, "Synchronization current")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "mA")
+    field(INP, "@celerotonChopper.proto getSynchronizationCurrent $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SYNC_CURRENT_SP")
+{
+    field(DESC, "Set Synchronization current")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setSynchronizationCurrent $(PORT)")
+}
+
+record(ai, "$(P)$(Q):AXIAL_MOM_INERT")
+{
+    field(DESC, "Axial moment of inertia")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "kgm2")
+    field(INP, "@celerotonChopper.proto getAxialMomentOfInertia $(PORT)")
+}
+
+record(ao, "$(P)$(Q):AXIAL_MOM_INERT_SP")
+{
+    field(DESC, "Set Axial moment of inertia")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setAxialMomentOfInertia $(PORT)")
+}
+
+record(ai, "$(P)$(Q):PM_FLUX_LINKAGE")
+{
+    field(DESC, "PM flux linkage")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "Vs")
+    field(INP, "@celerotonChopper.proto getPMFluxLinkage $(PORT)")
+}
+
+record(ao, "$(P)$(Q):PM_FLUX_LINKAGE_SP")
+{
+    field(DESC, "Set PM flux linkage")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setPMFluxLinkage $(PORT)")
+}
+
+record(ai, "$(P)$(Q):PHASE_RESIST")
+{
+    field(DESC, "Phase resistance")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "Ohm")
+    field(INP, "@celerotonChopper.proto getPhaseResistance $(PORT)")
+}
+
+record(ao, "$(P)$(Q):PHASE_RESIST_SP")
+{
+    field(DESC, "Set Phase resistance")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setPhaseResistance $(PORT)")
+}
+
+record(mbbo,"$(P)$(Q):ROT_DIRECTION_SP") 
+{
+    field(DESC, "Set Rotation Direction")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setRotationDirection $(PORT)")
+    field(ZRST, "CW")
+    field(ONST, "CCW")
+    field(ZRVL, 0)
+    field(ONVL, 1)
+}
+
+record(mbbi, "$(P)$(Q):ROT_DIRECTION")
+{
+    field(DESC, "Rotation Direction")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@celerotonChopper.proto getRotationDirection $(PORT)")
+    field(ZRST, "CW")
+    field(ONST, "CCW")
+    field(ZRVL, 0)
+    field(ONVL, 1)
+}
+
+record(ai, "$(P)$(Q):ACC_RATIO_AB")
+{
+    field(DESC, "Acc. Ratio (above sync.)")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm/s")
+    field(INP, "@celerotonChopper.proto getAccRationAboveSync $(PORT)")
+}
+
+record(ao, "$(P)$(Q):ACC_RATIO_AB_SP")
+{
+    field(DESC, "Set Acc. Ratio (above sync.)")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setAccRationAboveSync $(PORT)")
+}
+
+record(ai, "$(P)$(Q):ACC_RATIO_BEL")
+{
+    field(DESC, "Acc. Ratio (below sync.)")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm/s")
+    field(INP, "@celerotonChopper.proto getAccRationBelowSync $(PORT)")
+}
+
+record(ao, "$(P)$(Q):ACC_RATIO_BEL_SP")
+{
+    field(DESC, "Set Acc. Ratio (below sync.)")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setAccRationBelowSync $(PORT)")
+}
+
+record(ai, "$(P)$(Q):SC_RAISE_TIME")
+{
+    field(DESC, "Speed controller raise time")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "s")
+    field(INP, "@celerotonChopper.proto getSCRaiseTime $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SC_RAISE_TIME_SP")
+{
+    field(DESC, "Set Speed controller raise time")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setSCRaiseTime $(PORT)")
+}
+
+record(ai, "$(P)$(Q):UD_SYNC_SP")
+{
+    field(DESC, "User defined sync speed")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm")
+    field(INP, "@celerotonChopper.proto getUserDefSyncSpeed $(PORT)")
+}
+
+record(ao, "$(P)$(Q):UD_SYNC_SP_SP")
+{
+    field(DESC, "Set User defined sync speed")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setUserDefSyncSpeed $(PORT)")
+}
+
+record(ai, "$(P)$(Q):UD_SYNC_SPL")
+{
+    field(DESC, "User defined sync speed (lower)")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm")
+    field(INP, "@celerotonChopper.proto getUserDefSyncSpeedL $(PORT)")
+}
+
+record(ao, "$(P)$(Q):UD_SYNC_SPL_SP")
+{
+    field(DESC, "Set User defined sync speed (lower)")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setUserDefSyncSpeedL $(PORT)")
+}
+
+record(ai, "$(P)$(Q):UD_SYNC_SPU")
+{
+    field(DESC, "User defined sync speed (upper)")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm")
+    field(INP, "@celerotonChopper.proto getUserDefSyncSpeedU $(PORT)")
+}
+
+record(ao, "$(P)$(Q):UD_SYNC_SPU_SP")
+{
+    field(DESC, "Set User defined sync speed (upper)")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setUserDefSyncSpeedU $(PORT)")
+}
+
+record(ai, "$(P)$(Q):PROP_SPEED_GAIN")
+{
+    field(DESC, "Proportional speed gain")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@celerotonChopper.proto getProportionalSpeedGain $(PORT)")
+}
+
+record(ao, "$(P)$(Q):PROP_SPEED_GAIN_SP")
+{
+    field(DESC, "Set Proportional speed gain")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setProportionalSpeedGain $(PORT)")
+}
+
+record(ai, "$(P)$(Q):INTEGR_SPEED_GAIN")
+{
+    field(DESC, "Integral speed gain")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@celerotonChopper.proto getIntegralSpeedGain $(PORT)")
+}
+
+record(ao, "$(P)$(Q):INTEGR_SPEED_GAIN_SP")
+{
+    field(DESC, "Set Integral speed gain")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setIntegralSpeedGain $(PORT)")
+}
+
+record(mbbo,"$(P)$(Q):LEVITATE_SP") 
+{
+    field(DESC, "Set Levitate")
+    field(DTYP, "stream")
+    field(OUT, "@celerotonChopper.proto setLevitate $(PORT)")
+    field(ZRST, "OFF")
+    field(ONST, "ON")
+    field(ZRVL, 0)
+    field(ONVL, 1)
+}
+
+record(mbbi, "$(P)$(Q):LEVITATE")
+{
+    field(DESC, "Rotation Direction")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@celerotonChopper.proto getLevitate $(PORT)")
+    field(ZRST, "OFF")
+    field(ONST, "ON")
+    field(ZRVL, 0)
+    field(ONVL, 1)
+}
+
+# ==========================================================
+# READ ONLY VARIABLES
+# ==========================================================
+
+record(ai, "$(P)$(Q):ACTUAL_SPEED")
+{
+    field(DESC, "Actual Speed")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm")
+    field(INP, "@celerotonChopper.proto getActualSpeed $(PORT)")
+}
+
+record(ai, "$(P)$(Q):DEF_SYNC_SPEED_L")
+{
+    field(DESC, "Default sync speed (lower)")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm")
+    field(INP, "@celerotonChopper.proto getDefSyncSpeedL $(PORT)")
+}
+
+record(ai, "$(P)$(Q):DEF_SYNC_SPEED_U")
+{
+    field(DESC, "Default sync speed (upper)")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "rpm")
+    field(INP, "@celerotonChopper.proto getDefSyncSpeedU $(PORT)")
+}
+
+record(ai, "$(P)$(Q):DC_LINK_VOLTAGE")
+{
+    field(DESC, "DC-Link voltage")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "V")
+    field(INP, "@celerotonChopper.proto getDCLinkVoltage $(PORT)")
+}
+
+record(ai, "$(P)$(Q):DC_LINK_CURRENT")
+{
+    field(DESC, "Measured DC-Link current")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "mA")
+    field(INP, "@celerotonChopper.proto getDCLinkCurrent $(PORT)")
+}
+
+record(ai, "$(P)$(Q):CURRENT_REF")
+{
+    field(DESC, "Current reference")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "mA")
+    field(INP, "@celerotonChopper.proto getCurrentReference $(PORT)")
+}
+
+record(ai, "$(P)$(Q):OUTPUT_POWER")
+{
+    field(DESC, "Output power")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "W")
+    field(INP, "@celerotonChopper.proto getOutputPower $(PORT)")
+}
+
+record(ai, "$(P)$(Q):CONVERTER_TEMP")
+{
+    field(DESC, "Converter temperature")
+    field(DTYP, "stream")
+    field(SCAN, "5 second")
+    field(EGU, "C deg")
+    field(INP, "@celerotonChopper.proto getConverterTemp $(PORT)")
+}
+
+record(ai, "$(P)$(Q):MOTOR_TEMP_THC")
+{
+    field(DESC, "Motor temperature (THC)")
+    field(DTYP, "stream")
+    field(SCAN, "5 second")
+    field(EGU, "C deg")
+    field(INP, "@celerotonChopper.proto getMotorTempTHC $(PORT)")
+}
+
+record(ai, "$(P)$(Q):MOTOR_TEMP_PTC")
+{
+    field(DESC, "Motor temperature (PTC)")
+    field(DTYP, "stream")
+    field(SCAN, "5 second")
+    field(EGU, "C deg")
+    field(INP, "@celerotonChopper.proto getMotorTempPTC $(PORT)")
+}

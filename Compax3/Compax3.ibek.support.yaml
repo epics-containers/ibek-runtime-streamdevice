@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: Compax3
+
+entity_models:
+  - name: Compax3
+    description: |-
+      Parker Compax3 motor controller (ASCII serial interface)
+    parameters:
+      prefix:
+        type: str
+        description: |-
+          PV name prefix
+      suff1:
+        type: str
+        description: |-
+          First PV name suffix segment
+      suff2:
+        type: str
+        description: |-
+          Second PV name suffix segment
+      port1:
+        type: str
+        description: |-
+          First asyn port name segment
+      port2:
+        type: str
+        description: |-
+          Second asyn port name segment
+    databases:
+      - file: Compax3.template
+        args:
+          .*:

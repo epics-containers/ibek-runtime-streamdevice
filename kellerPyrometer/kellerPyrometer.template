@@ -1,0 +1,31 @@
+################################################################
+#
+# Keller Pyrometer template file.
+#
+# Macros:
+# % macro, P,           Device prefix
+# % macro, PORT,	Device port
+################################################################
+
+# % gui, kellerPyrometer, edm, kellerPyrometer.edl, P=$(P)
+
+record(stringin, "$(P):MESSAGE") {
+
+}
+
+record(ai, "$(P):TEMP") {
+  field(DTYP, "stream")
+  field(INP, "@kellerPyrometer.proto getTemperature($(P)) $(PORT)")
+  field(SCAN, "1 second")
+}
+
+record(stringin, "$(P):UNIT") {
+  field(DTYP, "stream")
+  field(INP, "@kellerPyrometer.proto getTemperatureUnit $(PORT)")
+  field(SCAN, "1 second")
+}
+
+
+
+
+

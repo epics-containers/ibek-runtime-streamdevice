@@ -1,0 +1,288 @@
+Terminator = NL;
+ExtraInput = Ignore;
+ReplyTimeout = 35000;
+MaxInput = 8000000;
+
+###########################################################################
+# Function selection
+
+meas_func_set{
+	# set
+	out "dmm.measure.func = dmm.FUNC_%{DC_VOLTAGE|AC_VOLTAGE|DC_CURRENT|AC_CURRENT|RESISTANCE|4W_RESISTANCE|ACV_FREQUENCY|ACV_PERIOD}";
+}
+
+meas_func_get{
+	# read
+	out "print(dmm.measure.func)";
+	in "dmm.FUNC_%{NONE|DC_VOLTAGE|AC_VOLTAGE|DC_CURRENT|AC_CURRENT|RESISTANCE|4W_RESISTANCE|DIODE|CAPACITANCE|TEMPERATURE|CONTINUITY|ACV_FREQUENCY|ACV_PERIOD|DCV_RATIO}";
+}
+
+###########################################################################
+# Autozero
+
+azero_en_set{
+	# set
+	out "dmm.measure.autozero.enable = dmm.%{OFF|ON}";
+}
+
+azero_en_get{
+	# read
+	out "print(dmm.measure.autozero.enable)";
+	in "dmm.%{OFF|ON}";
+}
+
+azero_once_set{
+	# cmd
+	out "dmm.measure.autozero.once()";
+}
+
+###########################################################################
+# Measurement Range
+
+m_range_auto_set{
+	# set
+	out "dmm.measure.autorange = dmm.%{OFF|ON}";
+}
+
+m_range_auto_get{
+	# read
+	out "print(dmm.measure.autorange)";
+	in "dmm.%{OFF|ON}";
+}
+
+m_range_fullscale_set{
+	# set
+	out "dmm.measure.range = %E";
+}
+
+m_range_fullscale_get{
+	# read
+	out "print(dmm.measure.range)";
+	in "%f";
+}
+
+###########################################################################
+# Filter
+
+filter_cnt_set{
+	# set
+	out "dmm.measure.filter.count = %i";
+}
+
+filter_cnt_get{
+	# read
+	out "print(dmm.measure.filter.count)";
+	in "%i";
+}
+
+filter_en_set{
+	# set
+	out "dmm.measure.filter.enable = dmm.%{OFF|ON}";
+}
+
+filter_en_get{
+	# read
+	out "print(dmm.measure.filter.enable)";
+	in "dmm.%{OFF|ON}";
+}
+
+filter_typ_set{
+	# set
+	out "dmm.measure.filter.type = dmm.FILTER_%{REPEAT_AVG|MOVING_AVG}";
+}
+
+filter_typ_get{
+	# read
+	out "print(dmm.measure.filter.type)";
+	in "dmm.FILTER_%{REPEAT_AVG|MOVING_AVG}";
+}
+
+filter_wind_set{
+	# set
+	out "dmm.measure.filter.window = %i";
+}
+
+filter_wind_get{
+	# read
+	out "print(dmm.measure.filter.window)";
+	in "%i";
+}
+
+###########################################################################
+# Measurement Math
+
+m_math_op_set{
+	# set
+	out "dmm.measure.math.format = dmm.MATH_%{MXB|PERCENT|RECIPROCAL}";
+}
+
+m_math_op_get{
+	# read
+	out "print(dmm.measure.math.format)";
+	in "dmm.MATH_%{MXB|PERCENT|RECIPROCAL}";
+}
+
+m_math_en_set{
+	# set
+	out "dmm.measure.math.enable = dmm.%{OFF|ON}";
+}
+
+m_math_en_get{
+	# read
+	out "print(dmm.measure.math.enable)";
+	in "dmm.%{OFF|ON}";
+}
+
+m_math_bfactor_set{
+	# set
+	out "dmm.measure.math.mxb.bfactor = %f";
+}
+
+m_math_bfactor_get{
+	# read
+	out "print(dmm.measure.math.mxb.bfactor)";
+	in "%f";
+}
+
+m_math_mfactor_set{
+	# set
+	out "dmm.measure.math.mxb.mfactor = %f";
+}
+
+m_math_mfactor_get{
+	# read
+	out "print(dmm.measure.math.mxb.mfactor)";
+	in "%f";
+}
+
+m_math_percref_set{
+	# set
+	out "dmm.measure.math.percent = %f";
+}
+
+m_math_percref_get{
+	# read
+	out "print(dmm.measure.math.percent)";
+	in "%f";
+}
+
+###########################################################################
+# Trace
+
+trace_cnt_get{
+	# read
+	out "print(defbuffer\$1.n)";
+	in "%i";
+}
+
+trace_clr_set{
+	# cmd
+	out "defbuffer\$1.clear()";
+}
+
+trace_start_get{
+	# read
+	out "print(defbuffer\$1.startindex)";
+	in "%i";
+}
+
+trace_end_get{
+	# read
+	out "print(defbuffer\$1.endindex)";
+	in "%i";
+}
+
+trace_read_get{
+	separator=",";
+	# read
+        out "printbuffer(%(\$1StartRead1-SP.VAL)i, %(\$1EndRead1-RB.VAL)i, defbuffer1.readings)";
+	in "%f";
+}
+
+trace_fetch_get{
+	# read
+	out "printbuffer(defbuffer\$1.endindex, defbuffer\$1.endindex, defbuffer\$1.readings)";
+	in "%f";
+}
+
+trace_fill_set{
+	# set
+	out "defbuffer\$1.fillmode = %b";
+}
+
+trace_fill_get{
+	# read
+	out "print(defbuffer\$1.fillmode)";
+	in "%b";
+}
+
+trace_capacity_set{
+	# set
+	out "defbuffer\$1.capacity = %i";
+}
+
+trace_capacity_get{
+	# read
+	out "print(defbuffer\$1.capacity)";
+	in "%i";
+}
+
+trace_avg_get{
+	# read
+	out "statsVar = buffer.getstats(defbuffer\$1)";
+	out "print(statsVar.mean)";
+	in "%f";
+}
+
+trace_clrstat_set{
+	# cmd
+	out "buffer.clearstats(defbuffer\$1)";
+}
+
+trace_max_get{
+	# read
+	out "statsVar = buffer.getstats(defbuffer\$1)";
+	out "print(statsVar.max.reading)";
+	in "%f";
+}
+
+trace_min_get{
+	# read
+	out "statsVar = buffer.getstats(defbuffer\$1)";
+	out "print(statsVar.min.reading)";
+	in "%f";
+}
+
+trace_stdd_get{
+	# read
+	out "statsVar = buffer.getstats(defbuffer\$1)";
+	out "print(statsVar.stddev)";
+	in "%f";
+}
+
+trace_meas_set{
+	# cmd
+	out "print(dmm.measure.read(defbuffer\$2))";
+	in "%(\$1FetchBuff\$2-Mon)f";
+}
+
+###########################################################################
+# System Settings
+
+sys_clearlog_set{
+	# cmd
+	out "eventlog.clear()";
+}
+
+sys_cntlog_get{
+	# read
+	out "print(eventlog.getcount())";
+	in "%i";
+}
+
+sys_nextlog_get{
+	# read
+	out "print(eventlog.next())";
+	in "%#s";
+}
+

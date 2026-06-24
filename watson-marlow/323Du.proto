@@ -1,0 +1,42 @@
+# This is the Watson Marlow 323Du pump protocol file
+
+Terminator = CR;
+
+## Write command to return all pump information
+## \code
+## send: 1RS
+## receive: (pump type) (set speed) (direction) (running status) !
+## e.g.     323Du 400.0 CCW 0 !
+## \endcode
+info {
+  out "1RS";
+  in "323Du %(\$1:INFO:SPD.VAL)f %(\$1:INFO:DIR.VAL){CW|CCW} %(\$1:INFO:RUN.VAL)d !";
+}
+
+## Write command to stop/start pump
+## \code
+## send: 1ST (STOP) or 1GO (START)
+## \endcode
+setRun {
+  out "1%{ST|GO}"
+}
+
+## Write command to set pump speed
+## \code
+## send: 1SPn
+## e.g.  1SP400
+## \endcode
+setSpd {
+  out "1SP%f"
+}
+
+## Write command to set pump direction
+## \code
+## send: 1RR (CW) or 1RL (CCW)
+## \endcode
+setDir {
+  out "1%{RR|RL}"
+}
+
+
+

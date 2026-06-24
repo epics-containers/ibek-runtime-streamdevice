@@ -1,0 +1,56 @@
+# % macro, P, Device prefix
+# % macro, Q, Device suffix
+# % macro, PORT, Asyn port name
+# % macro, DISABLE, Set to 0 to enable this at startup
+# % macro, DEVICE, The number of the device used for communication
+# % macro, name, object and gui association name
+# % gui, $(name=), edmembed, zaber_T-LSR_embed.edl, device=$(P)$(Q)
+# % gui, $(name=), edm, zaber_t-LSR.edl, device=$(P)$(Q)
+
+record(ao, "$(P)$(Q):RESET") {
+  field(DESC, "Reset all devices in the chain")
+  field(DTYP, "stream")
+  field(OUT, "@zaber_T-LSR.proto reset($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(bo, "$(P)$(Q):DISABLE") {
+  field(DESC, "Disable comms")
+  field(PINI, "YES")
+  field(VAL, "$(DISABLE=1)")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+record(longout, "$(P)$(Q):POSITION") {
+  field(DESC, "Request position")
+  field(DTYP, "stream")
+  field(OUT, "@zaber_T-LSR.proto moveAbsolute($(DEVICE)) $(PORT)")
+  field(EGU, "counts")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(longin, "$(P)$(Q):POSITION:RBV") {
+  field(DESC, "Position readback")
+  field(DTYP, "stream")
+  field(INP, "@zaber_T-LSR.proto getPosition($(DEVICE)) $(PORT)")
+  field(EGU, "counts")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SCAN, "1 second")
+  field(PINI, "YES")
+}
+
+record(longout, "$(P)$(Q):DATA") {
+  field(DESC, "Data for an arbitrary command")
+}
+
+record(longout, "$(P)$(Q):DATA:RBV") {
+  field(DESC, "Returned data")
+}
+
+record(stringout, "$(P)$(Q):COMMAND") {
+  field(DESC, "An arbitrary command byte, not \000")
+  field(DTYP, "stream")
+  field(OUT, "@zaber_T-LSR.proto arbitraryCommand($(DEVICE),$(P)$(Q)) $(PORT)")
+}

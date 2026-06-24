@@ -1,0 +1,92 @@
+# SQC-310 Material $(R)
+
+# Macros:
+# % macro, name, Device name
+# % macro, P, Device Prefix
+# % macro, R, Device Prefix
+# % macro, PORT, Asyn Port name
+
+
+record(stringout, "$(P):$(R):Name")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@SQC-310.proto set_material_name($(R)) $(PORT)")
+    field(FLNK, "$(P):$(R):Name_RBV")
+}
+
+record(stringin, "$(P):$(R):Name_RBV")
+{
+    field(DTYP, "stream")
+    field(INP,  "@SQC-310.proto get_material_name($(R)) $(PORT)")
+    field(PINI, "YES")
+}
+
+# Density
+
+record(longout, "$(P):$(R):RawDensity")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@SQC-310.proto set_material_density($(R)) $(PORT)")
+    field(FLNK, "$(P):$(R):RawDensity_RBV")
+}
+
+record(longin, "$(P):$(R):RawDensity_RBV")
+{
+    field(DTYP, "stream")
+    field(INP,  "@SQC-310.proto get_material_density($(R)) $(PORT)")
+    field(PINI, "YES")
+}
+
+record(ao, "$(P):$(R):Density") {
+    field(PREC, "2")
+    field(EGU,  "gcm^-3")
+    field(FLNK, "$(P):$(R):Density_CALC")
+}
+
+record(calcout, "$(P):$(R):Density_CALC") {
+    field(INPA, "$(P):$(R):Density")
+    field(CALC, "A*100")
+    field(OUT,  "$(P):$(R):RawDensity PP")
+}
+
+record(calc, "$(P):$(R):Density_RBV") {
+    field(INPA, "$(P):$(R):RawDensity_RBV CP")
+    field(CALC, "A/100")
+    field(PREC, "2")
+    field(EGU,  "gcm^-3")
+}
+
+# ZFactor
+
+record(longout, "$(P):$(R):RawZFactor")
+{
+    field (DTYP, "stream")
+    field (OUT,  "@SQC-310.proto set_material_zfactor($(R)) $(PORT)")
+    field (FLNK, "$(P):$(R):RawZFactor_RBV")
+}
+
+record(longin, "$(P):$(R):RawZFactor_RBV")
+{
+    field(DTYP, "stream")
+    field(INP,  "@SQC-310.proto get_material_zfactor($(R)) $(PORT)")
+    field(PINI, "YES")
+}
+
+record(ao, "$(P):$(R):ZFactor") {
+    field(PREC, "3")
+    field(EGU,  "%")
+    field(FLNK, "$(P):$(R):ZFactor_CALC")
+}
+
+record(calcout, "$(P):$(R):ZFactor_CALC") {
+    field(INPA, "$(P):$(R):ZFactor")
+    field(CALC, "A*1000")
+    field(OUT,  "$(P):$(R):RawZFactor PP")
+}
+
+record(calc, "$(P):$(R):ZFactor_RBV") {
+    field(INPA, "$(P):$(R):RawZFactor_RBV CP")
+    field(CALC, "A/1000")
+    field(PREC, "3")
+    field(EGU,  "%")
+}

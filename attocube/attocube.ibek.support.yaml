@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: attocube
+
+entity_models:
+  - name: ANC150
+    description: |-
+      Controls an attocube ANC150 pico motor controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      M:
+        type: str
+        description: |-
+          Motor suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      AXIS:
+        type: int
+        description: |-
+          Motor axis number
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: ANC150.template
+        args:
+          .*:

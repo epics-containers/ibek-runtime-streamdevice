@@ -1,0 +1,28 @@
+## This file was generated using detailConverter.py
+
+## This associates a BOY screen with the template
+# % gui, $(PORT), boydetail, keithley2400App_opi/k2400_detail.opi, P=$(P), R=$(R), DESC=Camera
+## PVs which could not be matched to section
+# % gui, $(PORT), groupHeading,  $(P) Device
+# % gui, $(PORT), demandString,  ID , $(P):ID
+# % gui, $(PORT), readback,  Voltage , $(P):V
+# % gui, $(PORT), readback,  Current , $(P):I
+# % gui, $(PORT), readback, Resistance , $(P):R
+# % gui, $(PORT), enum,  Output Control , $(P):OUTP
+# % gui, $(PORT), demandString,  Command , $(P):COMMAND
+# % gui, $(PORT), demandString,  Response , $(P):RESPONSE
+# % gui, $(PORT), groupExit, InfoExit
+# % gui, $(PORT), groupHeading, Source Settings
+# % gui, $(PORT), enum,  Source Mode , $(P):SOUR_FUNC
+# % gui, $(PORT), enum,  Source Fixed Mode , $(P):SOUR_MODE
+# % gui, $(PORT), enum,  Volt/Curr for below parameters , $(P):SOTX
+# % gui, $(PORT), demand,  Source Range , $(P):SOUR_RANG
+# % gui, $(PORT), demand,  Source Level , $(P):SOUR_LEV
+# % gui, $(PORT), groupExit, Source SettingsExit
+# % gui, $(PORT), groupHeading, Sense Settings
+# % gui, $(PORT), enum,  Sense Mode , $(P):SENS_FUNC
+# % gui, $(PORT), enum,  Volt/Curr for below params , $(P):SETX
+# % gui, $(PORT), demand,  Compliance Range , $(P):SENS_PROT
+# % gui, $(PORT), demand,  Measure Range , $(P):SENS_RANG
+# % gui, $(PORT), enum,  Auto Range ON/OFF , $(P):SENS_RANG_AUTO
+# % gui, $(PORT), groupExit, Sense SettingsExit

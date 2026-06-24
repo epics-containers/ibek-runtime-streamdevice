@@ -1,0 +1,93 @@
+####################################################
+#
+# Protocol file for the TTi CPX power supply
+#
+####################################################
+#
+# Ian Gillingham, May 2013
+#
+
+##################################################
+# General Settings
+##################################################
+
+Terminator = "\n";
+InTerminator = "\r\n";
+ReplyTimeout = 2000;
+
+###################################################
+# Protocols
+###################################################
+
+reset
+    {
+    out "*RST";
+    }
+
+# Get instrument identification
+getIDN
+    {
+    out "*IDN?";
+    in "%64c";
+    }
+
+# Set the output voltage
+setVoltage
+    {
+    out "V\$1 %f";
+    }
+
+# Get the output voltage
+getSetpointVoltage
+    {
+    out "V\$1?";
+    in "V\$1 %f";
+    }
+
+# Get the output voltage
+getActualVoltage
+    {
+    out "V\${1}O?";
+    in "%fV";
+    }
+
+# Set the output current
+setCurrent
+    {
+    out "I\$1 %f";
+    }
+
+# Get the output current
+getSetpointCurrent
+    {
+    out "I\$1?";
+    in "I\$1 %f";
+    }
+
+# Get the actual output current
+getActualCurrent
+    {
+    out "I\${1}O?";
+    in "%fA";
+    }
+
+# Set the output state
+setOutput
+    {
+    out "OP\${1} %d";
+    }
+
+# Get the output state
+getOutput
+    {
+    out "OP\${1}?";
+    in "%d";
+    }
+
+# Get the error register
+getError
+    {
+    out "EER?";
+    in "%d";
+    }
+

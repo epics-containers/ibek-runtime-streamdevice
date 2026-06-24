@@ -1,0 +1,166 @@
+# Protocol Summary:
+# <SYNC><LENGTH><COMMAND><CRC1><CRC2>
+# First charater is '!' and is used as a sync character
+# Second character is the length of the command string as ASCII(34 + command length)
+#   e.g. 1:#, 2:$, 3:%, 4:&, 5:', 6:(, etc
+# Last two characters are the device's custom CRCs of the length character (despite what the manual says) and command string
+# Use SQCCommand to generate full messages from commands
+# The device accepts null characters in place of CRCs, so this is used in places where the CRCs are not fixed
+# To send nulls via telnet enter Ctrl+@ (depends on keyboard layout) - they will appear as ^@
+# The device will send !$Ft- if it does not like the CRCs
+
+Terminator = ;  # The device uses the sync character, length and CRC to parse commands
+
+SYNC = "!";
+
+# This parses the second character of any response to see if an error was returned
+get_response_status {
+    # Don't parse A for success or errors will be cleared by successful polls
+    in $SYNC, "\?%{X|C|D|E|F|G}%*s", "\?\?";
+}
+
+get_device_name {
+    # Example: !#@O7 -> !8ASQC310C 2MB Ver 6.65Z� (Here response CRC2 is non-printable)
+    LEN = 0x23; CMD = "@"; CRC1 = 0x4F; CRC2 = 0x37;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "%s", "\?\?";
+    ExtraInput = Ignore;  # Just read the first section and ignore the rest
+}
+
+# Material Commands
+
+get_material_name {
+    # Example: !'F1? 1�i -> !(ATesth}
+    LEN = 0x27; CMD = "F\$1? 1"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in "%.1/A(.*)../";
+}
+
+set_material_name {
+    # Example: F1 1,Test                ^@^@ -> !$A5�
+    # Pad with spaces, left justified, so the width is fixed. The device strips the whitespace.
+    LEN = 0x3B; CMD = "F\$1 1,%-20s"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "\?\?"
+}
+
+get_material_density {
+    # Example: !'F1? 2Gi -> !'A100�U
+    # Decimal place is removed. Value always includes two decimal places. 100 -> 1.00
+    LEN = 0x27; CMD = "F\$1? 2"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "%d", "\?\?"
+}
+
+set_material_density {
+    # Example: !+F1 2,0100g[ -> !$A5�
+    # Pad with zeroes so the width is fixed
+    LEN = 0x2B; CMD = "F\$1 2,%04d"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "\?\?"
+}
+
+get_material_zfactor {
+    # Example: !'F1? 3^@^@ -> !'A100�U
+    # Decimal place is removed. Value always includes three decimal places. 100 -> 0.100
+    LEN = 0x27; CMD = "F\$1? 3"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "%d", "\?\?"
+}
+
+set_material_zfactor {
+    # Example: !+F1 3,0100Dy -> !$A5�
+    # Pad with zeroes so the width is fixed
+    LEN = 0x2B; CMD = "F\$1 3,%04d"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "\?\?"
+}
+
+# Sensor Commands
+
+get_crystal_tooling {
+    # Parameter: Sensor number
+    # Example: !(HA1? 1kA -> !)A1,49 Tg
+    # Device returns <sensor>,<value> as a percentage with no decimal places
+    LEN = 0x28; CMD = "HA1? \$1"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A\$1,", "%d", " ", "\?\?"
+}
+
+set_crystal_tooling {
+    # Parameters: Sensor Number
+    # Example: !+HA1 1,049^@^@ -> !$A5�
+    # Left pad with zeroes so the width is fixed
+    LEN = 0x2B; CMD = "HA1 \$1,%03d"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "\?\?"
+}
+
+get_rate {
+    # Parameter: Sensor number
+    # Example: !$L1f2 -> !)A 0.12l�
+    LEN = 0x24; CMD = "L\$1"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "%f", "\?\?";
+}
+
+get_thickness {
+    # Parameter: Sensor number
+    # Example: !$N1]Q -> !*A 0.000Z\
+    LEN = 0x24; CMD = "N\$1"; CRC1 = 0x0; CRC2 = 0x0;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "%f", "\?\?";
+}
+
+get_output_readings {
+    # Example: !$K1]1 -> !oA-1.00 0.00 100.00 0.000 0.00 0.00 100.00 0.000 0.00 -1 -1 -1 -1 -1 -1 -1 -1L4
+    LEN = 0x24; CMD = "K1"; CRC1 = 0x5D; CRC2 = 0x31;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "%+/A(.*)../"
+}
+
+get_sensor_readings {
+    # Example: !$K2^@^@ -> !vA0.00 -0.06 0.000 5991060.78 -0.05 0.000 5983183.08 0.00 0.000 0.00 0.00 0.000 0.00o0
+    LEN = 0x24; CMD = "K2"; CRC1 = 0x9D; CRC2 = 0x31;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "%+/A(.*)../"
+}
+
+# Run State Commands
+
+get_run_state {
+    # Parameter: PV Prefix
+    # Example: !$V?Zt -> !0A0 1305 6 1 0��
+    LEN = 0x24; CMD = "V?"; CRC1 = 0x5A; CRC2 = 0x74;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    # in $SYNC, "%.1/A(.*)../"
+    in $SYNC, "\?A", "%(\$1:State_RBV)d %(\$1:RunTime_RBV)d %(\$1:ProcessNumber_RBV)d %(\$1:ActiveLayer_RBV)d %(\$1:ControlMode_RBV)1d", "\?\?";
+}
+
+start_process {
+    # Example: !$U0 -> !$A5�
+    LEN = 0x24; CMD = "U0"; CRC1 = 0x9B; CRC2 = 0x52;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "\?\?";
+}
+
+reset_process {
+    # Example: !$U1Zq -> !$A5�
+    LEN = 0x24; CMD = "U1"; CRC1 = 0x5A; CRC2 = 0x71;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "\?\?";
+}
+
+zero_thickness {
+    # Example: !%U32 -> !$A5�
+    LEN = 0x25; CMD = "U32"; CRC1 = 0x94; CRC2 = 0x53;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "\?\?";
+}
+
+zero_time {
+    # Example: %U33Up -> !$A5�
+    LEN = 0x25; CMD = "U33"; CRC1 = 0x55; CRC2 = 0x70;
+    out $SYNC, $LEN, $CMD, $CRC1, $CRC2;
+    in $SYNC, "\?A", "\?\?";
+}

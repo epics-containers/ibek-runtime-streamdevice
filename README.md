@@ -40,7 +40,10 @@ hashes a **file list**, so it already generalises to any combination of the abov
 files not yet invented). Add the files your support yaml needs and they are vendored
 together as a unit.
 
-This repo currently provides one pattern:
+This repo provides StreamDevice patterns for many devices, each a top-level folder
+auto-generated from the device's DLS XMLbuilder support module (`etc/builder.py` +
+its StreamDevice protocol and EPICS template). The `lakeshore340` pattern is the
+worked example of the file-set:
 
 ```
 lakeshore340/

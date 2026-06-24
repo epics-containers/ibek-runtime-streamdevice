@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: knauer
+
+entity_models:
+  - name: BlueShadow40P
+    description: |-
+      Controls a Knauer BlueShadow 40P HPLC pump
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port for communication with device
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: blueShadow40P.template
+        args:
+          .*:
+  - name: Azura21S
+    description: |-
+      Controls a Knauer Azuar V2.1S valve drive
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port for communication with device
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: azuraV2-1S.template
+        args:
+          .*:

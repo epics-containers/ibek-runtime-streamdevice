@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: stanford
+
+entity_models:
+  - name: sr570
+    description: |-
+      Controls a Stanford SR570 current amplifier
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port for this device
+      DESC:
+        type: str
+        description: |-
+          Description for this device (displayed on EDM screen)
+    databases:
+      - file: sr570.template
+        args:
+          .*:

@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: zaber_T-LSR
+
+entity_models:
+  - name: Zaber_T_LSR
+    description: |-
+      Zaber T-LSR linear stage controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      DISABLE:
+        type: int
+        description: |-
+          Set to 0 to enable this at startup
+        default: 1
+      DEVICE:
+        type: int
+        description: |-
+          The number of the device used for communication
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: zaber_T-LSR.template
+        args:
+          .*:

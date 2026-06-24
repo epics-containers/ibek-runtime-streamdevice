@@ -1,0 +1,179 @@
+################################################################
+# Protocol file for the FMB Oxford APD-ACE Pulse Processing Unit
+#
+# This unit controls an Avalanche photo-diode detector for direct
+# X-ray counting.  It must be in NOECHO mode for this software
+# to work (this is the default after power on).
+#
+# Communications setup:
+# 9600 baud, 8 data bits, 1 stop bit, no parity
+#
+# Date: 16/07/2010
+#
+################################################################
+
+OutTerminator = CR;
+InTerminator = CR LF;
+replytimeout = 1000;
+readtimeout  = 2000;
+
+# Read and set the head limits (max bias current followed by max temp in the same command/response)
+# Note two sets of get/set protocols are used so that the output records can be initialised correctly
+getMaxCurr {
+	out "?HLIM";
+	in "%f %*f";
+}
+
+getMaxTemp {
+	out "?HLIM";
+	in "%*f %f";
+}
+
+setMaxCurr {
+	out "HLIM %f %(\$1:MAXTEMP:DMD.VAL)f";
+	@init{ 
+        getMaxCurr;            
+    };
+}
+
+setMaxTemp {
+	out "HLIM %(\$1:MAXCURR:DMD.VAL)f %f";
+	@init{ 
+        getMaxTemp;            
+    };
+}
+
+# Read the current temperature of the head
+getHeadTemp {
+	out "?HTEMP";
+	in "%f";
+}
+
+# Read the current state of the head
+getHeadState {
+	out "?HSTATE";
+	in "%s";
+}
+
+# Get/set the bias setpoint and state of the detector head
+# Response format is <biasValue> [ON|OFF]
+# Use two sets of get/set protocols so that we can initialise the output records correctly
+getBiasValue {
+	out "?HVOLT";
+	in "%f %*s";
+}
+
+setBiasValue {
+	out "HVOLT %f %(\$1:BIAS:CTRL.VAL)s";
+	@init{ 
+        getBiasValue;            
+    };
+}
+
+getBiasState {
+	out "?HVOLT";
+	in "%*f %s";
+}
+
+setBiasState {
+	out "HVOLT %(\$1:BIAS:DMD.VAL)f %s";
+	@init{ 
+        getBiasState;            
+    };
+}
+
+# Query the measured bias voltage of the head
+biasMonitor {
+	out "?HVMON";
+	in "%f";
+}
+
+# Query the pulse shaping
+getShaping {
+	out "?OUT";
+	in "%{5|10|20|30}";
+}
+
+# Define the pulse shaping of the SCA output < 5|10|20|30 >
+setShaping {
+	out "OUT %{5|10|20|30}";
+	@init{ 
+        getShaping;            
+    };
+}
+
+# Query the SCA mode and levels
+# Response format: INT|WIN <llth> [<winth>]
+# In INT mode only the llth level is returned so use ExtraInput=Ignore setting
+# The database ensures that getWINTH is only called when in WIN mode
+# Again, use three sets of get/set protocols to initialise the output records correctly
+getSCA {
+	ExtraInput = Ignore;
+	out "?SCA";
+	in "%{INT|WIN} %*f";
+}
+
+getLLTH {
+	ExtraInput = Ignore;
+	out "?SCA";
+	in "%*s %f";
+}
+
+getWINTH {
+	out "?SCA";
+	in "%*s %*f %f";
+}
+
+setSCA {
+	out "SCA %s";
+	@init{ 
+        getSCA;            
+    };
+}
+
+setLLTH {
+	out "SCA %(\$1:SCA:MODE:DMD.VAL)s %f";
+	@init{ 
+        getLLTH;            
+    };
+}
+
+setWINTH {
+	out "SCA %(\$1:SCA:MODE:DMD.VAL)s %(\$1:LLTH:DMD.VAL)f %f";
+	@init{ 
+        getWINTH;            
+    };
+}
+
+# Start the count, specifying integration time and no
+# of repetitions
+startCount {
+	out "TCT %(\$1:INTTIME.VAL)u %(\$1:NREP.VAL)u";
+}
+
+# Abort a count
+stopCount {
+	out "STCT";;
+}
+
+# Get the firmware version
+getVersion {
+	out "?VER";
+	in "%*s %s";
+}
+
+# Query the ratemeter values (0 to 1e8)
+getINTRate {
+	out "?RATE";
+	in "%f %*f";
+}
+getWINRate {
+	out "?RATE";
+	in "%*f %f";
+}
+
+# Query last error
+getErrorStatus {
+	out "?ERR";
+	in "%s";
+}

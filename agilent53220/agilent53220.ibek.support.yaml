@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: agilent53220
+
+entity_models:
+  - name: agilent53220
+    description: |-
+      Agilent 53220 frequency analyser
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      name:
+        type: id
+        description: |-
+          Name to export to gda as
+    databases:
+      - file: agilent53220.template
+        args:
+          .*:

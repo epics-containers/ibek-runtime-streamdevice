@@ -1,0 +1,31 @@
+Terminator = CR;
+
+LockTimeout = 1000;
+ReplyTimeout = 1000;
+ReadTimeout = 1000;
+ExtraInput = Ignore;
+
+recv = "\$1 %f";
+
+getData 
+{
+	out "\$1";
+	in $recv;
+	@init { out "*@=\$1"; in $recv; }
+}
+getGas 
+{
+	in "\$1 %*f %39c";
+}
+
+
+gasSelect 
+{
+	out "A$$%d";
+}
+
+setZero
+{
+	out "A$$V";
+}
+

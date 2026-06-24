@@ -1,0 +1,11 @@
+InTerminator = CR CR LF;
+OutTerminator = CR LF;
+ReplyTimeout = 4000;
+
+status { out "ST"; in "%(\$1:FW.RVAL)u,%(\$1:FD.RVAL)u,%(\$1:TH2O.RVAL)u,%(\$1:TSH.RVAL)u,%(\$1:HREL.RVAL)u"; }
+
+voff { out "SP"; }
+von  { out "BF"; }
+ratio { out "FR%03u"; in "%u"}
+th2o { out "TW%03u"; in "%u" }
+tsh { out "TK%03u"; in "%u" }

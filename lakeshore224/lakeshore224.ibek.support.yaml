@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: lakeshore224
+
+entity_models:
+  - name: lakeshore224
+    description: |-
+      Lakeshore 224 Temperature Monitor
+      Notes: The loop dependant PVs are in a seperate template file, included in this one.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+    databases:
+      - file: lakeshore224.template
+        args:
+          .*:
+
+  - name: lakeshore224_input_dls
+    description: |-
+      Template to provide the records required for a Lakeshore 224 input.
+      This makes use of the macros required by lakeshore224.template but also
+      requires macros to specify the input channel and index.
+    parameters:
+      TNAME:
+        type: str
+        description: |-
+          Number of Temperature Sensor
+      INDEX:
+        type: str
+        description: |-
+          Channel A, B or C1-C5, or D1-D5
+      P:
+        type: str
+        description: |-
+          Prefix for PV name. $(P):DISABLE_POLL used for SDIS
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      TEMPSCAN:
+        type: int
+        description: |-
+          SCAN rate for the temperature/voltage readings
+      TADEL:
+        type: float
+        description: |-
+          (optional) - Archive deadband for temperatures
+        default: 0.1
+      TMDEL:
+        type: float
+        description: |-
+          (optional) - Monitor deadband for temperatures
+        default: 0.01
+      VADEL:
+        type: float
+        description: |-
+          (optional) - Archive deadband for voltages
+        default: 1
+      VMDEL:
+        type: float
+        description: |-
+          (optional) - Monitor deadband for voltages
+        default: 1
+    databases:
+      - file: lakeshore224_input_dls.template
+        args:
+          .*:

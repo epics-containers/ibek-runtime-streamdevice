@@ -1,0 +1,138 @@
+# File EdwardsScroll.template
+#
+# % macro, __doc__,          Template for Serial control and monitoring of Edwards Scroll pumps via serial.  Usually in collaboration with a PLC which has On/Off control.
+#
+# % macro, P,    Mandatory. Device prefix
+# % macro, port, Mandatory. Asyn port name
+# % macro, name, Optional.  Name for gui element
+#
+# % gui, $(name=), edm , EdwardsScroll.edl, device=$(P)
+#
+# % archiver 10 monitor
+# Units in 0.1W so using ASLO to scale the readback
+record(ai, "$(P):POWER") 
+{
+  field(DESC, "Motor Power Readback")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@EdScroll.proto getMotorPower $(port)")
+  field(ASLO, "0.1")  
+  field(EGU,  "W")
+}
+
+# % archiver 10 monitor
+record(ai, "$(P):TEMP") 
+{
+  field(DESC, "Pump Temperature Readback")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@EdScroll.proto getPumpTemp $(port)")
+  field(EGU,  "C")
+}
+
+# % archiver 10 monitor
+record(ai, "$(P):TOTAL_TIME") 
+{
+  field(DESC, "Total Run Time Readback")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@EdScroll.proto getTotalTime $(port)")
+  field(EGU,  "hrs")
+}
+
+# % archiver 10 monitor
+record(ai, "$(P):TIME_SINCE_TIP") 
+{
+  field(DESC, "Time Since Tip Changed Readback")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@EdScroll.proto getRunTimeSinceTip $(port)")
+  field(EGU,  "hrs")
+}
+
+# % archiver 10 monitor
+record(mbbo, "$(P):SET_SPEED")
+{
+  field(DESC, "Set Pump Speed")
+  field(DTYP, "Soft Channel")
+  field(OUT,  "$(P):SPEED_FANOUT")
+  field(ZRST, "Standby Speed")
+  field(ZRVL, "1")
+  field(ONST, "Full Speed")
+  field(ONVL, "2")
+  #field(PINI, "YES")
+  field(VAL,  "1")
+  field(FLNK, "$(P):LAST_ERR_CODE PP")
+}
+
+# % archiver 10 monitor
+record(fanout, "$(P):SPEED_FANOUT")
+{ 
+  field(DESC, "Speed Fanout")
+  field(SELM, "Specified")
+  field(SELL, "$(P):SET_SPEED.RVAL CPP")
+  field(LNK1, "$(P):DO_STANDBY_SPEED PP")
+  field(LNK2, "$(P):DO_FULL_SPEED PP")
+}
+
+# % archiver 10 monitor
+record(bo, "$(P):DO_STANDBY_SPEED")
+{
+  field(DESC, "Run pump at standby speed")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT,  "@EdScroll.proto doStandbySpeed($(P)) $(port)")
+}
+
+# % archiver 10 monitor
+record(bo, "$(P):DO_FULL_SPEED")
+{
+  field(DESC, "Run pump at full speed")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT,  "@EdScroll.proto doFullSpeed($(P)) $(port)")
+}
+
+# % archiver 10 monitor
+record(bo, "$(P):RESET_TIP_INTERVAL") 
+{
+  field(DESC, "Reset Tip Change Interval")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT,  "@EdScroll.proto doServiceReset($(P)) $(port)")
+}
+
+# % archiver 10 monitor
+record(mbbi, "$(P):LAST_ERR_CODE" ) 
+{
+  field(DESC, "Return code from last command received")
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  # No Error
+  field(ZRST, "No Error")
+  field(ZRVL, "0")
+  field(ZRSV, "NO_ALARM")
+  # Invalid Command for Object ID
+  field(ONST, "Invalid Command")
+  field(ONVL, "1")
+  field(ONSV, "MINOR")
+  # Invalid Query/Command
+  field(TWST, "Invalid Query")
+  field(TWVL, "2")
+  field(TWSV, "MINOR")
+  # Missing Parameter
+  field(THST, "Missing Param")
+  field(THVL, "3")
+  field(THSV, "MINOR")
+  # Parameter Out of Range
+  field(FRST, "Out of Range")
+  field(FRVL, "4")
+  field(FRSV, "MINOR")
+  # Invalid Command in Current State  
+  field(FVST, "Invalid Command")
+  field(FVVL, "5")
+  field(FVSV, "MINOR")
+}
+
+
+

@@ -1,0 +1,35 @@
+# Streams protocol file for the huber chiller
+# Initial version GNX91527 16/07/2014
+
+# use "streamReload" to reload this file without restarting the IOC
+
+ExtraInput = Ignore;
+ReadTimeout = 500;
+OutTerminator = CR;
+InTerminator = CR;
+
+sendCmd
+{
+  out "%s";
+  in  "%s";
+}
+
+getDeviceCmd
+{
+  out "[M01V07C6";
+  in  "%s";
+}
+
+getGenCmd
+{
+  out "[M01G0D******C0";
+  in  "%s";
+}
+
+getLimCmd
+{
+  out "[M01L0F********1B";
+  in  "%s";
+}
+
+

@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: enzLoCuM4
+
+entity_models:
+  - name: enzLoCuM4
+    description: |-
+      Template database for an ENZ LoCuM-4 Low Current Monitor
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      port:
+        type: str
+        description: |-
+          Serial port on IOC (e.g. ty_40_1)
+      adr:
+        type: str
+        description: |-
+          Address (e.g. 01)
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+      noinit:
+        type: str
+        description: |-
+          Set to _noinit to suppress @init processing
+        default: ""
+    databases:
+      - file: enzLoCuM4.template
+        args:
+          .*:

@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: GR150
+
+entity_models:
+  - name: gr150
+    description: |-
+      Support for Grant GR150 chiller.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      bus:
+        type: str
+        description: |-
+          Asyn port name
+      DISABLE:
+        type: int
+        description: |-
+          If 1 then disable the comms on startup
+        default: 0
+      tempdesc:
+        type: str
+        description: |-
+          Optional.  Description in TEMPERATURE record DESC field.  Defaults to "Chiller water temp"
+        default: Chiller water temperature
+      name:
+        type: id
+        description: |-
+          Object and GUI association name
+    databases:
+      - file: gr150.template
+        args:
+          .*:

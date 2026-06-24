@@ -1,0 +1,85 @@
+# Temperature sensor template.
+#
+#% macro, device, Device name
+#% macro, tty, Terminal name
+
+record(bo, "$(device):INIT")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@opSensTempSens.proto init $(tty)")
+    field(PINI, "YES")
+}
+
+record(bi, "$(device):SCAN")
+{
+    field(DTYP, "stream")
+    field(INP,  "@opSensTempSens.proto scan($(device)) $(tty)")
+    field(SCAN, "I/O Intr")
+}
+
+record(ai, "$(device):TEMP1")
+{
+    field(ADEL, "0.1")
+    field(EGU,  "deg C")
+    field(HOPR, "50")
+    field(LOPR, "10")
+    field(MDEL, "-1")
+    field(PREC, "2")
+}
+
+record(ai, "$(device):TEMP2")
+{
+    field(ADEL, "0.1")
+    field(EGU,  "deg C")
+    field(HOPR, "50")
+    field(LOPR, "10")
+    field(MDEL, "-1")
+    field(PREC, "2")
+}
+
+record(ai, "$(device):TEMP3")
+{
+    field(ADEL, "0.1")
+    field(EGU,  "deg C")
+    field(HOPR, "50")
+    field(LOPR, "10")
+    field(MDEL, "-1")
+    field(PREC, "2")
+}
+
+record(ai, "$(device):TEMP4")
+{
+    field(ADEL, "0.1")
+    field(EGU,  "deg C")
+    field(HOPR, "50")
+    field(LOPR, "10")
+    field(MDEL, "-1")
+    field(PREC, "2")
+}
+
+record(bo, "$(device):STOP")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@opSensTempSens.proto stop() $(tty)")
+}
+
+record(ai, "$(device):CHANS")
+{
+    field(DTYP, "stream")
+    field(INP, "@opSensTempSens.proto getChanCount() $(tty)")
+    field(SCAN, "Passive")
+}
+
+record(ai, "$(device):CH1OFF")
+{
+    field(DTYP, "stream")
+    field(INP, "@opSensTempSens.proto getOff1() $(tty)")
+    field(SCAN, "Passive")
+}
+
+record(ai, "$(device):CHECK")
+{
+    field(DTYP, "stream")
+    field(INP, "@opSensTempSens.proto commCheck() $(tty)")
+    field(SCAN, "Passive")
+}

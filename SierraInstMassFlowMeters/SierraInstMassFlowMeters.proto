@@ -1,0 +1,19 @@
+# 
+# Stream device protocol for the Sierra Instruments Mass FLow Meters Smart Track XXX
+# 
+
+terminator = CR;
+separator = "";
+extrainput   = Ignore;
+
+# get_flow{out"?Flowffff"; in"Flow%f"} #working
+get_flow{out"?Flow"; in"Flow%f"}
+# get_flow{in"Flow%f"}
+get_setf{out"?Setfffff"; in"Setf%.2f"}
+get_setr{out"?Setrffff"; in"Setr%.2f"}
+get_unti{out"?Untiffff"; in"Unti%i"}
+get_valve{out"?Vlviffff"; in"Vlvi%i"}
+get_gasi{out"?Gasiffff"; in"Gasi%i"}
+get_strm{out"?Strm";in"Strm%s"}
+get_vern{out"?Vern";in"Vern%s"}
+get_srnm{out"?Srnm";in"Srnm%s"}

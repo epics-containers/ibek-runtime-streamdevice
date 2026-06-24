@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: specsVCU1000
+
+entity_models:
+  - name: specsVCU1000
+    description: |-
+      SPECS VCU1000 controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device PV prefix 1
+      Q:
+        type: str
+        description: |-
+          Device PV prefix 2 (can be "")
+      PORT:
+        type: str
+        description: |-
+          Asyn UDP port name which connects to the VCU port (xxx.xxx.xxx.xxx:2005 UDP)
+    databases:
+      - file: specsVCU1000.template
+        args:
+          .*:

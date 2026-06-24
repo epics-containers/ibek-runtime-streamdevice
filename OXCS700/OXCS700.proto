@@ -1,0 +1,81 @@
+Terminator = "";
+ReadTimeout = 100;
+PollPeriod = 100;
+ReplyTimeout = 2000;
+#MaxInput = 32;
+
+# read status input
+# 32 byte packet:
+# 0: unsigned char Length = always 32, ignored
+# 1: unsigned char Type
+# 2,3: unsigned short GasSetPoint (centi-Kelvin)
+# 4,5: unsigned short GasTemp (centi-Kelvin)
+# 6,7: signed short GasError (centi-Kelvin)
+# 8: unsigned char Runmode (enum, values 0..6)
+# 9: unsigned char PhaseID (enum, values 0..10)
+# 10,11: unsigned short RampRate (centi-Kelvin/s)
+# 12,13: unsigned short TargetTemp (centi-Kelvin)
+# 14,15: unsigned short EvapTemp (centi-Kelvin)
+# 16,17: unsigned short SuctTemp (centi-Kelvin)
+# 18,19: unsigned short TimeRemaining (minutes)
+# 20: unsigned char GasFlow (deci-litres/min)
+# 21: unsigned char GasHeat (%)
+# 22: unsigned char EvapHeat (%)
+# 23: unsigned char SuctHeat (%)
+# 24: unsigned char LinePressure (centi-bar)
+# 25: unsigned char Alarm (enum, values 0..16)
+# 26,27: unsigned short RunTime (minutes)
+# 28,29: unsigned short ControllerNumber
+# 30: unsigned char SoftwareVersion
+# 31: unsigned char EvapAdjust
+# 32: unsigned char TurboMode
+# 33: unsigned char HardwareType
+# 34: unsigned char Level (%)
+# 35: unsigned char ShutterTime (unused in module)
+# 36: unsigned char UnusedOne (unused in module)
+# 37: unsigned char UnusedTwo (unused in module)
+# 38,39: unsigned short UnusedThree (unused in module)
+# 39,40: unsigned short UnusedFour (unused in module)
+
+read { in "%0r%(\$1:TYPE.RVAL)0r%(\$1:SETPOINT.RVAL)02r"
+          "%(\$1:TEMP.RVAL)02r%(\$1:ERROR.RVAL)2r"
+          "%(\$1:RUNMODE.RVAL)0r%(\$1:PHASE.RVAL)0r%(\$1:RAMPRATE.RVAL)02r"
+          "%(\$1:TARGETTEMP.RVAL)02r%(\$1:EVAPTEMP.RVAL)02r"
+          "%(\$1:SUCTTEMP.RVAL)02r%(\$1:REMAINING.RVAL)02r%(\$1:GASFLOW.RVAL)0r"
+          "%(\$1:GASHEAT.RVAL)0r%(\$1:EVAPHEAT.RVAL)0r%(\$1:SUCTHEAT.RVAL)0r"
+          "%(\$1:BACKPRESS.RVAL)0r%(\$1:ALARMI.RVAL)0r%(\$1:RUNTIME.RVAL)02r"
+          "%(\$1:CTRLNUM.RVAL)02r%(\$1:VER.RVAL)0r%(\$1:EVAPADJUST.RVAL)0r"
+          "%(\$1:TURBOMODE.RVAL)0r%(\$1:HARDWARETYPE.RVAL)0r%(\$1:LEVEL.RVAL)0r"
+          "%0r%0r%0r%02r%02r"; }
+
+#read { in "%1c%(\$1:TYPE.RVAL)r%(\$1:SETPOINT.RVAL)2r"
+#          "%(\$1:TEMP.RVAL)2r%(\$1:ERROR.RVAL)2r"
+#          "%(\$1:RUNMODE.RVAL)r%(\$1:PHASE.RVAL)r%(\$1:RAMPRATE.RVAL)2r"
+#          "%(\$1:TARGETTEMP.RVAL)2r%(\$1:EVAPTEMP.RVAL)2r"
+#          "%(\$1:SUCTTEMP.RVAL)2r%(\$1:REMAINING.RVAL)2r%(\$1:GASFLOW.RVAL)r"
+#          "%(\$1:GASHEAT.RVAL)r%(\$1:EVAPHEAT.RVAL)r%(\$1:SUCTHEAT.RVAL)r"
+#          "%(\$1:BACKPRESS.RVAL)r%(\$1:ALARMI.RVAL)r%(\$1:RUNTIME.RVAL)2r"
+#          "%(\$1:CTRLNUM.RVAL)2r%(\$1:VER.RVAL)r%(\$1:EVAPADJUST.RVAL)r"; }
+
+
+# structure of valid command packet is
+# char size of packet
+# char type of packet
+# char *params, list of params
+
+restart { out "\x02\x0a"; }
+ramp    { out "\x06\x0b%(\$1:RRATEH.RVAL)r%(\$1:RRATEL.RVAL)r%(\$1:RTEMPH.RVAL)r%(\$1:RTEMPL.RVAL)r"; }
+plat    { out "\x04\x0c%(\$1:PTIMEH.RVAL)r%(\$1:PTIMEL.RVAL)r"; }
+hold    { out "\x02\x0d"; }
+cool    { out "\x04\x0e%(\$1:CTEMPH.RVAL)r%(\$1:CTEMPL.RVAL)r"; }
+end     { out "\x04\x0f%(\$1:ERATEH.RVAL)r%(\$1:ERATEL.RVAL)r"; }
+purge   { out "\x02\x10"; }
+pause   { out "\x02\x11"; }
+resume  { out "\x02\x12"; }
+stop    { out "\x02\x13"; }
+turbo   { out "\x03\x14%(\$1:TURBO.RVAL)r"; }
+setstatusformat   { out "\x03\x28%(\$1:SETSTATUSFORMAT.RVAL)r"; }
+
+
+
+

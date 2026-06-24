@@ -1,0 +1,138 @@
+
+Terminator = LF CR;
+ReplyTimeout = 1000;
+ReadTimeout = 500;
+
+ACCL = "\$1AC";
+VELO = "\$1VA";
+VMAX = "\$1VU";
+POSITION = "\$1PA";
+RELATIVE = "\$1PR";
+RBV = "\$1TP?";
+ERR = "\$1TE?";
+NLIM = "\$1SL";
+PLIM = "\$1SR";
+CTRL = "\$1KM";
+
+setSwitchboxChannel {
+	out "\$1MX%d";
+}
+
+getSwitchboxChannel {
+	out "\$1MX?";
+	in "\$1MX? %d";
+}
+
+getId {
+	wait 1000;
+	out "\$1ID?";
+	in "\$1ID? %s";
+	@init{ wait 500; out "\$1ID?"; in "\$1ID? %s"; }
+}
+
+tellPosition {
+	out $RBV;
+	in $RBV "%i";
+}
+
+setAbsolutePosition {
+	out $POSITION "%i";
+	@init { out $RBV; in $RBV " %i"; }
+}
+
+setRelativePosition {
+	out $RELATIVE "%i";
+# unfortunatly the controller response to the relative
+# move request is a very strange large value...
+# - So we just dont read it!
+#	@init { out $RELATIVE "?"; in $RELATIVE "? %i"; }
+}
+
+setAcceleration {
+	out $ACCL "%f";
+	@init { wait 500; out $ACCL "?"; in $ACCL "? %f" }
+}
+
+getAcceleration {
+	out $ACCL "?";
+	in $ACCL "? %f";
+}
+
+setVelocity {
+	out $VELO "%f";
+	@init { wait 500; out $VELO "?"; in $VELO "? %f"; }
+}
+
+setVMAX {
+	out $VMAX "%f";
+	@init { out $VMAX "?"; in $VMAX "? %f"; }
+}
+
+getVelocity {
+	out $VELO "?";
+	in $VELO "? %f";
+}
+
+getError {
+	wait 200;
+	out $ERR;
+	in $ERR " %39c";
+}
+
+setControlMode {
+	out $CTRL "%i";
+}
+
+getControlMode {
+	out $CTRL "?";
+	in $CTRL "? %i";
+}
+
+getNLim {
+	out $NLIM "?";
+	in $NLIM "? %i";
+}
+
+setNLim {
+	out $NLIM "%i";
+}
+
+getPLim {
+	out $PLIM "?";
+	in $PLIM "? %i";
+}
+
+setPLim {
+	out $PLIM "%i";
+}
+
+# Controller status:
+#  81 = Motor on, no motion
+#  80 = Motor on, motion in progress
+#  64 = Motor off, no motion
+getStatus{
+	out "\$1TS?";
+	in "\$1TS? %i";
+}
+
+manualCmd {
+    ExtraInput = Ignore;
+    out "%s"; in "%39c"
+}
+
+# Commands that have no readback
+stopMotion {
+	out "\$1ST";
+}
+
+motorEnable {
+	out "\$1%{MF|MO}";
+}
+
+cmdHome {
+	out "\$1OR";
+}
+
+cmdSave {
+	out "\$1SM";
+}

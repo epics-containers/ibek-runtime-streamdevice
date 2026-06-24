@@ -1,0 +1,202 @@
+################################################################################
+#
+# Stream device protocol for CAENels HV-Adaptor power supply for bimorph mirrors
+#
+# The device driver implements a simple string-based communications protocol. So
+# it should work with any sort of power supply that has the same set of commands
+# or a sub-set of them.
+#
+# 2015 - Nicoletta De Maio
+#
+################################################################################
+
+################################################################################
+#
+# Protocol variables
+#
+
+ReplyTimeout = 2000;
+Terminator = CR LF;
+
+################################################################################
+#
+# Device-level commands
+#
+
+groupsList {
+
+    out ":GROUPSLIST?";
+
+    in "%s";
+
+}
+
+################################################################################
+#
+# Group-level GET commands
+#
+
+grGetBinInp {
+
+    out "GROUP\$2:\$3?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)54c";
+    }
+}
+
+grGetMode {
+
+    out "GROUP\$2:OPMODE?";
+
+    in "%s";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)54c";
+    }
+}
+
+grGetTemp {
+
+    out "GROUP\$2:TEMP?";
+
+    in "%s";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)54c";
+    }
+}
+
+grGetChs {
+
+    out "GROUP\$2:CHANNELS?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)54c";
+    }
+}
+
+grGetTL {
+    out "GROUP\$2:TRGTLIST?";
+    in "%(\$1:GROUP\$2:TARGETC.ZRST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:TARGETC.ONST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:TARGETC.TWST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:TARGETC.THST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:TARGETC.FRST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:TARGETC.FVST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:TARGETC.SXST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:TARGETC.SVST)/[A-Za-z0-9]*/;";
+
+    @mismatch {
+      in "%(\$1:RESPONSE)54c";
+    }
+}
+
+grGetKL {
+    out "GROUP\$2:KILLERLIST?";
+    in "%(\$1:GROUP\$2:KILLERC.ZRST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:KILLERC.ONST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:KILLERC.TWST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:KILLERC.THST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:KILLERC.FRST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:KILLERC.FVST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:KILLERC.SXST)/[A-Za-z0-9]*/;%(\$1:GROUP\$2:KILLERC.SVST)/[A-Za-z0-9]*/;";
+
+    @mismatch {
+      in "%(\$1:RESPONSE)54c";
+    }
+}
+
+################################################################################
+#
+# Group-level SET commands
+#
+
+grSetMode {
+
+    out "GROUP\$2:OPMODE:%s";
+
+    in "%(\$1:RESPONSE)54c";
+}
+
+grSetCmd {
+
+    out "GROUP\$2:\$3";
+
+    in "%(\$1:RESPONSE)54c";
+}
+
+grOnOff {
+
+    out "GROUP\$2:ALL:\$3";
+
+    in "%(\$1:RESPONSE)54c";
+}
+
+grSetV {
+
+    out "GROUP\$2:ALL\$3:%f";
+
+    in "%(\$1:RESPONSE)54c";
+}
+
+grSetTrgt {
+    out "GROUP\$2:TRGTAPPLY:%s";
+
+    @mismatch {
+      in "%(\$1:RESPONSE)54c";
+    }
+}
+
+grSetKiller {
+    out "GROUP\$2:KILLERAPPLY:%s";
+
+    @mismatch {
+      in "%(\$1:RESPONSE)54c";
+    }
+}
+
+grStopKiller {
+    out "GROUP\$2:KILLERSTOP";
+
+    @mismatch {
+      in "%(\$1:RESPONSE)54c";
+    }
+}
+
+
+################################################################################
+#
+# Channel-level GET commands
+#
+
+chGetSt {
+
+    out "GROUP\$2:STATUS\$3?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)54c";
+    }
+}
+
+chGetV {
+
+    out "GROUP\$2:\$3\$4?";
+
+    in "%f";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)54c";
+    }
+}
+
+################################################################################
+#
+# Channel-level SET commands
+#
+
+chSetV {
+
+    out "GROUP\$2:\$3\$4:%f";
+
+    in "%(\$1:RESPONSE)54c";
+}

@@ -1,0 +1,92 @@
+################################################################
+# Protocol file for the FMB Oxford Fast Scintillation Detector
+# and Pulse Processing Unit (Cyberstar X2000): model CBY-2206
+#
+# Communications setup:
+# 9600 baud, 8 data bits, 1 stop bit, no parity
+#
+# Set commands return only the ACK character (\006) with no
+# other terminator
+#
+# Date: 02/08/2010
+#
+################################################################
+
+OutTerminator = LF;
+InTerminator = LF;
+replytimeout = 100;
+readtimeout  = 2000;
+
+# Parameter 1 is the device address (0-15)
+
+# Reset the device
+reset {
+	InTerminator = "";
+	out "*RST\$1";
+	in "\x06";
+}
+
+# Set/get the gain
+getGain {
+	out ":INP\$1:GAIN?";
+	in "\x06%f";
+}	
+
+setGain {
+	InTerminator = "";
+	out ":INP\$1:GAIN %f";
+	in "\x06";
+	@init{ 
+        getGain;            
+    };
+}	
+
+# Set/get thresholds
+getUpper {
+	out ":SENS\$1:SCA:UPP?";
+	in "\x06%f";
+}
+
+setUpper {
+	InTerminator = "";
+	out ":SENS\$1:SCA:UPP %f";
+	in "\x06";
+	@init{ 
+        getUpper;            
+    };
+}
+
+getLower {
+	out ":SENS\$1:SCA:LOW?";
+	in "\x06%f";
+}	
+
+setLower {
+	InTerminator = "";
+	out ":SENS\$1:SCA:LOW %f";
+	in "\x06";
+    @init{ 
+        getLower;            
+    };
+}
+
+getPeakTime {
+	out ":SENS\$1:PKT?";
+	in "\x06%{1000|300|100|50}";
+}
+
+# Set/get the peaking time
+setPeakTime {
+	InTerminator = "";
+	out ":SENS\$1:PKT %{1000|300|100|50}";
+	in "\x06";
+    @init{ 
+        getPeakTime;            
+    };
+}
+
+# Check if saturation is detected
+querySat {
+	out ":SENS\$1:SAT?";
+	in "\x06%{0|1}";
+}

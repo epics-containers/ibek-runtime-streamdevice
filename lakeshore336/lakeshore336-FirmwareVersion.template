@@ -1,0 +1,18 @@
+# lakeshore336-FirmwareVersion.template
+# A template that extracts the firmware version from the device
+# identification string in the $(P):ID record
+# parameters are:
+#   P     - the device name (same as in lakeshore336.template)
+
+record(aSub, "$(P):FIRMWARE:CALC")
+{
+        field(SNAM, "extractFirmwareVersion")
+        field(INPA, "$(P):ID CP")
+        field(FTA,  "STRING")
+        field(OUTB, "$(P):FIRMWARE:VERSION PP")
+        field(FTVB, "STRING")
+}
+
+record(stringout, "$(P):FIRMWARE:VERSION")
+{
+}
