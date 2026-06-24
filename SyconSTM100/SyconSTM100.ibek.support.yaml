@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: SyconSTM100
+
+entity_models:
+  - name: SyconSTM100
+    description: |-
+      Sycon STM-100 thin film deposition monitor
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          asyn serial port number
+    databases:
+      - file: SyconSTM100.template
+        args:
+          .*:

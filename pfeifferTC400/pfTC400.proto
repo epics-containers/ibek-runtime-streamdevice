@@ -1,0 +1,822 @@
+# File pfTC400.proto
+#
+# Stream Device protocol file for the Pfeiffer TC400 turbo pump controller unit.
+#
+# The controller uses RS485 only.
+#
+# Keep the filename short because it appears in EPICS record INP fields in the protocol call and
+# can easily overflow some field string length limit (approx 64 characters at present???)
+#
+# Keep the protocol names relatively short because otherwise run up against string length limit
+# for protocol calls in INP fields.
+#
+# The device expects a "telegram".  See Manual Section 8.2 p.29 for the specification of the
+# telegram format.  This is an extract.
+#
+# address   action
+# |         |     parameter
+# |         |     |        length
+# |         |     |        |     data      checksum terminator
+# a2 a1 a0  *  0  n2 n1 n0 l1 l0 dn ... d0 c2 c1 c0 CR
+#
+# It consists of ASCII characters only, apart from the terminating carriage return.  The
+# telegram is not of fixed length and includes the length of the data and finishes with a check
+# sum.  The check sum is the sum of all the preceding ASCII characters modulo 256.
+#
+# The unit has a serial unit number, so several units can be daisy chained together.  This is
+# the address part of the telegram.  A unit number of zero is to tell all units on the bus to
+# reply.  Not yet sure if it is preferable to use zero, since we always use 1 unit on 1
+# connection, or whether it is better to be explicit about the unit number.  There is a
+# parameter which can be queried to get the serial number.  This would have to be sent to
+# address 0 to make sure you get a response from a unit of unknown serial address number.
+#
+# The action part appears to be 0 for a query telegram and 1 for a command telegram or a
+# response telegram If the controller has not understood, it replies with an error telegram.
+# All telegrams contain parameter number.  The error telegram contains an error message in the
+# data.  The controller can also produce error and warning codes.  These go into Error history
+# numbered parameters, they do not appear in telegrams otherwise.
+#
+# The telegram always includes a carriage return.
+#
+# The device has many (decimal) numbered parameters which can be queried and set.
+# The manual divides the parameter numbers into the following classes:
+# Access
+#    Numbers    Description        Comment
+# RW 001 to 064 Control Commands   I believe this includes some which should already be set up
+#                                  in the factory and should not be exposed by EPICS and
+#                                  certainly should be read only if they are.
+# R  300 to 399 Status Requests    These allow you to query state.
+#                                  They include error code history parameters.
+# RW 700 to 797 Set value Settings These seem to allow you to control stuff you might want users
+#                                  to set like set points.  They are a "new value".  But then
+#                                  you sometimes seem to have to poke a lower value parameter to
+#                                  make the controller read it.  It is possible that the manual
+#                                  is just suggesting this to verify the setting rather than it
+#                                  being necessary for the value to be accepted.
+#
+# Not every possible parameter number in the ranges is provided by this model of the Pfeiffer
+# controller and not all the parameters which are provided have been implemented.
+#
+# Although the length of the data in the telegram is variable, believe that the length of data
+# associated with a given numbered parameter is fixed.  Unfortunately, having sent a status
+# request telegram you could be expecting a response telegram of one type and length and receive
+# an error telegram of a datatype and different length in its stead.  See mismatch handlers.
+#
+# There does not appear to be any relationship between parameter numbers in the different
+# centuries.  The manual names and descriptions of parameters are rather terse with
+# Germanic-style concept descriptions, meaning it is not really clear what a particular
+# parameter means or what the action means.  Each parameter is given in the units as defined in
+# the manual which cannot be changed.  Some status info has multiple parameters to bring it back
+# in different units.  The manual gives "Datatype" numbers and a table which tells you the
+# lengths and possible values of such datatypes.
+#
+# Have written a custom format converter to create the Pfeiffer checksum.  Cannot reuse the
+# existing (%< angle bracket) converter because the code for that hardcodes some stuff we cannot
+# break into, so have used %Q.  When reading it back, we handle the checksum as 3 digits to be
+# ignored.
+# 
+# The protocol calls are listed in Pfeiffer parameter number order and the manual entry for each
+# parameter implemented is given.
+#
+# Table of datatypes:
+# Datatype Size (l1 l2) Manual Description          Values (dn to d0)
+#  0       06           False /true                 000000 or 111111
+#  1       06           Positive integer number     000000 to 999999
+#  2       06           Positive fixed comma number 001571 equal to 15.71
+#  4       06           Symbol chain                TC_400
+#  7       03           Positive integer number     000 to 999
+# 10       06           Exponential value           100023 equal to 1.0 times ten to the power of three. 
+#                                                   ???Really??? Fortunately we seem to have none.
+# 11       16           Symbol chain                BrezelBier&Wurst
+#
+
+# There does not seem to be a datatype given for the status query or the error telegrams.  The
+# manual appears to imply that the error telegram is always the same length (l1 l0 = 06).  This
+# could be different to the length of the good data telegram we were expecting!
+#
+# In a command response scenario, the pfeiffer sends a "command understood telegram", which
+# effectively is an echo of what it was told to do, OR an error telegram.
+#
+# Have decided to list the protocols in parameter number order so as not to get VERY confused!
+# 
+# NOTE: several of the parameters include the term "Set" in their name and a protocol naming
+# convention of getters and setters is used so names like getSetBlah and setSetBlah occur, but
+# they do make sense.
+#
+
+# ##############################################################################################
+# START OF GLOBAL DEFINITIONS
+
+Terminator = "\r";
+ReplyTimeout = 2000;
+ReadTimeout = 250;
+LockTimeout = 8000;
+
+# **********************************************************************************************
+# * Generic error telegram handler.                                                            *
+# **********************************************************************************************
+# Define a global handler to try to catch the error telegrams the Pfeiffer returns if it does
+# not like the command.  This is for most of the specific protocols as well as the generic
+# datatype protocols.  This must come at the top of the file because we want it to be a global
+# default and streamDevice applies it to all the protocols which FOLLOW.
+#
+# NOTE: These are the messages sent back by the unit.  They are DIFFERENT to the error code
+# parameters the unit holds, which can be queried and received as a valid data telegram and they
+# do not generate an error telegram (unless we formulate the query incorrectly...)  See
+# protocols for error code parameter(s) above.
+#
+# It is difficult to tell the difference between an acknowlegement telegram and an error
+# response - they both have action bit 1, the error has data length 06, but so do some of the
+# datatypes which are being acknowleged.  The main difference is that we are usually trying to
+# set numbers and the error data consists entirely of alphabetic and punctuation characters.
+# Getting an error while trying to set a string via datatype 4 could become very difficult to
+# parse.  Not sure if you are allowed nested mismatch handlers...  Setting strings will probably
+# require local mismatch handlers in the setter protocol.  Alternatively would have to group all
+# the string parameters at the bottom of the file and redefine a global handler part way down the
+# file.
+#
+# Making no apology for only handling errors from our one unit ID number - if we are seeing
+# rubbish from some other device on the line as happened during early development, this is
+# doomed to fail.
+#
+# We are using explicit record names here, but a protocol argument for the prefix, so have
+# introduced coupling between the protocol file and the template.
+#
+
+@mismatch { in "\$110%(\$2:RTN:ERR:ERRPARAMNO.VAL)3u06%(\$2:RTN:ERR:ERRMESS.VAL)#6s%*3u" }
+
+# END OF GLOBAL DEFINITIONS
+# ##############################################################################################
+# START OF CONTROL COMMAND PARAMETERS
+# (Numbers in range 001 to 099)
+# The Pfeiffer definition of "Control" includes configuration settings for how the pump will
+# operate and what relays and accessaries are connected to the system, which are more like
+# "system setup" commands so be careful with exposing these to users.  However vacuum group
+# have requested loads of them to be available.
+#
+# It also includes a write only "error acknowlegement" parameter (009)
+# with no explanation about how to use it.  We think it will clear the
+# error code once the problem has been cleared.  However we do not
+# want that functionality available from EPICS, only the PLC.
+#
+
+# **********************************************************************************************
+# * Parameter 001 Heating    Heating                                      Datatype 0 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 002 Standby    Standby                                      Datatype 0 Access RW *
+# **********************************************************************************************
+#
+getStandby         { out "\$10000202=?%Q"   ; in "\$11000206%1b%*5b%*3u" }
+setStandby         { out "\$11000206%1b%1b%1b%1b%1b%1b%Q" ; 
+                                              in "\$11000206%*6b%*3u"    }
+# **********************************************************************************************
+# * Parameter 004 RUTimeCtrl Run-up time control                          Datatype 0 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 010 PumpgStatn Pumping station                              Datatype 0 Access RW *
+# **********************************************************************************************
+# Read whether the "pumping station is on or off.  The manual says this is the one you write
+# when you want to turn it off not 023.
+#
+getPumpgStatn      { out "\$10001002=?%Q"   ; in "\$11001006%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 012 EnableVent Enable venting                               Datatype 0 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 017 CfgSpdSwPt Configuration rotation speed switchpoint     Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 019 CfgDO2     Configuration output DO2                     Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of digital output 2.  This
+# defines which piece of state info (NOT parameter number!!) to use to
+# set the state of Pin 9 of the remote interface.  There are 18
+# possible choices, which is rather sad as mbbi record can only do 16,
+# so will have to use calc or transform instead.
+#
+
+getCfgDO2          { out "\$10001902=?%Q"   ; in "\$11001903%3u%*3u"  }
+setCfgDO2          { out "\$11001903%03u%Q" ; in "\$11001903%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 023 MotorPump  Motor Pump                                   Datatype 0 Access RW *
+# **********************************************************************************************
+# Read whether the pump motor is on.
+#
+getMotorPump       { out "\$10002302=?%Q"   ; in "\$11002306%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 024 CfgDO1     Configuration output DO1                     Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of digital output 1.  This
+# defines which piece of state info (NOT parameter number!!) to use to
+# set the state of Pin 8 of the remote interface.
+#
+
+getCfgDO1          { out "\$10002402=?%Q"   ; in "\$11002403%3u%*3u"  }
+setCfgDO1          { out "\$11002403%03u%Q" ; in "\$11002403%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 025 OpModeBKP  Operation mode backing pump                  Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 026 SpdSetMode Rotation speed setting mode                  Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write whether pump is in rotation speed setting mode.  This
+# appears to have binary values only even though it is given as
+# datatype 7 in the manual.
+#
+
+getSpdSetMode      { out "\$10002602=?%Q"   ; in "\$11002603%3u%*3u"  }
+setSpdSetMode      { out "\$11002603%03u%Q" ; in "\$11002603%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 027 GasMode    Gas mode                                     Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the Flag for what gas the pump is configured for.  The
+# pump can be damaged if this is not set up correctly.
+#
+
+getGasMode         { out "\$10002702=?%Q"   ; in "\$11002703%3u%*3u"  }
+setGasMode         { out "\$11002703%03u%Q" ; in "\$11002703%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 030 VentMode   Venting mode                                 Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 035 CfgAccA1   Configuration accessory connection A1        Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of accessory connection A1.
+# The unit has two accessory connectors called A and B, which can each have 2 accessories 
+# connected which are numbered 1 and 2.  Accessory A1 is on pin 4 or accessory connection A.
+# This parameter defines what is connected to A1.
+#
+
+getCfgAccA1        { out "\$10003502=?%Q"   ; in "\$11003503%3u%*3u"  }
+setCfgAccA1        { out "\$11003503%03u%Q" ; in "\$11003503%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 036 CfgAccB1   Configuration accessory connection B1        Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of accessory connection B1.
+# Accessory B1 is on pin 4 of accessory connection B.
+# This parameter defines what is connected to B1.
+#
+
+getCfgAccB1        { out "\$10003602=?%Q"   ; in "\$11003603%3u%*3u"  }
+setCfgAccB1        { out "\$11003603%03u%Q" ; in "\$11003603%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 037 CfgAccA2   Configuration accessory connection A2        Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 037 CfgAccB2   Configuration accessory connection B2        Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 045 CfgRelR1   Configuration Relay 1                        Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of Relay R1 on the remote connection.
+#
+# Relay R1 is on pin 16 of the "remote" connector, however I think it
+# depends on how pins 15 and 17 are wired.  This parameter defines
+# what piece of status information (NOT parameter number!!) is output
+# as relay 1.
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+getCfgRelR1        { out "\$10004502=?%Q"   ; in "\$11004503%3u%*3u"  }
+setCfgRelR1        { out "\$11004503%03u%Q" ; in "\$11004503%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 046 CfgRelR2   Configuration Relay 2                        Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of Relay R2 on the remote connection.
+# Relay R2 is on pin 19 of the "remote" connector, however I think it
+# depends on how pins 18 and 20 are wired.  This parameter defines
+# what piece of status information (NOT parameter number!!) is output
+# as relay 2.
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+
+getCfgRelR2        { out "\$10004602=?%Q"   ; in "\$11004603%3u%*3u"  }
+setCfgRelR2        { out "\$11004603%03u%Q" ; in "\$11004603%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 047 CfgRelR3   Configuration Relay 3                        Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of Relay R3 on the remote connection.
+#
+# Relay R3 is on pin 22 of the "remote" connector, however I think it
+# depends on how pins 21 and 23 are wired.  This parameter defines
+# what piece of status information (NOT parameter number!!) is output
+# as relay 3.
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+
+getCfgRelR3        { out "\$10004702=?%Q"   ; in "\$11004703%3u%*3u"  }
+setCfgRelR3        { out "\$11004703%03u%Q" ; in "\$11004703%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 050 SealingGas  Sealing Gas                                 Datatype 0 Access RW *
+# **********************************************************************************************
+# Read/write whether the sealing gas is on or off
+#
+getSealingGas      { out "\$10005002=?%Q"   ; in "\$11005006%1b%*5b%*3u" }
+setSealingGas      { out "\$11005006%1b%1b%1b%1b%1b%1b%Q" ; 
+                                              in "\$11005006%*6b%*3u"    }
+
+# **********************************************************************************************
+# * Parameter 055 CfgAO1     Configuration output AO1                     Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of analogue output A01 on the remote connection.
+#
+# AO1 is on pin 12 of the "remote" connector.  This parameter defines
+# what piece of status information (NOT parameter number!!) is output
+# as analogue AO1.
+#
+
+getCfgAO1          { out "\$10005502=?%Q"   ; in "\$11005503%3u%*3u"  }
+setCfgAO1          { out "\$11005503%03u%Q" ; in "\$11005503%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 057 CfgAI1     Configuration input AI1                      Datatype 7 Access RW *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 060 CtrlViaInt  Control via interface                       Datatype 7 Access RW *
+# **********************************************************************************************
+# Read the remote priority setting - help to understand whether we do have control of the thing.
+# Testing showed that this one did not get updated when the interface lock (Param 061) was dropped
+# by the PLC hardware signal and only updated when EPICS successfully wrote something to the
+# controller.
+#
+getControlViaInt   { out "\$10006002=?%Q"   ; in "\$11006003%3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 061 IntSelLckd  Interface Selection Locked                  Datatype 0 Access RW *
+# **********************************************************************************************
+# Read whether control interface is locked - help to understand whether we do have 
+# control of the thing.  Testing showed that this one is updated when the PLC changes its
+# hardware priority control signal level.  It is on the write veto list to prevent EPICS locking
+# out the PLC.  Therefore DO NOT implement a set protocol for it.
+#
+getIntSelLckd      { out "\$10006102=?%Q"   ; in "\$11006106%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 062 CfgDI1     Configuration input DI1                      Datatype 7 Access RW *
+# **********************************************************************************************
+# Read/write the flag for the configuration of digital input 1.  This
+# defines which piece of state info (NOT parameter number!!) is controlled/set by the input
+# on Pin 2 of the remote interface connector.
+#
+
+getCfgDI1          { out "\$10006202=?%Q"   ; in "\$11006203%3u%*3u"  }
+setCfgDI1          { out "\$11006203%03u%Q" ; in "\$11006203%*3u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 063 CfgDI2     Configuration input DI2                      Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 064 CfgDI3     Configuration input DI3                      Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+
+# END OF CONTROL COMMAND PARAMETERS
+# (Numbers in range 001 to 099)
+# ##############################################################################################
+# START OF STATUS REQUEST PARAMETERS
+# (Numbers in range 300 to 399)
+#
+
+# **********************************************************************************************
+# * Parameter 300 RemotePrio  Remote priority                             Datatype 0 Access R  *
+# **********************************************************************************************
+# Read whether the remote interface has priority - help to understand whether we do have
+# control of the thing.  Testing showed that this one did not get updated when the interface lock
+# (Param 061) was dropped by the PLC hardware signal and only updated when EPICS successfully 
+# wrote something to the controller.
+#
+getRemotePrio      { out "\$10030002=?%Q"   ; in "\$11030006%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 302 SpdSwPtAtt  Rotation switchpoint attained               Datatype 0 Access R  *
+# **********************************************************************************************
+# Whether the pump has achieved the current switchpoint.
+# This is somewhat confusing because there can be two switchpoints.
+#
+getSpdSwPtAtt      { out "\$10030202=?%Q"   ; in "\$11030206%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 303 Error code  Error code                                  Datatype 4 Access R  *
+# **********************************************************************************************
+# Read the current error code.  The template has records to further parse the error code string.
+#
+getErrorCode       { out "\$10030302=?%Q"   ; in "\$11030306%#6s%*3u" }
+
+# **********************************************************************************************
+# * Parameter 304 OvTempElec  Excess temperature electronic drive unit    Datatype 0 Access R  *
+# **********************************************************************************************
+# Whether the electronic drive unit (the controller) is too hot.
+#
+getOvTempElec      { out "\$10030402=?%Q"   ; in "\$11030406%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 305 OvTempPump  Excess temperature pump                     Datatype 0 Access R  *
+# **********************************************************************************************
+# Whether the pump is too hot.
+#
+getOvTempPump      { out "\$10030502=?%Q"   ; in "\$11030506%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 306 SetSpAtt    Set rotation speed attained                 Datatype 0 Access R  *
+# **********************************************************************************************
+# Whether the pump has achieved the rotation speed which it has been set to do.  Not at all sure
+# what this means compared to attaining the switchpoints.  Maybe you can tell it to go to a
+# specific speed, which is not a switchpoint or it means whatever the current demand is then
+# that has been attained.
+#
+getSetSpdAtt       { out "\$10030602=?%Q"   ; in "\$11030606%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 307 PumpAccel   Pump accelerates                            Datatype 0 Access R  *
+# **********************************************************************************************
+# Whether the pump is accelerating.  Not clear whether that includes it decelerating.
+# Believe testing showed that this does NOT include deceleration.
+#
+getPumpAccel       { out "\$10030702=?%Q"   ; in "\$11030706%1b%*5b%*3u" }
+
+# **********************************************************************************************
+# * Parameter 308 SetRotSpd   Set rotation speed (Hz)                     Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the current set rotation speed in Hz.  For some speed attributes the controller has two
+# parameters in different units.  You cannot set this.  I think it is the speed the controller
+# is currently trying to get the pump to achieve, the current demand.
+#
+getSetRotSpdHz     { out "\$10030802=?%Q"   ; in "\$11030806%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 309 ActualSpd   Active rotation speed (Hz)                  Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the current rotation speed in Hz.  For some speed attributes the controller has two
+# parameters in different units.
+#
+getActualSpdHz     { out "\$10030902=?%Q"   ; in "\$11030906%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 310 DrvCurrent  Drive current                               Datatype 2 Access R  *
+# **********************************************************************************************
+# Read electrical current driving the pump.  This is in 100ths (implied by the specification of
+# datatype 2) of an Amp (stated in the manual), so EPICS records must scale accordingly.
+#
+getDrvCurrent      { out "\$10031002=?%Q"   ; in "\$11031006%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 311 OpHrsPump   Operating hours pump                        Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the operating hours of the pump.
+#
+getOpHrsPump       { out "\$10031102=?%Q"   ; in "\$11031106%6u%*3u" }
+
+# A test avoiding the checksum processing assuming unit ID 001.
+getMessing         { out "0010031102=?100"  ; in "00110311%s" ; @mismatch { in "%s" ; } }
+
+# **********************************************************************************************
+# * Parameter 312 Fw version  Firmware version electronic drive unit      Datatype 4 Access R  *
+# **********************************************************************************************
+# Read the firmware revision
+#
+getFwVersion       { out "\$10031202=?%Q"   ; in "\$11031206%#6s%*3u" }
+
+# **********************************************************************************************
+# * Parameter 313 DrvVoltage  Drive voltage                               Datatype 2 Access R  *
+# **********************************************************************************************
+# Read electrical volatage driving the pump.  This is in 100ths (implied by the specification of
+# datatype 2) of an Volt (stated in the manual), so EPICS records must scale accordingly.
+#
+getDrvVoltage      { out "\$10031302=?%Q"   ; in "\$11031306%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 314 OpHrsElec   Operating hours electronic drive unit       Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the operating hours of the controller.
+#
+getOpHrsElec       { out "\$10031402=?%Q"   ; in "\$11031406%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 315 NominalSpd  Nominal rotation speed (Hz)                 Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the nominal rotation speed in Hz.  For some speed attributes the controller has two
+# parameters in different units.  No explanation for the difference between nominal and actual
+# speed is given in the manual.
+#
+getNominalSpdHz    { out "\$10031502=?%Q"   ; in "\$11031506%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 316 DrvPower    Drive Power (W)                             Datatype 1 Access R  *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 319 PumpCycles  Pump cycles                                 Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the number of pump cycles.  Not sure whether this is the total number of pump cycles in
+# its lifetime or since power on or what no further explanation is given, but it appears in the
+# requirements.
+#
+getPumpCycles      { out "\$10031902=?%Q"   ; in "\$11031906%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 324 TempPwrStg  Temperature Power Stage                     Datatype 1 Access R  *
+# **********************************************************************************************
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+# Read the temperature of the power stage.  Units are degrees C.
+#
+getTempPwrStg      { out "\$10032402=?%Q"   ; in "\$11032406%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 326 TempElec    Temperature electronic                      Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the temperature of the controller.  Units are degrees C.
+#
+getTempElec        { out "\$10032602=?%Q"   ; in "\$11032606%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 330 TempPmpBot  Temperature pump bottom part                Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the temperature of the bottom part of the pump.  Units are degrees C.
+#
+getTempPmpBot      { out "\$10033002=?%Q"   ; in "\$11033006%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 336 AccelDecel  Acceleration / Deceleration                 Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the acceleration of the pump in revs per minute per second.  Since Datatype 1 is stated
+# to be a positive integer number, this will give no indication as to whether the pump is
+# speeding up or slowing down, only the rate at which it is doing so.
+#
+getAccelDecel      { out "\$10033602=?%Q"   ; in "\$11033606%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 342 TempBearing Temperature bearing                         Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the temperature of the motor bearing.  Units are degrees C.
+#
+getTempBearing     { out "\$10034202=?%Q"   ; in "\$11034206%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 346 TempMotor   Temperature Motor                           Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the temperature of the motor.  Units are degrees C.
+#
+getTempMotor       { out "\$10034602=?%Q"   ; in "\$11034606%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 349 ElecName    Name of electronic drive unit               Datatype 4 Access R  *
+# **********************************************************************************************
+# Read the unit name of the controller. 
+# 
+getElecName        { out "\$10034902=?%Q"   ; in "\$11034906%#6s%*3u" }
+getTest            { out "0010034902=?%Q"   ; in "00110349%s" ; @mismatch { in "%s" ; } }
+
+# **********************************************************************************************
+# * Parameter 354 HW Version  Hardware version electronic drive unit      Datatype 4 Access R  * 
+# **********************************************************************************************
+# Read the hardware revision
+#
+getHWVersion       { out "\$10035402=?%Q"   ; in "\$11035406%#6s%*3u" }
+
+# **********************************************************************************************
+# * Parameters 360-369 ErrHist1-10 Error code history, positions 1-10     Datatype 4 Access R  *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 397 SetRotSpd   Set rotation speed (rpm)                    Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the current set rotation speed in revs per minute.  For some speed attributes the
+# controller has two parameters in different units.  You cannot set this.  I think it is the
+# speed the controller is currently trying to get the pump to achieve, the current demand.
+#
+getSetRotSpdRpm    { out "\$10039702=?%Q"   ; in "\$11039706%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 398 ActualSpd   Actual rotation speed (rpm)                 Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the current rotation speed in RPM.  For some speed attributes the controller has two
+# parameters in different units.
+#
+getActualSpdRpm    { out "\$10039802=?%Q"   ; in "\$11039806%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 399 NominalSpd  Nominal rotation speed (rpm)                Datatype 1 Access R  *
+# **********************************************************************************************
+# Read the nominal rotation speed in RPM.  For some speed attributes the controller has two
+# parameters in different units.  The nominal speed is pump full speed.                      
+#
+getNominalSpdRpm   { out "\$10039902=?%Q"   ; in "\$11039906%6u%*3u" }
+
+# END OF STATUS REQUEST PARAMETERS
+# (Numbers in range 300 to 399)
+# ##############################################################################################
+# START OF SET VALUE SETTING PARAMETERS
+# (Numbers in range 700 to 799)
+#
+# In a setting protocol, we must parse, but eat the echoed response.
+# If it is an error response instead it won't parse and will jump to
+# the global mismatch handler which can deal with an error telegram,
+# and tries to deal with garbage, but might not succeed.  When dealing
+# with setting strings, be careful about forcing the parse to fail if
+# it is an error response, because an error telegram has very similar
+# structure to a valid command echo telegram.
+#
+
+# **********************************************************************************************
+# * Parameter 700 RUTimeSVal  Set value run up time                       Datatype 1 Access RW *
+# **********************************************************************************************
+# Read/write the set value run up time, units of minutes.
+#
+getRUTimeSVal      { out "\$10070002=?%Q"   ; in "\$11070006%6u%*3u"  }
+setRUTimeSVal      { out "\$11070006%06u%Q" ; in "\$11070006%*6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 701 SpdSwPt1    Rotation speed switchpoint 1                Datatype 1 Access RW *
+# **********************************************************************************************
+# Read/write switch point 1 - in units of %.
+#
+getSpdSwPt1        { out "\$10070102=?%Q"   ; in "\$11070106%6u%*3u"  }
+setSpdSwPt1        { out "\$11070106%06u%Q" ; in "\$11070106%*6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 707 SpdSVal     Set value in rot. speed setting mode        Datatype 2 Access RW *
+# **********************************************************************************************
+# Read set value of speed - in units of hundreths (implied by Datatype 2) of % (stated in 
+# manual).
+# This is for when the pump is in a mode where it is being told to go to a certain speed - it
+# will use this as the demand value.
+#
+getSpdSVal         { out "\$10070702=?%Q"   ; in "\$11070706%6u%*3u"  }
+setSpdSVal         { out "\$11070706%06u%Q" ; in "\$11070706%*6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 708 PwrSVal    Set value power consumption                  Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 710 SwoffBKP   Switching off threshold backing pump in      Datatype 1 Access RW *
+# *                          intermittant mode                                                 *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 711 SwonBKP    Switching on threshold backing pump in       Datatype 1 Access RW *
+# *                          intermittant mode                                                 *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 717 StdbySVal   Set value rotation speed at standby         Datatype 2 Access RW *
+# **********************************************************************************************
+# Read/write the definition of the rotation speed at "standby".  In units of hundreths of a % .
+#
+getStdbySVal       { out "\$10071702=?%Q"   ; in "\$11071706%6u%*3u"  }
+setStdbySVal       { out "\$11071706%06u%Q" ; in "\$11071706%*6u%*3u" } 
+
+# **********************************************************************************************
+# * Parameter 719 SpdSwPt2    Rotation speed switchpoint 2                Datatype 1 Access RW *
+# **********************************************************************************************
+# Read switch point 2 - in units of %.
+#
+getSpdSwPt2        { out "\$10071902=?%Q"   ; in "\$11071906%6u%*3u" }
+setSpdSwPt2        { out "\$11071906%06u%Q" ; in "\$11071906%*6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 720 VentSpd     Venting rot. speed at delayed venting       Datatype 7 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 721 VentTime    Venting time at delayed venting             Datatype 1 Access RW *
+# * NOT IMPLEMENTED                                                                            *
+# **********************************************************************************************
+
+# **********************************************************************************************
+# * Parameter 777 NomSpdConf  Nominal rotation speed confirmation         Datatype 1 Access RW *
+# **********************************************************************************************
+# There is some sort of procedure to confirm the factory set rotation speed.
+# The manual has a warning that if it is not confirmed, you will get an error code and
+# also that if this is incorrect for the pump model, damage can be caused.
+#
+getNomSpdConf     { out "\$10077702=?%Q"    ; in "\$11077706%6u%*3u" }
+
+# **********************************************************************************************
+# * Parameter 797 RS485Addr   RS-485 device address                       Datatype 1 Access RW *
+# **********************************************************************************************
+# Read the unit number.
+#
+# This protocol cannot work without knowing the unit number, it is a chicken-and-egg situation.
+# You need to address the unit number in the message telegram in order to get a reply.  If you
+# address it as part of group, it will accept commands, but will not reply - according to the
+# telegram page in the manual.
+#
+
+# Use this to check have the correct unit number.
+getUnitAddress     { out "\$10079702=?%Q"   ; in "\$11079706%6u%*3u" }
+
+# Use this to see if we have the default unit address value of 001.
+getUnitAddressDflt { out "0010079702=?%Q"   ; in "0011079706%6u%*3u" }
+
+# Use this to pass on a guess at what unit number might be and see if we get any reply.
+# Might have to step through 001 to 255 to get a reply.
+queryUnitAddress   { out "%03u0079702=?%Q"  ; in "%*3u1079706%6u%*3u" }
+
+# **********************************************************************************************
+# * Generic read/write of a given parameter number of different Datatypes                      *
+# **********************************************************************************************
+#
+# Requested as a feature by vacuum group so they have a record they can poke to read and set
+# stuff not explicitly referenced in the protocol.
+#
+# These are implemented in conjuction with a calcout or an scalcout record, so the items in
+# brackets refer to calc record field names.  The out protocols all have a reference to field A
+# which should contain the parameter number to be queried.  In the reply we eat the parameter
+# number and the checksum converting the value into an appropriate field.
+#
+
+getParamDatatype0  { out "\$100%(A)03u02=?%Q" ; in "\$110%*3u06%(B)1b%*5b%*3u" }
+getParamDatatype1  { out "\$100%(A)03u02=?%Q" ; in "\$110%*3u06%(B)6u%*3u"     }
+getParamDatatype2  { out "\$100%(A)03u02=?%Q" ; in "\$110%*3u06%(B)6u%*3u"     }
+getParamDatatype4  { out "\$100%(A)03u02=?%Q" ; in "\$110%*3u06%(AA)#6s%*3u"   }
+getParamDatatype7  { out "\$100%(A)03u02=?%Q" ; in "\$110%*3u03%(B)3u%*3u"     }
+
+# This one is listed as a datatype in the manual, but we dont seem to have any examples of them
+# and I think there might be a typo in the manual in the format.  Reluctant to implement this
+# without any means to provoke the controller to give a valid example to verify the format.  If
+# the format given is correct it will be horrid to implement from an EPICS record because the
+# multiplier and the power (you know, the mantissa and the wotsit) will have to be handled
+# separately and the decimal point dealt with, all of which is unnatural to EPICS which uses the
+# different formats interchangably.  The most natural way to deal with this would probably be
+# to write another custom converter flag.  Alternatively a calc or scalc would be involved.
+#getParamDatatype10 { out "\$100%(A)03u02=?%Q"  ; in "" }
+
+# This one is listed as a datatype in the manual, but we dont seem to have any examples of them.
+getParamDatatype11 { out "\$100%(A)03u02=?%Q" ; in "\$110%*3u16%(AA)#16s%*3u" }
+
+# Set the datatypes and eat the valid acknowlegement replies.
+#
+setParamDatatype0  { out "\$110%(A)03u06%(C)1b%(C)1b%(C)1b%(C)1b%(C)1b%(C)1b%Q" ; 
+                                                       in "\$110%*3u06%*6b%*3u"  }
+setParamDatatype1  { out "\$110%(A)03u06%(C)06u%Q"   ; in "\$110%*3u06%*6u%*3u"  }
+setParamDatatype2  { out "\$110%(A)03u06%(C)06u%Q"   ; in "\$110%*3u06%*6u%*3u"  } 
+
+# This one requires use of scalcout with stream DTYP for which we do not yet have support.
+#setParamDatatype4  { out "\$110%(A)03u06%(AA)#6s%Q"  ; in "\$110%*3u06%*6s%*3u"  }
+
+setParamDatatype7  { out "\$110%(A)03u03%(C)03u%Q"   ; in "\$110%*3u03%*3u%*3u"  }
+
+# Not bothering with datatype10.
+
+# This one requires use of scalcout with stream DTYP for which we do not yet have support.
+#setParamDatatype11 { out "\$110%(A)03u16%(AA)#16s%Q" ; in "\$110%*3u16%*16s%*3u" }
+
+# **********************************************************************************************
+# * Parameter 099         Non-existent parameter                       Datatype N/A Access N/A *
+# **********************************************************************************************
+# Attempt to deliberately provoke an error response to test error response handling by querying
+# a parameter not in the list, which presumably does not exist.  Unfortunately it might exist for
+# internal use or something like that.
+#
+
+# Treat it as datatype 1, so an error string response will not parse.
+getTestError       { out "\$10009902=?%Q"   ; in "\$11009906%6u%*3u" }
+

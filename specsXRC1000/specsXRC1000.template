@@ -1,0 +1,217 @@
+# substitutions:
+# % macro, P, Device prefix
+# % macro, PORT, terminal server asyn serial port number
+
+# % gui, specsXRC1000, edm, specsXRC1000.edl, P=$(P)
+
+record(stringin, "$(P):MESSAGE") {
+
+}
+
+record(ai, "$(P):EmissionCurrentA_RBV") {
+  field(DTYP, "stream")
+  field(DESC, "Read emission current")
+  field(INP, "@specsXRC1000.proto getEmissionCurrent($(P)) $(PORT) 0")
+  field(SCAN, "2 second")
+  field(PREC, "9")
+  field(EGU, "A")
+}
+
+record(calc, "$(P):EmissionCurrent_RBV") {
+  field(CALC, "A*1000.")
+  field(INPA, "$(P):EmissionCurrentA_RBV")
+  field(EGU, "mA")
+  field(PREC, "2")
+  field(SCAN, "2 second")
+}
+
+record(ao, "$(P):EmissionCurrentA") {
+  field(DTYP, "stream")
+  field(DESC, "Set emission current")
+  field(OUT, "@specsXRC1000.proto setEmissionCurrent($(P)) $(PORT) 0")
+  field(EGU, "A")
+  field(DRVH, "0.0666")
+  field(DRVL, "0")
+}
+
+record(calcout, "$(P):EmissionCurrent_calc") {
+  field(OUT, "$(P):EmissionCurrentA")
+  field(CALC, "A/1000.")
+  field(INPA, "$(P):EmissionCurrent")
+  field(EGU, "A")
+  field(PREC, "2")
+  field(FLNK, "$(P):EmissionCurrentA")
+}
+
+record(ao, "$(P):EmissionCurrent") {
+  field(EGU, "mA")
+  field(PREC, "2")
+  field(FLNK, "$(P):EmissionCurrent_calc")
+}
+
+record(ai, "$(P):AnodeVoltage_RBV") {
+  field(DTYP, "stream")
+  field(DESC, "Read anode voltage")
+  field(INP, "@specsXRC1000.proto getAnodeVoltage($(P)) $(PORT) 0")
+  field(SCAN, "2 second")
+  field(PREC, "5")
+  field(EGU, "V")
+}
+
+record(ao, "$(P):AnodeVoltage") {
+  field(DTYP, "stream")
+  field(DESC, "Set anode voltage")
+  field(OUT, "@specsXRC1000.proto setAnodeVoltage($(P)) $(PORT) 0")
+  field(EGU, "V")
+  field(DRVH, 15000)
+  field(DRVL, 0)
+}
+
+record(ai, "$(P):FilamentCurrent_RBV") {
+  field(DTYP, "stream")
+  field(DESC, "Read filament current")
+  field(INP, "@specsXRC1000.proto getFilamentCurrent($(P)) $(PORT) 0")
+  field(SCAN, "2 second")
+  field(PREC, "5")
+  field(EGU, "A")
+}
+
+record(ai, "$(P):FilamentVoltage_RBV") {
+  field(DTYP, "stream")
+  field(DESC, "Read filament voltage")
+  field(INP, "@specsXRC1000.proto getFilamentVoltage($(P)) $(PORT) 0")
+  field(SCAN, "2 second")
+  field(PREC, "5")
+  field(EGU, "V")
+}
+
+record(ai, "$(P):AnodePower_RBV") {
+  field(DTYP, "stream")
+  field(DESC, "Read anode power")
+  field(INP, "@specsXRC1000.proto getAnodePower($(P)) $(PORT) 0")
+  field(SCAN, "2 second")
+  field(PREC, "5")
+  field(EGU, "W")
+}
+
+record(bo, "$(P):Remote") {
+  field(DTYP, "stream")
+  field(DESC, "Set Remote ON / OFF (Local)")
+  field(OUT, "@specsXRC1000.proto setRemote($(P)) $(PORT) 0")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+}
+
+record(mbbi, "$(P):Remote_RBV") {
+  field(DTYP, "stream")
+  field(DESC, "Get Remote ON / OFF (Local)")
+  field(INP, "@specsXRC1000.proto getRemote($(P)) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "OFF")
+  field(ONVL, "1")
+  field(ONST, "CAN BUS")
+  field(TWVL, "2")
+  field(TWST, "RS-232")
+  field(SCAN, "2 second")
+}
+
+record(mbbo, "$(P):Anode") {
+  field(DTYP, "stream")
+  field(DESC, "Anode selection")
+  field(OUT, "@specsXRC1000.proto setAnode($(P)) $(PORT) 0")
+  field(ZRVL, "1")
+  field(ZRST, "Anode 1 (Al)")
+  field(ONVL, "2")
+  field(ONST, "Anode 2 (Mg)")
+}
+
+record(mbbi, "$(P):Anode_RBV") {
+  field(DTYP, "stream")
+  field(DESC, "Anode selection")
+  field(INP, "@specsXRC1000.proto getAnode($(P)) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "COOLING/OFF")
+  field(ONVL, "1")
+  field(ONST, "Anode 1 (Al)")
+  field(TWVL, "2")
+  field(TWST, "Anode 2 (Mg)")
+  field(SCAN, "2 second")
+}
+
+record(mbbo, "$(P):OperatingStatus") {
+  field(DTYP, "stream")
+  field(DESC, "Control operation")
+  field(OUT, "@specsXRC1000.proto setOperatingStatus($(P)) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "OFF")
+  field(ONVL, "1")
+  field(ONST, "COOLING")
+  field(TWVL, "2")
+  field(TWST, "STANDBY")
+  field(THVL, "3")
+  field(THST, "ANODE VOLTAGE")
+  field(FRVL, "4")
+  field(FRST, "ON") 
+}
+
+record(mbbi, "$(P):OperatingStatus_RBV") {
+  field(DTYP, "stream")
+  field(DESC, "Control operation")
+  field(INP, "@specsXRC1000.proto getOperatingStatus($(P)) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "OFF")
+  field(ONVL, "1")
+  field(ONST, "COOLING")
+  field(TWVL, "2")
+  field(TWST, "STANDBY")
+  field(THVL, "3")
+  field(THST, "ANODE VOLTAGE")
+  field(FRVL, "4")
+  field(FRST, "ON")
+  field(SCAN, "2 second")
+}
+
+# record(ai, "$(P):ErrorStatus_RBV") {
+#   field(DTYP, "stream")
+#   field(DESC, "Error status")
+#   field(INP, "@specsXRC1000.proto getErrorStatus($(P)) $(PORT) 0")
+#   field(SCAN, "2 second")
+# }
+
+# record(mbbiDirect, "$(P):Error_RBV") {
+#   field(INP, "$(P):ErrorStatus_RBV")
+#   field(SCAN, "2 second")
+# }
+
+# record(bi, "$(P):CoolingError_RBV") {
+#   field(INP, "$(P):Error_RBV.B0 MS")
+#   field(SCAN, "2 second")
+# }
+
+# record(bi, "$(P):BadVacuum_RBV") {
+#   field(INP, "$(P):Error_RBV.B1 MS")
+#   field(SCAN, "2 second")
+# }
+
+# record(bi, "$(P):Interlock_RBV") {
+#   field(INP, "$(P):Error_RBV.B2 MS")
+#   field(SCAN, "2 second")
+# }
+
+# record(bi, "$(P):HVSupplyError_RBV") {
+#   field(INP, "$(P):Error_RBV.B3 MS")
+#   field(SCAN, "2 second")
+# }
+
+# record(bi, "$(P):CurrentOverload_RBV") {
+#   field(INP, "$(P):Error_RBV.B4 MS")
+#   field(SCAN, "2 second")
+# }
+
+# record(bi, "$(P):Timeout_RBV") {
+#   field(INP, "$(P):Error_RBV.B7 MS")
+#   field(SCAN, "2 second")
+# }
+
+
+

@@ -1,0 +1,67 @@
+# % gui, $(name=), edmembed, MassFlowController.edl, P=$(P),Q=$(Q),STR=$(STR=$(name=))
+record(ai,$(P)$(Q):FLOW){
+    field(DESC, "Current mesured flow.")
+    field (SCAN, "1 second")
+    field(DTYP, "stream")
+    field(INP, "@SierraInstMassFlowMeters.proto get_flow $(PORT)")
+    field(PREC, 3)
+}
+
+# record(ai,$(P)$(Q):SETF){
+#     field(DESC, "Get current setpoint saved in the flash memory.")
+#     field(SCAN, "Passive")
+#     field(DTYP, "Stream")
+#     field(INP, "@SierraMassFlowMeters.proto get_setf $(PORT) 0")
+#     field(PREC, 2)
+# }
+
+# record(ai,$(P)$(Q):SETR){
+#     field(DESC, "Get current setpoint saved in the RAM memory.")
+#     field(SCAN, "Passive")
+#     field(DTYP, "Stream")
+#     field(INP, "@SierraMassFlowMeters.proto get_setr $(PORT) 0")
+#     field(PREC, 2)
+# }
+
+# record(mbbi,$(P)$(Q):UNTI){
+#     field(DESC, "Get current setpoint saved in the RAM memory.")
+#     field(SCAN, "Passive")
+#     field(DTYP, "Stream")
+#     field(INP, "@SierraMassFlowMeters.proto get_unti $(PORT) 0")
+#     field(PREC, 2)
+# }
+
+# record(mbbi,$(P)$(Q):VLVI){
+#     field(DESC, "Get current state of the valves.")
+#     field(SCAN, "Passive")
+#     field(DTYP, "Stream")
+#     field(INP, "@SierraMassFlowMeters.proto get_valve $(PORT) 0")
+#     field(ZRVL, "1")
+#     field(ONVL, "2")
+#     field(TWVL, "3")
+#     field(ZRST, "Automatic")
+#     field(ONST, "Closed")
+#     field(TWST, "Purge")
+# }
+
+# record(ai, $(P)$(Q):GASI){
+#     field(DESC, "Get current valve index.")
+#     field(SCAN, "Passive")
+#     field(DTYP, "Stream")
+#     field(INP, "@SierraMassFlowMeters.proto get_gasi $(PORT) 0")
+#     field(PREC, 1)
+# }
+
+# record(stringin, $(P)$(Q):STRM){
+#     field(DESC, "Current configured communication mode.")
+#     field(SCAN, "Passive")
+#     field(DTYP, "Stream")
+#     field(INP, "@SierraMassFlowMeters.proto get_strm $(PORT)")
+# }
+
+# record(stringin,$(P)$(Q):VERN){
+#     field(DESC, "Firmware version.")
+#     field (SCAN, "Passive")
+#     field(DTYP, "stream")
+#     field(INP, "@SierraInstMassFlowMeters.proto get_vern $(PORT)")
+# }

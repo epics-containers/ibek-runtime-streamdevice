@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: elmitecLEEM
+
+entity_models:
+  - name: leem
+    description: |-
+      Elmitec LEEM control and monitoring
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      PHI_MTR_RBV:
+        type: str
+        description: |-
+          PHI rotation motor RBV link or const e.g. "BL06I-MO-PEEM-01:PHI:OS.RBV MS" (default = 0)
+        default: "0"
+      name:
+        type: id
+        description: |-
+          Name to export to gda as
+    databases:
+      - file: leem.template
+        args:
+          .*:
+  - name: leemPSValue
+    description: |-
+      Elmitec LEEM power supply value parameter
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      IDX:
+        type: int
+        description: |-
+          The PS index of the LEEM parameter (default = 0)
+        default: 0
+      SCAN:
+        type: int
+        description: |-
+          Scan ratefor reading value from LEEM (default = 10)
+        default: 10
+      PREC:
+        type: int
+        description: |-
+          Precision for the LEEM parameter (default = 2)
+        default: 2
+      EGU:
+        type: str
+        description: |-
+          EGU for the LEEM parameter RBV (default = "")
+        default: ""
+      HOPR:
+        type: str
+        description: |-
+          HOPR for the LEEM parameter (default = "")
+        default: ""
+      LOPR:
+        type: str
+        description: |-
+          LOPR for the LEEM parameter (default = "")
+        default: ""
+      name:
+        type: id
+        description: |-
+          Name to export to gda as
+    databases:
+      - file: leem-PSValue.template
+        args:
+          .*:

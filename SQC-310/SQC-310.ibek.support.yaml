@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: SQC-310
+
+entity_models:
+  - name: SQC310
+    description: |-
+      SQC-310 Quartz Crystal Microbalance
+    parameters:
+      name:
+        type: id
+        description: |-
+          Device name
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port name
+    databases:
+      - file: SQC-310.template
+        args:
+          .*:

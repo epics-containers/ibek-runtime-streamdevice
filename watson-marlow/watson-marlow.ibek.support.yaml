@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: watson-marlow
+
+entity_models:
+  - name: Pump323Du
+    description: |-
+      Controls a Watson Marlow 323Du Pump
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: 323Du.template
+        args:
+          .*:

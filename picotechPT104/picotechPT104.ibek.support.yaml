@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: picotechPT104
+
+entity_models:
+  - name: pt104
+    description: |-
+      Device support for picotech PT104.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          Device suffix
+      CHAN1_NAME:
+        type: str
+        description: |-
+          Name for Chan1
+        default: Chan1
+      CHAN1_T_HIGH:
+        type: float
+        description: |-
+          High limit for Chan1
+        default: 200
+      CHAN1_T_LOW:
+        type: float
+        description: |-
+          Low limit for Chan1
+        default: -200
+      CHAN1_T_LOPR:
+        type: float
+        description: |-
+          Low operating range Chan1
+        default: -200
+      CHAN1_T_HOPR:
+        type: float
+        description: |-
+          High operating range Chan1
+        default: 200
+      CHAN2_NAME:
+        type: str
+        description: |-
+          Name for Chan2
+        default: Chan2
+      CHAN2_T_HIGH:
+        type: float
+        description: |-
+          High limit for Chan2
+        default: 200
+      CHAN2_T_LOW:
+        type: float
+        description: |-
+          Low limit for Chan2
+        default: -200
+      CHAN2_T_LOPR:
+        type: float
+        description: |-
+          Low operating range Chan2
+        default: -200
+      CHAN2_T_HOPR:
+        type: float
+        description: |-
+          High operating range Chan2
+        default: 200
+      CHAN3_NAME:
+        type: str
+        description: |-
+          Name for Chan3
+        default: Chan3
+      CHAN3_T_HIGH:
+        type: float
+        description: |-
+          High limit for Chan3
+        default: 200
+      CHAN3_T_LOW:
+        type: float
+        description: |-
+          Low limit for Chan3
+        default: -200
+      CHAN3_T_LOPR:
+        type: float
+        description: |-
+          Low operating range Chan3
+        default: -200
+      CHAN3_T_HOPR:
+        type: float
+        description: |-
+          High operating range Chan3
+        default: 200
+      CHAN4_NAME:
+        type: str
+        description: |-
+          Name for Chan4
+        default: Chan4
+      CHAN4_T_HIGH:
+        type: float
+        description: |-
+          High limit for Chan4
+        default: 200
+      CHAN4_T_LOW:
+        type: float
+        description: |-
+          Low limit for Chan4
+        default: -200
+      CHAN4_T_LOPR:
+        type: float
+        description: |-
+          Low operating range Chan4
+        default: -200
+      CHAN4_T_HOPR:
+        type: float
+        description: |-
+          High operating range Chan4
+        default: 200
+      PORT:
+        type: str
+        description: |-
+          Asyn port for connection with device
+      TIMEOUT:
+        type: float
+        description: |-
+          Timeout for temperature readout
+      name:
+        type: id
+        description: |-
+          Device and GUI name
+    databases:
+      - file: pt104.template
+        args:
+          .*:

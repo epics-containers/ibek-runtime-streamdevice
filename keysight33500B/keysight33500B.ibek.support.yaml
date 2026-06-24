@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: keysight33500B
+
+entity_models:
+  - name: keysight33500Bchan
+    description: |-
+      Controls a Keysight 33500B function generator channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      CHAN:
+        type: int
+        description: |-
+          Signal generator channel (1 or 2)
+      name:
+        type: id
+        description: |-
+          Name to export to gda as
+    databases:
+      - file: keysight33500Bchan.template
+        args:
+          .*:
+  - name: keysight33500B
+    description: |-
+      Controls a Keysight 33500B function generator
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      MAXPERIOD:
+        type: float
+        description: |-
+          Optional max limit for period (def=1000)
+        default: 1000
+      MINPERIOD:
+        type: float
+        description: |-
+          Optional min limit for period (def=5e-8)
+        default: 5.0e-8
+    databases:
+      - file: keysight33500B.template
+        args:
+          .*:

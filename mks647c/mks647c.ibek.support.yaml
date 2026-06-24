@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: mks647c
+
+entity_models:
+  - name: mks647cChan
+    description: |-
+      MKS 647C mass flow controller channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      Q:
+        type: str
+        description: |-
+          Suffix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      CHAN:
+        type: int
+        description: |-
+          Channel number
+    databases:
+      - file: mks647cChan.template
+        args:
+          .*:
+  - name: mks647c8ChanCtrl
+    description: |-
+      MKS 647C 8 channel mass flow controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      Q:
+        type: str
+        description: |-
+          Suffix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+    databases:
+      - file: mks647c8ChanCtrl.template
+        args:
+          .*:
+  - name: mks647c4ChanCtrl
+    description: |-
+      MKS 647C 4 channel mass flow controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      Q:
+        type: str
+        description: |-
+          Suffix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+    databases:
+      - file: mks647c4ChanCtrl.template
+        args:
+          .*:

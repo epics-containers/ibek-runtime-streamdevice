@@ -1,0 +1,98 @@
+# % macro, P,      PV name prefix
+# % macro, R,      PV name suffix
+# % macro, PORT,   asyn port
+# % macro, name,   module name
+
+# % gui, $(name=), edm, thermocube.edl, P=$(P),R=$(R)
+
+
+################################################################
+# Generic Asyn record.
+################################################################
+
+record(asyn, "$(P)$(R):ASYN") {
+  field(DTYP,"asynRecordDevice")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(OMAX,"1024")
+  field(IMAX,"1024")
+}
+
+
+record(bo, "$(P)$(R):START")
+{
+    field(DESC, "Chiller start")
+    field(DTYP, "stream")
+    field(ZNAM, "0")
+    field(ONAM, "1")
+    field(OUT, "@thermocube.proto start $(PORT)")
+}
+
+record(bo, "$(P)$(R):STOP")
+{
+    field(DESC, "Chiller stop")
+    field(DTYP, "stream")
+    field(ZNAM, "0")
+    field(ONAM, "1")
+    field(OUT, "@thermocube.proto stop $(PORT)")
+}
+
+record(ao,"$(P)$(R):TEMP:SP") {
+  field(SCAN, "Passive")
+  field(PREC,"1")
+  field(EGU, "deg")
+  field(DRVL, "5")
+  field(LOPR, "5")
+  field(HOPR, "50")
+  field(DRVH, "50")  
+  field(OUT, "$(P)$(R):TEMP:SP:OUT PP")
+  field(FLNK, "$(P)$(R):TEMP:SP:OUT")
+}
+
+
+record(calcout, "$(P)$(R):TEMP:SP:OUT")
+{
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(R):TEMP:SP")
+  field(CALC,"(A*9/5+32)*10")
+  field(DTYP, "stream")
+  field(OUT, "@thermocube.proto setTemperature($(P)$(R)) $(PORT)")
+}
+
+record(ai, "$(P)$(R):TEMP:SP:RBV:F")
+{
+    field(DESC, "Get temperature")
+    field(DTYP, "stream")
+    field(PREC,"1")
+    field(SCAN, "5 second")
+    field(INP, "@thermocube.proto getSetpointTemperature($(P)$(R)) $(PORT)")
+    field(FLNK, "$(P)$(R):TEMP:SP:RBV")
+}
+
+record(calc, "$(P)$(R):TEMP:SP:RBV")
+{
+  field(SCAN, "Passive")
+  field(PREC,"1")
+  field(EGU, "deg")    
+  field(INPA, "$(P)$(R):TEMP:SP:RBV:F")
+  field(CALC,"(A/10-32)*5/9")
+}
+
+record(ai, "$(P)$(R):TEMP:F")
+{
+    field(DESC, "Get actual temperature")
+    field(DTYP, "stream")
+    field(PREC,"1")
+    field(SCAN, "5 second")
+    field(INP, "@thermocube.proto getActualTemperature($(P)$(R)) $(PORT)")
+    field(FLNK, "$(P)$(R):TEMP")
+}
+
+record(calc, "$(P)$(R):TEMP")
+{
+  field(SCAN, "Passive")
+  field(PREC,"1")
+  field(EGU, "deg")    
+  field(INPA, "$(P)$(R):TEMP:F")
+  field(CALC,"(A/10-32)*5/9")
+}

@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: EdwardsScroll
+
+entity_models:
+  - name: EdwardsScroll
+    description: |-
+      Template for Serial control and monitoring of Edwards Scroll pumps via serial.  Usually in collaboration with a PLC which has On/Off control.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Mandatory. Device prefix
+      port:
+        type: str
+        description: |-
+          Mandatory. Asyn port name
+      name:
+        type: id
+        description: |-
+          Optional.  Name for gui element
+    databases:
+      - file: EdwardsScroll.template
+        args:
+          .*:

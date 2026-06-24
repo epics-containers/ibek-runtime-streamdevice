@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: cyberstar
+
+entity_models:
+  - name: CBY_2206
+    description: |-
+      Cyberstar CBY-2206 scintillation detector amplifier/discriminator
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      ADDR:
+        type: int
+        description: |-
+          device address
+      name:
+        type: id
+        description: |-
+          GUI name
+    databases:
+      - file: CBY-2206.template
+        args:
+          .*:

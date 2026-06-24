@@ -1,0 +1,269 @@
+################################################################################
+#
+# Stream device protocol for the TDK Lambda Gensys 3300W power supply
+#
+# 2021 - Hugh Baxter: Corrected some SCPI commands.
+#
+# 2020 - Pete Leicester: Added SCPI command equivalents for use over Ethernet, most of the RS232
+#        command are not supported over Ethernet.
+#        SCPI command protocols have suffix 'S', RS232 command protocols now have suffix 'R',
+#        Command protocols that work on both RS232 and SCPI connections have neither suffix.
+# 2016 - Jonathan Thompson: Initial RS232/485 protocol
+#
+################################################################################
+
+################################################################################
+#
+# Protocol variables
+#
+
+Terminator = CR;
+ExtraInput = Ignore;
+
+################################################################################
+#
+# Commands
+#
+
+# Select the device and place in remote mode
+onConnectR {
+    out "ADR %i";
+    in "OK";
+    out "RMT 1";
+    in "OK";
+}
+onConnectS {
+    Terminator = LF;
+    out "SYST:SET 1";
+}
+
+# Get the device identity
+getIdentityR {
+    out "IDN?";
+    in "%s";
+}
+getIdentityS {
+    Terminator = LF;
+    out "*IDN?";
+    in "%s";
+}
+
+# Get the software version
+getSwVersionR {
+    out "REV?";
+    in "%s";
+}
+getSwVersionS {
+    Terminator = LF;
+    out "SYST:VERS?";
+    in "%s";
+}
+
+# Get the device serial number
+getSerialNumberR {
+    out "SN?";
+    in "%s";
+}
+# This command doesn't actually exist for SCPI
+# will leave for now incase anything breaks
+# can use *IDN? to get the serial number.
+getSerialNumberS {
+    Terminator = LF;
+    out "SN?";
+    in "%s";
+}
+
+# Get the last test date
+getLastTestDateR {
+    out "DATE?";
+    in "%s";
+}
+# I'm not sure this command actually exist for SCPI
+# will leave for now incase anything breaks
+getLastTestDateS {
+    Terminator = LF;
+    out "DIAG:COMM:PASS DATE?";
+    in "%s";
+}
+
+# The demand voltage
+setDemandVoltageR {
+    out "PV %6.4f";
+    in "OK";
+}
+setDemandVoltageS {
+    Terminator = LF;
+    out "SOUR:VOLT %6.4f";
+}
+
+getDemandVoltageR {
+    out "PV?";
+    in "%f";
+}
+getDemandVoltageS {
+    Terminator = LF;
+    out "SOUR:VOLT?";
+    in "%f";
+}
+
+# The demand current
+setDemandCurrentR {
+    out "PC %6.4f";
+    in "OK";
+}
+setDemandCurrentS {
+    Terminator = LF;
+    out "SOUR:CURR %6.4f";
+}
+getDemandCurrentR {
+    out "PC?";
+    in "%f";
+}
+getDemandCurrentS {
+    Terminator = LF;
+    out "SOUR:CURR?";
+    in "%f";
+}
+
+# The actual voltage
+getActualVoltageR {
+    out "MV?";
+    in "%f";
+}
+getActualVoltageS {
+    Terminator = LF;
+    out "MEAS:VOLT?";
+    in "%f";
+}
+
+# The actual current
+getActualCurrentR {
+    out "MC?";
+    in "%f";
+}
+getActualCurrentS {
+    Terminator = LF;
+    out "MEAS:CURR?";
+    in "%f";
+}
+
+# Output state
+setOutputStateR {
+    out "OUT %{OFF|ON}";
+    in "OK";
+}
+setOutputStateS {
+    Terminator = LF;
+    out "OUTP:STAT %{OFF|ON}";
+}
+getOutputStateR {
+    out "OUT?";
+    in "%{OFF|ON}";
+}
+getOutputStateS {
+    Terminator = LF;
+    out "OUTP:STAT?";
+    in "%{OFF|ON}";
+}
+
+# Foldback protection
+setFoldbackProtectionR {
+    out "FLD %{OFF|ON}";
+    in "OK";
+}
+# Foldback protection
+setFoldbackProtectionS {
+    Terminator = LF;
+    out "SOUR:CURR:PROT:STAT %{OFF|ON}";
+}
+getFoldbackProtectionR {
+    out "FLD?";
+    in "%{OFF|ON}";
+}
+getFoldbackProtectionS {
+    Terminator = LF;
+    out "SOUR:CURR:PROT:STAT?";
+    in "%{OFF|ON}";
+}
+
+# Over voltage protection
+setOverVoltageProtectionR {
+    out "OVP %6.4f";
+    in "OK";
+}
+setOverVoltageProtectionS {
+    Terminator = LF;
+    out "SOUR:VOLT:PROT:LEV %6.4f";
+}
+getOverVoltageProtectionR {
+    out "OVP?";
+    in "%f";
+}
+getOverVoltageProtectionS {
+    Terminator = LF;
+    out "SOUR:VOLT:PROT:LEV?";
+    in "%f";
+}
+
+# Under voltage limit
+setUnderVoltageLimitR {
+    out "UVL %6.4f";
+    in "OK";
+}
+setUnderVoltageLimitS {
+    Terminator = LF;
+    out "SOUR:VOLT:LIM:LOW %6.4f";
+}
+getUnderVoltageLimitR {
+    out "UVL?";
+    in "%f";
+}
+getUnderVoltageLimitS {
+    Terminator = LF;
+    out "SOUR:VOLT:LIM:LOW?";
+    in "%f";
+}
+
+# Auto restart mode
+setAutoRestartModeR {
+    out "AST %{OFF|ON}";
+    in "OK";
+}
+setAutoRestartModeS {
+    Terminator = LF;
+    out "OUTP:PON %{OFF|ON}";
+}
+getAutoRestartModeR {
+    out "AST?";
+    in "%{OFF|ON}";
+}
+getAutoRestartModeS {
+    Terminator = LF;
+    out "OUTP:PON?";
+    in "%{OFF|ON}";
+}
+
+# Operating mode
+getOperatingModeR {
+    out "MODE?";
+    in "%{OFF|CV|CC}";
+}
+getOperatingModeS {
+    Terminator = LF;
+    out "SOUR:MOD?";
+    in "%{OFF|CV|CC}";
+}
+
+# Fault Event Register (on RS232) or Questionable Condition Condition Register (on SCPI)
+# NB Bits 1-7 of the two registers are the same (bit 0 and bit 8 upwards are different)
+getFaultEventRegR {
+    out "FEVE?";
+    in "%d";
+}
+getFaultEventRegS {
+    Terminator = LF;
+    out "STAT:QUES:COND?";
+    in "%d";
+}
+
+

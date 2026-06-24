@@ -1,0 +1,130 @@
+# Communication protocol file for fusion Pump 4000
+# Omar Elamin & Mateusz Hoppe
+# 2021
+
+
+InTerminator = CR LF;  # to use with simulator
+OutTerminator = CR LF;  # to use with simulator
+
+ReplyTimeout = 100;
+WriteTimeout = 100;
+ReadTimeout  = 100;
+
+start {
+     out "\$1 start \$2";
+     in "\$1 start \$2";
+     in "Pump start running...";
+}
+startAll {
+    out "start \$1";
+    in "start \$1";
+    in "Pump start running...";
+}
+pause {
+    out "\$1 pause";
+    in "\$1 pause";
+    in "Pump pause!";
+}
+pauseAll {
+    out "pause";
+    in "pause";
+    in "Pump pause!";
+}
+stop {
+    out "\$1 stop";
+    in "\$1 stop";
+    in "Pump stop!";
+}
+stopAll {
+    out "stop";
+    in "stop";
+    in "Pump stop!";
+}
+
+getStatus {
+    out "\$1 status";
+    in "\$1 status";
+    in "%d";
+}
+getMaxRate {
+    out "\$1 read limit parameter \$2";
+    in "\$1 read limit parameter \$2";
+    in "%f %*f %*f %*f";
+}
+getMinRate {
+    out "\$1 read limit parameter \$2";
+    in "\$1 read limit parameter \$2";
+    in "%*f %f %*f %*f";
+}
+getMaxVolume {
+    out "\$1 read limit parameter \$2";
+    in "\$1 read limit parameter \$2";
+    in "%*f %*f %f %*f";
+}
+getMinVolume {
+    out "\$1 read limit parameter \$2";
+    in "\$1 read limit parameter \$2";
+    in "%*f %*f %*f %f";
+}
+
+getDispensedVolume {
+    out "\$1 dispensed volume";
+    in "\$1 dispensed volume";
+    in "dispensed volume = %f";
+}
+
+getElapsedTime {
+    out "\$1 elapsed time";
+    in "\$1 elapsed time";
+    in "elapsed time = %f";
+}
+
+setUnits {
+    out "\$1 set units %d";
+    in "\$1 set units %*d";
+    in "units = %d";
+}
+
+setDiameter {
+    out "\$1 set diameter %f";
+    in "\$1 set diameter %*f";
+    in "diameter = %f";
+}
+
+setRate {
+    out "\$1 set rate %f";
+    in "\$1 set rate %*f";
+    in "rate = %f";
+}
+
+setTime {
+    out "\$1 set time %f";
+    in "\$1 set time %*f";
+    in "";
+    in "rate = %*f";
+    in "";
+    in "time = %f";
+}
+
+setVolume {
+    out "\$1 set volume %f";
+    in "\$1 set volume %*f";
+    in "volume = %f";
+}
+
+getDelay    {
+    out "\$1 set delay -1";
+    in "\$1 set delay -1";
+    in "delay = %f"; 
+}
+
+setDelay    {
+     out "\$1 set delay %f";
+     in "\$1 set delay %*f";
+     in "delay = %f"; 
+    @init { getDelay; }
+}
+
+
+
+

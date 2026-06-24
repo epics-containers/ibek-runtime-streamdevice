@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: kellerPyrometer
+
+entity_models:
+  - name: kellerPyrometer
+    description: |-
+      Keller Pyrometer
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Device port
+    databases:
+      - file: kellerPyrometer.template
+        args:
+          .*:

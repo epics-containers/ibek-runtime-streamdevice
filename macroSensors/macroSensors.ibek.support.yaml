@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: macroSensors
+
+entity_models:
+  - name: dmc_a2
+    description: |-
+      Support for the macro sensors dual channel LVDT reader.
+      The raw readings are available in the ':LVDT' PVs. A linear translation
+      function is also applied with the result available in the ':VAL' PVs.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix
+      R:
+        type: str
+        description: |-
+          Suffix
+      CHAN:
+        type: int
+        description: |-
+          1 or 2
+      PORT:
+        type: str
+        description: |-
+          Asyn port
+      ADDR:
+        type: int
+        description: |-
+          Address of device (normally 1)
+      OFF:
+        type: float
+        description: |-
+          Conversion offset
+      GRAD:
+        type: float
+        description: |-
+          Conversion factor
+      EGU:
+        type: str
+        description: |-
+          The engineering units of the translated value
+      PREC:
+        type: int
+        description: |-
+          The desired precision of the translated value
+      ENABLE2:
+        type: int
+        description: |-
+          Enable the second translation
+      OFF2:
+        type: float
+        description: |-
+          Conversion offset for second translation
+      GRAD2:
+        type: float
+        description: |-
+          Conversion factor for second translation
+      EGU2:
+        type: str
+        description: |-
+          The engineering units of the second translated value
+      PREC2:
+        type: int
+        description: |-
+          The desired precision of the second translated value
+    databases:
+      - file: dmc-a2.template
+        args:
+          .*:

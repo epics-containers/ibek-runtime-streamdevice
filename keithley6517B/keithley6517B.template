@@ -1,0 +1,533 @@
+
+# Macros:
+#% macro, P, Device Prefix
+#% macro, R, Device Suffix
+#% macro, PORT, Asyn Port name
+#% macro, A, Timeout
+# This associates the template with an edm screen
+# % gui, $(PORT), edm, keithley6517B.edl, P=$(P),R=$(R)
+
+
+
+#
+# Basic SCPI (IEEE488.2) commands
+#
+record(waveform, "$(P)$(R)IDN")
+{
+    field(DESC, "SCPI identification string")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getIDN(119) $(PORT) $(A)")
+    #field(PINI, "YES")
+    field(FTVL, "CHAR")
+    field(NELM, "120")
+}
+record(bo, "$(P)$(R)RST")
+{
+    field(DESC, "SCPI Reset")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto cmd(*RST) $(PORT) $(A)")
+}
+record(bo, "$(P)$(R)CLS")
+{
+    field(DESC, "SCPI Clear status")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto cmd(*CLS) $(PORT) $(A)")
+}
+record(bo, "$(P)$(R)TRG")
+{
+    field(DESC, "SCPI trigger")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto cmd(*TRG) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetSTB")
+{
+    field(DESC, "SCPI get status byte")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getD(*STB) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetESR")
+{
+    field(DESC, "SCPI get event status")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getD(*ESR) $(PORT) $(A)")
+}
+record(longout, "$(P)$(R)SetESE")
+{
+    field(DESC, "SCPI enable event status")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto setD(*ESE) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetESE")
+{
+    field(DESC, "SCPI enabled event status")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getD(*ESE) $(PORT) $(A)")
+}
+record(longout, "$(P)$(R)SetSRE")
+{
+    field(DESC, "SCPI enable service requests")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto setD(*SRE) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetSRE")
+{
+    field(DESC, "Enabled service requests")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getD(*SRE) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetOPC")
+{
+    field(DESC, "Output completion status")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getD(*OPC) $(PORT) $(A)")
+}
+
+
+######### Scan and readout control ######################
+#
+# Two paths for polling: data poll and settings poll.
+#
+record(bo, "$(P)$(R)EnaPoll")
+{
+   field(DESC, "Enable read polling")
+   field(ZNAM, "disable")
+   field(ONAM, "enable")
+   field(VAL, "1")
+   #field(PINI, "YES")
+}
+
+record(fanout, "$(P)$(R)ReadSettings")
+{
+   field(DESC, "Process all read fields")
+   field(LNK1, "$(P)$(R)FuncRBV")
+   field(LNK2, "$(P)$(R)SourceEnableRBV")
+   field(LNK3, "$(P)$(R)SourceVoltageRBV")
+   field(LNK4, "$(P)$(R)VSourceRangeRBV")
+   field(LNK5, "$(P)$(R)ArmContinuousRBV")
+   field(LNK6, "$(P)$(R)RangeRBV")
+   field(FLNK, "$(P)$(R)ReadSettings2")
+   field(SDIS, "$(P)$(R)EnaPoll")
+   field(DISV, "0")
+}
+record(fanout, "$(P)$(R)ReadSettings2")
+{
+   field(DESC, "Process all read fields")
+   field(LNK1, "$(P)$(R)DispTop")
+   field(LNK2, "$(P)$(R)DispBottom")
+   field(LNK3, "$(P)$(R)IntRBV")
+   #field(LNK4, "$(P)$(R)")
+   #field(LNK5, "$(P)$(R)")
+   #field(LNK6, "$(P)$(R)")
+}
+
+
+## Measurement configuration
+record(mbbo, "$(P)$(R)Func")
+{
+    field(DESC, "Measurement function")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto setFunction $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "Voltage")
+    field(ONVL, "1")
+    field(ONST, "Current")
+    field(TWVL,"2")
+    field(TWST,"Resistance")
+    field(THVL,"3")
+    field(THST,"Charge")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(mbbi, "$(P)$(R)FuncRBV")
+{
+    field(DESC, "Measurement function")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getFunction $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "Voltage")
+    field(ONVL, "1")
+    field(ONST, "Current")
+    field(TWVL,"2")
+    field(TWST,"Resistance")
+    field(THVL,"3")
+    field(THST,"Charge")
+    #field(PINI, "YES")
+}
+
+record(ao, "$(P)$(R)Int")
+{
+    field(DESC, "Set integration time")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto setAper($(P)$(R)FuncRBV) $(PORT) $(A)")
+    field(PREC, "3")
+    field(EGU,  "s")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(ai, "$(P)$(R)IntRBV")
+{
+    field(DESC, "Get integration time")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getAper($(P)$(R)FuncRBV) $(PORT) $(A)")
+    field(PREC, "3")
+    field(EGU, "s")
+}
+
+
+#
+# Voltage source
+#
+record(bo, "$(P)$(R)SourceEnable")
+{
+    field(DESC, "Disable/Enable voltage source")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto setD(OUTP:STAT) $(PORT) $(A)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bi, "$(P)$(R)SourceEnableRBV")
+{
+    field(DESC, "Voltage source enabled?")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getD(OUTP:STAT) $(PORT) $(A)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    #field(PINI, "YES")
+}
+record(ao, "$(P)$(R)SourceVoltage")
+{
+    field(DESC, "Source voltage setpoint")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto setF(SOUR:VOLT) $(PORT) $(A)")
+    field(EGU,  "V")
+    field(PREC, "3")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(ai, "$(P)$(R)SourceVoltageRBV")
+{
+    field(DESC, "Source voltage readback")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getF(SOUR:VOLT) $(PORT) $(A)")
+    field(EGU,  "V")
+    field(PREC, "3")
+    #field(PINI, "YES")
+}
+record(mbbo, "$(P)$(R)VSourceRange")
+{
+    field(DESC, "Voltage source range")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto setVSourceRange $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "100V")
+    field(ONVL, "1")
+    field(ONST, "1000V")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(mbbi, "$(P)$(R)VSourceRangeRBV")
+{
+    field(DESC, "Full-scale range readback")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getVSourceRange $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "100V")
+    field(ONVL, "1")
+    field(ONST, "1000V")
+    #field(PINI, "YES")
+}
+
+
+
+### Measurements ###
+
+record(bo, "$(P)$(R)ArmContinuous")
+{
+    field(DESC, "Arm device continuously")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto setArmContinuous(OUTP:STAT) $(PORT) $(A)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bi, "$(P)$(R)ArmContinuousRBV")
+{
+    field(DESC, "Arm device continuously?")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getArmContinuous(OUTP:STAT) $(PORT) $(A)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    #field(PINI, "YES")
+}
+
+# Calculation record to identify whether the device
+# is armed - and the user has enabled polling/comms.
+# The measurements can only be taken if both conditions are true.
+record(calc, "$(P)$(R)ArmPollCalc")
+{
+    field(DESC, "Check for arm and ena")
+    field(INPA, "$(P)$(R)ArmContinuousRBV CP")
+    field(INPB, "$(P)$(R)EnaPoll CP")
+    field(CALC, "A&&B")
+}
+
+record(ai, "$(P)$(R)Measurement")
+{
+    field(DESC, "Measure current")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto freshMeasurement($(P)$(R)) $(PORT) $(A)")
+    field(PREC, "5")
+    field(SDIS, "$(P)$(R)ArmPollCalc")
+    field(DISV, "0")
+}
+
+# Measurement units
+record(mbbi, "$(P)$(R)EGU")
+{
+    field(DESC, "Measurement units")
+    field(ZRVL, "0")
+    field(ZRST, "Volt")
+    field(ONVL, "1")
+    field(ONST, "Amps")
+    field(TWVL, "2")
+    field(TWST, "Ohms")
+    field(THVL, "3")
+    field(THST, "OHMCM (Volume)")
+    field(FRVL, "4")
+    field(FRST, "OHMSQ (Surface)")
+    field(FVVL, "5")
+    field(FVST, "%/V")
+    field(SXVL, "6")
+    field(SXST, "Coulombs")
+    #field(PINI, "YES")
+}
+
+# Measurement status
+record(mbbi, "$(P)$(R)STAT")
+{
+    field(DESC, "Measurement units")
+    field(ZRVL, "0")
+    field(ZRST, "Normal")
+    field(ONVL, "1")
+    field(ONST, "Zero Check Enabled")
+    field(TWVL, "2")
+    field(TWST, "Overflow")
+    field(THVL, "3")
+    field(THST, "Underflow")
+    field(FRVL, "4")
+    field(FRST, "Reference (Rel)")
+    field(FVVL, "5")
+    field(FVST, "Out of Limit")
+    #field(PINI, "YES")
+}
+
+
+# The current measurement range
+record(ai, "$(P)$(R)RangeRBV")
+{
+    field(DESC, "Source voltage readback")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getRange($(P)$(R)FuncRBV) $(PORT) $(A)")
+    field(PREC, "1")
+    #field(PINI, "YES")
+}
+
+
+######################################################################
+#
+#  Manual device control
+# Simulate key presses and read out the two lines of display
+#
+# Key presses:
+record(bo, "$(P)$(R)KeyRangeUp")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(1) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyRangeDown")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(17) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyRangeAuto")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(9) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyV")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(15) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyI")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(22) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyR")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(29) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyQ")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(5) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyVSourceUp")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(2) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyVSourceDown")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(26) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyZChk")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(23) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyRel")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(30) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyFilter")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(6) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyMath")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(13) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyTrig")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(20) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeySeq")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(27) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyLeftArrow")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(3) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyRightArrow")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(10) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyStore")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(14) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyRecall")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(21) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyExit")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(11) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyEnter")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(18) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyDispPrev")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(8) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+record(bo, "$(P)$(R)KeyDispNext")
+{
+    field(DESC, "Simulate key press")
+    field(DTYP, "stream")
+    field(OUT,  "@keithley6517B.proto keyPress(16) $(PORT) $(A)")
+    field(FLNK, "$(P)$(R)ReadSettings")
+}
+
+
+
+
+#### Device Display Lines  #################################
+record(stringin, "$(P)$(R)DispTop")
+{
+    field(DESC, "Device top display")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getDisplayTop $(PORT) $(A)")
+    #field(PINI, "YES")
+}
+
+record(stringin, "$(P)$(R)DispBottom")
+{
+    field(DESC, "Device bottom display")
+    field(DTYP, "stream")
+    field(INP,  "@keithley6517B.proto getDisplayBottom $(PORT) $(A)")
+}
+
+# Asyn record to send commands directly to device
+record(asyn,"$(P)$(R)ASYN")
+{
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"0")
+    field(OMAX,"80")
+    field(IMAX,"80")
+    field(OEOS,"\r")
+    field(IEOS,"\r")
+}
+
+
+

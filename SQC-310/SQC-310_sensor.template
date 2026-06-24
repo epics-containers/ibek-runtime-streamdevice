@@ -1,0 +1,43 @@
+# SQC-310 Sensor $(R)
+
+# Macros:
+# % macro, name, Device name
+# % macro, P, Device Prefix
+# % macro, R, Device Prefix
+# % macro, PORT, Asyn Port name
+
+record(ai, "$(P):$(R):Rate_RBV")
+{
+    field(DTYP, "stream")
+    field(SDIS, "$(P):Disable")
+    field(INP,  "@SQC-310.proto get_rate($(R)) $(PORT)")
+    field(EGU,  "Ang/s")
+    field(SCAN, "1 second")
+    field(PREC, "2")
+}
+
+record(ai, "$(P):$(R):Thickness_RBV")
+{
+    field(DTYP, "stream")
+    field(SDIS, "$(P):Disable")
+    field(INP,  "@SQC-310.proto get_thickness($(R)) $(PORT)")
+    field(EGU,  "Ang")
+    field(SCAN, "2 second")
+    field(PREC, "2")
+}
+
+record(longout, "$(P):$(R):CrystalTooling")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@SQC-310.proto set_crystal_tooling($(R)) $(PORT)")
+    field(EGU,  "%")
+    field(FLNK, "$(P):$(R):CrystalTooling_RBV")
+}
+
+record(longin, "$(P):$(R):CrystalTooling_RBV")
+{
+    field(DTYP, "stream")
+    field(INP,  "@SQC-310.proto get_crystal_tooling($(R)) $(PORT)")
+    field(EGU,  "%")
+    field(PINI, "YES")
+}

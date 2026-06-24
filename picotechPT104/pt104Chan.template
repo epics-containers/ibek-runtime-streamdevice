@@ -1,0 +1,272 @@
+# % macro, N, Channel Number
+# % macro, EEPR_IND, Offset of this channels data in EEPROM
+# % macro, DELAY, Time between the measurements that triggers the alarm
+# % macro, CHNAME, Name of this channel
+
+# % gui, $(name=), boydetail, pt104App_opi/pt104_details.opi, P=$(P),R=$(R),CHNAME=$(CHNAME)
+
+# % gui, $(name=), toggle, Channel Enable, $(P)$(R):$(CHNAME):Enable
+# % gui, $(name=), demand, Channel Offset demand, $(P)$(R):$(CHNAME):Offset
+# % gui, $(name=), readback, Channel Offset readback, $(P)$(R):$(CHNAME):Offset
+# % gui, $(name=), readback, Calculated temperature, $(P)$(R):$(CHNAME):T
+# % gui, $(name=), readback, Offset-corrected temperature, $(P)$(R):$(CHNAME):TCorr
+
+# % autosave 0 VAL
+record (bi, "$(P)$(R):$(CHNAME):Enable") {
+    field(DESC, "Enable? channel $(CHNAME)")
+    field(FLNK, "$(P)$(R):Configure")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enable")
+    field(VAL,  "1")
+}
+
+# % autosave 2 VAL
+# % archiver 600 Monitor
+record (ai, "$(P)$(R):$(CHNAME):Offset") {
+    field(DESC, "Offset for Channel $(CHNAME)")
+    field(INP,  "0")
+    field(DTYP, "Soft Channel")
+    field(LINR, "NO CONVERSION")
+    field(EGU,  "C")
+    field(PREC, "3")
+}
+
+record (subArray, "$(P)$(R):$(CHNAME):CalibRaw") {
+    field(DESC, "Calibration data")
+    field(FLNK, "$(P)$(R):$(CHNAME):Calib")
+    field(FTVL, "UCHAR")
+    field(MALM, "128")
+    field(NELM, "4")
+    field(INP,  "$(P)$(R):Eeprom CP")
+    field(INDX, "$(EEPR_IND)")
+    field(DTYP, "Soft Channel")
+}
+
+record (aSub, "$(P)$(R):$(CHNAME):Calib") {
+    field(DESC, "Extract value from calibration data")
+    field(SNAM, "pt104_ucharToUInt")
+
+    field(INPA, "$(P)$(R):$(CHNAME):CalibRaw")
+    field(FTA,  "UCHAR")
+    field(NOA,  "4")
+    field(NEA,  "4")
+
+    field(INPB, "1")
+    field(FTB,  "ULONG")
+    field(NOB,  "1")
+    field(NEB,  "1")
+
+    field(FTVA, "ULONG")
+}
+
+## Note: Processing of measurements is done in a chain (poor man's sseq)
+
+record (waveform, "$(P)$(R):$(CHNAME):MeasRaw") {
+    field(DESC, "Raw measurement data")
+    field(DISV, "0")
+    field(SDIS, "$(P)$(R):$(CHNAME):Enable")
+    field(SCAN, "I/O Intr")
+    field(FLNK, "$(P)$(R):$(CHNAME):Meas0Raw")
+    field(DTYP, "stream")
+    field(INP,  "@pt104.proto chan$(N)raw $(PORT)")
+    field(NELM, "19")
+    field(FTVL, "UCHAR")
+}
+
+record (subArray, "$(P)$(R):$(CHNAME):Meas0Raw") {
+    field(DESC, "Raw measurement data 0")
+    field(FTVL, "UCHAR")
+    field(FLNK, "$(P)$(R):$(CHNAME):Meas0")
+    field(MALM, "19")
+    field(NELM, "4")
+    field(INP,  "$(P)$(R):$(CHNAME):MeasRaw")
+    field(INDX, "0")
+    field(DTYP, "Soft Channel")
+}
+
+record (aSub, "$(P)$(R):$(CHNAME):Meas0") {
+    field(DESC, "Converted measurement 0")
+    field(SNAM, "pt104_ucharToUInt")
+    field(FLNK, "$(P)$(R):$(CHNAME):Meas1Raw")
+
+    field(INPA, "$(P)$(R):$(CHNAME):Meas0Raw")
+    field(FTA,  "UCHAR")
+    field(NOA,  "4")
+    field(NEA,  "4")
+
+    field(INPB, "0")
+    field(FTB,  "ULONG")
+    field(NOB,  "1")
+    field(NEB,  "1")
+
+    field(FTVA, "ULONG")
+}
+
+record (subArray, "$(P)$(R):$(CHNAME):Meas1Raw") {
+    field(DESC, "Raw measurement data 1")
+    field(FLNK, "$(P)$(R):$(CHNAME):Meas1")
+    field(FTVL, "UCHAR")
+    field(MALM, "19")
+    field(NELM, "4")
+    field(INP,  "$(P)$(R):$(CHNAME):MeasRaw")
+    field(INDX, "5")
+    field(DTYP, "Soft Channel")
+}
+
+record (aSub, "$(P)$(R):$(CHNAME):Meas1") {
+    field(DESC, "Converted measurement 1")
+    field(SNAM, "pt104_ucharToUInt")
+    field(FLNK, "$(P)$(R):$(CHNAME):Meas2Raw")
+
+    field(INPA, "$(P)$(R):$(CHNAME):Meas1Raw")
+    field(FTA,  "UCHAR")
+    field(NOA,  "4")
+    field(NEA,  "4")
+
+    field(INPB, "0")
+    field(FTB,  "ULONG")
+    field(NOB,  "1")
+    field(NEB,  "1")
+
+    field(FTVA, "ULONG")
+}
+
+record (subArray, "$(P)$(R):$(CHNAME):Meas2Raw") {
+    field(DESC, "Raw measurement data 2")
+    field(FLNK, "$(P)$(R):$(CHNAME):Meas2")
+    field(FTVL, "UCHAR")
+    field(MALM, "19")
+    field(NELM, "4")
+    field(INP,  "$(P)$(R):$(CHNAME):MeasRaw")
+    field(INDX, "10")
+    field(DTYP, "Soft Channel")
+}
+
+record (aSub, "$(P)$(R):$(CHNAME):Meas2") {
+    field(DESC, "Converted measurement 2")
+    field(SNAM, "pt104_ucharToUInt")
+    field(FLNK, "$(P)$(R):$(CHNAME):Meas3Raw")
+
+    field(INPA, "$(P)$(R):$(CHNAME):Meas2Raw")
+    field(FTA,  "UCHAR")
+    field(NOA,  "4")
+    field(NEA,  "4")
+
+    field(INPB, "0")
+    field(FTB,  "ULONG")
+    field(NOB,  "1")
+    field(NEB,  "1")
+
+    field(FTVA, "ULONG")
+}
+
+record (subArray, "$(P)$(R):$(CHNAME):Meas3Raw") {
+    field(DESC, "Raw measurement data 3")
+    field(FLNK, "$(P)$(R):$(CHNAME):Meas3")
+    field(FTVL, "UCHAR")
+    field(MALM, "19")
+    field(NELM, "4")
+    field(INP,  "$(P)$(R):$(CHNAME):MeasRaw")
+    field(INDX, "15")
+    field(DTYP, "Soft Channel")
+}
+
+record (aSub, "$(P)$(R):$(CHNAME):Meas3") {
+    field(DESC, "Converted measurement 3")
+    field(SNAM, "pt104_ucharToUInt")
+    field(FLNK, "$(P)$(R):$(CHNAME):Resistance")
+
+    field(INPA, "$(P)$(R):$(CHNAME):Meas3Raw")
+    field(FTA,  "UCHAR")
+    field(NOA,  "4")
+    field(NEA,  "4")
+
+    field(INPB, "0")
+    field(FTB,  "ULONG")
+    field(NOB,  "1")
+    field(NEB,  "1")
+
+    field(FTVA, "ULONG")
+}
+
+record (calc, "$(P)$(R):$(CHNAME):Resistance") {
+    field(DESC, "Measured resistance for channel $(N)")
+    field(DISV, "0")
+    field(SDIS, "$(P)$(R):$(CHNAME):Enable")
+    field(FLNK, "$(P)$(R):$(CHNAME):TCalc")
+    field(INPA, "$(P)$(R):$(CHNAME):Calib.VALA")
+    field(INPB, "$(P)$(R):$(CHNAME):Meas0.VALA")
+    field(INPC, "$(P)$(R):$(CHNAME):Meas1.VALA")
+    field(INPD, "$(P)$(R):$(CHNAME):Meas2.VALA")
+    field(INPE, "$(P)$(R):$(CHNAME):Meas3.VALA")
+    field(CALC, "1E-6*A*(E-D)/(C-B)")
+}
+
+record (sub, "$(P)$(R):$(CHNAME):TCalc") {
+    field(DESC, "Calculated Temperature for channel $(N)")
+    field(DISV, "0")
+    field(SDIS, "$(P)$(R):$(CHNAME):Enable")
+    field(FLNK, "$(P)$(R):$(CHNAME):TimeoutReset")
+    field(SNAM, "pt104_resToT")
+    field(INPA, "$(P)$(R):$(CHNAME):Resistance")
+}
+
+# % archiver 10 Monitor
+record (calc, "$(P)$(R):$(CHNAME):T") {
+    field(DESC, "Calculated Temperature for channel $(N)")
+    field(INPA, "$(P)$(R):$(CHNAME):TCalc MS CP")
+    field(INPB, "$(P)$(R):$(CHNAME):Alarm MS CP")
+    field(PREC, "3")
+    field(CALC, "A")
+    field(EGU,  "C")
+    field(HOPR, "$(T_HOPR)")
+    field(LOPR, "$(T_LOPR)")
+    field(HIGH, "$(T_HIGH)")
+    field(LOW,  "$(T_LOW)")
+    field(HSV,  "MAJOR")
+    field(LSV,  "MAJOR")
+}
+
+## Offset-corrected temperature
+# % archiver 10 Monitor
+record (calc, "$(P)$(R):$(CHNAME):TCorr") {
+    field(DESC, "Corrected temp (T-Offset) for chan $(N)")
+    field(INPA, "$(P)$(R):$(CHNAME):T MS CP")
+    field(INPB, "$(P)$(R):$(CHNAME):Offset CP")
+    field(PREC, "3")
+    field(CALC, "A-B")
+    field(EGU,  "C")
+    field(HOPR, "$(T_HOPR)")
+    field(LOPR, "$(T_LOPR)")
+    field(HIGH, "$(T_HIGH)")
+    field(LOW,  "$(T_LOW)")
+    field(HSV,  "MAJOR")
+    field(LSV,  "MAJOR")
+}
+
+## Timeout error generation
+record (ao, "$(P)$(R):$(CHNAME):TimeoutReset") {
+    field(DESC, "Reset the timer when the measurmnt comes")
+    field(VAL,  "$(DELAY)")
+    field(OUT,  "$(P)$(R):$(CHNAME):TimeoutTimer PP")
+}
+
+record (calc, "$(P)$(R):$(CHNAME):TimeoutTimer") {
+    field(DESC, "Timer, alarm should be raised on 0")
+    field(DISV, "0")
+    field(SDIS, "$(P)$(R):$(CHNAME):Enable")
+    field(SCAN, ".5 second")
+    field(CALC, "VAL<=0?0:VAL-.5")
+}
+
+record (calc, "$(P)$(R):$(CHNAME):Alarm") {
+    field(DESC, "Timeout alarm")
+    field(DISV, "0")
+    field(SDIS, "$(P)$(R):$(CHNAME):Enable")
+    field(SCAN, "1 second")
+    field(INPA, "$(P)$(R):$(CHNAME):TimeoutTimer")
+    field(CALC, "A == 0 ? 1 : 0")
+    field(HIHI, "1")
+    field(HHSV, "MAJOR")
+    field(PINI, "1")
+}

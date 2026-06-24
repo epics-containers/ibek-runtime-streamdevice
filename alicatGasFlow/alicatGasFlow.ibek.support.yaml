@@ -1,0 +1,518 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: alicatGasFlow
+
+entity_models:
+  - name: alicatGasFlow
+    description: |-
+      Alicat gas flow meter
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device prefix 1
+      S:
+        type: str
+        description: |-
+          Device prefix 2
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      HIHI:
+        type: float
+        description: |-
+          Flow Alarm HIHI
+      HIGH:
+        type: float
+        description: |-
+          Flow Alarm HIGH
+      LOLO:
+        type: float
+        description: |-
+          Flow Alarm LOLO
+      LOW:
+        type: float
+        description: |-
+          Flow Alarm LOW
+      SHTR:
+        type: str
+        description: |-
+          Shutter
+    databases:
+      - file: alicatGasFlow.template
+        args:
+          .*:
+  - name: alicatPressureCtrl
+    description: |-
+      Alicat pressure controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device prefix 1
+      Q:
+        type: str
+        description: |-
+          Device prefix 2
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      HIHI:
+        type: float
+        description: |-
+          Pressure Alarm HIHI
+      HIGH:
+        type: float
+        description: |-
+          Pressure Alarm HIGH
+      LOLO:
+        type: float
+        description: |-
+          Pressure Alarm LOLO
+      LOW:
+        type: float
+        description: |-
+          Pressure Alarm LOW
+      MAXP:
+        type: float
+        description: |-
+          Maximum pressure
+      SCALE:
+        type: float
+        description: |-
+          Set to 1 if your alicat is in the same scale units as EPICS
+        default: 68.9465
+    databases:
+      - file: alicatPressureCtrl.template
+        args:
+          .*:
+  - name: alicatMassCtrl
+    description: |-
+      Alicat mass flow controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device prefix 1
+      Q:
+        type: str
+        description: |-
+          Device prefix 2
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      HIHI:
+        type: float
+        description: |-
+          Pressure Alarm HIHI
+      HIGH:
+        type: float
+        description: |-
+          Pressure Alarm HIGH
+      LOLO:
+        type: float
+        description: |-
+          Pressure Alarm LOLO
+      LOW:
+        type: float
+        description: |-
+          Pressure Alarm LOW
+      MAXF:
+        type: float
+        description: |-
+          Maximum flow default 100 (for LoopVar = Mass or Volumetric)
+        default: 100
+      MAXP:
+        type: float
+        description: |-
+          Maximum pressure default 160 (for LoopVar = Pressure)
+        default: 160
+      SCALE:
+        type: float
+        description: |-
+          Scaling between unit EGU and bar (default 0.068948 for unit reporting in PSI, but some units report pressure in bar).
+        default: 0.068948
+      NUMGASES:
+        type: int
+        description: |-
+          Number of defined gases default 30
+        default: 30
+      GASNUM00:
+        type: int
+        description: |-
+          Number of gas00 default 0
+        default: 0
+      GASNAME00:
+        type: str
+        description: |-
+          Name of gas00 default Air
+        default: Air
+      GASNUM01:
+        type: int
+        description: |-
+          Number of gas01 default 1
+        default: 1
+      GASNAME01:
+        type: str
+        description: |-
+          Name of gas01 default Ar
+        default: Ar
+      GASNUM02:
+        type: int
+        description: |-
+          Number of gas02 default 2
+        default: 2
+      GASNAME02:
+        type: str
+        description: |-
+          Name of gas02 default CH4
+        default: CH4
+      GASNUM03:
+        type: int
+        description: |-
+          Number of gas03 default 3
+        default: 3
+      GASNAME03:
+        type: str
+        description: |-
+          Name of gas03 default CO
+        default: CO
+      GASNUM04:
+        type: int
+        description: |-
+          Number of gas04 default 4
+        default: 4
+      GASNAME04:
+        type: str
+        description: |-
+          Name of gas04 default CO2
+        default: CO2
+      GASNUM05:
+        type: int
+        description: |-
+          Number of gas05 default 5
+        default: 5
+      GASNAME05:
+        type: str
+        description: |-
+          Name of gas05 default C2H6
+        default: C2H6
+      GASNUM06:
+        type: int
+        description: |-
+          Number of gas06 default 6
+        default: 6
+      GASNAME06:
+        type: str
+        description: |-
+          Name of gas06 default H2
+        default: H2
+      GASNUM07:
+        type: int
+        description: |-
+          Number of gas07 default 7
+        default: 7
+      GASNAME07:
+        type: str
+        description: |-
+          Name of gas07 default He
+        default: He
+      GASNUM08:
+        type: int
+        description: |-
+          Number of gas08 default 8
+        default: 8
+      GASNAME08:
+        type: str
+        description: |-
+          Name of gas08 default N2
+        default: N2
+      GASNUM09:
+        type: int
+        description: |-
+          Number of gas09 default 9
+        default: 9
+      GASNAME09:
+        type: str
+        description: |-
+          Name of gas09 default N2O
+        default: N2O
+      GASNUM10:
+        type: int
+        description: |-
+          Number of gas10 default 0
+        default: 10
+      GASNAME10:
+        type: str
+        description: |-
+          Name of gas10 default Ne
+        default: Ne
+      GASNUM11:
+        type: int
+        description: |-
+          Number of gas11 default 11
+        default: 11
+      GASNAME11:
+        type: str
+        description: |-
+          Name of gas11 default O2
+        default: O2
+      GASNUM12:
+        type: int
+        description: |-
+          Number of gas12 default 12
+        default: 12
+      GASNAME12:
+        type: str
+        description: |-
+          Name of gas12 default C3H8
+        default: C3H8
+      GASNUM13:
+        type: int
+        description: |-
+          Number of gas13 default 13
+        default: 13
+      GASNAME13:
+        type: str
+        description: |-
+          Name of gas13 default n-C4H10
+        default: n-C4H10
+      GASNUM14:
+        type: int
+        description: |-
+          Number of gas14 default 14
+        default: 14
+      GASNAME14:
+        type: str
+        description: |-
+          Name of gas14 default C2H2
+        default: C2H2
+      GASNUM15:
+        type: int
+        description: |-
+          Number of gas15 default 15
+        default: 15
+      GASNAME15:
+        type: str
+        description: |-
+          Name of gas15 default C2H4
+        default: C2H4
+      GASNUM16:
+        type: int
+        description: |-
+          Number of gas16 default 16
+        default: 16
+      GASNAME16:
+        type: str
+        description: |-
+          Name of gas16 default i-C4H10
+        default: i-C4H10
+      GASNUM17:
+        type: int
+        description: |-
+          Number of gas17 default 17
+        default: 17
+      GASNAME17:
+        type: str
+        description: |-
+          Name of gas17 default Kr
+        default: Kr
+      GASNUM18:
+        type: int
+        description: |-
+          Number of gas18 default 18
+        default: 18
+      GASNAME18:
+        type: str
+        description: |-
+          Name of gas18 default Xe
+        default: Xe
+      GASNUM19:
+        type: int
+        description: |-
+          Number of gas19 default 19
+        default: 19
+      GASNAME19:
+        type: str
+        description: |-
+          Name of gas19 default SF6
+        default: SF6
+      GASNUM20:
+        type: int
+        description: |-
+          Number of gas20 default 20
+        default: 20
+      GASNAME20:
+        type: str
+        description: |-
+          Name of gas20 default C-25
+        default: C-25
+      GASNUM21:
+        type: int
+        description: |-
+          Number of gas21 default 21
+        default: 21
+      GASNAME21:
+        type: str
+        description: |-
+          Name of gas21 default C-10
+        default: C-10
+      GASNUM22:
+        type: int
+        description: |-
+          Number of gas22 default 22
+        default: 22
+      GASNAME22:
+        type: str
+        description: |-
+          Name of gas22 default C-8
+        default: C-8
+      GASNUM23:
+        type: int
+        description: |-
+          Number of gas23 default 23
+        default: 23
+      GASNAME23:
+        type: str
+        description: |-
+          Name of gas23 default C-2
+        default: C-2
+      GASNUM24:
+        type: int
+        description: |-
+          Number of gas24 default 24
+        default: 24
+      GASNAME24:
+        type: str
+        description: |-
+          Name of gas24 default C-75
+        default: C-75
+      GASNUM25:
+        type: int
+        description: |-
+          Number of gas25 default 25
+        default: 25
+      GASNAME25:
+        type: str
+        description: |-
+          Name of gas25 default A-75
+        default: A-75
+      GASNUM26:
+        type: int
+        description: |-
+          Number of gas26 default 26
+        default: 26
+      GASNAME26:
+        type: str
+        description: |-
+          Name of gas26 default A-25
+        default: A-25
+      GASNUM27:
+        type: int
+        description: |-
+          Number of gas27 default 27
+        default: 27
+      GASNAME27:
+        type: str
+        description: |-
+          Name of gas27 default A-1025
+        default: A-1025
+      GASNUM28:
+        type: int
+        description: |-
+          Number of gas28 default 28
+        default: 28
+      GASNAME28:
+        type: str
+        description: |-
+          Name of gas28 default Star29
+        default: Star29
+      GASNUM29:
+        type: int
+        description: |-
+          Number of gas29 default 29
+        default: 29
+      GASNAME29:
+        type: str
+        description: |-
+          Name of gas29 default P-5
+        default: P-5
+      GASNUM30:
+        type: int
+        description: |-
+          Number of gas30 default 30
+        default: 30
+      GASNAME30:
+        type: str
+        description: |-
+          Name of gas30 default ""
+        default: ""
+      GASNUM31:
+        type: int
+        description: |-
+          Number of gas31 default 31
+        default: 31
+      GASNAME31:
+        type: str
+        description: |-
+          Name of gas31 default ""
+        default: ""
+      GASNUM32:
+        type: int
+        description: |-
+          Number of gas32 default 32
+        default: 32
+      GASNAME32:
+        type: str
+        description: |-
+          Name of gas32 default ""
+        default: ""
+      GASNUM33:
+        type: int
+        description: |-
+          Number of gas33 default 33
+        default: 33
+      GASNAME33:
+        type: str
+        description: |-
+          Name of gas33 default ""
+        default: ""
+      GASNUM34:
+        type: int
+        description: |-
+          Number of gas34 default 34
+        default: 34
+      GASNAME34:
+        type: str
+        description: |-
+          Name of gas34 default ""
+        default: ""
+      GASNUM35:
+        type: int
+        description: |-
+          Number of gas35 default 35
+        default: 35
+      GASNAME35:
+        type: str
+        description: |-
+          Name of gas35 default ""
+        default: ""
+    databases:
+      - file: alicatMassCtrl.template
+        args:
+          .*:

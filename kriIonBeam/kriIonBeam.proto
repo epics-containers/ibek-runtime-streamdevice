@@ -1,0 +1,246 @@
+###############################################################
+#
+# Stream device protocol for Kaufman & Robinson ion beam rig
+#
+# Author: Nicoletta De Maio
+# Date:   July 2017
+#
+###############################################################
+
+###############################################################
+#
+# Protocol variables
+#
+
+Terminator = CR; # TODO: in and out terminator may differ
+
+###############################################################
+#
+# Controller-level GET commands
+#
+
+beamStatus {
+
+    out "BEAM?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+getEmission {
+
+    out "EMISSION?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+getDischarge {
+
+    out "DIS?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+getRemote {
+
+    out "COM?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+getIdent {
+
+    out "*IDN?";
+
+    in "%s %*s %*s";
+}
+
+getLastError {
+
+    out "*TST?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+getLastErrorString {
+
+    out "*TST?";
+
+    # Get all non-null characters
+    in "%#s";
+}
+
+getOutput {
+
+    out "OUT?";
+
+    # Remove comma before processing
+    in "%#/,//%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+getMode {
+
+    out "MDE?";
+
+    in "%d";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+getConfig {
+
+    out "CFG?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+getProg {
+
+    out "P?";
+
+    in "%i";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+###############################################################
+#
+# Parameter-level GET commands
+#
+
+getT {
+
+    out "P\$3:\$2?";
+
+    # Second argument is units
+    in "%f%*s";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+get {
+
+    out "P:\$2?";
+
+    # Second argument is units
+    in "%f%*s";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+rbv {
+    out "R:\$2";
+
+    # Second argument is units
+    in "%f%*s";
+
+    @mismatch {
+
+        in "%(\$1:RESPONSE)64c";
+    }
+}
+
+###############################################################
+#
+# Controller-level SET commands
+#
+
+reset {
+
+    out "*RST";
+
+    in "%(\$1:RESPONSE)64c";
+}
+
+setRemote {
+
+    out "COM:%i";
+
+    in "%(\$1:RESPONSE)64c";
+}
+
+setOutput {
+
+    out "OUT:%02i";
+
+    in "%(\$1:RESPONSE)64c";
+}
+
+setMode {
+
+    out "MDE:%i";
+
+    in "%(\$1:RESPONSE)64c";
+}
+
+setProg {
+
+    out "P%i";
+
+    in "%(\$1:RESPONSE)64c";
+}
+
+###############################################################
+#
+# Parameter-level SET commands
+#
+
+setT {
+
+    out "P\$3:\$2 %f"; # TODO: precision
+
+    in "%(\$1:RESPONSE)64c";
+}
+
+set {
+
+    out "P:\$2 %f"; # TODO: precision
+
+    in "%(\$1:RESPONSE)64c";
+}

@@ -1,0 +1,322 @@
+################################################################
+#
+# Keithley 2400 Sourcemeter template file.
+#
+# Macros:
+#   P - Prefix for PV name
+#   PORT - Bus/Port Address (eg. ASYN Port).
+#   ADDR - Address on the bus (optional)
+#   SCAN - SCAN rate for read parameters.
+#   name - Name of device for gui - only appears in percent gui lines.
+#
+#   OMAX - Optional.  Defaults to 100.  Asyn record max output buffer for raw commands
+#   IMAX - Optional.  Defaults to 1000.  Asyn record max input buffer for raw commands
+#   TMOT - Optional.  Defaults to 1.  Asyn record timeout
+#   gda_name - Optional.  Defaults to be empty.  Name for gda interface appearing in percent gdatag line.
+#   gda_desc - Optional.  Defaults to be empty.  Description for gda interface appearing in percent gdatag line.
+#
+# Notes: 
+#   Voltage and Current are archived every 10 secs.
+#   Voltage and current are handled by the alarm handler.
+#   All set parameters are autosaved every second. 
+#
+################################################################
+
+#% gdatag,template,k2400,$(gda_name=),$(gda_desc=)
+
+# % gui, $(name), edm, k2400.edl, P=$(P)
+
+include "k2400_detail.template"
+
+################################################################
+# Read records
+################################################################
+#
+# ///
+# /// Read the ID string from the device.
+# ///
+# % macro, P, Device prefix
+# % macro, PORT, Asyn port name
+# % macro, ADDR, Asyn addr (usually 0)
+# % macro, SCAN, SCAN rate for read parameters.
+# % macro, name, Name of device for gui - only appears in percent gui lines.
+#
+# % macro, OMAX, Optional.  Defaults to 100.  Asyn record max output buffer for raw commands
+# % macro, IMAX, Optional.  Defaults to 1000.  Asyn record max input buffer for raw commands
+# % macro, TMOT, Optional.  Defaults to 1.  Asyn record timeout in seconds
+# % macro, gda_name, Optional.  Defaults to be empty.  Name for gda interface appearing in percent gdatag line.
+# % macro, gda_desc, Optional.  Defaults to be empty.  Description for gda interface appearing in percent gdatag line.
+#
+record(stringin, "$(P):ID") {
+  field(DTYP, "stream")
+  field(INP, "@k2400.proto getID $(PORT) $(ADDR)")
+  field(PINI, "YES")
+  field(SCAN, "Passive")
+}
+
+# ///
+# /// Read the voltage.
+# ///
+#% gdatag,pv,ro,$(gda_name=),V
+#% archiver 10 Monitor
+#% alh
+record(ai, "$(P):V") {
+  field(DTYP, "stream")
+  field(INP, "@k2400.proto getV $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 6)
+  field(EGU, "V")
+  field(DISV, 0)
+}
+
+
+# ///
+# /// Read the current.
+# ///
+#% gdatag,pv,ro,$(gda_name=),I
+#% archiver 10 Monitor
+#% alh
+record(ai, "$(P):I") {
+  field(DTYP, "stream")
+  field(INP, "@k2400.proto getI $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 6)
+  field(EGU, "A")
+  field(DISV, 0)
+}
+
+# ///
+# /// Read the resistance.
+# ///
+#% gdatag,pv,ro,$(gda_name=),R
+#% archiver 10 Monitor
+#% alh
+record(ai, "$(P):R") {
+  field(DTYP, "stream")
+  field(INP, "@k2400.proto getR $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 6)
+  field(EGU, "ohm")
+  field(DISV, 0)
+}
+
+
+################################################################
+# Write records
+################################################################
+
+# ///
+# /// Control the output (ON/OFF).
+# ///
+#% gdatag,pv,rw,$(gda_name=),OUTP
+#% autosave 1 VAL
+record(bo, "$(P):OUTP") {
+  field(DTYP, "stream")
+  field(DESC, "Output ON/OFF")
+  field(OUT, "@k2400.proto setOUTP $(PORT) $(ADDR)")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+  field(FLNK, "$(P):ENABLESCAN")
+}
+
+# ///
+# /// Control the scanning based on the OUTP record.
+# ///
+record(dfanout, "$(P):ENABLESCAN") {
+  field(DOL, "$(P):OUTP")
+  field(OMSL, "closed_loop")
+  field(OUTA, "$(P):V.DISV")
+  field(OUTB, "$(P):I.DISV")
+  field(OUTC, "$(P):R.DISV")
+}
+
+# ///
+# /// Control the source operating mode (VOLT/CURR).
+# ///
+#% gdatag,pv,rw,$(gda_name=),SOUR_FUNC
+#% autosave 1 VAL
+record(bo, "$(P):SOUR_FUNC") {
+  field(DTYP, "stream")
+  field(DESC, "Source Operating Mode")
+  field(OUT, "@k2400.proto setSO_FUNC $(PORT) $(ADDR)")
+  field(ZNAM, "VOLT")
+  field(ONAM, "CURR")
+}
+
+# ///
+# /// Control the fixed source (VOLT/CURR).
+# ///
+#% gdatag,pv,rw,$(gda_name=),SOUR_MODE
+#% autosave 1 VAL
+record(bo, "$(P):SOUR_MODE") {
+  field(DTYP, "stream")
+  field(DESC, "Source Fixed Mode")
+  field(OUT, "@k2400.proto setSO_MODE $(PORT) $(ADDR)")
+  field(ZNAM, "VOLT")
+  field(ONAM, "CURR")
+}
+
+# ///
+# /// Set this to VOLT or CURR, to set the XXX mode to use for the source settings. 
+# /// Used for any commands that need the XXX as part of the command string.
+# ///
+#% gdatag,pv,rw,$(gda_name=),SOTX
+#% autosave 1 VAL
+record(bo, "$(P):SOTX") {
+   field(DESC, "String used for XXX part")
+   field(ZNAM, "VOLT")
+   field(ONAM, "CURR")
+}
+
+# ///
+# /// Control the source range (VOLT/CURR, float range).
+# ///
+#% gdatag,pv,rw,$(gda_name=),SOUR_RANG
+#% autosave 1 VAL
+record(ao, "$(P):SOUR_RANG") {
+  field(DTYP, "stream")
+  field(DESC, "Source Range")
+  field(OUT, "@k2400.proto setSO_RANG($(P):SOTX) $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Control the source level (VOLT/CURR, float level).
+# ///
+#% gdatag,pv,rw,$(gda_name=),SOUR_LEV
+#% autosave 1 VAL
+record(ao, "$(P):SOUR_LEV") {
+  field(DTYP, "stream")
+  field(DESC, "Source Level")
+  field(OUT, "@k2400.proto setSO_LEV($(P):SOTX) $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Control the sense operating mode (VOLT/CURR).
+# ///
+#% gdatag,pv,rw,$(gda_name=),SENS_FUNC
+#% autosave 1 VAL
+record(bo, "$(P):SENS_FUNC") {
+  field(DTYP, "stream")
+  field(DESC, "Sense Operating Mode")
+  field(OUT, "@k2400.proto setSE_FUNC $(PORT) $(ADDR)")
+  field(ZNAM, "VOLT")
+  field(ONAM, "CURR")
+}
+
+# ///
+# /// Set this to VOLT or CURR, to set the XXX mode to use for the sense settings. 
+# /// Used for any commands that need the XXX as part of the command string.
+# ///
+#% gdatag,pv,rw,$(gda_name=),SETX
+#% autosave 1 VAL
+record(bo, "$(P):SETX") {
+   field(DESC, "String used for sense XXX")
+   field(ZNAM, "VOLT")
+   field(ONAM, "CURR")
+}
+
+# ///
+# /// Control the sense compliance range (VOLT/CURR, float compliance level).
+# ///
+#% gdatag,pv,rw,$(gda_name=),SENS_PROT
+#% autosave 1 VAL
+record(ao, "$(P):SENS_PROT") {
+  field(DTYP, "stream")
+  field(DESC, "Sense compliance")
+  field(OUT, "@k2400.proto setSE_PROT($(P):SETX) $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Control the sense measure range (VOLT/CURR, float measure range).
+# ///
+#% gdatag,pv,rw,$(gda_name=),SENS_RANG
+#% autosave 1 VAL
+record(ao, "$(P):SENS_RANG") {
+  field(DTYP, "stream")
+  field(DESC, "Sense measure range")
+  field(OUT, "@k2400.proto setSE_RANG($(P):SETX) $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Control the sense auto range (VOLT/CURR, ON/OFF).
+# ///
+#% gdatag,pv,rw,$(gda_name=),SENS_RANG_AUTO
+#% autosave 1 VAL
+record(bo, "$(P):SENS_RANG_AUTO") {
+  field(DTYP, "stream")
+  field(DESC, "Sense auto range")
+  field(OUT, "@k2400.proto setSE_RANGAUTO($(P):SETX) $(PORT) $(ADDR)")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+}
+
+
+#################################################################
+# Generic protocol PV, to send any command.
+#################################################################
+
+# ///
+# /// Generic commands. Do a caput on this, and do a subsequent caget to get the response. Max 39 chars.
+# ///
+#% gdatag,pv,rw,$(gda_name=),RESPONSE
+record (stringin, "$(P):RESPONSE") {
+  field (DTYP, "stream")
+  field (DESC, "Holds command response.")
+  field (INP, "@k2400.proto gen $(PORT) $(ADDR)")
+}
+
+# ///
+# /// Generic command. This holds the command and stores it.
+# ///
+#% gdatag,pv,rw,$(gda_name=),COMMAND
+record (stringout, "$(P):COMMAND") {
+  field (DESC, "Holds command string.")
+  field (OUT, "$(P):RESPONSE")
+  field(FLNK, "$(P):RESPONSE")
+}
+
+
+# /// Generic asyn command for long string read and write. Write to BOUT and read BINP.
+# NB requires following in starup file 
+#  asynOctetSetInputEos("keithley",0,"\n")
+#  asynOctetSetOutputEos("keithley",0,"\n")
+record(asyn, "$(P):ASYN") {
+  field(PORT, "$(PORT)")
+  field(OEOS, "\n")
+  field(IEOS, "\n")
+  field(OFMT, "Hybrid")
+  field(OMAX, "$(OMAX=100)")
+  field(BOUT, "")
+  field(IFMT, "Hybrid")
+  field(IMAX, "$(IMAX=1000)")
+  field(BINP, "")
+  field(TMOT, "$(TMOT=1)")
+  field(FLNK, "$(P):ERR:COUNT")
+}
+
+#################################################################
+# Error PVs.
+#################################################################
+
+record(waveform, "$(P):ERR:STRING") {
+  field(DESC, "Read inst error string")
+  field(DTYP, "stream")
+  field(INP, "@k2400.proto readLine(SYST:ERR?) $(PORT)")
+  field(NELM, "100")
+  field(FTVL, "CHAR")
+  field(FLNK, "$(P):ERR:COUNT")
+}
+
+record(ai, "$(P):ERR:COUNT") {
+  field(DESC, "Read error count")
+  field(DTYP, "stream")
+  field(INP, "@k2400.proto readInt(SYST:ERR:COUNT?) $(PORT)")
+}
+
+record(bo, "$(P):SYST:CLEAR") {
+  field(DESC, "Clear err & evt")
+  field(DTYP, "stream")
+  field(OUT, "@k2400.proto writeCmd(SYST:CLEAR) $(PORT)")
+  field(HIGH, "1")
+  field(FLNK, "$(P):ERR:COUNT")
+}

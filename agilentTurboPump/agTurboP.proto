@@ -1,0 +1,1480 @@
+#*********************************************
+#	*Protocol File*
+#*********************************************
+
+# Agilent Turbomolecular Pump, model TwisTorr 305-IC / 305-FS
+
+# Protocol file: agTurboP.proto
+# Developed by: Gregory Gay, 
+#   rev1.0: May 2021, serial commands for 305-IC on-board controller
+#   rev2.0: January 2022, serial commands for 305-FS remote controller
+
+#############################################
+# COMMUNICATION FORMAT
+
+# 8 data bit
+# no parity
+# 1 stop bit
+# baud rate: from 600 to 9600 programmable
+
+#############################################
+# STREAM DEVICE PROTOCOL
+
+# Message format is:
+#      "<STX>"+"<ADDR>"+"<WIN>"+"<COM>"+"<DATA>"+"<ETX>"+"<CRC>"
+# where
+#	<STX>	: Start of transmission (1 byte) = 0x02
+#	<ADDR>	: Unit address in hex (1 byte) = 0x80 (+ device number for RS485, 0 to 31)
+#	<WIN>	: Window number corresponding to specific commands (3 bytes) = string of 3 numeric characters in hex ('000' to '999')
+#	<COM>	: Command (1 byte) = 0x30 to read the window, 0x31 to write into the window
+#	<DATA>	: Data to be written into the window, not present for reading command = 1, 6 or 10 bytes in hex according to the data type (respectively logic, numeric and alphanumeric data types)
+#	<ETX>	: End of transmission (1 byte) = 0x03
+#	<CRC>	: XOR of all characters subsequent to <STX> and including the <ETX> terminator,
+#           hexadecimal coded and indicated by two ASCII characters
+#
+# Reply format is:
+#      "<STX>"+"<ADDR>"+"<ANSW>"+"<ETX>"+"<CRC>"
+# where
+#	<STX>	: Start of transmission (1 byte) = 0x02
+#	<ADDR>	: Unit address in hex (1 byte) = 0x80 (+ device number for RS485, 0 to 31)
+#   <ANSW>  : Answer whose structure will depend on the data type of the message = 1, 6 or 10 bytes
+#	<ETX>	: End of transmission (1 byte) = 0x03
+#	<CRC>	: XOR of all characters subsequent to <STX> and including the <ETX> terminator,
+#           hexadecimal coded and indicated by two ASCII characters
+
+#############################################
+#SPECIFIC CONTROLLER RESPONSES
+#
+# 0x06 - ACK - successful execution
+# 0x15 - NAK - failed execution
+# 0x32 - not a valid window
+# 0x33 - wrong data type for the given window
+# 0x34 - out of range value
+# 0x35 - read-only / temporarily disabled window
+
+#############################################
+#COMMAND EXAMPLES
+#
+# getPump {
+#     out "\x02\x80\x30\x30\x30\x30\x03%01<xor>";
+#     in "\x02\x80\x30\x30\x30\x30%{0|1}\x03%01<xor>";
+# }
+# setPump {
+#     out "\x02\x80\x30\x30\x30\x31%x\x03%01<xor>";
+#     in "\x02\x80%x\x03%01<xor>";
+# }
+
+#############################################
+#SYSTEM VARIABLES
+
+Terminator = "";
+ExtraInput = Ignore;
+LockTimeout = 5000;
+WriteTimeout = 100;
+ReplyTimeout = 2000;
+ReadTimeout = 20;
+
+#############################################
+#PROTOCOL ARGUMENTS
+# first (and only) parameter passed to the command is the desired value
+
+#############################################
+#USER VARIABLES
+
+#address field of the device in hexadecimal
+#[0x80] for RS232 communication, [0x80 + device number] for RS485 communication
+addr = "\x80";
+
+#############################################
+#REQUESTS AND ANSWERS
+
+###############
+##### Active commands related to the running mode of the pump
+
+# Start/Stop command
+# (read only in remote/Front mode for the FS model)
+# value = 0 for Stop, 1 for Start
+# factory default = Stop
+# data format: 1 byte
+# (use bi/bo record)
+getPump {
+    out STX $addr "\x30\x30\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x30\x30\x30" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setPump {
+    out STX $addr "\x30\x30\x30" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getPump; }
+}
+
+# Controller configuration
+# (operating mode of the controller: serial port, rear panel, front panel or profibus port)
+# (additionnal Front and Profibus modes for the FS model)
+# value = 0 for Serial, 1 for Remote, 2 for Front, 3 for Profibus
+# factory default = Remote
+# data format: 1 byte
+# (use mbbi/mbbo record)
+getController {
+    out STX $addr "\x30\x30\x38" 0x30 ETX "%01<xor>";
+    in STX $addr "\x30\x30\x38" 0x30 "%{0|1|2|3}" ETX "%01<xor>";
+}
+setController {
+    out STX $addr "\x30\x30\x38" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getController; }
+}
+
+# Low speed activation command
+# value = 0 for Off, 1 for On
+# factory default = Off
+# data format: 1 byte
+# (use bi/bo record)
+getLowSpeed {
+    out STX $addr "\x30\x30\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x30\x30\x31" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setLowSpeed {
+    out STX $addr "\x30\x30\x31" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getLowSpeed; }
+}
+
+# Soft Start command
+# (write only in Stop condition)
+# (Serial controller configuration required for IC model, Front mode required for FS model)
+# value = 0 for Disable, 1 for Enable
+# factory default = Enable at the first START, then Disable
+# data format: 1 byte
+# (use bi/bo record)
+getSoftStart {
+    out STX $addr "\x31\x30\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x30\x30" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setSoftStart {
+    out STX $addr "\x31\x30\x30" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getSoftStart; }
+}
+
+# Gas Load Type configuration
+# (selects the type of gas used in the process)
+# (combination of gas type and temperature reading will make the controller limit the power supplied to the pump)
+# value = 0 for molar_mass>=30g/mol (e.g. Ar), 1 for 4g/mol<molar_mass<30g/mol (e.g. N2)
+#       2 for molar_mass<=4g/mol (e.g.H2, He)
+
+# factory default = 0
+# data format: 6 bytes
+# (use mbbi/mbbo record)
+getGasType {
+    out STX $addr "\x31\x35\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x35\x37" 0x30 "\x30\x30\x30\x30\x30%{0|1|2}" ETX "%01<xor>";
+}
+setGasType {
+    out STX $addr "\x31\x35\x37" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getGasType; }
+}
+
+# Active Stop configuration
+# (enables/disables the stop with active braking, i.e. uses the motor to brake the pump)
+# (available to FS model only and write in Stop condition only)
+# value = 0 for Disable, 1 for Enable
+# factory default =  Disable
+# data format: 1 byte
+# (use bi/bo record)
+getActiveStop {
+    out STX $addr "\x31\x30\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x30\x37" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setActiveStop {
+    out STX $addr "\x31\x30\x37" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getActiveStop; }
+}
+
+# Stop Speed Reading configuration
+# (reading of the pump rotational speed during the slowing phase that follows a stop command)
+# (write only in Stop condition for IC model, any for FS model)
+# value = 0 for Disable, 1 for Enable
+# factory default = 1 for IC model, 0 for FS model
+# data format: 1 byte
+# (use bi/bo record)
+getStopRead {
+    out STX $addr "\x31\x36\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x36\x37" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setStopRead {
+    out STX $addr "\x31\x36\x37" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getStopRead; }
+}
+
+
+###############
+##### Active commands related to the relay R1
+##### (used with programmable analog output on logic output connector J1, pins 11/4)
+
+# R1 Setpoint type configuration
+# (selects the type of reference measurement to drive the relay R1)
+# (e.g. driving frequency of the pump, power supplied to the pump, time from the start, achievement of normal condition, or pressure read by the gauge (if present))
+# (pressure type available only for FS model and only if the gauge is connected) 
+# value = 0 for Frequency, 1 for Power, 2 for Time, 3 for Normal, 4 for Pressure
+# factory default = Frequency for IC model, Normal for FS model
+# data format: 6 bytes
+# (use mbbi/mbbo record)
+getR1SetpointType {
+    out STX $addr "\x31\x30\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x30\x31" 0x30 "\x30\x30\x30\x30\x30%{0|1|2|3|4}" ETX "%01<xor>";
+}
+setR1SetpointType {
+    out STX $addr "\x31\x30\x31" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getR1SetPointType; }
+}
+
+# R1 Setpoint logic configuration
+# (control logic activation type for the setpoint output signal)
+# (positive logic = the relay is energized when the measurement exceeds the reference)
+# (negative logic = the relay is energized when the measurement is below the reference)
+# ("high-level active" indicates the output is ON when the signal is above the threshold)
+# value = 0 for High-level active, 1 for Low-level active
+# factory default = High-level
+# data format: 1 byte
+# (use bi/bo record)
+getR1SetpointLogic {
+    out STX $addr "\x31\x30\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x30\x34" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setR1SetpointLogic {
+    out STX $addr "\x31\x30\x34" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getR1SetpointLogic; }
+}
+
+# R1 Setpoint Threshold configuration
+# (reference value at which the relay R1 is activated; not available in Normal mode (WIN101))
+# value = from 0 to 99999 for the IC model, expressed in Hz/W/sec
+# value = from 0 to 999999 for the FS model, expressed in Hz/W/sec/mbar
+# factory default = 720 for the IC model, 867 for the FS model
+# data format: 6 bytes
+# (use ai/ao record)
+getR1SetpointThreshold {
+    out STX $addr "\x31\x30\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x30\x32" 0x30 "%06d" ETX "%01<xor>";
+}
+setR1SetpointThreshold {
+    out STX $addr "\x31\x30\x32" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getR1SetpointThreshold; }
+}
+
+# R1 Setpoint Delay configuration
+# (time between the pump start and the setpoint check)
+# (mask time within which the setpoint is not driven even if the threshold value has been reached)
+# (not available in Normal mode (WIN101))
+# value = from 0 to 999999 seconds
+# factory default = 0
+# data format: 6 bytes
+# (use ai/ao record)
+getR1SetpointDelay {
+    out STX $addr "\x31\x30\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x30\x33" 0x30 "%06d" ETX "%01<xor>";
+}
+setR1SetpointDelay {
+    out STX $addr "\x31\x30\x33" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getR1SetpointDelay; }
+}
+
+# R1 Setpoint Hysteresis configuration
+# value = from 0 to 100, expressed in % of the R1 threshold value
+# factory default = 2
+# data format: 6 bytes
+# (use ai/ao record)
+getR1SetpointHysteresis {
+    out STX $addr "\x31\x30\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x30\x35" 0x30 "%06d" ETX "%01<xor>";
+}
+setR1SetpointHysteresis {
+    out STX $addr "\x31\x30\x35" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init {getR1SetpointHysteresis; }
+}
+
+# R1 Setpoint State command
+# (read-only, reports the actual state of the setpoint output)
+# (only available for the IC model)
+# value = 0 for Off (not yet reached), 1 for On (reached)
+# read format: 1 byte
+# (use bi record)
+getR1SetpointState {
+    out STX $addr "\x32\x32\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x32\x31" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+
+# R1 Setpoint Pressure Threshold command
+# (read-only, reports the actual pressure setpoint value if WIN101 is set to Pressure)
+# (only available for the FS model with the Gauge connected)
+# value = X.X EsXX with X= 0 to 9 and s= + or -)
+# read format: 10 bytes
+# (use stringin record)
+getR1PressureSetpoint {
+    out STX $addr "\x31\x36\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x36\x32" 0x30 "%10c" ETX "%01<xor>";
+}
+
+
+###############
+##### Active commands related to the relay R2
+##### (used with programmable analog output on logic output connector J1, pins 14/7)
+
+# R2 Setpoint type configuration
+# (only available for the FS model)
+# (selects the type of reference measurement to drive the relay R1)
+# (e.g. driving frequency of the pump, power supplied to the pump, time from the start, achievement of normal condition, or pressure read by the gauge (if present))
+# (pressure type available only if the gauge is connected) 
+# value = 0 for Frequency, 1 for Power, 2 for Time, 3 for Normal, 4 for Pressure
+# factory default = Normal
+# data format: 6 bytes
+# (use mbbi/mbbo record)
+getR2SetpointType {
+    out STX $addr "\x31\x37\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x37\x31" 0x30 "\x30\x30\x30\x30\x30%{0|1|2|3|4}" ETX "%01<xor>";
+}
+setR2SetpointType {
+    out STX $addr "\x31\x37\x31" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getR2SetPointType; }
+}
+
+# R2 Setpoint logic configuration
+# (control logic activation type for the setpoint output signal)
+# (positive logic = the relay is energized when the measurement exceeds the reference)
+# (negative logic = the relay is energized when the measurement is below the reference)
+# (only available for the FS model)
+# ("high-level active" indicates the output is ON when the signal is above the threshold)
+# value = 0 for High-level active, 1 for Low-level active
+# factory default = High-level
+# data format: 1 byte
+# (use bi/bo record)
+getR2SetpointLogic {
+    out STX $addr "\x31\x37\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x37\x34" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setR2SetpointLogic {
+    out STX $addr "\x31\x37\x34" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getR2SetpointLogic; }
+}
+
+# R2 Setpoint Threshold configuration
+# (reference value at which the relay R2 is activated; not available in Normal mode (WIN171))
+# (only available for the FS model)
+# value = from 0 to 999999, expressed in Hz/W/sec/mbar
+# factory default = 867
+# data format: 6 bytes
+# (use ai/ao record)
+getR2SetpointThreshold {
+    out STX $addr "\x31\x37\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x37\x32" 0x30 "%06d" ETX "%01<xor>";
+}
+setR2SetpointThreshold {
+    out STX $addr "\x31\x37\x32" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getR2SetpointThreshold; }
+}
+
+# R2 Setpoint Delay configuration
+# (time between the pump start and the setpoint check)
+# (mask time within which the setpoint is not driven even if the threshold value has been reached)
+# (not available in Normal mode (WIN171))
+# (only available for the FS model)
+# value = from 0 to 999999 seconds
+# factory default = 0
+# data format: 6 bytes
+# (use ai/ao record)
+getR2SetpointDelay {
+    out STX $addr "\x31\x37\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x37\x33" 0x30 "%06d" ETX "%01<xor>";
+}
+setR2SetpointDelay {
+    out STX $addr "\x31\x37\x33" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getR2SetpointDelay; }
+}
+
+# R2 Setpoint Hysteresis configuration
+# (only available for the FS model)
+# value = from 0 to 100, expressed in % of the R2 threshold value
+# factory default = 2
+# data format: 6 bytes
+# (use ai/ao record)
+getR2SetpointHysteresis {
+    out STX $addr "\x31\x37\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x37\x35" 0x30 "%06d" ETX "%01<xor>";
+}
+setR2SetpointHysteresis {
+    out STX $addr "\x31\x37\x35" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init {getR2SetpointHysteresis; }
+}
+
+# R2 Setpoint Pressure Threshold command
+# (read-only, reports the actual pressure setpoint value if WIN101 is set to Pressure)
+# (only available for the FS model with the Gauge connected)
+# value = X.X EsXX with X= 0 to 9 and s= + or -)
+# read format: 10 bytes
+# (use stringin record)
+getR2PressureSetpoint {
+    out STX $addr "\x31\x37\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x37\x36" 0x30 "%10c" ETX "%01<xor>";
+}
+
+
+###############
+##### Active commands related to the excitation frequency
+
+# Maximum Frequency configuration
+# (defines the maximum frequency settable by WIN120)
+# (command available for IC model only)
+# value = from 700 to 1010 Hz
+# factory default = 1010
+# data format: 6 bytes
+# (use ai/ao record)
+getMaxFrequency {
+    out STX $addr "\x31\x32\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x32\x31" 0x30 "%06d" ETX "%01<xor>";
+}
+setMaxFrequency {
+    out STX $addr "\x31\x32\x31" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getMaxFrequency; }
+}
+
+# Low Speed Frequency configuration
+# (sets the desired rotational speed of the pump in low-speed mode)
+# value = from 700 to 1010 Hz
+# factory default = 700
+# data format: 6 bytes
+# (use ai/ao record)
+getLowSpeedFrequency {
+    out STX $addr "\x31\x31\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x31\x37" 0x30 "%06d" ETX "%01<xor>";
+}
+setLowSpeedFrequency {
+    out STX $addr "\x31\x31\x37" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getLowSpeedFrequency; }
+}
+
+# Target Frequency configuration
+# (sets the desired rotational frequency of the pump when low-speed is not active)
+# value = from low speed frequency to 1010 Hz
+# factory default = 1010
+# data format: 6 bytes
+# (use ai/ao record)
+getTargetFrequency {
+    out STX $addr "\x31\x32\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x32\x30" 0x30 "%06d" ETX "%01<xor>";
+}
+setTargetFrequency {
+    out STX $addr "\x31\x32\x30" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getTargetFrequency; }
+}
+
+# Actual Driving Frequency command
+# (read-only command)
+# value = actual driving frequency in Hz
+# read format: 6 bytes
+# (use ai record)
+getActualFrequency {
+    out STX $addr "\x32\x30\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x30\x33" 0x30 "%06d" ETX "%01<xor>";
+}
+
+
+###############
+##### Active commands related to the vent valve
+
+# Vent valve operation mode configuration
+# (auto pump speed mode available for the FS model only)
+# value = 0 for Automatic (i.e. controlled by the controller, closes after valve delay),
+#	    1 for On Command (i.e. controlled by the serial port, closes when toggled off)
+#       2 for Auto pump speed (i.e. controlled by the controller, taking into account the pump deceleration)
+# factory default = Automatic
+# data format: 1 byte
+# (use bi/bo record)
+getValveMode {
+    out STX $addr "\x31\x32\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x32\x35" 0x30 "%{0|1|2}" ETX "%01<xor>";
+}
+setValveMode {
+    out STX $addr "\x31\x32\x35" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getValveMode; }
+}
+
+# Vent Valve Opening Delay configuration
+# (time delay between stopping of the pump and opening of the vent valve)
+# value = from 0 to 65535 counts with 1count=0.2sec (i.e. from 0 to 13107 sec)
+# factory default = 3 counts
+# data format: 6 bytes
+# (use ai/ao record)
+getValveDelay {
+    out STX $addr "\x31\x32\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x32\x36" 0x30 "%06d" ETX "%01<xor>";
+}
+setValveDelay {
+    out STX $addr "\x31\x32\x36" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getValveDelay; }
+}
+
+# Vent Valve Opening Time configuration
+# (time during which the valve stays in the OPEN state following the pump STOP command)
+# (if 0, the valve is to be kept open indefinitely (until the next start))
+# value = from 0 to 65535 counts with 1count=0.2sec (i.e. from 0 to 13107 sec)
+# factory default = 0 count
+# data format: 6 bytes
+# (use ai/ao record)
+getValveOpening {
+    out STX $addr "\x31\x34\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x34\x37" 0x30 "%06d" ETX "%01<xor>";
+}
+setValveOpening {
+    out STX $addr "\x31\x34\x37" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getValveOpening; }
+}
+
+# Vent Valve Control configuration
+# (sets the vent valve on or off)
+# (write only if valve operation WIN125 is 'On command')
+# value = 0 for Off/Closed, 1 for On/Opened
+# factory default = 0 for the IC model, 1 for the FS model
+# data format: 1 byte
+# (use bi/bo record)
+getValveState {
+    out STX $addr "\x31\x32\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x32\x32" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setValveState {
+    out STX $addr "\x31\x32\x32" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getValveState; }
+}
+
+# Vent Valve type
+# (available to IC model only)
+# (sets the type of valve connected to the pump)
+# (write only if the pump is stopped WIN000 and the controller is in serial mode WIN008)
+# value = 0 for Normally Closed, 1 for Normally Open
+# factory default = 1
+# data format: 1 byte
+# (use bi/bo record)
+getValveType {
+    out STX $addr "\x31\x34\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x34\x30" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setValveType {
+    out STX $addr "\x31\x34\x30" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getValveType; }
+}
+
+
+################
+##### Active commands related to the gauge
+
+# Gauge Gas Type configuration
+# (available to FS model only)
+# value = 0 for Not Configured, 1 for Nitrogen, 2 for Argon, 3 for Hydrogen, 4 for Other
+# factory default = 0
+# data format: 6 bytes
+# (use mbbi/mbbo record)
+getGaugeGasType {
+    out STX $addr "\x31\x38\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x38\x31" 0x30 "\x30\x30\x30\x30\x30%{0|1|2|3|4}" ETX "%01<xor>";
+}
+setGaugeGasType {
+    out STX $addr "\x31\x38\x31" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getGaugeGasType; }
+}
+
+# Gauge Correction Factor configuration
+# (correction factor of the pressure measurement for custom gauge (WIN181=4))
+# (Pressure indicated by  instrument = Pressure measured * Gas correction / 10)
+# (available to FS model only)
+# value = from 10 to 999
+# factory default = ---
+# data format: 6 bytes
+# (use ai/ao record)
+getGaugeCFactor {
+    out STX $addr "\x31\x38\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x38\x32" 0x30 "%06d" ETX "%01<xor>";
+}
+setGaugeCFactor {
+    out STX $addr "\x31\x38\x32" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getGaugeCFactor; }
+}
+
+# Gauge Power Mode configuration
+# (used to turn off the gauge at certain condition)
+# (available to FS model only)
+# value = 0 for No Power (i.e. gauge Off),
+#       1 for Power On Always (i.e. gauge On),
+#       2 for Power On Setpoint1 (i.e. normally Off but turns On when R1 setpoint is activated),
+#       3 for Power On Setpoint2 (i.e. normally Off but turns On when R2 setpoint is activated),
+#       4 for Power On Setpoint3 (i.e. normally Off but turns On when gauge setpoint is activated)
+# (for values 2, 3 and 4, if the set point type is 'Pressure', then the gauge is always On)
+# factory default = ---
+# data format: 6 bytes
+# (use mbbi/mbbo record)
+getGaugePowerMode {
+    out STX $addr "\x32\x36\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x36\x37" 0x30 "\x30\x30\x30\x30\x30%{0|1|2|3|4}" ETX "%01<xor>";
+}
+setGaugePowerMode {
+    out STX $addr "\x32\x36\x37" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getGaugePowerMode; }
+}
+
+# Gauge Setpoint Type configuration
+# (available to FS model only)
+# value = 0 for Frequency, 1 for Power, 2 for Time, 3 for Normal
+# factory default = 3
+# data format: 6 bytes
+# (use mbbi/mbbo record)
+getGaugeSPtType {
+    out STX $addr "\x31\x33\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x33\x36" 0x30 "\x30\x30\x30\x30\x30%{0|1|2|3}" ETX "%01<xor>";
+}
+setGaugeSPtType {
+    out STX $addr "\x31\x33\x36" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getGaugeSPtType; }
+}
+
+# Gauge Setpoint Logic configuration
+# (available to FS model only)
+# (control logic activation type for the setpoint output signal)
+# (positive logic = the relay is energized when the measurement exceeds the reference)
+# (negative logic = the relay is energized when the measurement is below the reference)
+# ("high-level active" indicates the output is ON when the signal is above the threshold)
+# value = 0 for High-level active, 1 for Low-level active
+# factory default = High-level
+# data format: 1 byte
+# (use bi/bo record)
+getGaugeSPtLogic {
+    out STX $addr "\x31\x33\x39" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x33\x39" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setGaugeSPtLogic {
+    out STX $addr "\x31\x33\x39" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getGaugeSPtLogic; }
+}
+
+# Gauge Setpoint Threshold configuration
+# (available to FS model only)
+# value = from 0 to 999999, expressed in Hz/W/sec/mbar
+# factory default = 867
+# data format: 6 bytes
+# (use ai/ao record)
+getGaugeSPtThreshold {
+    out STX $addr "\x31\x33\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x33\x37" 0x30 "%06d" ETX "%01<xor>";
+}
+setGaugeSPtThreshold {
+    out STX $addr "\x31\x33\x37" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getGaugeSPtThreshold; }
+}
+
+# Gauge Setpoint Delay configuration
+# (available to FS model only)
+# (time between the pump start and the setpoint check)
+# value = from 0 to 999999 seconds
+# factory default = 0
+# data format: 6 bytes
+# (use ai/ao record)
+getGaugeSPtDelay {
+    out STX $addr "\x31\x33\x38" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x33\x38" 0x30 "%06d" ETX "%01<xor>";
+}
+setGaugeSPtDelay {
+    out STX $addr "\x31\x33\x38" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getGaugeSPtDelay; }
+}
+
+# Gauge Setpoint Hysteresis configuration
+# (available to FS model only)
+# value = from 0 to 100, expressed in % of the gauge threshold value
+# factory default = 2
+# data format: 6 bytes
+# (use ai/ao record)
+getGaugeSPtHysteresis {
+    out STX $addr "\x31\x34\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x34\x30" 0x30 "%06d" ETX "%01<xor>";
+}
+setGaugeSPtHysteresis {
+    out STX $addr "\x31\x34\x30" 0x31 "%06d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init {getGaugeSPtHysteresis; }
+}
+
+# Gauge Status Code command
+# (command only available to FS model with gauge connected) 
+# value = gauge status
+# read format: 6 bytes 
+# (use ai record)
+getGaugeStatus {
+    out STX $addr "\x32\x35\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x35\x37" 0x30 "\x30\x30\x30\x30%02d" ETX "%01<xor>";
+}
+
+
+##############
+##### Active commands related to the external fan
+
+# External Fan Mode configuration
+# (driving mode of the external cooling fan)
+# value = 0 for Always On, 1 for Serially Controlled
+# factory default = 0
+# data format: 6 bytes
+# (use bi/bo record)
+getFanMode {
+    out STX $addr "\x31\x34\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x34\x33" 0x30 "\x30\x30\x30\x30\x30%{0|1}" ETX "%01<xor>";
+}
+setFanMode {
+    out STX $addr "\x31\x34\x33" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getFanMode; }
+}
+
+# External Fan Activation configuration
+# value = 0 for Off, 1 for On
+# factory default = 0
+# data format: 1 byte
+# (use bi/bo record)
+getFanControl {
+    out STX $addr "\x31\x34\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x34\x34" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setFanControl {
+    out STX $addr "\x31\x34\x34" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getFanControl; }
+}
+
+
+###############
+##### Active commands that relate to general pump settings
+
+# Serial Type Selection configuration
+# (requires modification of Moxa terminal server settings too!)
+# (command available to FS model only)
+# value = 0 for RS232, 1 for RS485
+# factory default = RS232
+# data format: 1 byte
+# (use bi/bo record)
+getSerialType {
+    out STX $addr "\x35\x30\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x35\x30\x34" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setSerialType {
+    out STX $addr "\x35\x30\x34" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getSerialType; }
+}
+
+# Serial baud rate configuration
+# (Moxa terminal server settings must be changed too!)
+# (communication speed above 9600bit/s only available for IC model)
+# value = 0 for 600bit/s, 1 for 1200bit/s, 2 for 2400bit/s, 3 for 4800bit/s,
+#	4 for 9600bit/s, 5 for 19200bit/s, 6 for 38400bit/s
+# factory default = 9600bit/s
+# data format: 6 bytes
+# (use mbbi record)
+getBaudRate {
+    out STX $addr "\x31\x30\x38" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x30\x38" 0x30 "\x30\x30\x30\x30\x30%{0|1|2|3|4|5|6}" ETX "%01<xor>";
+}
+setBaudRate {
+    out STX $addr "\x31\x30\x38" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getBaudRate; }
+}
+
+# Interlock type configuration
+# (P1 input connector, pin3)
+# (operating mode of the interlock input when controller is set to 'START-INTERLOCK' mode on the front panel)
+# (impulse mode = interlock input active only at the time of starting; later de-activation of the interlock has no impact)
+# (continuous = interlock input constantly active; de-activation of the interlock interrupts the driving of the pump)
+# value = 0 for Impulse, 1 for Continuous 
+# factory default = Continuous for IC model, Impulse for FS model
+# data format: 1 byte
+# (use bi/bo record)
+getInterlock {
+    out STX $addr "\x31\x31\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x31\x30" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setInterlock {
+    out STX $addr "\x31\x31\x30" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getInterlock; }
+}
+
+# Start Output configuration
+# (establishes the required pump status to activate the start output)
+# (configurable start output used with logic output connector J1, pin13 and pin6)
+# (available to FS model only)
+# value = 0 for Starting (i.e. output is active only during acceleration ramp-up),
+#        1 for Running (i.e. output is active when the pump is driven)
+# factory default = Starting
+# data format: 1 byte
+# (use bi/bo record)
+getStartOutput {
+    out STX $addr "\x31\x37\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x37\x37" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setStartOutput {
+    out STX $addr "\x31\x37\x37" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getStartOutput; }
+}
+
+# Analog Output type configuration
+# (J1 logic output connector, pin2)
+# (selects the type of output voltage signal to be sent to the programmable analogue output)
+# (e.g. drive frequency of the pump, power supplied to the pump, temperature of the pump or pressure read by the gauge)
+# (aditional Pressure type for the FS model only)
+# value = 0 for Frequency, 1 for Power, 2 for Temperature, 3 for Pressure
+# factory default = Frequency for IC model, Power for FS model
+# data format: 6 bytes
+# (use ai/ao record)
+getAOType {
+    out STX $addr "\x31\x31\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x31\x31" 0x30 "\x30\x30\x30\x30\x30%{0|1|2|3}" ETX "%01<xor>";
+}
+setAOType {
+    out STX $addr "\x31\x31\x31" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getAOType; }
+}
+
+# Pressure Unit command
+# (sets the unit of measurement for pressure readings on the serial line and on the display)
+# (available to FS model only)
+# value = 0 for mbar, 1 for Pascal, 2 for Torr
+# factory default = 0
+# data format: 6 bytes
+# (use mbbi/mbbo record)
+getPressureUnit {
+    out STX $addr "\x31\x36\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x36\x33" 0x30 "\x30\x30\x30\x30\x30%{0|1|2}" ETX "%01<xor>";
+}
+setPressureUnit {
+    out STX $addr "\x31\x36\x33" 0x31 "\x30\x30\x30\x30\x30%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getPressureUnit; }
+}
+
+# Maximum Power Limit command
+# (reads the maximum DC power deliverable to the pump)
+# (available to FS model only)
+# value = from 0 to 999 watts
+# read format: 6 bytes
+# (use ai record)
+getPumpMaxPower {
+    out STX $addr "\x31\x35\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x31\x35\x35" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Pump temperature command
+# (returns the current temperature of the outer ring of the upper bearing on the pump)
+# value = from 0 to 99 degree celsius
+# read format: 6 bytes
+# (use ai record)
+getPumpTemp {
+    out STX $addr "\x32\x30\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x30\x34" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Pressure Reading command
+# (reads the current pressure delivered by the pump)
+# (available to FS model only and with the gauge connected)
+# value = power value in mbar|Pascal|Torr (see WIN163) with format X.X E XX
+# read format: 10 bytes
+# (use stringin record)
+getPumpPressure {
+    out STX $addr "\x32\x32\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x32\x34" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Pump Rotation Frequency command
+# (returns the rotational speed of the pump as a function of the controller output frequency)
+# (read-only, available to FS model only)
+# value = rotation frequency in rpm
+# read format: 6 bytes
+# (use ai record)
+getPumpRotation {
+    out STX $addr "\x32\x32\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x32\x36" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# RS485 Device configuration
+# (defines the serial address in RS485 communication)
+# value = device number from 0 to 31
+# factory default = 0
+# data format: 6 bytes
+# (use ai/ao record)
+getRS485Device {
+    out STX $addr "\x35\x30\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x35\x30\x33" 0x30 "\x30\x30\x30\x30%02d" ETX "%01<xor>";
+}
+setRS485Device {
+    out STX $addr "\x35\x30\x33" 0x31 "\x30\x30\x30\x30%02d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getRS485Device; }
+}
+
+# RunUp Time Control configuration
+# (the pump is allowed to spin at a speed value less than the normal operating speed (700Hz)) 
+# value = 0 for Off, 1 for On
+# factory default = On
+# data format: 1 byte
+# (use bi/bo record)
+getRunUpControl {
+    out STX $addr "\x37\x32\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x37\x32\x35" 0x30 "%{0|1}" ETX "%01<xor>";
+}
+setRunUpControl {
+    out STX $addr "\x37\x32\x35" 0x31 "%x" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getRunUpControl; }
+}
+
+# RunUp Time configuration
+# (maximum amount of low speed time allowed before the pump stop and 'Run Up Time' error appears)
+# value = from 0 to 30 minutes
+# factory default = 15
+# data format: 6 bytes
+# (use ai/ao record)
+getRunUpTime {
+    out STX $addr "\x37\x32\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x37\x32\x34" 0x30 "\x30\x30\x30\x30%02d" ETX "%01<xor>";
+}
+setRunUpTime {
+    out STX $addr "\x37\x32\x34" 0x31 "\x30\x30\x30\x30%02d" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+    @init { getRunUpTime; }
+}
+
+
+###############
+##### Active commands that relate to the electric motor
+
+# Supplied Bus Current command
+# (reads the actual value of the bus current supplied by the controller to the electric motor)
+# value = value in mA dc
+# read format: 6 bytes
+# (use ai record)
+getBusCurrent {
+    out STX $addr "\x32\x30\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x30\x30" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# 3Phase Voltage command
+# (reads the actual value of the peak 3-phase voltage supplied by the controller to power the electric motor)
+# value = value in 1/10V for the IC model, in Vdc for the FS model
+# read format: 6 bytes 
+# (use ai record)
+get3PhaseVoltage {
+    out STX $addr "\x32\x30\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x30\x31" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Output Power command
+# (reads the actual value of power supplied by the controller to the electric motor)
+# value = value in Watts
+# read format: 6 bytes 
+# (use ai record)
+getOutputPower {
+    out STX $addr "\x32\x30\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x30\x32" 0x30 "%06d" ETX "%01<xor>";
+}
+
+
+###############
+##### Active commands that relate to the controller status
+
+# MOSFET Controller Temperature command
+# (reads the controller heatsink temperature)
+# value = value in degree Celsius
+# read format: 6 bytes 
+# (use ai record)
+getTempMOSFET {
+    out STX $addr "\x32\x31\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x31\x31" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# PCB Controller Temperature command
+# (reads the controller cooling air temperature)
+# value = value in degree Celsius
+# read format: 6 bytes 
+# (use ai record)
+getTempPCB {
+    out STX $addr "\x32\x31\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x31\x36" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Bus Voltage command
+# (command available to IC model only)
+# value = value in volts
+# read format: 6 bytes 
+# (use ai record)
+getBusVoltage {
+    out STX $addr "\x32\x33\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x33\x34" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Standby Time command
+# (indicates the total hours spent by the controller in stand-by mode)
+# (command available to IC model only)
+# value = value in hours
+# read format: 6 bytes 
+# (use ai record)
+getCtrlStandbyTime {
+    out STX $addr "\x33\x30\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x30\x37" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Controller Life Time command
+# (may not be available to FS model)
+# value = value in hours
+# read format: 6 bytes 
+# (use ai record)
+getCtrlLifeTime {
+    out STX $addr "\x33\x39\x39" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x39\x39" 0x30 "%06d" ETX "%01<xor>";
+}
+
+
+###############
+##### Active commands that relate to the pump codes
+
+# Pump Status Code command
+# value = real time status
+# read format: 6 bytes 
+# (use ai record)
+getPumpStatus {
+    out STX $addr "\x32\x30\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x30\x35" 0x30 "\x30\x30\x30\x30%02d" ETX "%01<xor>";
+}
+
+# Pump Error Code command
+# value = 12 bits significant for IC model, 8 bits significant for FS model
+# read format: 6 bytes 
+# (use ai record)
+getErrorCode {
+    out STX $addr "\x32\x30\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x30\x36" 0x30 "\x30\x30\x30\x30%02d" ETX "%01<xor>";
+}
+
+# Pump Warning Code command
+# (warning code available to IC model only)
+# value = 14 bits significant
+# read format: 6 bytes 
+# (use ai record)
+getWarningCode {
+    out STX $addr "\x32\x32\x38" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x32\x38" 0x30 "\x30\x30\x30\x30%02d" ETX "%01<xor>";
+}
+
+
+###############
+##### Active commands that relate to the pump service
+
+# Standard Information command
+# (command available to IC model only)
+# value = four parts (1st=status pump, 2nd=output power,
+#			3rd=driving frequency, 4th=body temperature)
+# read format: 11 bytes 
+# (use stringin record)
+getStdInfo {
+    out STX $addr "\x32\x33\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x32\x33\x31" 0x30 "%11c" ETX "%01<xor>";
+}
+
+# Average Pump Temperature command
+# (may not be available to FS model)
+# value = value in degrees Celsius
+# read format: 6 bytes 
+# (use ai record)
+getPumpAvgTemp {
+    out STX $addr "\x33\x38\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x38\x32" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Average Pump Power command
+# (may not be available to FS model)
+# value = value in watts
+# read format: 6 bytes 
+# (use ai record)
+getPumpAvgPower {
+    out STX $addr "\x33\x38\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x38\x34" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Last Cycle Time command
+# (indicates the running time of the last cycle, i.e. from the last start to the current time)
+# (the pump must be running)
+# value = from 0 to 999999 minutes
+# read format: 6 bytes 
+# (use ai record)
+getLastCycleTime {
+    out STX $addr "\x33\x30\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x30\x30" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Total Cycle Number command
+# (indicates the number of start/stop cycles during the whole pump life)
+# value = from 0 to 9999 cycles
+# read format: 6 bytes 
+# (use ai record)
+getTotalCycleNum {
+    out STX $addr "\x33\x30\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x30\x31" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Total Pump Life Time command
+# (total operating time of the pump)
+# value = value in hours
+# read format: 6 bytes 
+# (use ai record)
+getPumpLifetime {
+    out STX $addr "\x33\x30\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x30\x32" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# 1H Average Pump Temperature command
+# (may not be available to FS model)
+# value = value in degrees Celsius
+# read format: 6 bytes 
+# (use ai record)
+get1hAvgTemp {
+    out STX $addr "\x33\x36\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x36\x32" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# 1H Average Bus Current command
+# (may not be available to FS model)
+# value = value in mA
+# read format: 6 bytes 
+# (use ai record)
+get1hAvgCurrent {
+    out STX $addr "\x33\x36\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x36\x33" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# 1H Average Supplied Power command
+# (may not be available to FS model)
+# value = value in watts
+# read format: 6 bytes 
+# (use ai record)
+get1hAvgPower {
+    out STX $addr "\x33\x36\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x36\x34" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# 1H Average Driving Frequency command
+# (may not be available to FS model)
+# value = value in Hz
+# read format: 6 bytes 
+# (use ai record)
+get1hAvgFrequency {
+    out STX $addr "\x33\x36\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x36\x35" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Pump Life Reset command
+# (resets values of pump life, also cycle time and cycle number for FS model)
+# value = 1 for reset
+# write format: 1 byte
+# (use longout record)
+setLifeReset {
+    out STX $addr "\x31\x30\x39" 0x31 "\x31" ETX "%01<xor>";
+    in STX $addr ACK ETX "%01<xor>";
+}
+
+# Date and Time RTC of the controller
+# (command available to IC model only, format DDMMYYhhmmss)
+# value = 12 chars
+# read format: 12 bytes
+# (use stringin record)
+getCtrlDateTime {
+    out STX $addr "\x37\x32\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x37\x32\x37" 0x30 "%12c" ETX "%01<xor>";
+}
+
+
+###############
+##### Active commands that relate to the hardware information (fixed)
+
+# Controller Part Number command
+# (command available to IC model only)
+# value = 11 chars
+# read format: 11 bytes
+# (use stringin record)
+getCtrlPartNb {
+    out STX $addr "\x33\x31\x39" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x31\x39" 0x30 "%11c" ETX "%01<xor>";
+}
+
+# Controller Serial Number command
+# (may not be available to FS model)
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getCtrlSerialNb {
+    out STX $addr "\x33\x32\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x32\x33" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Controller Modification Level command
+# (may not be available to FS model)
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getCtrlUpgradingLv {
+    out STX $addr "\x33\x32\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x32\x35" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Pump Part Number command
+# (may not be available to FS model)
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getPumpPartNb {
+    out STX $addr "\x33\x32\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x32\x30" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Pump Part Number Special command
+# (may not be available to FS model)
+# value = 4 chars
+# read format: 4 bytes 
+# (use stringin record)
+getPumpSpecialPN {
+    out STX $addr "\x33\x32\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x32\x31" 0x30 "%4c" ETX "%01<xor>";
+}
+
+# Pump Serial Number command
+# (may not be available to FS model)
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getPumpSerialNb {
+    out STX $addr "\x33\x32\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x32\x32" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Pump Modification Level command
+# (may not be available to FS model)
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getPumpUpgradingLv {
+    out STX $addr "\x33\x32\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x32\x34" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Program Listing CRC command
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getProgramCRC {
+    out STX $addr "\x34\x30\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x34\x30\x30" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Bootloader CRC command
+# (command available to IC model only)
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getBootloaderCRC {
+    out STX $addr "\x34\x30\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x34\x30\x31" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Parameter Listing CRC command
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getParameterCRC {
+    out STX $addr "\x34\x30\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x34\x30\x32" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Parameter Listing Structure command
+# value = 10 chars
+# read format: 10 bytes 
+# (use stringin record)
+getParameterStruct {
+    out STX $addr "\x34\x30\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x34\x30\x34" 0x30 "%10c" ETX "%01<xor>";
+}
+
+# Program Listing Revision command
+# (command available to IC model only)
+# value = 12 chars
+# read format: 12 bytes 
+# (use stringin record)
+getProgramRevision {
+    out STX $addr "\x34\x30\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x34\x30\x36" 0x30 "%12c" ETX "%01<xor>";
+}
+
+# Parameter Listing Revision command
+# (command available to IC model only)
+# value = 12 chars
+# read format: 12 bytes 
+# (use stringin record)
+getParameterRevision {
+    out STX $addr "\x34\x30\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x34\x30\x37" 0x30 "%12c" ETX "%01<xor>";
+}
+
+
+###############
+##### Active commands that relate to the worst recorded data
+
+# Worst Temperature Cycle Number command
+# (may not be available to FS model)
+# value = cycle count
+# read format: 6 bytes 
+# (use ai record)
+getWorstTempCycle {
+    out STX $addr "\x33\x36\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x36\x36" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Temperature Cycle Time command
+# (may not be available to FS model)
+# value = value in minutes
+# read format: 6 bytes 
+# (use ai record)
+getWorstTempTime {
+    out STX $addr "\x33\x36\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x36\x37" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Temperature Cycle Temperature command
+# (may not be available to FS model)
+# value = value in degrees Celsius
+# read format: 6 bytes 
+# (use ai record)
+getWorstTempTemp {
+    out STX $addr "\x33\x36\x38" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x36\x38" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Temperature Cycle Current command
+# (may not be available to FS model)
+# value = value in mA
+# read format: 6 bytes 
+# (use ai record)
+getWorstTempCurrent {
+    out STX $addr "\x33\x36\x39" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x36\x39" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Temperature Cycle Power command
+# (may not be available to FS model)
+# value = value in watts
+# read format: 6 bytes 
+# (use ai record)
+getWorstTempPower {
+    out STX $addr "\x33\x37\x30" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x37\x30" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Temperature Cycle Frequency command
+# (may not be available to FS model)
+# value = value in Hertz
+# read format: 6 bytes 
+# (use ai record)
+getWorstTempFreq {
+    out STX $addr "\x33\x37\x31" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x37\x31" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Power Cycle Number command
+# (may not be available to FS model)
+# value = cycle count
+# read format: 6 bytes 
+# (use ai record)
+getWorstPowerCycle {
+    out STX $addr "\x33\x37\x32" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x37\x32" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Power Cycle Time command
+# (may not be available to FS model)
+# value = value in minutes
+# read format: 6 bytes 
+# (use ai record)
+getWorstPowerTime {
+    out STX $addr "\x33\x37\x33" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x37\x33" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Power Cycle Temperature command
+# (may not be available to FS model)
+# value = value in degrees Celsius
+# read format: 6 bytes 
+# (use ai record)
+getWorstPowerTemp {
+    out STX $addr "\x33\x37\x34" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x37\x34" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Power Cycle Current command
+# (may not be available to FS model)
+# value = value in mA
+# read format: 6 bytes 
+# (use ai record)
+getWorstPowerCurrent {
+    out STX $addr "\x33\x37\x35" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x37\x35" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Power Cycle Power command
+# (may not be available to FS model)
+# value = value in watts
+# read format: 6 bytes 
+# (use ai record)
+getWorstPowerPower {
+    out STX $addr "\x33\x37\x36" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x37\x36" 0x30 "%06d" ETX "%01<xor>";
+}
+
+# Worst Power Cycle Frequency command
+# (may not be available to FS model)
+# value = value in Hertz
+# read format: 6 bytes 
+# (use ai record)
+getWorstPowerFreq {
+    out STX $addr "\x33\x37\x37" 0x30 ETX "%01<xor>";
+    in STX $addr "\x33\x37\x37" 0x30 "%06d" ETX "%01<xor>";
+}

@@ -1,0 +1,591 @@
+# % macro, P,      PV name prefix
+# % macro, R,      PV name suffix
+# % macro, PORT,   asyn port
+# % macro, name,   module name
+
+# % gui, $(name=), edm, fusion4000.edl, P=$(P),R=$(R)
+
+
+################################################################
+# Generic Asyn record.
+################################################################
+
+record(asyn, "$(P)$(R):ASYN") {
+  field(DTYP,"asynRecordDevice")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(OMAX,"1024")
+  field(IMAX,"1024")
+}
+
+################################################################
+# Pump control
+################################################################
+
+
+record(bo, "$(P)$(R):P1:START_BASIC")
+{
+  field(DESC, "Start pump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto start(1,0) $(PORT)")
+}
+
+record(bo, "$(P)$(R):P1:START_PROGRAM")
+{
+  field(DESC, "Start pump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto start(1,1) $(PORT)")
+}
+
+record(bo, "$(P)$(R):P2:START_BASIC")
+{
+  field(DESC, "Start pump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto start(2,0) $(PORT)")
+}
+
+record(bo, "$(P)$(R):P2:START_PROGRAM")
+{
+  field(DESC, "Start pump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto start(2,1) $(PORT)")
+}
+
+record(bo, "$(P)$(R):START_ALL_BASIC")
+{
+  field(DESC, "Start pump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto startAll(0) $(PORT)")
+}
+
+record(bo, "$(P)$(R):START_ALL_PROGRAM")
+{
+  field(DESC, "Start pump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto startAll(1) $(PORT)")
+}
+
+record(bo, "$(P)$(R):P1:PAUSE")
+{
+  field(DESC, "Pausepump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto pause(1) $(PORT)")
+}
+
+record(bo, "$(P)$(R):P2:PAUSE")
+{
+  field(DESC, "Pausepump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto pause(2) $(PORT)")
+}
+
+record(bo, "$(P)$(R):PAUSE_ALL")
+{
+  field(DESC, "Pausepump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto pauseAll $(PORT)")
+}
+
+record(bo, "$(P)$(R):P1:STOP")
+{
+  field(DESC, "Stop pump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto stop(1) $(PORT)")
+}
+
+record(bo, "$(P)$(R):P2:STOP")
+{
+  field(DESC, "Stop pump")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto stop(2) $(PORT)")
+}
+
+record(bo, "$(P)$(R):STOP_ALL")
+{
+  field(DESC, "Stop pumps")
+  field(DTYP, "stream")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(OUT, "@fusion4000.proto stopAll $(PORT)")
+}
+
+
+record(mbbi, "$(P)$(R):P1:STATUS")
+{
+  field(DESC, "get pump status")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP, "@fusion4000.proto getStatus(1) $(PORT)")
+  field(ZRST, "stopped")       field(ZRVL, "0")
+  field(ONST, "running")       field(ONVL, "1")
+  field(TWST, "paused")        field(TWVL, "2")
+  field(THST, "delayed")       field(THVL, "3")
+  field(FRST, "stalled")       field(FRVL, "4")
+}
+
+record(mbbi, "$(P)$(R):P2:STATUS")
+{
+  field(DESC, "get pump status")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP, "@fusion4000.proto getStatus(2) $(PORT)")
+  field(ZRST, "stopped")       field(ZRVL, "0")
+  field(ONST, "running")       field(ONVL, "1")
+  field(TWST, "paused")        field(TWVL, "2")
+  field(THST, "delayed")       field(THVL, "3")
+  field(FRST, "stalled")       field(FRVL, "4")
+}
+
+record(ai, "$(P)$(R):P1:MAX_VOLB")
+{
+  field(DESC, "get max volume in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMaxVolume(1,0) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:MIN_VOLB")
+{
+  field(DESC, "get min volume in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMinVolume(1,0) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:MAX_RATEB")
+{
+  field(DESC, "get max rate in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMaxRate(1,0) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:MIN_RATEB")
+{
+  field(DESC, "get max rate in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMinRate(1,0) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:MAX_VOLP")
+{
+  field(DESC, "get max volume in program mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMaxVolume(1,1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:MIN_VOLP")
+{
+  field(DESC, "get min volume in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMinVolume(1,1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:MAX_RATEP")
+{
+  field(DESC, "get max rate in program mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMaxRate(1,1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:MIN_RATEP")
+{
+  field(DESC, "get max rate in program mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMinRate(1,1) $(PORT)")
+}
+
+
+
+record(ai, "$(P)$(R):P2:MAX_VOLB")
+{
+  field(DESC, "get max volume in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMaxVolume(2,0) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:MIN_VOLB")
+{
+  field(DESC, "get min volume in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMinVolume(2,0) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:MAX_RATEB")
+{
+  field(DESC, "get max rate in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMaxRate(2,0) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:MIN_RATEB")
+{
+  field(DESC, "get max rate in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMinRate(2,0) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:MAX_VOLP")
+{
+  field(DESC, "get max volume in program mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMaxVolume(2,1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:MIN_VOLP")
+{
+  field(DESC, "get min volume in basic mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMinVolume(2,1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:MAX_RATEP")
+{
+  field(DESC, "get max rate in program mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMaxRate(2,1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:MIN_RATEP")
+{
+  field(DESC, "get max rate in program mode")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getMinRate(2,1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:DISPENCED_VOL")
+{
+  field(DESC, "get dispensed volume")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getDispensedVolume(1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:DISPENCED_VOL")
+{
+  field(DESC, "get dispensed volume")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getDispensedVolume(2) $(PORT)")
+}
+
+
+record(ai, "$(P)$(R):P1:ELAPSED_TIME")
+{
+  field(DESC, "get elapsed time")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getElapsedTime(1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:ELAPSED_TIME")
+{
+  field(DESC, "get elapsed time")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(INP, "@fusion4000.proto getElapsedTime(2) $(PORT)")
+}
+
+
+# record(ao, "$(P)$(R):DIAMETER")
+# {
+#   field(DESC, "set diameter")
+#   field(DTYP, "stream")
+#   field(OUT, "@fusion4000.proto setDiameter(1) $(PORT)")
+# }
+
+record(ai, "$(P)$(R):P1:DELAY_RBV")
+{
+  field(DESC, "get diameter")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP, "@fusion4000_parameter.proto getDelay1 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P1:DELAY")
+{
+  field(DESC, "set diameter")
+  field(DTYP, "stream")
+  field(OUT, "@fusion4000.proto setDelay(1) $(PORT)")
+}
+
+record(mbbi, "$(P)$(R):P1:UNITS_RBV") 
+{
+  field(DESC, "Units")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@fusion4000_parameter.proto getUnits1 $(PORT)")
+  field(ZRST, "mL/min")      field(ZRVL, "0")
+  field(ONST, "mL/hr")       field(ONVL, "1")
+  field(TWST, "uL/min")      field(TWVL, "2")
+  field(THST, "ul/hr")       field(THVL, "3")
+}
+
+record(mbbo, "$(P)$(R):P1:UNITS") 
+{
+  field(DESC, "Units")
+  field(DTYP, "stream")
+  field(OUT, "@fusion4000.proto setUnits(1) $(PORT)")
+  field(ZRST, "mL/min")      field(ZRVL, "0")
+  field(ONST, "mL/hr")       field(ONVL, "1")
+  field(TWST, "uL/min")      field(TWVL, "2")
+  field(THST, "ul/hr")       field(THVL, "3")
+}
+
+record(ai, "$(P)$(R):P1:DIAMETER_RBV") 
+{
+  field(DESC, "Diameter")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(INP, "@fusion4000_parameter.proto getDiameter1 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P1:DIAMETER") 
+{
+  field(DESC, "Diameter")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(OUT, "@fusion4000.proto setDiameter(1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:RATE_RBV") 
+{
+  field(DESC, "rate")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(INP, "@fusion4000_parameter.proto getRate1 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P1:RATE") 
+{
+  field(DESC, "rate")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(OUT, "@fusion4000.proto setRate(1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:TIME_RBV") 
+{
+  field(DESC, "time")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(INP, "@fusion4000_parameter.proto getTime1 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P1:TIME") 
+{
+  field(DESC, "rate")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(OUT, "@fusion4000.proto setTime(1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P1:VOLUME_RBV") 
+{
+  field(DESC, "volume")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(INP, "@fusion4000_parameter.proto getVolume1 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P1:VOLUME") 
+{
+  field(DESC, "volume")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(OUT, "@fusion4000.proto setVolume(1) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:DELAY_RBV")
+{
+  field(DESC, "get diameter")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP, "@fusion4000_parameter.proto getDelay2 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P2:DELAY")
+{
+  field(DESC, "set diameter")
+  field(DTYP, "stream")
+  field(OUT, "@fusion4000.proto setDelay(2) $(PORT)")
+}
+
+record(mbbi, "$(P)$(R):P2:UNITS_RBV") 
+{
+  field(DESC, "Units")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@fusion4000_parameter.proto getUnits2 $(PORT)")
+  field(ZRST, "mL/min")      field(ZRVL, "0")
+  field(ONST, "mL/hr")       field(ONVL, "1")
+  field(TWST, "uL/min")      field(TWVL, "2")
+  field(THST, "ul/hr")       field(THVL, "3")
+}
+
+record(mbbo, "$(P)$(R):P2:UNITS") 
+{
+  field(DESC, "Units")
+  field(DTYP, "stream")
+  field(OUT, "@fusion4000.proto setUnits(2) $(PORT)")
+  field(ZRST, "mL/min")      field(ZRVL, "0")
+  field(ONST, "mL/hr")       field(ONVL, "1")
+  field(TWST, "uL/min")      field(TWVL, "2")
+  field(THST, "ul/hr")       field(THVL, "3")
+}
+
+record(ai, "$(P)$(R):P2:DIAMETER_RBV") 
+{
+  field(DESC, "Diameter")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(INP, "@fusion4000_parameter.proto getDiameter2 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P2:DIAMETER") 
+{
+  field(DESC, "Diameter")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(OUT, "@fusion4000.proto setDiameter(2) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:RATE_RBV") 
+{
+  field(DESC, "rate")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(INP, "@fusion4000_parameter.proto getRate2 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P2:RATE") 
+{
+  field(DESC, "rate")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(OUT, "@fusion4000.proto setRate(2) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:TIME_RBV") 
+{
+  field(DESC, "time")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(INP, "@fusion4000_parameter.proto getTime2 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P2:TIME") 
+{
+  field(DESC, "rate")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(OUT, "@fusion4000.proto setTime(2) $(PORT)")
+}
+
+record(ai, "$(P)$(R):P2:VOLUME_RBV") 
+{
+  field(DESC, "volume")
+  field(PINI, "YES")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(INP, "@fusion4000_parameter.proto getVolume2 $(PORT)")
+}
+
+record(ao, "$(P)$(R):P2:VOLUME") 
+{
+  field(DESC, "volume")
+  field(DTYP, "stream")
+  field(PREC, "3")
+  field(OUT, "@fusion4000.proto setVolume(2) $(PORT)")
+}
+
+
+# record(ai, "$(P)$(R):STATUS") 
+# {
+#   field(DESC, "Pump status")
+#   field(PINI, "YES")
+#   field(SCAN, "1 second")
+#   field(DTYP, "stream")
+#   field(INP, "@fusion4000.proto getStatus($(P)$(R)) $(PORT)")
+#   field(FLNK, "$(P)$(R):STATUS:WORD")
+# }
+
+# record(calc, "$(P)$(R):STATUS:WORD") {
+#   field(INPA, "$(P)$(R):STATUS")
+#   field(SCAN, "Passive")
+#   field(CALC, "1 << A")
+# }

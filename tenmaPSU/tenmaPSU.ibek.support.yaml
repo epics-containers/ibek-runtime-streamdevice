@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: tenmaPSU
+
+entity_models:
+  - name: tenma
+    description: |-
+      Tenma PSU
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port)
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters
+      MAXI:
+        type: float
+        description: |-
+          Max output current (default=5)
+        default: 5
+      MAXV:
+        type: float
+        description: |-
+          Max output voltage (default=30)
+        default: 30
+      TGET:
+        type: str
+        description: |-
+          Temperature get
+      KP:
+        type: float
+        description: |-
+          PID KP
+      KI:
+        type: float
+        description: |-
+          PID KI
+      KD:
+        type: float
+        description: |-
+          PID KD
+      SETPOINT:
+        type: float
+        description: |-
+          PID temperature setpoint
+    databases:
+      - file: tenma.template
+        args:
+          .*:

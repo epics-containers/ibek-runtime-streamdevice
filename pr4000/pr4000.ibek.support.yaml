@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: pr4000
+
+entity_models:
+  - name: pr4000chan
+    description: |-
+      Template database for a PR4000 Baratron gauge controller channel
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      port:
+        type: str
+        description: |-
+          Asyn Port name, e.g. ty_40_0
+      channel:
+        type: int
+        description: |-
+          Channel number (1 or 2)
+    databases:
+      - file: pr4000chan.template
+        args:
+          .*:
+  - name: pr4000
+    description: |-
+      Template database for a PR4000 Baratron gauge controller
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device e.g.BLxxI-VA-GCTLR-01
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      ch1pv:
+        type: str
+        description: |-
+          Channel 1 PV (as device in pr4000chan.template)
+      ch2pv:
+        type: str
+        description: |-
+          Channel 2 PV (as device in pr4000chan.template)
+      name:
+        type: id
+        description: |-
+          Name to export to gda as
+    databases:
+      - file: pr4000.template
+        args:
+          .*:

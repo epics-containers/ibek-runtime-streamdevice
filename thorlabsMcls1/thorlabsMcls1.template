@@ -1,0 +1,142 @@
+# % macro, name,   Name
+# % macro, P,      PV name prefix
+# % macro, Q,      PV name suffix
+# % macro, BLUE,  Blue channel name
+# % macro, RED,   Red channel name
+# % macro, VRED,  Very red channel name
+# % macro, IRED,  (Near) infrared channel name
+# % macro, PORT,   asyn port
+# % macro, desc,   Description
+
+# % gui, $(name=), edm, thorlabsMcls1.edl, P=$(P),Q=$(Q),desc=$(desc)
+
+# System-Wide
+
+record(stringin, "$(P)$(Q):Id_RBV")
+{
+	field(DESC, "Info About Laser")
+	field(PINI, "YES")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@thorlabsMcls1.proto getId $(PORT)")
+}
+
+record(bi, "$(P)$(Q):SystemEnabled_RBV")
+{
+	field(DESC, "Is the laser master control on")
+	field(DTYP, "stream")
+	field(PINI, "YES")
+	field(SCAN, "1 second")
+	field(INP, "@thorlabsMcls1.proto isSystemEnabled $(PORT)")
+	field(ZNAM, "Off")
+	field(ONAM, "On")
+}
+
+record(bo, "$(P)$(Q):SystemEnabled")
+{
+	field(DESC, "Set the laser master control on")
+	field(PINI, "YES")
+    field(DTYP, "stream")
+    field(OUT, "@thorlabsMcls1.proto setSystemEnabled $(PORT)")
+}
+
+# Channel Info
+
+record(mbbi, "$(P)$(Q):Channel_RBV")
+{
+	field(DESC, "Current laser channel")
+	field(DTYP, "stream")
+	field(SCAN, ".2 second")
+	field(INP, "@thorlabsMcls1.proto getChannel $(PORT)")
+	field(ZRVL, "1")
+	field(ONVL, "2")
+	field(TWVL, "3")
+	field(THVL, "4")
+}
+
+record(mbbo, "$(P)$(Q):Channel")
+{
+	field(DESC, "Set the laser channel")
+	field(PINI, "YES")
+    field(DTYP, "stream")
+    field(OUT, "@thorlabsMcls1.proto setChannel $(PORT)")
+    field(ZRVL, "1")
+	field(ONVL, "2")
+	field(TWVL, "3")
+	field(THVL, "4")
+	field(ZRST, "$(BLUE)")
+	field(ONST, "$(RED)")
+	field(TWST, "$(VRED)")
+	field(THST, "$(IRED)")
+}
+
+record(bi, "$(P)$(Q):ChannelEnabled_RBV")
+{
+	field(DESC, "Is the laser channel control on")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@thorlabsMcls1.proto isChannelEnabled $(PORT)")
+	field(ZNAM, "Off")
+	field(ONAM, "On")
+}
+
+record(bo, "$(P)$(Q):ChannelEnabled")
+{
+	field(DESC, "Set the laser channel control")
+	field(PINI, "YES")
+    field(DTYP, "stream")
+    field(OUT, "@thorlabsMcls1.proto setChannelEnabled $(PORT)")
+}
+
+# Power
+
+record(ai, "$(P)$(Q):ChannelPower_RBV")
+{
+	field(DESC, "Power of the current active channel")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@thorlabsMcls1.proto getChannelPower $(PORT)")
+}
+
+record(ai, "$(P)$(Q):ChannelCurrent_RBV")
+{
+	field(DESC, "Reported current of the active channel")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@thorlabsMcls1.proto getChannelCurrent $(PORT)")
+}
+
+record(ao, "$(P)$(Q):ChannelCurrent")
+{
+	field(DESC, "Current of the active channel")
+	field(PINI, "YES")
+    field(DTYP, "stream")
+    field(OUT, "@thorlabsMcls1.proto setChannelCurrent $(PORT)")
+}
+
+# Temperature
+
+record(ai, "$(P)$(Q):ChannelTemperature_RBV")
+{
+	field(PINI, "YES")
+	field(DESC, "Temperature of the active channel")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@thorlabsMcls1.proto getChannelTemperature $(PORT)")
+}
+
+record(ai, "$(P)$(Q):ChannelTargetTemperature_RBV")
+{
+	field(DESC, "Reported channel target temperature")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP, "@thorlabsMcls1.proto getChannelTargetTemperature $(PORT)")
+}
+
+record(ao, "$(P)$(Q):ChannelTargetTemperature")
+{
+	field(DESC, "Channel target temperature")
+	field(PINI, "YES")
+    field(DTYP, "stream")
+    field(OUT, "@thorlabsMcls1.proto setChannelTargetTemperature $(PORT)")
+}

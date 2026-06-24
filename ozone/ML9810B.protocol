@@ -1,0 +1,70 @@
+#
+# Protocol file for ML9810B Ozone Analyser
+#
+# Modification history
+#
+# 2006-04-07 S. C. Robertson (Diamond)
+#  
+
+InTerminator = LF;
+OutTerminator = CR;
+replytimeout = 10000;
+readtimeout  = 10000;
+locktimeout  = 10000;
+
+# These are (most of) the commands possible with Ozone Analyser.
+
+# ABORT reply is 0-Done, or 1-Fail.
+abort 	{ out 	"ABORT,???";
+	  in 	"%{\6|\15}";}
+
+# Perform zero-span cycle.
+dazsc 	{ out 	"DAZSC,???";
+	  in 	"%{\6|\15}";}
+
+#DCOMM
+
+
+#Returns the current average concentration data.
+davgc 	{ out 	"DAVGC,???";
+	  in 	"(gas)\20(statusWord)\0D\0A"}
+
+#Returns the current instant concentration data.
+dconc 	{ out	"DCONC,???";
+	  in	"\6%(A)f\x20%(B)1x%(C)1x%(D)1x%(E)1x\x0D"}
+		
+#Return event log
+devent 	{ out	"DEVENT,???";
+	  in	"(string)";}
+
+#Return gain(S) and zero offset(Z)
+dgain	{ out	"DGAIN,???";
+	  in	"\6%(A)f,%(B)f\x0D\x0A";}
+
+#Return INSTRUMENT STATUS MENU
+dinstr	{ out	"DINSTR,???";
+	  in	"(stat1),...,(stat12)\0D\0A";}
+
+#Enter SPAN mode [0-Done, or 1-Fail]  
+dspan	{ out	"DSPAN,???";
+	  in 	"%{\6|\15}";}
+
+#Return SYSTEM TEMPERATURED MENU
+dtemps	{ out	"DTEMPS,???";
+	  in "\6%(A)f,,%(B)f,%(C)f,,,%(D)f,,,\x0D\x0A%(E)f,,%(F)f,%(G)f,,,%(H)f,%(I)f,,\x0D\x0A";}
+
+#Return requested trend buffer [\$1=last 100 avg'd gas readings].
+dtrend	{ out	"DTREND,???,1,1,\$1";
+	  in	"(index)\20(req.trend)\0D\0A";}
+
+#Enter ZERO mode  [0-Done, or 1-Fail]  
+dzero	{ out	"DZERO,???";
+	  in 	"%{\6|\15}";}
+
+#Open up unit to full terminal access [more]
+remote	{ out	"REMOTE,???";
+	  in	"\6";}
+
+#Reboot unit
+reset	{ out	"RESET,???";
+	  in	"\6";}

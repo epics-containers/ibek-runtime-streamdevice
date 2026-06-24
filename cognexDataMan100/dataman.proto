@@ -1,0 +1,6 @@
+Terminator = CR;
+ReadTimeout = 1000;
+
+read {
+    in "%s";
+}

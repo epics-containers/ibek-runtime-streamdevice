@@ -1,0 +1,2232 @@
+# File pfeifferTC400.template
+#
+# % macro, __doc__, Support for Pfeiffer TC400 & TC110 turbo pump controllers supplied as part of Pfeiffer turbo pumps like the HiPace series.
+#
+# Linda Pratt, March 2015
+#
+# Pfeiffer has "Control command" parameters, "Status request" parameters
+# and "Set value settings" parameters, name component, CTL, STS, SVS respectively.
+#
+# % macro, P,            Mandatory. Device prefix for record names.
+# % macro, R,            Mandatory. Record name prefix.
+# % macro, port,         Mandatory. Name of the serial port the device is on.
+# % macro, TC110,        Optional.  Whether actually a TC110, which lacks some features.          0 or 1.     Defaults to zero (i.e. assumes TC400).
+# % macro, unitaddr,     Optional.  Three decimal digit unit number in the RS 485 addressing.     001 to 255. Defaults to 001.
+# % macro, pump_model,   Optional.  Model of the pump.  For GUI information, makes no difference.             Defaults to Unknown.
+# % macro, pump_descr,   Optional.  Description string for the pump.  Record location, function, etc.         Defaults to Pfeiffer turbo pump.
+# % macro, DISABLED,     Optional.  Set to 1 to disable comms.  Defaults to 0 (enabled).
+# % macro, name,         object and gui association name
+# % gui, $(name=), edm, pfeifferTC400_Monitoring.edl, P=$(P), R=$(R)
+#
+# This one is not currently required afterall.
+# % macro, paramno_display, Optional.  Whether to display parameter nos on status and control screens. 0 or 1.   Defaults to zero.  Part of Expert Mode.
+#
+# *******************************************************
+# START OF MODEL SET UP
+#
+# Record to allow template written for TC400 to be extended to
+# support TC110, which lacks a few features compared to the TC400.
+# This stops the processing of some records, which would otherwise
+# lead to error replies from the TC110 via SDIS fields on the
+# appropriate records.  So far, this is the configuration of the 3
+# relays via the connector, (TC110 does not have relays) and one
+# temperature record.
+#
+# This information is readback dynamically as a version info PV but it
+# seems more robust and simpler to already know what model to expect at
+# build time.
+#
+# If we need to handle more models in future, might need to split the
+# template but this will do for now.
+#
+record(bo, "$(P)$(R):MODEL") {
+  field(ZNAM, "TC400")
+  field(ONAM, "TC110")
+  field(VAL, "$(TC110=0)")
+  field(PINI, "YES")
+}
+
+# END OF MODEL SET UP.
+# *******************************************************
+# START OF EXPERT
+#
+# Record to support Entering Expert mode and firing up Expert screen.
+# Default to non-expert.
+# 
+record(bo, "$(P)$(R):EXPERT") {
+  field(ZNAM, "Non-Expert")
+  field(ONAM, "Expert")
+  field(VAL, "0")
+  field(PINI, "YES")
+}
+
+# END OF EXPERT.
+# *******************************************************
+# START OF READBACK OF CONTROL AND STATUS PARAMETERS REGARDING ACCESS.
+#
+# Readback which control interface has priority.
+# Parameter 060 Datatype 7
+#
+record(mbbi, "$(P)$(R):RBV:CTL:INTSEL") {
+  field(DESC, "Current control interface.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getControlViaInt($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Unknown")
+  field(ZRVL, "0")
+  field(ZRSV, "NO_ALARM")
+  field(ONST, "Remote")
+  field(ONVL, "1")
+  field(ONSV, "NO_ALARM")
+  field(TWST, "RS-485")
+  field(TWVL, "2")
+  field(TWSV, "NO_ALARM")
+  field(THST, "PV.can")
+  field(THVL, "4")
+  field(THSV, "NO_ALARM")
+  field(FRST, "Field Bus")
+  field(FRVL, "8")
+  field(FRSV, "NO_ALARM")
+  field(FVST, "E74")
+  field(FVVL, "16")
+  field(FVSV, "NO_ALARM")
+# This value is probably not meaningful as a readback, but the underlying parameter can also be written to.
+  field(SXST, "Unlock Interface")
+  field(SXVL, "255")
+  field(SXSV, "NO_ALARM")
+}
+
+#
+# Readback whether control interface selection is currently locked.
+# This one effectively reports whether the PLC has priority over
+# command functions via the hardware interface or EPICS serial has
+# priority.  It is on the veto list because EPICS must not lock out
+# the PLC.  Therefore DO NOT create a SET record for it.
+# Parameter 061 Datatype 0
+#
+record(bi, "$(P)$(R):RBV:CTL:INTSELLCKD") {
+  field(DESC, "Control interface selection locked?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getIntSelLckd($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Unlocked")
+  field(ONAM, "Locked")
+}
+
+#
+# Readback of whether the remote interface has priority.
+# Parameter 300  Datatype 0
+#
+record(bi, "$(P)$(R):RBV:STS:REMOTEPRIO") {
+  field(DESC, "Interface Remote has priority?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getRemotePrio($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+}
+
+# Fans out the processing for all the control access records.
+record(fanout, "$(P)$(R):FAN:RBV:CTL:ACCESSALL") {
+  field(DESC, "Control access info fanout")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:CTL:INTSEL PP MS")
+  field(LNK2, "$(P)$(R):RBV:CTL:INTSELLCKD PP MS")
+  field(LNK3, "$(P)$(R):RBV:STS:REMOTEPRIO PP MS")
+}
+# END OF RECORDS FOR CONTROL AND STATUS PARAMETERS REGARDING ACCESS.
+# *******************************************************
+# START OF RECORDS FOR CONTROL PARAMS CLOSE TO OUR HEARTS
+# (and therefore scanned regularly).
+#
+# Most can be set but only some have been requested to have
+# setting them supported and have deliberately omitted the ones
+# not requested.
+#
+# The readback for whether in standby mode.
+# Parameter 002 Datatype 0
+#
+# % archiver 10 monitor
+#
+record(bi, "$(P)$(R):RBV:CTL:STANDBY") {
+  field(DESC, "In Standby Mode?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getStandby($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# Set whether pump in standby mode.
+# Parameter 002 Datatype 0
+# This is now reserved to be PLC only functionality.
+#
+#record(bo, "$(P)$(R):SET:CTL:STANDBY") {
+#  field(DESC, "Set Standby Mode")
+#  field(DTYP, "stream")
+#  field(SCAN, "Passive")
+#  field(OUT, "@pfTC400.proto setStandby($(unitaddr=001),$(P)$(R)) $(port)")
+#  field(ZNAM, "Off")
+#  field(ONAM, "On")
+#}
+
+# The readback of whether the "pumping station" is on.
+# Parameter 010 Datatype 0
+#
+# % archiver 10 monitor
+#
+record(bi, "$(P)$(R):RBV:CTL:PUMPSTATIONON") {
+  field(DESC, "Pump Station On?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getPumpgStatn($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# The readback of whether the pump motor is on.
+# Parameter 023 Datatype 0
+#
+# % archiver 10 monitor
+#
+record(bi, "$(P)$(R):RBV:CTL:MOTORPUMPON") {
+  field(DESC, "Pump Motor On?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getMotorPump($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# The readback for whether in speed setting mode.
+# Parameter 026 Datatype 7
+# The manual gives only 0 and 1 as values even though it says it is datatype 7, which is not binary.
+#
+# % archiver 10 monitor
+#
+record(bi, "$(P)$(R):RBV:CTL:SPDSETMODE") {
+  field(DESC, "In SpeedSetting Mode?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSpdSetMode($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# Set whether in speed setting mode.
+# Parameter 026 Datatype 7
+#
+record(bo, "$(P)$(R):SET:CTL:SPDSETMODE") {
+  field(DESC, "Set speed setting Mode")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setSpdSetMode($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# The readback for whether in sealing gas mode.
+# Parameter 050 Datatype 0
+#
+# % archiver 10 monitor
+#
+record(bi, "$(P)$(R):RBV:CTL:SEALINGGAS") {
+  field(DESC, "SealingGas?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSealingGas($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# Set whether in sealing gas mode.  Vac group have specified this is to be allowed to be set.
+# Parameter 050 Datatype 0
+#
+record(bo, "$(P)$(R):SET:CTL:SEALINGGAS") {
+  field(DESC, "Set SealingGas")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setSealingGas($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# Fans out the processing for the scanned control command parameter records.
+record(fanout, "$(P)$(R):FAN:RBV:CTL:ALL") {
+  field(DESC, "Control command states")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:CTL:STANDBY")
+  field(LNK2, "$(P)$(R):RBV:CTL:PUMPSTATIONON")
+  field(LNK3, "$(P)$(R):RBV:CTL:MOTORPUMPON")
+  field(LNK4, "$(P)$(R):RBV:CTL:SPDSETMODE")
+  field(LNK5, "$(P)$(R):RBV:CTL:SEALINGGAS")
+}
+
+# END OF RECORDS FOR CONTROL PARAMS SCANNED REGULARLY.
+# *******************************************************
+# START OF RECORDS FOR CONFIGURATION CONTROL PARAMS (NOT SCANNED SO FAST)
+#
+# These can be considered as configuration parameters.
+# However vacuum group have added them to the spec of what to be able to set.
+#
+# Readback of configuration output DO2
+# Parameter 019 Datatype 7
+#
+record(ai, "$(P)$(R):RBV:CFG:CFGDO2") {
+  field(DESC, "Digital output DO2 configuration.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgDO2($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+}
+
+# Set configuration of digital output DO2
+# Parameter 019 Datatype 7
+#
+record(ao, "$(P)$(R):SET:CFG:CFGDO2") {
+  field(DESC, "Configure digital output DO2")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgDO2($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+  field(DRVL, "0")
+  field(DRVH, "17")
+}
+
+# Readback of configuration output DO1
+# Parameter 024 Datatype 7
+#
+record(ai, "$(P)$(R):RBV:CFG:CFGDO1") {
+  field(DESC, "Digital output DO1 configuration.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgDO1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+}
+
+# Set configuration of digital output DO1
+# Parameter 024 Datatype 7
+#
+record(ao, "$(P)$(R):SET:CFG:CFGDO1") {
+  field(DESC, "Configure digital output DO1")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgDO1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+  field(DRVL, "0")
+  field(DRVH, "17")
+}
+
+# The gas mode is a configuration parameter it is important for the users to see because
+# the pump can be damaged if it is configured to pump the wrong gas.
+# However since it is a configuration parameter, it does not need to be scanned fast.
+#
+# The readback of the gas mode.
+# Parameter 027 Datatype 7
+#
+record(mbbi, "$(P)$(R):RBV:CFG:GASMODE") {
+  field(DESC, "Gas mode.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getGasMode($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Heavy Gases")
+  field(ZRVL, "0")
+  field(ZRSV, "NO_ALARM")
+  field(ONST, "Light Gases")
+  field(ONVL, "1")
+  field(ONSV, "NO_ALARM")
+  field(TWST, "Helium")
+  field(TWVL, "2")
+  field(TWSV, "NO_ALARM")
+}
+
+# Set the gas mode.
+# Parameter 027 Datatype 7
+#
+record(mbbo, "$(P)$(R):SET:CFG:GASMODE") {
+  field(DESC, "Configure gas mode")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setGasMode($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Heavy gases")
+  field(ZRVL, "0")
+  field(ONST, "Light gases")
+  field(ONVL, "1")
+  field(TWST, "Helium")
+  field(TWVL, "2")
+}
+
+# Readback of configuration accessory connection A1
+# Parameter 035 Datatype 7
+#
+record(mbbi, "$(P)$(R):RBV:CFG:CFGACCA1") {
+  field(DESC, "Accessory A1 configuration.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgAccA1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Fan")
+  field(ZRVL, "0")
+  field(ZRSV, "NO_ALARM")
+  field(ONST, "Vent vlv, norml clsd")
+  field(ONVL, "1")
+  field(ONSV, "NO_ALARM")
+  field(TWST, "Heating")
+  field(TWVL, "2")
+  field(TWSV, "NO_ALARM")
+  field(THST, "Backing pump")
+  field(THVL, "3")
+  field(THSV, "NO_ALARM")
+  field(FRST, "Fan (temp contrld)")
+  field(FRVL, "4")
+  field(FRSV, "NO_ALARM")
+  field(FVST, "Sealing gas")
+  field(FVVL, "5")
+  field(FVSV, "NO_ALARM")
+  field(SXST, "Always 0")
+  field(SXVL, "6")
+  field(SXSV, "NO_ALARM")
+  field(SVST, "Always 1")
+  field(SVVL, "7")
+  field(SVSV, "NO_ALARM")
+  field(EIST, "Pwr fail venting")
+  field(EIVL, "8")
+  field(EISV, "NO_ALARM")
+}
+
+# Set the configuration of accessory connection A1
+# VAL set to manufacturers default of zero, but with explicit PINI No.
+# Default value of 1 the value found from testing.
+# Parameter 035 Datatype 7
+#
+record(mbbo, "$(P)$(R):SET:CFG:CFGACCA1") {
+  field(DESC, "Configure accessory A1.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgAccA1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Fan")
+  field(ZRVL, "0")
+  field(ONST, "Vent vlv, norml clsd")
+  field(ONVL, "1")
+  field(TWST, "Heating")
+  field(TWVL, "2")
+  field(THST, "Backing pump")
+  field(THVL, "3")
+  field(FRST, "Fan (temp contrld)")
+  field(FRVL, "4")
+  field(FVST, "Sealing gas")
+  field(FVVL, "5")
+  field(SXST, "Always 0")
+  field(SXVL, "6")
+  field(SVST, "Always 1")
+  field(SVVL, "7")
+  field(EIST, "Pwr fail venting")
+  field(EIVL, "8")
+  field(VAL, "0")
+  field(PINI, "NO")
+}
+
+# Readback of configuration accessory connection B1
+# Parameter 036 Datatype 7
+#
+record(mbbi, "$(P)$(R):RBV:CFG:CFGACCB1") {
+  field(DESC, "Accessory B1 configuration.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgAccB1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Fan")
+  field(ZRVL, "0")
+  field(ZRSV, "NO_ALARM")
+  field(ONST, "Vent vlv, norml clsd")
+  field(ONVL, "1")
+  field(ONSV, "NO_ALARM")
+  field(TWST, "Heating")
+  field(TWVL, "2")
+  field(TWSV, "NO_ALARM")
+  field(THST, "Backing pump")
+  field(THVL, "3")
+  field(THSV, "NO_ALARM")
+  field(FRST, "Fan (temp contrld)")
+  field(FRVL, "4")
+  field(FRSV, "NO_ALARM")
+  field(FVST, "Sealing gas")
+  field(FVVL, "5")
+  field(FVSV, "NO_ALARM")
+  field(SXST, "Always 0")
+  field(SXVL, "6")
+  field(SXSV, "NO_ALARM")
+  field(SVST, "Always 1")
+  field(SVVL, "7")
+  field(SVSV, "NO_ALARM")
+  field(EIST, "Pwr fail venting")
+  field(EIVL, "8")
+  field(EISV, "NO_ALARM")
+}
+
+# Set the configuration of accessory connection B1
+# VAL set to manufacturers default of 1, but with explicit PINI NO.
+# Parameter 036 Datatype 7
+#
+record(mbbo, "$(P)$(R):SET:CFG:CFGACCB1") {
+  field(DESC, "Configure accessory B1")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgAccB1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Fan")
+  field(ZRVL, "0")
+  field(ONST, "Vent vlv, norml clsd")
+  field(ONVL, "1")
+  field(TWST, "Heating")
+  field(TWVL, "2")
+  field(THST, "Backing pump")
+  field(THVL, "3")
+  field(FRST, "Fan (temp contrld)")
+  field(FRVL, "4")
+  field(FVST, "Sealing gas")
+  field(FVVL, "5")
+  field(SXST, "Always 0")
+  field(SXVL, "6")
+  field(SVST, "Always 1")
+  field(SVVL, "7")
+  field(EIST, "Pwr fail venting")
+  field(EIVL, "8")
+  field(VAL, "1")
+}
+
+# Readback of configuration of relay 1
+# Parameter 045 Datatype 7
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+record(ai, "$(P)$(R):RBV:CFG:CFGRELR1") {
+  field(DESC, "Relay R1 configuration")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgRelR1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):MODEL")
+}
+
+# Set configuration of relay 1
+# Parameter 045 Datatype 7
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+record(ao, "$(P)$(R):SET:CFG:CFGRELR1") {
+  field(DESC, "Configure relay R1")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgRelR1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+  field(DRVL, "0")
+  field(DRVH, "17")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):MODEL")
+}
+
+# Readback of configuration relay 2
+# Parameter 046 Datatype 7
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+record(ai, "$(P)$(R):RBV:CFG:CFGRELR2") {
+  field(DESC, "Relay R2 configuration")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgRelR2($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):MODEL")
+}
+
+# Set configuration of relay 2
+# Parameter 046 Datatype 7
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+record(ao, "$(P)$(R):SET:CFG:CFGRELR2") {
+  field(DESC, "Configure relay R2")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgRelR2($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+  field(DRVL, "0")
+  field(DRVH, "17")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):MODEL")
+}
+
+# Readback of configuration relay 3
+# Parameter 047 Datatype 7
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+record(ai, "$(P)$(R):RBV:CFG:CFGRELR3") {
+  field(DESC, "Relay R3 configuration")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgRelR3($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):MODEL")
+}
+
+# Set configuration of relay 3
+# Parameter 047 Datatype 7
+#
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+record(ao, "$(P)$(R):SET:CFG:CFGRELR3") {
+  field(DESC, "Configure relay R3")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgRelR3($(unitaddr=001),$(P)$(R)) $(port)")
+  field(LOPR, "0")
+  field(HOPR, "17")
+  field(DRVL, "0")
+  field(DRVH, "17")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):MODEL")
+}
+
+# Readback of configuration output AO1
+# Parameter 055 Datatype 7
+#
+record(mbbi, "$(P)$(R):RBV:CFG:CFGAO1") {
+  field(DESC, "Analogue Output AO1 configuration")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgAO1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Actual Rotation Speed")
+  field(ZRVL, "0")
+  field(ZRSV, "NO_ALARM")
+  field(ONST, "Power")
+  field(ONVL, "1")
+  field(ONSV, "NO_ALARM")
+  field(TWST, "Current")
+  field(TWVL, "2")
+  field(TWSV, "NO_ALARM")
+  field(THST, "Always 0V")
+  field(THVL, "3")
+  field(THSV, "NO_ALARM")
+  field(FRST, "Always 10V")
+  field(FRVL, "4")
+  field(FRSV, "NO_ALARM")
+  field(FVST, "Follows AI1")
+  field(FVVL, "5")
+  field(FVSV, "NO_ALARM")
+}
+
+# Set configuration of analogue output AO1
+# VAL set to Manufacturers default of zero, but PINI "No".
+# Parameter 055 Datatype 7
+#
+record(mbbo, "$(P)$(R):SET:CFG:CFGAO1") {
+  field(DESC, "Configure analogue output AO1")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgAO1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Actual Rotation Speed")
+  field(ZRVL, "0")
+  field(ONST, "Power")
+  field(ONVL, "1")
+  field(TWST, "Current")
+  field(TWVL, "2")
+  field(THST, "Always 0V")
+  field(THVL, "3")
+  field(FRST, "Always 10V")
+  field(FRSV, "NO_ALARM")
+  field(FVST, "Follows AI1")
+  field(FVVL, "5")
+  field(VAL, "0")
+  field(PINI, "NO")
+}
+
+# Readback of configuration of digital input DI1
+# Parameter 062 Datatype 7
+#
+record(mbbi, "$(P)$(R):RBV:CFG:CFGDI1") {
+  field(DESC, "Digital input DI1 configuration")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getCfgDI1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Deactivated")
+  field(ZRVL, "0")
+  field(ZRSV, "NO_ALARM")
+  field(ONST, "Enable venting")
+  field(ONVL, "1")
+  field(ONSV, "NO_ALARM")
+  field(TWST, "Heating")
+  field(TWVL, "2")
+  field(TWSV, "NO_ALARM")
+  field(THST, "Sealing Gas")
+  field(THVL, "3")
+  field(THSV, "NO_ALARM")
+  field(FRST, "Run-up time control")
+  field(FRVL, "4")
+  field(FRSV, "NO_ALARM")
+  field(FVST, "Rot spd setting mode")
+  field(FVVL, "5")
+  field(FVSV, "NO_ALARM")
+}
+
+# Set configuration of digital input DI1.
+# VAL set to Manufacturers default value of 1 but want explicit PINI "No"
+# so you do not overwrite value in controller on startup.
+# Parameter 062 Datatype 7
+#
+record(mbbo, "$(P)$(R):SET:CFG:CFGDI1") {
+  field(DESC, "Configure digital input DI1")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setCfgDI1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZRST, "Deactivated")
+  field(ZRVL, "0")
+  field(ONST, "Enable venting")
+  field(ONVL, "1")
+  field(TWST, "Heating")
+  field(TWVL, "2")
+  field(THST, "Sealing Gas")
+  field(THVL, "3")
+  field(FRST, "Run-up time control")
+  field(FRVL, "4")
+  field(FVST, "Rot spd setting mode")
+  field(FVVL, "5")
+  field(VAL, "1")
+  field(PINI, "NO")
+}
+
+# Fans out processing for readback of the digital and analogue input and output configurations.
+record(fanout, "$(P)$(R):FAN:RBV:CFG:DIGANLGALL") {
+  field(DESC, "Dig/Anal config state processing.")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:CFG:CFGDO1")
+  field(LNK2, "$(P)$(R):RBV:CFG:CFGDO2")
+  field(LNK3, "$(P)$(R):RBV:CFG:CFGAO1")
+  field(LNK4, "$(P)$(R):RBV:CFG:CFGDI1")
+}
+
+# Fans out the processing for the slower scanned control command parameter records.
+record(fanout, "$(P)$(R):FAN:RBV:CFG:ALL") {
+  field(DESC, "Configuration state processing.")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:CFG:GASMODE")
+  field(LNK2, "$(P)$(R):RBV:CFG:CFGACCA1")
+  field(LNK3, "$(P)$(R):RBV:CFG:CFGACCB1")
+  field(LNK4, "$(P)$(R):RBV:CFG:CFGRELR1")
+  field(LNK5, "$(P)$(R):RBV:CFG:CFGRELR2")
+  field(LNK6, "$(P)$(R):RBV:CFG:CFGRELR3")
+  field(FLNK, "$(P)$(R):FAN:RBV:CFG:DIGANLGALL.PROC")
+}
+
+# END OF RECORDS FOR CONTROL PARAMS NOT SCANNED SO FAST
+# *******************************************************
+# START OF RECORDS FOR SPEED STATUS PARAMS
+# These are close to our hearts and therefore scanned regularly.
+#
+#
+# The readback of whether the rotation switchpoint is attained.
+# Parameter 302 Datatype 0
+#
+record(bi, "$(P)$(R):RBV:STS:SPSPDATT") {
+  field(DESC, "Speed switchpt attained?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSpdSwPtAtt($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Not Attained")
+  field(ONAM, "Attained")
+}
+
+# The readback of whether the rotation "set" speed is attained.
+# Parameter 306 Datatype 0
+#
+record(bi, "$(P)$(R):RBV:STS:SETSPDATT") {
+  field(DESC, "Set speed attained?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSetSpdAtt($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Not Attained")
+  field(ONAM, "Attained")
+}
+
+# The readback of whether the pump is accelerating.
+# Parameter 307 Datatype 0
+#
+# % archiver 10 monitor
+#
+record(bi, "$(P)$(R):RBV:STS:ISACCEL") {
+  field(DESC, "Is pump accelerating?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getPumpAccel($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "Not Accelerating")
+  field(ONAM, "Accelerating")
+}
+
+# Readback of the "set" rotation speed in Hz.  This could be the demand speed
+# in some modes of operation (as in the speed the controller demands of the pump,
+# not what we are demanding of the controller).
+# Parameter 308 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:SETROTSPDHZ") {
+  field(DESC, "The set rotation speed (Hz)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSetRotSpdHz($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "Hz")
+}
+
+#
+# The readback of the actual rotational speed in Hertz
+# Parameter 309 Datatype 1
+# Forward link to update the percentage speed calculation when this updates.
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:SPEEDHZ") {
+  field(DESC, "Current rotational speed (Hz).")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getActualSpdHz($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "Hz")
+  field(FLNK, "$(P)$(R):CLC:STS:SPEEDPERCENT PP")
+}
+
+# Readback of the "nominal" rotation speed in Hz.  
+# Parameter 315 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:NOMSPDHZ") {
+  field(DESC, "The nominal rot speed (Hz)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getNominalSpdHz($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "Hz")
+}
+
+# Calculate the current actual percentage speed from the current
+# actual speed over the nominal speed in the same speed units.  Have
+# the choice of whether to use Hz or RPM PVs as the input to the
+# calculation and have plumped for Hz.
+#
+record(calcout, "$(P)$(R):CLC:STS:SPEEDPERCENT") {
+  field(DESC, "Calculate %age speed")
+  field(INPA, "$(P)$(R):RBV:STS:SPEEDHZ")
+  field(INPB, "$(P)$(R):RBV:STS:NOMSPDHZ")
+  field(CALC, "100*A/B")
+  field(OUT, "$(P)$(R):RBV:STS:SPEEDPERCENT PP MS")
+}
+
+# Calculated current actual percentage speed.
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:SPEEDPERCENT") {
+  field(DESC, "Current %age speed")
+  field(EGU, "%")
+  field(PREC, "0")
+}
+
+# Readback of the acceleration / deceleration in revs per minute per second.  
+# Parameter 336  Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:ACCELDECEL") {
+  field(DESC, "Acceleration / Deceleration (RPM/s)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getAccelDecel($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "RPM/s")
+}
+
+# Readback of the "set" rotation speed in RPM.  This could be the demand speed
+# in some modes of operation (as in the speed the controller demands of the pump,
+# not what we are demanding of the controller).
+# Parameter 397 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:SETROTSPDRPM") {
+  field(DESC, "The set rotation speed (RPM)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSetRotSpdRpm($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "RPM")
+}
+
+#
+# The readback of the actual rotational speed in RPM
+# Parameter 398 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:SPEEDRPM") {
+  field(DESC, "Current rotational speed (RPM).")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getActualSpdRPM($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "RPM")
+}
+
+# Readback of the "nominal" rotation speed in RPM.  
+# Parameter 399 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:NOMSPDRPM") {
+  field(DESC, "The nominal rot speed (RPM)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getNominalSpdRpm($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "RPM")
+}
+
+# Fans out the processing for the speed value status parameter records.
+record(fanout, "$(P)$(R):FAN:RBV:STS:SPDALL") {
+  field(DESC, "Speed values")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:STS:SETROTSPDHZ")
+  field(LNK2, "$(P)$(R):RBV:STS:SETROTSPDRPM")
+  field(LNK3, "$(P)$(R):RBV:STS:SPEEDHZ")
+  field(LNK4, "$(P)$(R):RBV:STS:SPEEDRPM")
+  field(LNK5, "$(P)$(R):RBV:STS:NOMSPDHZ")
+  field(LNK6, "$(P)$(R):RBV:STS:NOMSPDRPM")
+  field(FLNK, "$(P)$(R):FAN:RBV:STS:SPDSTATEALL")
+}
+
+# Fans out the processing to the state speed info - couldnt fit in the first.
+record(fanout, "$(P)$(R):FAN:RBV:STS:SPDSTATEALL") {
+  field(DESC, "Speed states")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:STS:SPSPDATT")
+  field(LNK2, "$(P)$(R):RBV:STS:SETSPDATT")
+  field(LNK3, "$(P)$(R):RBV:STS:ISACCEL")
+  field(LNK4, "$(P)$(R):RBV:STS:ACCELDECEL")
+}
+
+# END OF RECORDS FOR STATUS PARAMS CLOSE TO OUR HEARTS.
+# *******************************************************
+# START OF RECORDS FOR STATUS PARAMS NOT SO CLOSE TO OUR HEARTS 
+# (and therefore scanned a bit more slowly).
+#
+
+# The readback of whether the controller is overheating.
+# Parameter 304 Datatype 0
+#
+# % archiver 10 monitor
+#
+record(bi, "$(P)$(R):RBV:STS:OVERTEMPELEC") {
+  field(DESC, "Controller over temperature?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getOvTempElec($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+}
+
+# The readback of whether the pump is overheating.
+# Parameter 305 Datatype 0
+#
+# % archiver 10 monitor
+#
+record(bi, "$(P)$(R):RBV:STS:OVERTEMPPUMP") {
+  field(DESC, "Controller over temperature?")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getOvTempPump($(unitaddr=001),$(P)$(R)) $(port)")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+}
+
+# Readback of drive current.  This has to be scaled because the controller
+# returns a value 100 times larger.
+# Parameter 310 Datatype 2
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:CURRENT") {
+  field(DESC, "Current driving the pump")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getDrvCurrent($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "A")
+  field(LINR, "SLOPE")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+  field(PREC, "2")
+}
+
+# Readback of pump operating hours.
+# Parameter 311 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:OPHOURSPUMP") {
+  field(DESC, "Hours of pump operation")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getOpHrsPump($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "Hours")
+}
+
+# A test to avoid checksum processing.  This record should work when others do not.
+record(stringin, "$(P)$(R):RBV:STS:MESSING") {
+  field(DESC, "Readback Operating Hours")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@pfTC400.proto getMessing $(port)")
+}
+
+# Readback of drive voltage.  This has to be scaled because the controller
+# returns a value 100 times larger.
+# Parameter 313 Datatype 2
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:VOLTAGE") {
+  field(DESC, "Voltage driving the pump")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getDrvVoltage($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "V")
+  field(LINR, "SLOPE")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+  field(PREC, "2")
+}
+
+#
+# Readback of controller operating hours.
+# Parameter 314 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:OPHOURSELEC") {
+  field(DESC, "Hours of controller operation")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getOpHrsElec($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "Hours")
+}
+
+#
+# Readback of Pump cycles.
+# Parameter 319 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:STS:PUMPCYCLES") {
+  field(DESC, "Pump cylces")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getPumpCycles($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "Cycles")
+}
+
+# Readback of the power stage temperature in degrees C.
+# Parameter 324 Datatype 1
+# NOTE: This one is not documented in the TC110 manual and therefore does not exist or is not 
+# meaningful for that controller.
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:POWERSTAGETEMP") {
+  field(DESC, "Power stage temperature (degC)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getTempPwrStg($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "degC")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):MODEL")
+}
+
+# Readback of the controller temperature in degrees C.
+# Parameter 326 Datatype 1
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:ELECTEMP") {
+  field(DESC, "Controller temperature (degC)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getTempElec($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "degC")
+}
+
+# Readback of the temperature of the bottom part of the pump in degrees C.
+# Parameter 330 Datatype 1
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:PUMPBOTTOMTEMP") {
+  field(DESC, "Pump bottom part temperature (degC)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getTempPmpBot($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "degC")
+}
+
+# Readback of the power stage temperature in degrees C.
+# Parameter 342 Datatype 1
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:BEARINGTEMP") {
+  field(DESC, "Bearing temperature (degC)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getTempBearing($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "degC")
+}
+
+# Readback of the motor temperature in degrees C.
+# Parameter 346 Datatype 1
+#
+# % archiver 10 monitor
+#
+record(ai, "$(P)$(R):RBV:STS:MOTORTEMP") {
+  field(DESC, "Motor Temperature (degC)")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getTempMotor($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "degC")
+}
+
+# Need 2 fanouts because have more records than the 6 links allowed on a single fanout.
+
+# Fans out the processing for the "lifetime" records.
+record(fanout, "$(P)$(R):FAN:RBV:STS:LFTALL") {
+  field(DESC, "Accumulated totals records")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:STS:OPHOURSPUMP PP MS")
+  field(LNK2, "$(P)$(R):RBV:STS:OPHOURSELEC PP MS")
+  field(LNK3, "$(P)$(R):RBV:STS:PUMPCYCLES PP MS")
+}
+
+# Fans out the processing for the over temperature records.
+record(fanout, "$(P)$(R):FAN:RBV:STS:OVERTEMPALL") {
+  field(DESC, "Over temperature processing")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:STS:OVERTEMPELEC   PP MS")
+  field(LNK2, "$(P)$(R):RBV:STS:OVERTEMPPUMP   PP MS")
+}
+
+# Fans out the processing for the temperature records.
+record(fanout, "$(P)$(R):FAN:RBV:STS:TEMPALL") {
+  field(DESC, "Temperature processing")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:STS:POWERSTAGETEMP PP MS")
+  field(LNK2, "$(P)$(R):RBV:STS:ELECTEMP       PP MS")
+  field(LNK3, "$(P)$(R):RBV:STS:PUMPBOTTOMTEMP PP MS")
+  field(LNK4, "$(P)$(R):RBV:STS:BEARINGTEMP    PP MS")
+  field(LNK5, "$(P)$(R):RBV:STS:MOTORTEMP      PP MS")
+  field(FLNK, "$(P)$(R):FAN:RBV:STS:OVERTEMPALL PP MS")
+}
+
+# Fans out the processing for the temperature, current and voltage records.
+record(fanout, "$(P)$(R):FAN:RBV:STS:TIVLALL") {
+  field(DESC, "Temps, Current, Voltage processing")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:STS:CURRENT      PP MS")
+  field(LNK2, "$(P)$(R):RBV:STS:VOLTAGE      PP MS")
+  field(LNK3, "$(P)$(R):FAN:RBV:STS:TEMPALL  PP MS")
+  field(LNK4, "$(P)$(R):FAN:RBV:STS:LFTALL   PP MS")
+}
+
+#
+# END OF STATUS PARAM RECORDS MONITORED SLOWLY.
+# *******************************************************
+# START OF RECORDS FOR VERSION INFORMATION.
+#
+# These we scan at initialisation or on demand only.
+# They are actually all status parameters as far as the
+# Pfeiffer is concerned.
+#
+# The Firmware version information.
+# Parameter 312 Datatype 4
+#
+record(stringin, "$(P)$(R):RBV:VSN:FIRMWARE") {
+  field(DESC, "Readback Firmware Version")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@pfTC400.proto getFwVersion($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+#
+# The Hardware version information.
+# Parameter 354 Datatype 4
+#
+record(stringin, "$(P)$(R):RBV:VSN:HARDWARE") {
+  field(DESC, "Readback Hardware Version")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@pfTC400.proto getHWVersion($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+# The name of the controller.
+# Parameter 349 Datatype 4
+#
+record(stringin, "$(P)$(R):RBV:VSN:ELECNAME") {
+  field(DESC, "Readback Electronic Drive name")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@pfTC400.proto getElecName($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+# A test record.
+record(stringin, "$(P)$(R):RBV:VSN:TEST") {
+  field(DESC, "Readback Electronic Drive")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@pfTC400.proto getTest $(port)")
+}
+
+# The Unit RS-485 device address number.  If this is wrong in the
+# macro definition, nothing will work as the unit will not respond
+# anyway and you will not be able to set it to the correct value
+# without guessing what its current value is.  This is because
+# the protocol is two-wire RS-485, which expects multiple devices
+# on the same line, which we never do.
+# Parameter 797 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:VSN:UNITADDR") {
+  field(DESC, "Readback of unit address number.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@pfTC400.proto getUnitAddress($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+# Fans out the processing for all the version/model records.
+record(fanout, "$(P)$(R):FAN:RBV:VSN:ALL") {
+  field(DESC, "Version info fanout")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:VSN:FIRMWARE PP MS")
+  field(LNK2, "$(P)$(R):RBV:VSN:HARDWARE PP MS")
+  field(LNK3, "$(P)$(R):RBV:VSN:ELECNAME PP MS")
+  field(LNK4, "$(P)$(R):RBV:VSN:UNITADDR PP MS")
+}
+
+# END OF RECORDS FOR VERSION INFORMATION STATUS PARAMETERS.
+# *******************************************************
+# START OF RECORDS FOR SET VALUE SETTINGS PARAMETERS.
+#
+# Readback of the set value run up time.
+# Parameter 700 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:SVS:RUTIMESVAL") {
+  field(DESC, "Set value run-up time.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getRUTimeSVal($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "min")
+}
+
+# % autosave 1 VAL
+# Set the run up time set value.  Allowed range 1 to 120 minutes.
+# Parameter 700 Datatype 1
+#
+record(ao, "$(P)$(R):SET:SVS:RUTIMESVAL") {
+  field(DESC, "Set run-up value set time.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setRUTimeSVal($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "min")
+  field(DRVL, "1")
+  field(DRVH, "120")
+  field(LOPR, "1")
+  field(HOPR, "120")
+}
+
+# Readback of the percentage value of switchpoint 1 rotation speed.
+# Parameter 701 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:SVS:SPDSWPT1") {
+  field(DESC, "Rotation speed switchpoint 1")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSpdSwPt1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(PREC, "0")
+  field(EGU, "%")
+}
+
+# % autosave 1 VAL
+# Set the  percentage value of switchpoint 1 rotation speed.
+# Parameter 701 Datatype 1
+#
+record(ao, "$(P)$(R):SET:SVS:SPDSWPT1") {
+  field(DESC, "Set rot speed switchpt 1")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setSpdSwPt1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "%")
+  field(DRVL, "50")
+  field(DRVH, "97")
+  field(LOPR, "50")
+  field(HOPR, "97")
+  field(PREC, "0")
+}
+
+# Readback of the percentage value we have set the pump to go to in
+# rotation speed setting mode.  This has to be scaled because the
+# controller (Datatype 2) returns a value 100 times larger. The vacuum
+# group say they are not interested in this but it seems very
+# confusing for EPICS not to provide this when the pump is operating
+# in rot speed setting mode.
+# Parameter 707  Datatype 2
+#
+record(ai, "$(P)$(R):RBV:SVS:SPDSVAL") {
+  field(DESC, "The rotation speed setting.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSpdSVal($(unitaddr=001),$(P)$(R)) $(port)")
+  field(PREC, "2")
+  field(EGU, "%")
+  field(LINR, "SLOPE")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+}
+
+# % autosave 1 VAL
+# Set the percentage value we want the pump to go to in
+# rotation speed setting mode.  Allowed range 20-100% (percentage of nominal full speed).
+# Therefore set precision of 2.
+# Parameter 707 Datatype 2
+#
+record(ao, "$(P)$(R):SET:SVS:SPDSVAL") {
+  field(DESC, "Set rotation speed setting.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT,  "@pfTC400.proto setSpdSVal($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU,  "%")
+  field(LINR, "SLOPE")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+  field(DRVL, "20")
+  field(DRVH, "100")
+  field(LOPR, "20")
+  field(HOPR, "100")
+  field(PREC, "2")
+}
+
+# Readback of the percentage value we have set the pump to go to in
+# standby speed setting mode.  This has to be scaled because the
+# controller (Datatype 2) returns a value 100 times larger.  This is
+# the only one vacuum group say they are interested in.
+# Parameter 717 Datatype 2
+#
+record(ai, "$(P)$(R):RBV:SVS:STDBYSPD") {
+  field(DESC, "The standby speed setting.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getStdbySVal($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "%")
+  field(PREC, "2")
+  field(LINR, "SLOPE")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+}
+
+# % autosave 1 VAL
+# Set the standby speed setting value.  Allowed range 20-100% (percentage of full speed).
+# Force the error message processing, if any.  Therefore set precision of 2.
+# Parameter 717 Datatype 2
+#
+record(ao, "$(P)$(R):SET:SVS:STDBYSPD") {
+  field(DESC, "Set Standby Speed setting.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT,  "@pfTC400.proto setStdbySVal($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU,  "%")
+  field(LINR, "SLOPE")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+  field(DRVL, "20")
+  field(DRVH, "100")
+  field(LOPR, "20")
+  field(HOPR, "100")
+  field(PREC, "2")
+}
+
+# Readback of the percentage value of switchpoint 2 rotation speed.
+# Parameter 719 Datatype 1
+#
+record(ai, "$(P)$(R):RBV:SVS:SPDSWPT2") {
+  field(DESC, "Rotation speed switchpoint 2")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP, "@pfTC400.proto getSpdSwPt2($(unitaddr=001),$(P)$(R)) $(port)")
+  field(PREC, "0")
+  field(EGU, "%")
+}
+
+# % autosave 1 VAL
+# Set the  percentage value of switchpoint 1 rotation speed.
+# Parameter 719 Datatype 1
+#
+record(ao, "$(P)$(R):SET:SVS:SPDSWPT2") {
+  field(DESC, "Set rot speed switchpt 2")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@pfTC400.proto setSpdSwPt2($(unitaddr=001),$(P)$(R)) $(port)")
+  field(EGU, "%")
+  field(DRVL, "50")
+  field(DRVH, "97")
+  field(LOPR, "50")
+  field(HOPR, "97")
+  field(PREC, "0")
+}
+
+# Vacuum group not interested in this, but I think it might be needed
+# when attempting to set at least one of the other speed parameters.
+# Parameter 777 Datatype 1
+# getNomSpdConf    
+#
+# Fans out the processing for all the readback records on the setable variable parameters
+# (but not the records to set them).
+#
+record(fanout, "$(P)$(R):FAN:RBV:SVS:ALL") {
+  field(DESC, "Variable setting params")
+  field(SCAN, "Passive")
+  field(LNK1, "$(P)$(R):RBV:SVS:RUTIMESVAL")
+  field(LNK2, "$(P)$(R):RBV:SVS:STDBYSPD")
+  field(LNK3, "$(P)$(R):RBV:SVS:SPDSVAL")
+  field(LNK4, "$(P)$(R):RBV:SVS:SPDSWPT1")
+  field(LNK5, "$(P)$(R):RBV:SVS:SPDSWPT2")
+}
+
+#
+# END OF RECORDS FOR SET VALUE SETTINGS PARAMETERS.
+# *******************************************************
+# START OF RECORDS FOR GENERIC HANDLING OF PARAMETER DATATYPES.
+# 
+# Not all the parameters have implemented protocols.
+# Vacuum group want to be able to do occasional things.
+#
+# These records support direct interaction with a parameter
+# provided type and number of the parameter are known.
+#
+# They are not scanned by default, their scanning is controlled
+# from a GUI or with a caput and they are processed on demand only.
+#
+#  0       06           False /true                 000000 or 111111
+#  1       06           Positive integer number     000000 to 999999
+#  2       06           Positive fixed comma number 001571 equal to 15.71
+#  4       06           Symbol chain                TC_400
+#  7       03           Positive integer number     000 to 999
+# 10       06           Exponential value           100023 equal to 1.0 times ten to the power of three. 
+#                                                   ???Really??? Fortunately we seem to have none.
+# 11       16           Symbol chain                BrezelBier&Wurst
+#
+# Have not implemented datatype 10 - see protocol file for comment on why not.
+#
+
+# Parameter number to scan or set.  This is shared amongst all the data types.
+record(ai, "$(P)$(R):QRY:PARAM:PARAMNO") {
+  field(DESC, "Desired parameter number.")
+  field(PINI, "YES")
+# NOTE: The parameter number will be padded with zeros to 3 digits, but we do not want EPICS to think we mean Octal.
+# Parameter 023 is called MotorPump 1 for on, 0 for off.
+  field(VAL, "23")
+  field(FLNK, "$(P)$(R):CLC:ACS:VETOLISTCHK PP")
+}
+
+# Parameter type of parameter to scan or set.  This is mostly to help
+# the GUI, but shall also need it to stop the parameter being scanned
+# as multiple datatypes at the same time, a recipe for error messages
+# and confusion.
+#
+record(mbbi, "$(P)$(R):QRY:PARAM:DATATYPE") {
+  field(DESC, "Datatype of desired parameter.")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(ZRST, "Datatype0")
+  field(ZRVL, "0")
+  field(ONST, "Datatype1")
+  field(ONVL, "1")
+  field(TWST, "Datatype2")
+  field(TWVL, "2")
+  field(THST, "Datatype4")
+  field(THVL, "4")
+  field(FRST, "Datatype7")
+  field(FRVL, "7")
+  field(FVST, "Datatype11")
+  field(FVVL, "11")
+  field(FLNK, "$(P)$(R):TFM:PARAM:SCANRATE PP")
+}
+
+# Turn on the scanning for the getter record for the selected datatype
+# and and turn off the scanning on the getter records for all the
+# other datatypes.  Had to comment out the links for string datatypes 4
+# and 11 because are not currently able to build the support for them.
+#
+# This is required because life gets very confusing
+# if multiple datatype getters are scanning at the same time because
+# they share the query parameter number.  At least one of the getters
+# is likely to result in regular errors, even if one of the others is
+# successful.  If more than one succeeds, the values can be
+# inconsistent, since they are not synchronous.
+#
+# 0 is scan Passive
+# 6 is scan 1 second - set in field B
+#
+# The values field A is tested against are the possible numeric values
+# of the datatype record above, they are not the datatype number.
+#
+record(transform, "$(P)$(R):TFM:PARAM:SCANRATE") {
+  field(DESC, "Datatype record scanning control")
+  field(INPA, "$(P)$(R):QRY:PARAM:DATATYPE")
+  field(INPB, "6")
+  field(CLCC, "A=0?B:0")
+  field(OUTC, "TS-VA-TURBO-03:GET:PARAM:DATATYPE0.SCAN")
+  field(CLCD, "A=1?B:0")
+  field(OUTD, "TS-VA-TURBO-03:GET:PARAM:DATATYPE1.SCAN")
+  field(CLCE, "A=2?B:0")
+  field(OUTE, "TS-VA-TURBO-03:GET:PARAM:DATATYPE2.SCAN")
+  field(CLCF, "A=3?B:0")
+#  field(OUTF, "TS-VA-TURBO-03:GET:PARAM:DATATYPE4.SCAN")
+  field(CLCG, "A=4?B:0")
+  field(OUTG, "TS-VA-TURBO-03:GET:PARAM:DATATYPE7.SCAN")
+  field(CLCH, "A=5?B:0")
+#  field(OUTH, "TS-VA-TURBO-03:GET:PARAM:DATATYPE11.SCAN")
+}
+
+# Need a transform record here to make sure only 1 datatype record scans based on the DATATYPE record.
+# And maybe also to wipe the read back value when a new type or number is selected.
+#
+# Datatype fields.
+# Could not figure out how to get these to work with the default processing fields, so the protcol file explicitly refers to calc fields.
+# The OUT field contains the protocol call.  Could not get this to work using an INPblah field to do the protocol field.  The stream device
+# documentation is very terse about how to make this work but we now have something which does.
+# Field B or AA is reserved for the result.
+#
+# Read of Datatype 0
+#
+record(calcout, "$(P)$(R):GET:PARAM:DATATYPE0") {
+  field(DESC, "Queries datatype0 params")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(CALC, "A")
+  field(OCAL, "A")
+  field(DOPT, "Use OCAL")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO")
+  field(OUT, "@pfTC400.proto getParamDatatype0($(unitaddr=001),$(P)$(R)) $(port)")
+  field(FLNK, "$(P)$(R):RBV:PARAM:DATATYPE0") 
+}
+
+# Read of Datatype 1
+#
+record(calcout, "$(P)$(R):GET:PARAM:DATATYPE1") {
+  field(DESC, "Queries datatype1 params")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(CALC, "A")
+  field(OCAL, "A")
+  field(DOPT, "Use OCAL")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO")
+  field(OUT, "@pfTC400.proto getParamDatatype1($(unitaddr=001),$(P)$(R)) $(port)")
+  field(FLNK, "$(P)$(R):RBV:PARAM:DATATYPE1") 
+}
+
+# Read of Datatype 2
+#
+record(calcout, "$(P)$(R):GET:PARAM:DATATYPE2") {
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(CALC, "A")
+  field(OCAL, "A")
+  field(DOPT, "Use OCAL")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO")
+  field(OUT, "@pfTC400.proto getParamDatatype2($(unitaddr=001),$(P)$(R)) $(port)")
+  field(FLNK, "$(P)$(R):RBV:PARAM:DATATYPE2") 
+}
+
+# NOTE: Have not been able to test this at time of writing
+# because scalcout stream device support is not available.
+# This requires scalcout streamDevice module support, which is not
+# built into the streamDevice module at time of writing because
+# scalcout is provided by calc module, which is part of synapps
+# and optional in the streamDevice build.  It has not been tested.
+#
+# Read of Datatype 4
+#
+#record(scalcout, "$(P)$(R):GET:PARAM:DATATYPE4") {
+#  field(DESC, "Queries datatype4 params")
+#  field(DTYP, "stream")
+#  field(SCAN, "Passive")
+#  field(CALC, "A")
+#  field(OCAL, "A")
+#  field(DOPT, "Use OCAL")
+#  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO")
+#  field(OUT, "@pfTC400.proto getParamDatatype4($(unitaddr=001),$(P)$(R)) $(port)")
+#  field(FLNK, "$(P)$(R):RBV:PARAM:DATATYPE4") 
+#}
+#
+# Read of Datatype 7
+#
+record(calcout, "$(P)$(R):GET:PARAM:DATATYPE7") {
+  field(DESC, "Queries datatype7 params")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(CALC, "A")
+  field(OCAL, "A")
+  field(DOPT, "Use OCAL")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO")
+  field(OUT, "@pfTC400.proto getParamDatatype7($(unitaddr=001),$(P)$(R)) $(port)")
+  field(FLNK, "$(P)$(R):RBV:PARAM:DATATYPE7") 
+}
+
+# Not bothering with Datatype 10.
+#
+# NOTE: Have not been able to test this at time of writing
+# because scalcout stream device support is not available.
+# This requires scalcout streamDevice module support, which is not
+# built into the streamDevice module at time of writing because
+# scalcout is provided by calc module, which is part of synapps
+# and optional in the streamDevice build.  It has not been tested.
+#
+# Read of Datatype 11
+#
+#record(scalcout, "$(P)$(R):GET:PARAM:DATATYPE11") {
+#  field(DESC, "Queries datatype11 params")
+#  field(DTYP, "stream")
+#  field(SCAN, "Passive")
+#  field(CALC, "A")
+#  field(OCAL, "A")
+#  field(DOPT, "Use OCAL")
+#  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO")
+#  field(OUT, "@pfTC400.proto getParamDatatype11($(unitaddr=001),$(P)$(R)) $(port)")
+#  field(FLNK, "$(P)$(R):RBV:PARAM:DATATYPE11") 
+#}
+#
+# NOTE: Since we do not know which parameter we are dealing with we do not know what its values mean.
+#
+# Datatype 0 - binary
+#
+record(bi, "$(P)$(R):RBV:PARAM:DATATYPE0") {
+  field(DESC, "Value of datatype0 param")
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(R):GET:PARAM:DATATYPE0.B")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+# Datatype 1 - Manual says "Positive integer number."  But it is only 6 (decimal) digits long.
+#
+record(ai, "$(P)$(R):RBV:PARAM:DATATYPE1") {
+  field(DESC, "Value of datatype1 param")
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(R):GET:PARAM:DATATYPE1.B")
+}
+
+# Datatype 2 - Manual says "Positive fixed comma number."  They mean
+# fixed point because the manual has not been properly translated from
+# German.  The value is in "hundreths".  We do not know the
+# Engineering units or anything about the range because we do not know
+# what parameter it is.
+#
+record(ai, "$(P)$(R):RBV:PARAM:DATATYPE2") {
+  field(DESC, "Value of datatype2 param")
+  field(DTYP, "Raw Soft Channel")
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(R):GET:PARAM:DATATYPE2.B")
+  field(LINR, "SLOPE")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+  field(PREC, "2")
+}
+
+# Datatype 4 - Manual says "Symbol chain." But from other info it can only be 6 characters long.
+#
+record(stringin, "$(P)$(R):RBV:PARAM:DATATYPE4") {
+  field(DESC, "Value of datatype4 param")
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(R):GET:PARAM:DATATYPE4.AA")
+}
+
+# Datatype 7 - Manual says "Positive integer number."   But it is only 3 (decimal) digits long.
+#
+record(ai, "$(P)$(R):RBV:PARAM:DATATYPE7") {
+  field(DESC, "Value of datatype7 param")
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(R):GET:PARAM:DATATYPE7.B")
+}
+
+# Datatype 10 - There aren't any parameters of this datatype, so not implementing this.
+#
+# Datatype 11 - Manual says "Symbol chain"    But it is 16 characters long.  
+# The manual does not explain about padding or truncation or anything like that.
+#
+record(stringin, "$(P)$(R):RBV:PARAM:DATATYPE11") {
+  field(DESC, "Value of datatype11 param")
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(R):GET:PARAM:DATATYPE11.AA")
+}
+
+#
+# NOTE: Since we do not know which parameter we are dealing with we do not know what its values mean.
+#
+# Demand for datatype0 - value to be used when setting it.
+#
+record(bi, "$(P)$(R):DMD:PARAM:DATATYPE0") {
+  field(DESC, "Datatype0 param desired value")
+  field(SCAN, "Passive")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+#
+# NOTE: Since we do not know which parameter we are dealing with we do not know what its range is
+# as defined by the Pfeiffer firmware and can only restrict it to the full range allowed for this 
+# type of Pfeiffer data.
+#
+# Demand for datatype0 - value to be used when setting it.
+#
+record(ao, "$(P)$(R):DMD:PARAM:DATATYPE1") {
+  field(DESC, "Datatype1 param desired value")
+  field(SCAN, "Passive")
+  field(DRVL, "0")
+  field(DRVH, "999999")
+  field(LOPR, "0")
+  field(HOPR, "999999")
+}
+
+#
+# NOTE: Since we do not know which parameter we are dealing with we do not know what its range is
+# as defined by the Pfeiffer firmware and can only restrict it to the full range allowed for this 
+# type of Pfeiffer data.
+#
+# Demand for datatype2 - value to be used when setting it.
+#
+record(ao, "$(P)$(R):DMD:PARAM:DATATYPE2") {
+  field(DESC, "Datatype2 param desired value")
+  field(SCAN, "Passive")
+  field(PREC, "2")
+  field(LINR, "SLOPE")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+  field(DRVL, "0")
+  field(DRVH, "9999.99")
+  field(LOPR, "0")
+  field(HOPR, "9999.99")
+}
+
+#
+# This has not been tested because the functionality for scalcout stream device support was not 
+# available at time of writing.  There might be issues concerning error message processing with 
+# this datatype because any error telegram might have the same format as a valid acknowlegement
+# reply telegram.
+#
+# NOTE: Since we do not know which parameter we are dealing with we do not know what its allowed
+# string values as defined by the Pfeiffer firmware might be, if any and can only restrict it to 
+# the length allowed for this type of Pfeiffer data.  This is done by the protocol, because the
+# stringout record can be upto 40 characters and there is now field to limit its length to 6.
+# Might be able to add another calc to enforce the limit.
+#
+# Demand for datatype4 - value to be used when setting it.
+#
+record(stringout, "$(P)$(R):DMD:PARAM:DATATYPE4") {
+ field(DESC, "Datatype4 param desired value")
+ field(SCAN, "Passive")
+}
+
+#
+# NOTE: Since we do not know which parameter we are dealing with we do not know what its range is
+# as defined by the Pfeiffer firmware and can only restrict it to the full range allowed for this 
+# type of Pfeiffer data.
+#
+# Demand for datatype7 - value to be used when setting it.
+#
+record(ao, "$(P)$(R):DMD:PARAM:DATATYPE7") {
+  field(DESC, "Datatype7 param desired value")
+  field(SCAN, "Passive")
+  field(DRVL, "0")
+  field(DRVH, "999")
+  field(LOPR, "0")
+  field(HOPR, "999")
+}
+
+#
+# Not bothering with Datatype 10
+#
+# This has not been tested because the functionality for scalcout stream device support was not 
+# available at time of writing.  There might be issues concerning error message processing with 
+# this datatype because any error telegram might have the same format as a valid acknowlegement
+# reply telegram.
+#
+# NOTE: Since we do not know which parameter we are dealing with we do not know what its allowed
+# string values as defined by the Pfeiffer firmware might be, if any and can only restrict it to 
+# the length allowed for this type of Pfeiffer data.  This is done by the protocol, because the
+# stringout record can be upto 40 characters and there is now field to limit its length to 16.  
+# Might be able to add another calc to enforce the limit.
+#
+# Demand for datatype11 - value to be used when setting it.
+#
+record(stringout, "$(P)$(R):DMD:PARAM:DATATYPE11") {
+ field(DESC, "Datatype11 param desired value")
+ field(SCAN, "Passive")
+}
+
+#
+# NOTE: Not allowed to test any of these with a real pump :-(
+#
+# Write to Datatype 0
+#
+record(calcout, "$(P)$(R):SET:PARAM:DATATYPE0") {
+  field(DESC, "Sets datatype0 params")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(CALC, "B=1?0:1")
+  field(OOPT, "When Non-zero")
+  field(OCAL, "C")
+  field(DOPT, "Use OCAL")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO PP")
+  field(INPB, "$(P)$(R):STS:ACS:VETOED" )
+  field(INPC, "$(P)$(R):DMD:PARAM:DATATYPE0")
+  field(OUT, "@pfTC400.proto setParamDatatype0($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+#
+# NOTE: Not allowed to test any of these with a real pump :-(
+#
+# Write to Datatype 1
+#
+record(calcout, "$(P)$(R):SET:PARAM:DATATYPE1") {
+  field(DESC, "Sets datatype1 params")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(CALC, "B=1?0:1")
+  field(OOPT, "When Non-zero")
+  field(OCAL, "C")
+  field(DOPT, "Use OCAL")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO PP")
+  field(INPB, "$(P)$(R):STS:ACS:VETOED" )
+  field(INPC, "$(P)$(R):DMD:PARAM:DATATYPE1.RVAL PP")
+  field(OUT, "@pfTC400.proto setParamDatatype1($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+#
+# NOTE:  We are allowed to test setting some datatype2 parameters on a real pump. 
+# Use Parameter nos 717 or 707 to test these with a real pump, first making
+# sure that standby (002) or rotation speed setting mode (026) respectively
+# is off and setting the value straight back to what it was before immediately afterwards.
+#
+# Input A is the parameter number to set.  The link is PP to make sure
+#            make sure the veto list has been checked.
+# Input B is the result of the veto list check on the parameter number.
+# Input C is the value to be output.  The link is PP to make sure linear
+#            conversion has been done - hoping this will work.
+# CALC sets VAL to veto output if present because
+# OOPT is set to collaborate in this.
+# OCAL sets OVAL to the value to output.  It is just a copy of the input
+#            at present.  At present we use C, not OVAL in the protocol
+#            anyway. 
+# Fields A and C are used by the protocol 
+# (i.e. it needs parameter number and value).
+#
+# Write to Datatype 2
+#
+record(calcout, "$(P)$(R):SET:PARAM:DATATYPE2") {
+  field(DESC, "Sets datatype2 params")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(CALC, "B=1?0:1")
+  field(OOPT, "When Non-zero")
+  field(OCAL, "C")
+  field(DOPT, "Use OCAL")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO PP")
+  field(INPB, "$(P)$(R):STS:ACS:VETOED" )
+  field(INPC, "$(P)$(R):DMD:PARAM:DATATYPE2.RVAL PP")
+  field(OUT, "@pfTC400.proto setParamDatatype2($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+# 
+# This requires scalcout streamDevice module support, which is not
+# built into the streamDevice module at time of writing because
+# scalcout is provided by calc module, which is part of synapps
+# and optional in the streamDevice build.  It has not been tested.
+#
+# Input A is the parameter number to set.  The link is PP to make sure
+#            make sure the veto list has been checked.
+# Input B is the result of the veto list check on the parameter number.
+# Input AA is the string value to be output.
+# CALC sets VAL to veto output if present because
+# OOPT is set to collaborate in this.
+# OCAL sets OVAL to the value to output.  It is just a copy of the input
+#            at present.  At present we use AA, not OVAL in the protocol
+#            anyway. 
+# Fields A and C are used by the protocol 
+# (i.e. it needs parameter number and value).
+#
+# Write to Datatype 4
+#
+#record(scalcout, "$(P)$(R):SET:PARAM:DATATYPE4") {
+#  field(DESC, "Sets datatype4 params")
+#  field(DTYP, "stream")
+#  field(SCAN, "Passive")
+#  field(CALC, "B=1?0:1")
+#  field(OOPT, "When Non-zero")
+#  field(OCAL, "AA")
+#  field(DOPT, "Use OCAL")
+#  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO PP")
+#  field(INPB, "$(P)$(R):STS:ACS:VETOED" )
+#  field(INPAA, "$(P)$(R):DMD:PARAM:DATATYPE4 PP")
+#  field(OUT, "@pfTC400.proto setParamDatatype4($(unitaddr=001),$(P)$(R)) $(port)")
+#}
+#
+#
+# NOTE: Not allowed to test any of these with a real pump :-(
+#
+# Write to Datatype 7
+#
+record(calcout, "$(P)$(R):SET:PARAM:DATATYPE7") {
+  field(DESC, "Sets datatype7 params")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(CALC, "B=1?0:1")
+  field(OOPT, "When Non-zero")
+  field(OCAL, "C")
+  field(DOPT, "Use OCAL")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO PP")
+  field(INPB, "$(P)$(R):STS:ACS:VETOED" )
+  field(INPC, "$(P)$(R):DMD:PARAM:DATATYPE7.RVAL PP")
+  field(OUT, "@pfTC400.proto setParamDatatype7($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+# 
+# This requires scalcout streamDevice module support, which is not
+# built into the streamDevice module at time of writing because
+# scalcout is provided by calc module, which is part of synapps
+# and optional in the streamDevice build.  It has not been tested.
+#
+# Write to Datatype 11
+#
+#record(scalcout, "$(P)$(R):SET:PARAM:DATATYPE11") {
+#  field(DESC, "Sets datatype11 params")
+#  field(DTYP, "stream")
+#  field(SCAN, "Passive")
+#  field(CALC, "B=1?0:1")
+#  field(OOPT, "When Non-zero")
+#  field(OCAL, "AA")
+#  field(DOPT, "Use OCAL")
+#  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO PP")
+#  field(INPB, "$(P)$(R):STS:ACS:VETOED" )
+#  field(INPAA, "$(P)$(R):DMD:PARAM:DATATYPE11 PP")
+#  field(OUT, "@pfTC400.proto setParamDatatype11($(unitaddr=001),$(P)$(R)) $(port)")
+#}
+#
+# END OF RECORDS FOR GENERIC PARAMETER DATATYPES.
+# *******************************************************
+# START OF PARAMETER ACCESS CHECKING
+#
+# At present the only checking we do is based on the veto list.
+# These are additional support for generic data type setting.
+# There are some parameters we want to bar writing to from
+# the IOC because they are in the dominion of the PLC.
+#
+# No checking is done based on what we think the write
+# permission of the parameter on the pfeiffer might be.
+# Neither do we check the PLC has ceded remote control
+# and allowed RS-485 control.
+# Also we cannot apply DRVH and DRVL to realistic values
+# or anything like that.
+#
+# The veto library routine has the table of vetoed parameter
+# numbers hardcoded.
+#
+record(aSub, "$(P)$(R):CLC:ACS:VETOLISTCHK") {
+  field(DESC, "Check param not on write vetolist")
+  field(SNAM, "pfeifferParamSetVetolistCheck")
+  field(FTA, "SHORT")
+  field(INPA, "$(P)$(R):QRY:PARAM:PARAMNO")
+  field(FTVB, "SHORT")
+  field(OUTB, "$(P)$(R):STS:ACS:VETOED PP")
+  field(FTVC, "STRING")
+  field(OUTC, "$(P)$(R):STS:ACS:EXPLANATION PP")
+}
+
+# The integer flag returned by the veto list check.
+# Use this for visibility of demand value box.
+#
+record(bi, "$(P)$(R):STS:ACS:VETOED") {
+  field(DESC, "Whether write is vetoed")
+  field(ZNAM, "Allowed")
+  field(ONAM, "Vetoed")
+}
+
+# The constructed explanation string returned by the veto list check.
+record(stringin, "$(P)$(R):STS:ACS:EXPLANATION") {
+  field(DESC, "Explanation of last vetolist check." )
+}
+
+# END OF PARAMETER ACCESS CHECKING
+# *******************************************************
+# START OF ERROR CODE HANDLING
+#
+# NOTE: "Error code" refers to a value held in the Pfeiffer ErrorCode
+# Parameter.  They are NOT the errors returned in error message
+# telegrams, which are different in format and interpretation and
+# attempted to be handled below.  Error codes can be queried and the
+# reply received successfully without an error telegram being
+# involved.
+#
+# NOTE: A History of upto 10 previous error code parameters is
+# available but not requested as a requirement.
+#
+# Readback of current error code.
+# Parameter 303
+#
+record(stringin, "$(P)$(R):RBV:ERR:ERRCODE") {
+  field(DESC, "Readback current error code")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@pfTC400.proto getErrorCode($(unitaddr=001),$(P)$(R)) $(port)")
+  field(FLNK, "$(P)$(R):CLC:ERR:ERRCODEPARSE")
+}
+
+# The parser routine has tables of error and warning codes.
+record(aSub, "$(P)$(R):CLC:ERR:ERRCODEPARSE") {
+  field(DESC, "Interpret current error code")
+  field(SNAM, "pfeifferErrorCodeParse")
+  field(FTA, "STRING")
+  field(INPA, "$(P)$(R):RBV:ERR:ERRCODE")
+  field(FTVB, "STRING")
+  field(OUTB, "$(P)$(R):STS:ERR:CODEEXPLANATION PP")
+  field(FTVC, "SHORT")
+  field(OUTC, "$(P)$(R):STS:ERR:CODENUM PP")
+  field(FTVD, "SHORT")
+  field(OUTD, "$(P)$(R):STS:ERR:CODETYPE PP")
+}
+
+# The Explanation returned by the parser.
+record(stringin, "$(P)$(R):STS:ERR:CODEEXPLANATION") {
+  field(DESC, "Meaning of current error/warning code." )
+}
+
+# The integer number returned by the parser.
+record(ai, "$(P)$(R):STS:ERR:CODENUM") {
+  field(DESC, "Error code number.")
+}
+
+# The code type returned by the parser.
+record(mbbi, "$(P)$(R):STS:ERR:CODETYPE") {
+  field(DESC, "Error code type.")
+  field(ZRVL, "0")
+  field(ZRST, "None")
+  field(ONVL, "1")
+  field(ONST, "Warning")
+  field(TWVL, "2")
+  field(TWST, "Error")
+}
+
+# END OF ERROR CODE HANDLING
+# *******************************************************
+# START OF ERROR RESPONSE HANDLING
+#
+# NOTE: "Error response" refers to the content of an error message
+# telegram sent by the Pfeiffer instead of either the answer to a
+# query message telegram of the acknowledgement of a command telegram.
+# They are NOT the Pfeiffer error code parameters which are handled
+# above and are not involved in error telegrams (unless there is an
+# error trying to query one...)  They are caught by the mismatch
+# handler(s), so these records are stream device ones, even though
+# they make no call to the protocol.
+#
+# The parameter reported to be causing the error.  It is extracted by the
+# stream device protocol and placed in this record.
+record(ai, "$(P)$(R):RTN:ERR:ERRPARAMNO")
+{
+#  field(DTYP, "stream")
+  field(DTYP, "Soft Channel")
+  field(DESC, "Last err msg concerned this param no")
+#  field(PINI, "YES" )
+#  field(VAL, "0")
+}
+
+# The error message relating to the problem parameter.  It is extracted
+# by the stream device protocol and placed in this record.
+#
+record(stringin, "$(P)$(R):RTN:ERR:ERRMESS")
+{
+#  field(DTYP, "stream")
+  field(DTYP, "Soft Channel")
+  field(DESC, "Last error message.")
+}
+
+# The parser routine has a table of known error messages.
+# It takes the short message string and constructs a longer
+# explanation, unfortunately restricted to 39 characters.
+#
+record(aSub, "$(P)$(R):CLC:ERR:ERRMESSPARSE") {
+  field(DESC, "Interpret error message")
+  field(SNAM, "pfeifferErrorMessageParse")
+  field(FTA, "STRING")
+  field(INPA, "$(P)$(R):RTN:ERR:ERRMESS CP")
+  field(FTB, "SHORT")
+  field(INPB, "$(P)$(R):RTN:ERR:ERRPARAMNO")
+  field(FTVC, "STRING")
+  field(OUTC, "$(P)$(R):RTN:ERR:MESSEXPLANATION PP")
+}
+
+# The constructed explanation string for the message returned by the parser.
+record(stringin, "$(P)$(R):RTN:ERR:MESSEXPLANATION") {
+  field(DESC, "Meaning of last error message." )
+}
+
+# Record to test error response handling - need a way to deliberately provoke
+# an error message from the controller.  This parameter would appear to be
+# non existent and that appears from the possible values of error listed in
+# the manual to be a condition which will provoke an error response.
+# This record is not scanned or displayed.
+#
+# Parameter 099
+#
+record(ai, "$(P)$(R):RBV:ERR:TESTERR") {
+  field(DESC, "Provoke duff param error response.")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(INP,  "@pfTC400.proto getTestError($(unitaddr=001),$(P)$(R)) $(port)")
+}
+
+# Need to clear the last error message, otherwise it hangs around
+# indefinitely and makes it look like things failed which have
+# actually succeeded, so provide some records to do this.
+#
+# Null error message.
+#
+record(stringout, "$(P)$(R):DFT:ERR:ERRMESS") {
+  field(DESC, "Default error string at init/reset")
+  field(OUT, "$(P)$(R):RTN:ERR:ERRMESS PP")
+  field(VAL, "")
+  field(PINI, "YES")
+}
+
+# Provide null error message parameter number and provoke
+# processing of null error message.  The transform is a glorified
+# fanout, but it gives control over the processing order,
+# which is important, because want the message parser
+# to automatically pick up that the reset has happened
+# records have to be updated for the parser to parse
+# successfully. Also allows use of fixed value of field INPA to
+# save the need for a separate record to hold the null param
+# number.
+#
+record(transform, "$(P)$(R):TFM:ERR:ERRMESSCLEAR") {
+  field(DESC, "Clear last error message and paramno")
+  field(INPA, "0")
+  field(INPB, "1")
+  field(OUTA, "$(P)$(R):RTN:ERR:ERRPARAMNO PP")
+  field(OUTB, "$(P)$(R):DFT:ERR:ERRMESS.PROC PP")
+}
+
+# END OF ERROR RESPONSE HANDLING
+# *******************************************************
+# START OF RECORDS FOR SCANNING CONTROL
+#
+# Put these last for the sake of the pini fanout.
+#
+# % autosave 1 VAL
+# This record needed to stop various records scanning and generating lots
+# of error messages if the box is unplugged - this tends to be needed
+# for end station IOCs.
+#
+record(bo, "$(P)$(R):DISABLE") {
+  field(DESC, "Disable comms")
+  field(PINI, "YES")
+  field(VAL, "$(DISABLED=0)")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+# To provide PINI control.  The info retrieved on initialisation - stuff that's useful
+# to know, but should not change.  Might also used for some refresh buttons.
+#
+record(fanout, "$(P)$(R):FAN:PINI1") {
+  field(DESC, "PINI processing fanout 1")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(LNK1, "$(P)$(R):FAN:RBV:VSN:ALL")
+#  field(FLNK, "$(P)$(R):FAN:PINI2 PP")
+}
+
+# To provide control over the scanning rate of the "faster changing" stuff.
+record(fanout, "$(P)$(R):FAN:SCANFAST1") {
+  field(DESC, "Fast scan processing fanout 1")
+  field(SCAN, "1 second")
+#  field(SCAN, "Passive")
+  field(SDIS, "$(P)$(R):DISABLE")
+  field(LNK1, "$(P)$(R):FAN:RBV:CTL:ALL")
+  field(LNK2, "$(P)$(R):FAN:RBV:STS:SPDALL")
+#  field(FLNK, "$(P)$(R):FAN:SCANFAST2 PP")
+}
+
+# To provide control over the scanning rate of the "slowly changing" stuff.
+record(fanout, "$(P)$(R):FAN:SCANSLOW1") {
+  field(DESC, "Slow scan processing fanout 1")
+  field(SCAN, "10 second")
+#  field(SCAN, "Passive")
+  field(SDIS, "$(P)$(R):DISABLE")
+  field(LNK1, "$(P)$(R):RBV:ERR:ERRCODE")
+  field(LNK2, "$(P)$(R):FAN:RBV:CTL:ACCESSALL")
+  field(LNK3, "$(P)$(R):FAN:RBV:STS:TIVLALL")
+  field(LNK4, "$(P)$(R):FAN:RBV:SVS:ALL")
+#  field(FLNK, "$(P)$(R):FAN:SCANSLOW2 PP")
+}
+
+# END OF RECORDS FOR SCANNING CONTROL
+# *******************************************************
+# START OF RECORDS FOR EDM GUI CONTROL
+#
+# These values are not read back from controller.
+#
+# Will need a password mechanism to put into "Expert Mode".
+# This will land up being a separate record for each pump on the IOC, but we cannot help that.
+#
+#
+# Also might need a record to tell the screens to display the parameter numbers on all widgets on screens
+# other than the Expert screen, which will do that anyway.
+# Maybe EDM can do this internally with a LOC
+#
+#record(bi, "$(P)$(R):DSP:PARAMNOS") {
+#  field(DESC, "GUI parameter no display.")
+#  field(SCAN, "Passive")
+#  field(ZNAM, "Off")
+#  field(ONAM, "On")
+#  field(VAL, "$(paramno_display=0)")
+#  field(PINI, "YES")
+#}
+#
+# END OF RECORDS FOR EDM GUI CONTROL
+# *******************************************************
+# START OF RECORDS FOR EDM GUI DISPLAY OF DESCRIPTIVE INFO
+#
+# The pump model, for example Pfeiffer HiPace.
+# Defaults to "Unknown"
+#
+# NOTE: 
+#    The :MODEL record at the top of the template file refers to the Controller model and makes
+#    a small difference to the behaviour of EPICS.  
+#    This record is for the pump controlled and makes no difference to behaviour.
+#
+record(stringout, "$(P)$(R):PUMP:MODEL") {
+  field(DESC, "Pump model.")
+  field(SCAN, "Passive")
+  field(VAL, "$(pump_model=Unknown)")
+  field(PINI, "YES")
+}
+
+# Description of the pump.
+#
+# Suggest what it is used for or where it is physically.
+# Defaults to something vague.
+#
+record(stringout, "$(P)$(R):PUMP:DESCRIPTION") {
+  field(DESC, "Pump description.")
+  field(SCAN, "Passive")
+  field(VAL, "$(pump_descr=Pfeiffer turbo pump)")
+  field(PINI, "YES")
+}
+
+# END OF RECORDS FOR EDM GUI DISPLAY OF DESCRIPTIVE INFO
+# *******************************************************

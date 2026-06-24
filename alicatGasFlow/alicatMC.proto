@@ -1,0 +1,95 @@
+################################################################################################
+# Protocol file for:
+#
+# Alicat MC MCR MCS MCV series mass flow controllers
+#
+# NB Ensure that serial comms has been enabled on the alicat lcd panel otherwise it will not 
+# be possible to change the setpoint (Control setup screen, Input must be set to serial).
+#
+# NB2 Do not set a setpoint above 0 if there is no inlet gas pressure otherwise the alicat will get very hot!
+#
+################################################################################################
+#
+# Register 20 - This information was obtained from alicat support and explains some magic numbers
+# used in the database. R20 provides a way of changing/reading the Loop Var (MC series manual P19),
+# 
+# In R20 you have a base value of 8215 that you do not want to mess with made up as follows
+#   8192: Auto tare function
+#     16: 5.12 static volts on pin 2 of the device
+#      7: 0-5V output of mass flow
+#
+# You will add the following values to 8215 to produce the number to write to R20 to change 
+# the loop control for the device
+#   8215 + 1024 = 9239 for mass flow
+#   8215 + 768 = 8983 for volumetric flow
+#   8215 + 256 = 8471 for pressure
+#
+# In mass and volumetric flow loop modes the set calculation is: Desired set point x 64000 / 100
+# In pressure mode it is: Desired set point x 64000 / 160
+#
+################################################################################################
+
+
+Terminator = CR;
+
+LockTimeout = 3000;
+ReplyTimeout = 3000;
+ReadTimeout = 1000;
+ExtraInput = Ignore;
+
+
+##################
+# generic commands
+
+# get data command
+# e.g. cmd: 'A<cr>' Resp: 'A +014.85 +023.07 +0000.1 +0000.1 0031.2     He<cr>' (i.e. absPressure temp, volumetric flow, mass flow, set pt, gas)
+# NB *@=A -> set unit address to 'A'
+
+# NB use a waveform[5] to read float values with getData
+getData 
+{
+	out "\$1";
+	in "\$1 %f";
+	@init { out "*@=\$1"; in "\$1 %f"; }
+}
+
+getGas 
+{ 
+    out "\$1"; 
+    in "\$1 %*f %*f %*f %*f %*f %s";
+}
+
+setGas 
+{
+    out "\$1" "$$%d";
+    in "\$1 %*f %*f %*f %*f %*f %*s";
+}
+
+##################
+# Controller only command
+
+# Read register
+# e.g. *R22 - read register 22
+#      Read proportional gain Cmd: '*R21<cr>' Resp: 'A  021 = 65000<cr> (max 65535)
+#      Read differential gain Cmd: '*R22<cr>' Resp: 'A  022 = 05000<cr> (max 65535)
+getReg { out "*R\$2"; in "\$1 %*d = %u"; }
+
+# Set Register
+# e.g. set proportional gain Cmd: '*W21=600<cr>' Resp: 'A  021 = 600<cr>' (max 65535)
+#      set differential gain Cmd: '*W22=100<cr>' Resp: 'A  022 = 100<cr>' (max 65535)
+setReg { out "*W\$2=%u"; in "\$1"; }
+
+# Set setpoint
+# 0-65535 where 64000 = full scale (so can go a little over)
+# e.g. Cmd: 'A64000<cr>" Resp: 'A +014.60 011.72[ HLD]<cr>'
+setSetpt { out "\$1%u"; }
+
+# Set setpoint as real value
+# Limit and values depend on the configuration of the Mass Flow Controller itself, 
+# as set on R20 -- and in the controller screen is usually under:
+# MENU->CONTROL->Control Loop->Control: xxxx
+# e.g. Cmd: 'as1.5<cr>" Resp: 'A +014.60 011.72[ HLD]<cr>'
+setSetRealpt { out "as\$1%f"; }
+
+
+

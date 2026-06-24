@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: Keithley6487
+
+entity_models:
+  - name: Keithley6487
+    description: |-
+      Controls a Keithley 6487 picoammeter
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      A:
+        type: int
+        description: |-
+          Asyn port address
+      NELM:
+        type: int
+        description: |-
+          Size of trigger capture waveform (default 1000)
+        default: 1000
+      MSCAN:
+        type: str
+        description: |-
+          Measure scan rate, use Passive to disable if using trigger acq. (default 1 second)
+        default: 1 second
+      MODEL:
+        type: int
+        description: |-
+          Set to 0 for 6487, 1 for 6485 (default 0)
+        default: 0
+      DESCSHORT:
+        type: str
+        description: |-
+          Optional.  Short description of current signal for use on packed GUI screens (but only EPICS VAL default actually limits the length of the string).  Defaults to $(P)$(R).
+        default: $(P)$(R)
+      DESCLONG:
+        type: str
+        description: |-
+          Optional.  Longer description of the current signal.  Defaults to $(P)$(R) current signal.  The EPICS string record VAL field length limit is the restriction on the length of the string (of 39 characters under EPICS R3.14.12.7).
+        default: $(P)$(R) current signal
+      name:
+        type: id
+        description: |-
+          Optional.  Name to export to gda as
+    databases:
+      - file: devKeithley6487.db
+        args:
+          .*:

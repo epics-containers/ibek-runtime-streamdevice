@@ -1,0 +1,201 @@
+# pr4000.template
+#% macro, __doc__, Template database for a PR4000 Baratron gauge controller
+# Ian Gillingham - December 2014
+#
+# substitutions:
+# % macro, device, Device e.g.BLxxI-VA-GCTLR-01
+# % macro, port, Asyn port name
+# % macro, ch1pv, Channel 1 PV (as device in pr4000chan.template)
+# % macro, ch2pv, Channel 2 PV (as device in pr4000chan.template)
+# % macro, name, Name to export to gda as
+# % gui, $(name=), edm, pr4000.edl, device=$(device), ch1pv=$(ch1pv), ch2pv=$(ch2pv)
+#
+################################################################################
+# Error code
+# Raw code from controller divided by ten
+# 010 = Syntax error
+# 020 = Command failure
+#
+#record(mbbi, "$(device):ERR")
+#{
+#    field(DESC, "Error code")
+#    field(DTYP, "stream")
+#    field(ZRST, "OK")
+#    field(ONST, "SYNTAX")
+#    field(TWST, "CMDFAIL")
+#}
+#
+# The :DISA record is essentially a development
+# tool and not intended for use in the field.
+#
+#
+record(bi, "$(device):DISA")
+    {
+    field(DESC, "Channel Disable")
+    field(VAL,  "0")
+    field(ZNAM, "ENABLE")
+    field(ONAM, "DISABLE")
+    field(PINI, "YES")
+    }
+
+
+################################################################################
+# Controller Version
+#
+#% archiver 10 Monitor
+#% controldesk Controller Version readback
+record(stringin, "$(device):ID")
+{
+    field(DESC, "Controller Version")
+    field(DTYP, "stream")
+    field(INP,  "@pr4000.protocol id() $(port)")
+    field(SDIS, "$(device):DISA")
+    field(SCAN, "5 second")
+}
+
+record(stringin, "$(device):DEBUG")
+{
+    field(DESC, "Generic command")
+    field(DTYP, "stream")
+    field(INP,  "@pr4000.protocol debug() $(port)")
+    field(SCAN, "Passive")
+}
+
+record(stringout, "$(device):DISPTEXTOUT")
+    {
+    field(DESC, "Display Text")
+    field(DTYP, "stream")
+    field(OUT,  "@pr4000.protocol dt_set() $(port)")
+    }
+
+record(stringin, "$(device):DISPTEXT")
+    {
+    field(DESC, "Display Text")
+    field(DTYP, "stream")
+    field(INP,  "@pr4000.protocol dt() $(port)")
+    field(SDIS, "$(device):DISA")
+    field(SCAN, "5 second")
+    }
+
+record(mbbi, "$(device):REMOTEMODE")
+    {
+    field(DESC, "Remote Mode")
+    field(DTYP, "stream")
+    field(INP,  "@pr4000.protocol remotemode() $(port)")
+    field(ZRVL, "0")
+    field(ZRST, "OFF")
+    field(ONVL, "1")
+    field(ONST, "ON")
+    field(SDIS, "$(device):DISA")
+    field(SCAN, "2 second")
+    }
+
+record(mbbo, "$(device):REMOTEMODE_SET")
+    {
+    field(DESC, "Remote Mode Set")
+    field(DTYP, "stream")
+    field(OUT,  "@pr4000.protocol remotemode_set() $(port)")
+    field(ZRVL, "0")
+    field(ZRST, "OFF")
+    field(ONVL, "1")
+    field(ONST, "ON")
+    }
+    
+record(mbbiDirect, "$(device):BITSSTATUS")
+    {
+    field(SDIS, "$(device):DISA")
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(INP,  "@pr4000.protocol status() $(port)")
+    field(NOBT, "8")
+    }
+record(bi, "$(device):STCOMERR")
+    {
+    field(DESC, "Controller Comm Error")
+    field(INP,  "$(device):BITSSTATUS.B0 CP MS")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MINOR")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    }
+record(bi, "$(device):STURANGEAIN0")
+    {
+    field(DESC, "Controller AIN0 underrange")
+    field(INP,  "$(device):BITSSTATUS.B1 CP MS")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MINOR")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    }
+
+record(bi, "$(device):STORANGEAIN0")
+    {
+    field(DESC, "Controller AIN0 overrange")
+    field(INP,  "$(device):BITSSTATUS.B2 CP MS")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MINOR")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    }
+
+record(bi, "$(device):STURANGEAIN1")
+    {
+    field(DESC, "Controller AIN1 underrange")
+    field(INP,  "$(device):BITSSTATUS.B3 CP MS")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MINOR")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    }
+record(bi, "$(device):STORANGEAIN1")
+    {
+    field(DESC, "Controller AIN1 overrange")
+    field(INP,  "$(device):BITSSTATUS.B4 CP MS")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MINOR")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    }
+record(bi, "$(device):STRELAY0")
+    {
+    field(DESC, "Relay 0")
+    field(INP,  "$(device):BITSSTATUS.B5 CP MS")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MINOR")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    }
+record(bi, "$(device):STRELAY1")
+    {
+    field(DESC, "Relay 1")
+    field(INP,  "$(device):BITSSTATUS.B6 CP MS")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MINOR")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    }
+record(bi, "$(device):STPARCHANGED")
+    {
+    field(DESC, "Param changed by user")
+    field(INP,  "$(device):BITSSTATUS.B7 CP MS")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MINOR")
+    field(ZNAM, "OFF")
+    field(ONAM, "ON")
+    }
+
+record(waveform, "$(device):RANGENAMES")
+    {
+    field(DESC, "Range names array")
+    field(DTYP, "Soft Channel")
+    field(FTVL, "STRING")
+    field(NELM, "20")
+    #field(INP, "11 22 33 44")
+    field(PINI, "YES")
+    }
+
+    
+
+
+
+    

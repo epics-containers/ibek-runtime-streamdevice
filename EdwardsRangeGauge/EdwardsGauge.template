@@ -1,0 +1,114 @@
+# File EdwardsGauge.template
+#
+# % macro, __doc__,          Template for Serial control and monitoring of Edwards Pressure pumps via serial.  Usually in collaboration with a PLC which has On/Off control.
+#
+# % macro, P,    Mandatory. Device prefix
+# % macro, port, Mandatory. Asyn port name
+# % macro, name, Optional.  Name for gui element
+#
+# % gui, $(name=), edm , EdwardsPressure.edl, device=$(P)
+
+# % archiver 10 monitor
+record(longin, "$(P):MultiDrop_RBV")
+{
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(SCAN, "10 second")
+    field(INP, "@EdGauge.proto getMultiDrop $(port)")
+}
+
+# % archiver 10 monitor
+record(ai, "$(P):PRESSURE_READ") {
+    field(INP, "@EdGauge.proto getGauge1Pressure $(port)")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(EGU, "Pa")
+    field(FLNK, "$(P):P")
+}
+
+# % archiver 10 monitor
+# P converted to mbar
+record(calcout, "$(P):P") {
+    field(INPA, "$(P):PRESSURE_READ")
+    field(CALC, "A/100")
+    field(EGU, "mbar")
+}
+
+# % archiver 10 monitor
+record(longin, "$(P):Gauge1Priority_RBV") {
+    field(DTYP, "stream")
+    field(INP, "@EdGauge.proto getGauge1Priority $(port)")
+    field(SCAN, "1 second")
+    field(FLNK, "$(P):Gauge1Severity.PROC")
+}
+
+# % archiver 10 monitor
+record(calcout, "$(P):Gauge1Severity") {
+    field(INPA, "$(P):Gauge1Priority_RBV")
+    field(CALC, "MIN(A,2)") # 2 & 3 both represent major alarms
+    field(OUT, "$(P):P.SEVR")
+    field(OOPT, "On Change")
+}
+
+# % archiver 10 monitor
+record(longin, "$(P):Gauge1Units_RBV") {
+    field(PINI, "YES")
+    field(INP, "@EdGauge.proto getGauge1UnitsType $(port)")
+    field(DTYP, "stream")
+    field(SCAN, "10 second")
+    field(FLNK, "$(P):Gauge1InPressureMode")
+}
+
+# % archiver 10 monitor
+record(longin, "$(P):Gauge1AlertID_RBV") {
+    field(PINI, "YES")
+    field(INP, "@EdGauge.proto getGauge1AlertID $(port)")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(FLNK, "$(P):AlertIDCalc.PROC")
+}
+
+# % archiver 10 monitor
+record(calcout, "$(P):Gauge1InPressureMode") {
+    field(SCAN, "Passive")
+    field(INPA, "$(P):Gauge1Units_RBV")
+    field(CALC, "A==59")
+}
+
+# % archiver 10 monitor
+record(calcout, "$(P):AlertIDCalc") {
+    field(SCAN, "Passive")
+    field(INPA, "$(P):Gauge1AlertID_RBV")
+    field(CALC, "MIN(A,7)")
+    field(OUT, "$(P):STA PP")
+    field(OOPT, "Every Time")
+}
+
+# % archiver 10 monitor
+record(mbbi, "$(P):STA") {
+    field(SCAN, "Passive")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(SVVL, "7")
+    field(ZRSV, "0")
+    field(ONSV, "2")
+    field(TWSV, "2")
+    field(THSV, "2")
+    field(FRSV, "2")
+    field(FVSV, "2")
+    field(SXSV, "2")
+    field(SVSV, "2")
+    field(ZRST, "No Alert")
+    field(ONST, "ADC Fault")
+    field(TWST, "ADC Not Ready")
+    field(THST, "Over Range")
+    field(FRST, "Under Range")
+    field(FVST, "ADC Invalid")
+    field(SXST, "No Gauge")
+    field(SVST, "Unknown")
+}

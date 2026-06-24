@@ -1,0 +1,78 @@
+# streamDevice protocol file for LEEM 2000
+
+InTerminator = '\0';
+OutTerminator = '\0';
+# MaxInput = 0;
+# LockTimeout should be GT ReplyTimeout
+LockTimeout = 5000;
+ReplyTimeout = 2000;
+ReadTimeout = 100;
+ExtraInput = Ignore;
+
+
+getf {
+    out "get \$1"; in "%f";
+}
+
+getf2 {
+    out "get \$1 \$2"; in "%f";
+}
+
+# read float using 'get' command name from a string PV
+getcmdf{
+    out "get %(\$1)s"; in "%f";
+}
+
+setf {
+    out "set \$1=%f"; in "0";
+}
+
+setf2 {
+    out "set \$1 \$2=%f"; in "0";
+}
+
+# write float using 'set' command name from a string PV
+setcmdf{
+    out "set %(\$1)s=%f"; in "0";
+}    
+
+rdf {
+    out "\$1"; in "%f";
+}
+
+rdf2 {
+    out "\$1 \$2"; in "%f";
+}
+
+rdidxstr {
+    out "\$1 %(\$2)d"; in "%#s";
+}
+
+wridxstr {
+    out "\$1 %(\$2)d %s"; in "0";
+}
+
+rdidxf {
+    out "\$1 %(\$2)d"; in "%f";
+}
+
+wridxf {
+    out "\$1 %(\$2)d %f"; in "0";
+}
+
+# read float using command from a string PV
+rdcmdf {
+    out "%(\$1)s"; in "%f";
+}
+
+wrstr {
+    out "%s"; in "0";
+}
+
+wrstr2 {
+    out "\$1 %s"; in "0";
+}
+
+rdstr {    
+    out "\$1"; in "%#s";
+}

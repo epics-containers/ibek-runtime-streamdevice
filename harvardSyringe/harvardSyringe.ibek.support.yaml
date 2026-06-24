@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: harvardSyringe
+
+entity_models:
+  - name: harvardSyringe
+    description: |-
+      Harvard Syringe Pump
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      desc:
+        type: str
+        description: |-
+          Device label for GUI
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      DISABLE:
+        type: int
+        description: |-
+          Set to 0 to enable this at startup
+        default: 1
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: harvardSyringe.template
+        args:
+          .*:

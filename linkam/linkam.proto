@@ -1,0 +1,64 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for Linkam CI93 / DSC600
+#
+# 19200 baud, 8 bit, 1 stop bits, no parity bit, RTS/CTS handshake
+#
+
+terminator   = CR;
+replytimeout = 1000;
+readtimeout  = 500;
+locktimeout = 5000;
+extrainput   = Ignore;
+separator = "";
+
+#################################################################################
+# T92/93/94 commands
+
+# Get Status
+#getstatus{out "T"; in "%1r%(\$1\$2)1r%(\$1\$3)1r%(\$1\$4)1r\?\?%(\$1\$5)4X";}
+getstatus{out "T"; in "%4c\?\?%(\$1)4X";}
+getstatus2{out "T"; in "%10c";}
+
+# Set Temperature Ramp Rate
+setrate{ out "R1%04u"; in ""}
+
+# Set Temperature Ramp Limit
+setlimit{ out "L1%04i"; in ""}
+
+# Stop(E)/Start(S)/Hold(O) Temperature Ramp
+setramp{ out "%{E|S|O}"; in ""}
+
+getstage{out "\xefS"; in "%#s"; }
+
+##################
+# LNP94 pump commands
+
+# Select LNP manual (Pm0) or automatic mode (Pa0)
+setpump{ out "%{Pm0|Pa0}"; in ""}
+
+# Select LNP speed (in manual mode only)
+#setpumpspeed{ out "P%#1r"; }
+setpumpspeed{ out "P%{0|1|2|3|4|5|6|7|8|9|:|;|<|=|>|?|@|A|B|C|D|E|F|G|H|I|J|K|L|M|N}"; in ""}
+
+#################################################################################
+# DSC600 commands (TMS94)
+
+# Set sample time
+settempperiod{ out "\xE7%04u"; in ""}
+
+# Clear/Reset buffer
+resettempbuffer{ out "B"; in ""}
+
+# Get Temperature and DSC data
+# DSC may be 32767 - buffer empty, 32766 - marker, 32765 - end of data collection.
+gettemp{out "D"; in "%4X%(\$1.VAL)4X";}
+
+# Stop logging on profile complete (SP)(sends 32765 to dsc) or on command (SC)(such as Ecr)
+settempmode{ out "%{SP|SC}"; in ""}
+
+#################################################################################

@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: agilentE364xA
+
+entity_models:
+  - name: E364xA
+    description: |-
+      Agilent E364xA programmable DC power supply
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      PREC:
+        type: int
+        description: |-
+          decimal precision to use. Default=3
+        default: 3
+    databases:
+      - file: E364xA.template
+        args:
+          .*:

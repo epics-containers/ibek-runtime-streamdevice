@@ -1,0 +1,279 @@
+##################################################
+#
+# Protocol File
+#
+# Protocol file for ISEG HV PSU (model NHQ x0xx)
+# Diamond Light Source, Aug 2009
+#
+# NOTES:
+# The unit echos back each character before sending a response to
+# a command. So to read the status for channel 1 for example:
+# Out: S
+# In: S
+# Out: 1
+# In: 1
+# Out: \r
+# In: \r
+# Out: \n
+# In: \nS1=ON
+# Now the next command can be started.
+#
+##################################################
+
+
+##################################################
+# General Settings
+##################################################
+
+#Terminator = "\r\n";  #<CR><LF>  or   0x0D 0x0A
+ReplyTimeout = 5000;
+OutTerminator = "";
+InTerminator = "";
+ReadTimeout = 200;
+
+writeDelay = 10;
+
+##################################################
+# Get functions
+##################################################
+
+
+# /// Read the actual current on channel N
+# Note mismatch handler required because %m doesnt handle '0000-08' which iseg returns for 0 value sometimes.
+getIActual {
+   MaxInput=1;
+   out "I";
+   in "I";
+   out "\$1";
+   in "\$1";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n%m\r\n"; @mismatch {in "\n%d%*3c\r\n";}
+}
+#getIActual { DOESNT WORK
+#   Terminator = "\r\n";
+#   out "I\$1";
+#   in "I\$1";
+#   in "%m";
+#}
+#getIActual { DOESNT WORK
+#    MaxInput=1;
+#    InTerminator="I";
+#    out "I";
+#    in "";
+#    InTerminator="\$1";    
+#    out "\$1";
+#    in "";
+#    InTerminator="\r";    
+#    out "\r";
+#    in "";
+#    InTerminator="\n";    
+#    out "\n";
+#    in "";
+#    MaxInput=0;
+#    in "%m\r";
+#}
+# Half works with a terminal server but not direct RS232
+#getIActual {
+#   OutTerminator="";
+#   InTerminator="\r\n";
+#   out "I"; wait $writeDelay;
+#   out "\$1"; wait $writeDelay;
+#   out "\r"; wait $writeDelay;
+#   out "\n"; 
+#   in "I\$1";
+#   in "%m";
+#}
+
+# /// Read the channel status information
+getChannelStatus {
+   MaxInput=1;
+   out "S";
+   in "S";
+   out "\$1";
+   in "\$1";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\nS\$1=%3c\r\n";
+}
+
+# /// Read the channel status information
+getChannelStatusE {
+   MaxInput=1;
+   out "S";
+   in "S";
+   out "\$1";
+   in "\$1";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\nS\$1=%{OFF|ON |ON|INH|TRP|L2H|H2L}\r\n";
+}
+
+# /// Read the unit number
+getUnitNumber {
+   ExtraInput = Ignore;
+   MaxInput=1;
+   out "#";
+   in "#";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n%d;%*f;%*dV;%*d%*{mA|uA}\r\n";
+}
+
+# /// Read the unit number
+getUnitSoftRel {
+   MaxInput=1;
+   out "#";
+   in "#";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n%*d;%f;%*dV;%*d%*{mA|uA}\r\n";
+}
+
+# /// Read the V out max
+getVOutMax {
+   MaxInput=1;
+   out "#";
+   in "#";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n%*d;%*f;%dV;%*d%*{mA|uA}\r\n";
+}
+
+# /// Read the I out max
+getIOutMax {
+   MaxInput=1;
+   out "#";
+   in "#";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n%*d;%*f;%*dV;%d%*{mA|uA}\r\n";
+}
+
+# /// Generic read function to read an integer value.
+getGeneric {
+   MaxInput=1;
+   out "\$1";
+   in "\$1";
+   out "\$2";
+   in "\$2";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n%d\r\n"
+}
+
+# Note mismatch handler required because %m doesnt handle '0000-08' which iseg returns for 0 value sometimes.
+getGenericExp {
+   MaxInput=1;
+   out "\$1";
+   in "\$1";
+   out "\$2";
+   in "\$2";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n%m\r\n"; @mismatch {in "\n%d%*3c\r\n";}
+}
+
+##################################################
+# Set functions
+##################################################
+
+# /// Use this to sync with the device. Call at startup.
+sync {
+   ExtraInput = Ignore;
+   out "\r\n";
+   in "%39c"
+}
+
+# /// Generic write for 3 chars. Makes use of calc record fields.
+w3 {
+   MaxInput=1;
+   out "\$1";
+   in "\$1";
+   out "\$2";
+   in "\$2";
+   out "=";
+   in "=";
+   out "%(A)1d";
+   in "%(A)1d";
+   out "%(B)1d";
+   in "%(B)1d";
+   out "%(C)1d";
+   in "%(C)1d";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n\r\n";
+}
+
+# /// Generic write for 4 chars. Makes use of calc record fields.
+w4 {
+   MaxInput=1;
+   out "\$1";
+   in "\$1";
+   out "\$2";
+   in "\$2";
+   out "=";
+   in "=";
+   out "%(A)1d";
+   in "%(A)1d";
+   out "%(B)1d";
+   in "%(B)1d";
+   out "%(C)1d";
+   in "%(C)1d";
+   out "%(D)1d";
+   in "%(D)1d";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\n\r\n";
+}
+
+
+# /// Start a voltage change
+setStartVChange {
+   MaxInput=1;
+   out "G";
+   in "G";
+   out "\$1";
+   in "\$1";
+   out "\r";
+   in "\r";
+   out "\n";
+   MaxInput=0;
+   in "\nS\$1=%3c\r\n";
+}
+
+
+##################################################
+# Generic
+##################################################
+
+
+
+# /// Use this send any command and get back the response (max 39 chars).
+gen {
+    ExtraInput = Ignore;
+    out "%s";
+    in "%39c"
+}

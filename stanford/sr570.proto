@@ -1,0 +1,51 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for Stanford SR570 Low Noise Current Amp
+#
+# 9600 baud, DCE, 8 bit, 1 stop bits, no parity bit, 2 stop bits, no handshake
+#
+
+terminator   = CR LF;
+replytimeout = 1000;
+readtimeout  = 100;
+locktimeout = 10000;
+extrainput   = Ignore;
+separator = "";
+
+#################################################################################
+# Command set
+
+# Sensitivity 
+sens_set{out "SENS%u"; in "SENS%*u"}
+sucm_set{out "SUCM%u"; in "SUCM%*u"}
+sucv_set{out "SUCV%u"; in "SUCV%*u"}
+
+# Input offset current 
+ioon_set{out "IOON%u"; in "IOON%*u"}
+iolv_set{out "IOLV%u"; in "IOLV%*u"}
+iosn_set{out "IOSN%u"; in "IOSN%*u"}
+iouc_set{out "IOUC%u"; in "IOUC%*u"}
+iouv_set{out "IOUV%i"; in "IOUV%*i"}
+
+# Bias voltage
+bson_set{out "BSON%u"; in "BSON%*u"}
+bslv_set{out "BSLV%i"; in "BSLV%*i"}
+
+# Filter 
+fltt_set{out "FLTT%u"; in "FLTT%*u"}
+lfrq_set{out "LFRQ%u"; in "LFRQ%*u"}
+hfrq_set{out "HFRQ%u"; in "HFRQ%*u"}
+rold_set{out "ROLD"; in "ROLD"}
+
+# Other
+gnmd_set{out "GNMD%u"; in "GNMD%*u"}
+invt_set{out "INVT%u"; in "INVT%*u"}
+blnk_set{out "BLNK%u"; in "BLNK%*u"}
+reset{out "*RST"; in "*RST"}
+
+
+#################################################################################

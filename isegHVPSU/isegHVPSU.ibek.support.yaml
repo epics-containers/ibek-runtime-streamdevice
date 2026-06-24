@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: isegHVPSU
+
+entity_models:
+  - name: isegNHQ223M
+    description: |-
+      ISEG HV PSU template file.
+      Notes: The voltages and currents are archived every 10s
+      All other parameters (including status) are read on demand
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      SCAN1:
+        type: int
+        description: |-
+          SCAN rate in seconds for the actual voltage readings e.g. 5
+      SCAN2:
+        type: int
+        description: |-
+          SCAN rate in seconds for the actual current readings e.g. 5
+      MAXV:
+        type: float
+        description: |-
+          Default 6000 - Max output voltage (V)
+        default: 6000
+      MAXI:
+        type: float
+        description: |-
+          Default 6 - Max output current (mA)
+        default: 6000
+      EXP:
+        type: str
+        description: |-
+          Default  - "" or Exp if iseg returns/sets voltage in exponential format
+        default: ""
+      ISCALE:
+        type: float
+        description: |-
+          Default 1 - trip current READBACK scale factor (current displayed = transmission values * ISCALE)
+        default: 1
+      ISCALESET:
+        type: float
+        description: |-
+          Default 1 - trip current SET scale factor (transmission value = current displayed / ISCALESET)
+        default: 1
+      VSCALE:
+        type: float
+        description: |-
+          Default 1 - voltage set point READBACK scale factor (voltage displayed = transmission values * VSCALE)
+        default: 1
+      VSCALESET:
+        type: float
+        description: |-
+          Default 1 - voltage set point SET scale factor (transmission value = voltage displayed / VSCALE)
+        default: 1
+      IMAXUNIT:
+        type: str
+        description: |-
+          Unit for I MAX
+        default: mA
+      ITRIPUNIT:
+        type: str
+        description: |-
+          Unit for I TRIP
+        default: uA
+    databases:
+      - file: isegNHQ223M.template
+        args:
+          .*:
+  - name: isegHVPSU
+    description: |-
+      ISEG HV PSU template file.
+      Notes: The voltages and currents are archived every 10s
+      All other parameters (including status) are read on demand
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      SCAN1:
+        type: int
+        description: |-
+          SCAN rate in seconds for the actual voltage readings e.g. 5
+      SCAN2:
+        type: int
+        description: |-
+          SCAN rate in seconds for the actual current readings e.g. 5
+      MAXV:
+        type: float
+        description: |-
+          Default 6000 - Max output voltage (V)
+        default: 6000
+      MAXI:
+        type: float
+        description: |-
+          Default  - Max output current (mA)
+        default: 6000
+      EXP:
+        type: str
+        description: |-
+          Default  - "" or Exp if iseg returns/sets voltage in exponential format
+        default: ""
+      ISCALE:
+        type: float
+        description: |-
+          Default 1 - trip current READBACK scale factor (current displayed = transmission values * ISCALE)
+        default: 1
+      ISCALESET:
+        type: float
+        description: |-
+          Default  - trip current SET scale factor (transmission value = current displayed / ISCALESET)
+        default: 1
+      VSCALE:
+        type: float
+        description: |-
+          Default 1 - voltage set point READBACK scale factor (voltage displayed = transmission values * VSCALE)
+        default: 1
+      VSCALESET:
+        type: float
+        description: |-
+          Default 1 - voltage set point SET scale factor (transmission value = voltage displayed / VSCALE)
+        default: 1
+      IMAXUNIT:
+        type: str
+        description: |-
+          Unit for I MAX
+        default: mA
+      ITRIPUNIT:
+        type: str
+        description: |-
+          Unit for I TRIP
+        default: uA
+    databases:
+      - file: isegHVPSU.template
+        args:
+          .*:

@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: tdklambda
+
+entity_models:
+  - name: Gen3300w
+    description: |-
+      TDK Lambda 3300W power supply
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS name prefix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      CMDSET:
+        type: str
+        description: |-
+          Command set: use 'R' for RS232(default) or 'S' for SCPI(Ethernet)
+        default: R
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: gen3300w.template
+        args:
+          .*:

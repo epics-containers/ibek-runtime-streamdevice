@@ -1,0 +1,184 @@
+# Stream device protocol for the Agilent E364xA Dual output DC power supply
+#
+# Serial port settings are: 9600 8N2 (software handshaking ON)
+#
+# The device has to be put in "remote" mode before accepting serial
+# commands. The remote mode can be set with the SYST:REM or SYST:RWL commands.
+#
+
+## Input and output terminator is carriage return and linefeed
+Terminator = CR LF;
+
+## ReplyTimeout of 2 sec seems appropriate
+ReplyTimeout = 2000;
+
+# ==============  Instrument and device settings  =====================
+
+## Set the remote or local control mode
+# The device must be put in REMote mode before commands are accepted
+ctrlMode {
+    out "SYST:%{LOC|REM|RWL}";
+    wait 500;
+}
+
+## Select one of the two channels to operate on
+selectChannel {
+    out "INST:NSEL %i";
+    wait 500;
+}
+getChannel {
+    out "INST:NSEL?";
+    in "%i";
+}
+
+## Switch on or off the output on the device terminals
+enableOutput {
+    out "OUTP %{OFF|ON}; OUTP?";
+    in "%i";
+}
+
+outputStatus {
+    out "OUTP?";
+    in "%i";
+}
+
+## Enable or disable channel tracking
+setTracking {
+    out "OUTP:TRACK %{OFF|ON}";
+    wait 500;
+}
+getTracking {
+    out "OUTP:TRACK?";
+    in "%i"
+}
+
+## Write a string of up to 11 characters to the device 7 segment display
+setDispTxt {
+    out 'DISP:TEXT "%s"';
+}
+
+# ==============  Voltage settings  =====================
+
+## Configure the voltage range
+# Some ranges may not be available on all instruments in the series
+setVoltRange {
+    out "VOLT:RANG %{P8V|P20V|P35V|P60V}";
+    wait 500;
+}
+
+getVoltRange {
+    out "VOLT:RANG?";
+    in "%{P8V|P20V|P35V|P60V}";
+}
+
+## Set the output voltage on the current channel
+setVoltage {
+    out "VOLT %f; VOLT?";
+    in "%f";
+}
+
+getVoltage {
+    out "VOLT?";
+    in "%f";
+}
+
+## Get the voltage measurement on the current channel
+measureVoltage {
+    out "MEAS:VOLT?";
+    in "%f";
+}
+
+## Set voltage protection trip level
+setVoltProt {
+    out "VOLT:PROT %f";
+    wait 100;
+}
+getVoltProt {
+    out "VOLT:PROT?";
+    in "%f";
+}
+
+## Enable or disable voltage protection
+setVoltProtStat {
+    out "VOLT:PROT:STAT %{OFF|ON}";
+    wait 100;
+}
+getVoltProtStat {
+    out "VOLT:PROT:STAT?";
+    in "%i";
+}
+
+## Read voltage protection trip status
+getVoltProtTrip {
+    out "VOLT:PROT:TRIP?";
+    in "%i";
+}
+
+## Clear a voltage protection trip
+clrVoltProtTrip {
+    out "VOLT:PROT:CLE";
+    wait 500;
+}
+
+## Read voltage limits in the selected voltage range
+getVoltLim {
+    out "VOLT? \$1";
+    in "%f";
+}
+
+# ==============  Current settings  =====================
+
+## Set programmable current level
+setProgCurr {
+    out "CURR %f";
+}
+getProgCurr {
+    out "CURR?";
+    in "%f";
+}
+
+## Measure the current on the output terminals
+measureCurrent {
+    out "MEAS:CURR?";
+    in "%f";
+}
+
+## Read the current limits in the selected voltage range
+getCurrLim {
+    out "CURR? \$1";
+    in "%f";
+}
+
+
+# ==============  Errors and status  =====================
+
+## Read and clear the error code and string
+# The error codes are stacked in a FIFO on the device
+# and each read clears one entry in the FIFO
+getError {
+    ExtraInput = Ignore;
+    out "SYST:ERR?";
+    in "%i,%(\$1)39c";
+}
+
+## Read the device ID
+getId {
+    ExtraInput = Ignore;
+    out "*IDN?";
+    in "Agilent Technologies,%39c"
+}
+
+## Read the device system version
+getVersion {
+    ExtraInput = Ignore;
+    out "SYST:VERS?";
+    in  "%6c";
+}
+
+## To allow user typing in a manual command in a string record
+manualCmd {
+    ExtraInput = Ignore;
+    out "%(\$1)s"; in "%39c";
+    wait 100;
+}
+

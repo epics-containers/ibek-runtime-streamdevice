@@ -1,0 +1,83 @@
+
+# Edwards Scroll Pump Protocol
+
+# Control side communicaton to the pump is done via RS232.  The serial line 
+# must be enabld by a hardware line before the software will talk. This is done 
+# by linking the serial enable input signal (Pin 5) to Pin 2.  This could be 
+# arranged in the cable so that whenever a serial cable is connected, serial
+# comms are enabled.
+
+# The serial enable line acts as an intelock for start commands over the serial
+# interface.  If the pump is running in serial control mode, (ie having been sent
+# a serial start command) and the serial enable subsequently becomes inactive,
+# the pump will flaf a fail condition and will decellerate to rest.  To clear this
+# fail condition you must re-activate the serial enable line and send a serial 
+# stop command
+
+# Serial Protocol:
+
+# 9600 baud
+# 8 bits
+# 1 stop bit
+# No parity
+# No handshaking
+# All alphabetical characters to be sent uppercase
+# Every command will receive a response
+# Characters not framed with start and stop bits are ignored
+# Unrecognised (but correctly formatted) messsages return an error code
+
+# Message Structure:
+
+# <Start Char><Command><Object Number><Data Field (only for some commands)<Stop Char>
+#      !/?       XXX    space if none                   X                     CR
+
+# ! used for commands
+# ? used for queries
+
+# Error Codes (returned behind echoed command):
+
+# 0 - No error
+# 1 - Invalid command for object ID
+# 2 - Invalid query / command
+# 3 - Missing parameter
+# 4 - Parameter out of range
+# 5 - Invalid command in current state
+
+# A wide range of serial commands are available and listed in the manual, but
+# Diamond is only interested in a small subset of these:
+
+Terminator = "\r";
+ExtraInput = Ignore;
+
+# Get measured motor power (in W)
+# The response gives voltage / current / power
+# So we ignore the first two numbers here
+getMotorPower {out "?V809" ; in "=V809 %*u;%*u;%u" ; }
+
+# Get the measured pump controller heat-sink temperature (in C)
+# The response gives pump temperature (not used on Scroll pumps) / Heat sink temperatue
+# So we ignore the first number here
+getPumpTemp { out "?V808" ; in "=V808 %*d;%u" ; }
+
+# Get the total time the pump has run for (in hrs)
+getTotalTime { out "?V810" ; in "=V810 %u" ; } 
+
+# Get the pump running time since the last tip seal service (in hrs)
+# The response gives 'since' / 'to'
+# So we ignore the second number here
+getRunTimeSinceTip { out "?V814"; in "=V814 %u;%*u" ; }
+
+# Set the pump speed to full
+doFullSpeed { out "!C803 0" ; in "*C803 %(\$1:LAST_ERR_CODE.VAL)u" ; }
+
+# Set the the pump speed to standby
+# An indicator on the pump, labelled with a moon, is illuminated on standby
+doStandbySpeed { out "!C803 1" ; in "*C803 %(\$1:LAST_ERR_CODE.VAL)u" ; }
+
+# Reset the service indicator
+doServiceReset { out "!C814 1" ; in "*C814 %(\$1:LAST_ERR_CODE.VAL)u" ; }
+
+# Commands to stop and start the pump
+doPumpStart { out "!C802 1" ; in "*C802 %(\$1:LAST_ERR_CODE.VAL)u" ; }
+doPumpStop  { out "!C802 0" ; in "*C802 %(\$1:LAST_ERR_CODE.VAL)u" ; }
+

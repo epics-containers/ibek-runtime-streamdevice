@@ -1,0 +1,111 @@
+# Protocol file for Thorlabs MCLS-1 laser
+# Callum Forrester
+# 07/09/2017
+
+Terminator = CR;
+extrainput = ignore;
+
+
+# It is adviseable to explicitly connect to and disconnect from
+# the laser with every command, as the interface is not designed for
+# high speed, automated communication. This helps to increase the chances 
+# of mutual exclusion.
+
+open {
+	connect 1000;
+}
+
+close {
+	disconnect;
+}
+
+
+# System-wide commands
+
+getId {
+	open;
+	out "id?";
+	in "%?#*s"; in "%?#s";
+	close;
+}
+
+isSystemEnabled {
+	open;
+	out "system?";
+	in "%?#*s"; in "%{0|1}";
+	close;
+}
+
+setSystemEnabled {
+	open;
+	out "system=%i";
+	close;
+}
+
+# Channel commands
+
+getChannel {
+	open;
+	out "channel?";
+	in "%?#*s"; in "%i";
+	close;
+}
+
+setChannel {
+	open;
+	out "channel=%i";
+	close;
+}
+
+isChannelEnabled {
+	open;
+	out "enable?";
+	in "%?#*s"; in "%{0|1}";
+	close;
+}
+
+setChannelEnabled {
+	open;
+	out "enable=%i";
+	close;
+}
+
+getChannelPower {
+	open;
+	out "power?";
+	in "%?#*s"; in "%f";
+	close;
+}
+
+getChannelCurrent {
+	open;
+	out "current?";
+	in "%?#*s"; in "%f";
+	close;
+}
+
+setChannelCurrent {
+	open;
+	out "current=%f";
+	close;
+}
+
+getChannelTemperature {
+	open;
+	out "temp?";
+	in "%?#*s"; in "%f";
+	close;
+}
+
+getChannelTargetTemperature {
+	open;
+	out "target?";
+	in "%?#*s"; in "%f";
+	close;
+}
+
+setChannelTargetTemperature {
+	open;
+	out "target=%f";
+	close;
+}

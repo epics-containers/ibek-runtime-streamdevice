@@ -1,0 +1,90 @@
+# Protocol file for the Omega Platinum Series Controllers including:
+#   CN32Pt,CN16Pt,CN16DPt,CN8Pt,CN8DPt,CN8EPt,DP32Pt,DP16Pt,DP8Pt,DP8EP
+# Version: 1.0
+#
+# Command format:
+# <start of frame><command class><command ID><space><parameter list><terminator>
+#   start of frame = '*'
+#   command class = 'G','P','W' or 'R' (i.e. get, put, write or read);
+#   command ID = three hexadecimal digits (see manual).
+#   parameter list = usually floats or integers space seperated if more than one.
+#   terminator = '\r' carriage return;
+#
+# Default comms setup is: 19200 baud, Odd parity, 8 bit, 1 stop bit.
+# Protocols below assume echo is on. This is preferable to verify Write/Put commands are received.
+
+ReplyTimeout = 3000;
+ReadTimeout = 1000;
+Terminator = CR;
+ExtraInput = Ignore;
+
+
+# Write/Read float (echo on)
+writefloat {
+	out "*W\$1 %f";
+    in "W";
+}
+readfloat {
+	out "*R\$1";
+    in "R\$1%f"
+}
+# Write/Read float with one parameter (echo on)
+writefloat2 {
+	out "*W\$1 \$2 %f";
+    in "W";
+}
+readfloat2 {
+	out "*R\$1 \$2";
+    in "R\$1\$2%f";
+}
+
+# Write/Read integer (echo on)
+writeint {
+	out "*W\$1 %d";
+    in "W";
+}
+readint {
+	out "*R\$1";
+    in "R\$1%d";
+}
+# Write/Read integer with one parameter (echo on)
+writeint2 {
+	out "*W\$1 \$2 %d";
+    in "W"
+}
+readint2 {
+	out "*R\$1 \$2";
+    in "R\$1\$2%d";
+}
+
+# Put/Get float (echo on)
+putfloat {
+	out "*P\$1 %f";
+    in "P";
+}
+getfloat {
+	out "*G\$1";
+    in "G\$1%f";
+}
+
+# Put/Get integer (echo on)
+putint {
+	out "*P\$1 %i";
+    in "P";
+}
+getint {
+	out "*G\$1";
+    in "G\$1%i";
+}
+
+# Put/Get string (echo on)
+getstring {
+	out "*G\$1";
+    in "G\$1%s";
+}
+
+# Send a raw command string.  Useful for configuration changes required. (echo on)
+sendRawCommand {
+	out "*%s";
+	in "%#s";
+}

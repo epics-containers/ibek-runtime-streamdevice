@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: keithley6517B
+
+entity_models:
+  - name: keithley6517B
+    description: |-
+      Keithley 6517B Electrometer
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      R:
+        type: str
+        description: |-
+          Device Suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port name
+      A:
+        type: str
+        description: |-
+          Timeout
+    databases:
+      - file: keithley6517B.template
+        args:
+          .*:

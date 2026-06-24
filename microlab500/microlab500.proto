@@ -1,0 +1,144 @@
+## 
+## \file microlab500.proto
+## \brief Stream device protocol for microlab 500 syringe pump from Hamilton
+## \details Device is supplied set to 9600 baud 7 bits 1 stop odd parity
+##
+## \author Giles Knap, Andrew Wilson
+##
+
+Terminator   = CR;
+
+LockTimeout  = 1000;
+ReplyTimeout = 1000;
+ReadTimeout  = 100;
+ExtraInput   = Ignore;
+separator    = "";
+
+
+####################################################################### 
+# setup
+
+## Auto-address the device: required after connecting
+connect{
+     out "1a"; 
+     wait 100;
+}
+
+## Initialize (home) syringes and valves
+initialise{
+     out "aXR";
+     in"%*s"; # ignore echo of command
+     in"\06";
+}
+
+
+####################################################################### 
+# motion for left and right syringes
+
+## Pickup tweak
+pickup{
+    out "a\$1P%dR";
+    in"%*s";
+    in"\06";
+}
+
+## Dispense tweak
+dispense{
+    out "a\$1D%dR";
+    in"%*s";
+    in"\06";
+}
+
+## Absolute move
+move{
+    out "a\$1M%dR";
+    in"%*s";
+    in"\06";
+}
+
+## Set syringe default speed
+speed{
+    out "a\$1YSS%d";
+    in"%*s";
+    in"\06";
+}
+
+## Set return steps
+return{
+    out "a\$1YSN%d";
+    in"%*s";
+    in"\06";
+}
+
+
+####################################################################### 
+# readbacks for left and right syringes + valves
+
+## Read syringe position
+positionS{
+    out "a\$1YQE";
+    in"%*s";
+    in"\06%d";
+}
+
+## Read valve position
+positionV{
+    out "a\$1LQP";
+    in"%*s";
+    in"\06%d";
+}
+
+## Read back syringe default speed
+getSpeed{
+    out "a\$1YQS";
+    in"%*s";
+    in"\06%d";
+}
+
+#######################################################################
+## set valve positions
+
+setvalve{
+    out "a\$1%{x|I|x|W|O}R";
+    in"%*s";
+    in"\06";
+}
+
+######################################################################
+## Stop motion
+
+stop{
+    out "aK";
+    in "%*s";
+    in "\06";
+    wait 100;
+    out "aV";
+    in "%*s";
+    in "\06";
+}
+
+######################################################################
+# Readback for "instrument done request"
+# Command: <address>F
+# Response: Y	Instrument is idle and command buffer is empty
+#           N	Instrument is idle and command buffer is not empty
+#           *	Instrument is busy
+
+#done{
+#   out "aF";
+#   in "%*s";
+#   in "\06%{Y|N|*}";
+#}
+
+#######################################################################
+## \brief Readback for "instrument busy status"
+## \details Command: <address>T1
+## Response: 1 byete.
+##           bit 1 for left syringe;
+##           bit 3 for right syringe.
+##           Bit is zero when that side is busy and one when idle
+busybyte{
+  out "aT1";
+  in "%*s";
+  in "\06%1r";
+}

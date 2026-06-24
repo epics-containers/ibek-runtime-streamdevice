@@ -1,0 +1,83 @@
+################################################################
+#
+# Lakeshor 224 Temperature Monitor template file.
+#
+# Macros:
+# % macro, P, Prefix for PV name
+# % macro, PORT, Bus/Port Address (eg. ASYN Port).
+# % macro, ADDR, Address on the bus (optional)
+#
+# Notes: The loop dependant PVs are in a seperate template file, included in this one.
+#
+# Matt Pearson, June 2013
+#
+#November 2017 - Adapting Matt Pearso's LS336 code to LS224
+#
+################################################################
+
+record(bo, "$(P):DISABLE") {
+  field(DESC, "Disable set records")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Set Enabled")
+  field(ONAM, "Set Disabled")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(bo, "$(P):DISABLE_POLL") {
+  field(DESC, "Disable polling")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Poll Enabled")
+  field(ONAM, "Poll Disabled")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+################################################################
+# Read records
+################################################################
+
+##
+## Read the ID string from the device.
+##
+record(stringin, "$(P):ID") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore224.proto getID $(PORT) $(ADDR)")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+}
+
+##
+## Read the model number from the device.
+##
+record(stringin, "$(P):MODEL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore224.proto getMODEL $(PORT) $(ADDR)")
+  field(SCAN, "I/O Intr")
+}
+
+##
+## Read the serial number from the device.
+##
+record(stringin, "$(P):SERIAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore224.proto getSERIAL $(PORT) $(ADDR)")
+  field(SCAN, "I/O Intr")
+}
+
+##
+## Read the firmware from the device.
+##
+record(stringin, "$(P):FIRMWARE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore224.proto getFIRMWARE $(PORT) $(ADDR)")
+  field(SCAN, "I/O Intr")
+}

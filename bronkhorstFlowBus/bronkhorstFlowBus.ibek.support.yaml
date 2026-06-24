@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: bronkhorstFlowBus
+
+entity_models:
+  - name: coriFlow
+    description: |-
+      Controls a bronkhorst coriFlow controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      NODE:
+        type: str
+        description: |-
+          Node number, normally 80 (hex for 128, broadcast)
+        default: "80"
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: coriFlow.template
+        args:
+          .*:

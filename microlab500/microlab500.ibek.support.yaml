@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: microlab500
+
+entity_models:
+  - name: microlab500
+    description: |-
+      Controls a Hamilton Microlab 500 series syringe pump
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port for communication with device
+      LEFTSYRINGEVOL:
+        type: float
+        description: |-
+          Left syringe volume (uL)
+      RIGHTSYRINGEVOL:
+        type: float
+        description: |-
+          Right syringe volume (uL)
+      STROKESIZE:
+        type: int
+        description: |-
+          Number of steps per full syringe stroke
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: microlab500whole.template
+        args:
+          .*:

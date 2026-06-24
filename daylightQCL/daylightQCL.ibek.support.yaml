@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: daylightQCL
+
+entity_models:
+  - name: daylightQCL
+    description: |-
+      Daylight Solutions quantum cascade laser (QCL) controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+    databases:
+      - file: daylightQCL.template
+        args:
+          .*:

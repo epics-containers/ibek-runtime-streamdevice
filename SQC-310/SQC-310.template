@@ -1,0 +1,196 @@
+#########################################################################################
+# SQC-310 Quartz Crystal Microbalance
+#
+# Authors: Laura Arcidiacono, Gary Yendell
+
+# Macros:
+# % macro, name, Device name
+# % macro, P, Device Prefix
+# % macro, PORT, Asyn Port name
+
+# This associates the template with an edm screen
+# % gui, $(name), edm, SQC-310.edl, P=$(P)
+
+# Disable Polling
+record(bo, "$(P):Disable") {
+    field(DESC, "Disable polling")
+    field(PINI, "YES")
+    field(VAL,  "1")
+    field(OMSL, "supervisory")
+    field(ZNAM, "Enabled")
+    field(ONAM, "Disabled")
+}
+
+record(stringin, "$(P):DeviceName_RBV") {
+    field(DTYP, "stream")
+    field(INP,  "@SQC-310.proto get_device_name $(PORT)")
+    field(PINI, "YES")
+}
+
+# Response Status
+
+record (longin, "$(P):GetResponseStatus")
+{
+    field(DTYP, "stream")
+    field(INP,  "@SQC-310.proto get_response_status $(PORT)")
+    field(SCAN, "I/O Intr")
+    field(FLNK, "$(P):ResponseStatus_CALC")
+}
+
+record(calcout, "$(P):ResponseStatus_CALC" ) {
+    field(INPA, "$(P):GetResponseStatus")
+    field(CALC, "A")
+    field(OUT,  "$(P):ResponseStatus_RBV PP")
+}
+
+# This mbbi could use the get_response stream protocol directly, but then we can't caput 0 to reset the error
+record(mbbi,"$(P):ResponseStatus_RBV") {
+    field(DTYP, "Soft Channel")
+    field(ZRVL, "0")
+    field(ZRST, "")  # No error
+    field(ONVL, "1")
+    field(ONST, "Invalid command")
+    field(ONSV, "MAJOR")
+    field(TWVL, "2")
+    field(TWST, "Invalid value")
+    field(TWSV, "MAJOR")
+    field(THVL, "3")
+    field(THST, "Invalid mode for command")
+    field(THSV, "MAJOR")
+    field(FRVL, "4")
+    field(FRST, "Invalid CRC")
+    field(FRSV, "MAJOR")
+    field(FVVL, "5")
+    field(FVST, "Response too long")
+    field(FVSV, "MAJOR")
+    field(VAL,  "0")
+    field(PINI, "YES")
+}
+
+# Run State
+
+record(stringin, "$(P):GetRunState") {
+    field(DTYP, "stream")
+    field(SDIS, "$(P):Disable")
+    field(INP,  "@SQC-310.proto get_run_state($(P)) $(PORT)")
+    field(PINI, "YES")
+    field(SCAN, ".5 second")
+}
+
+record(stringin, "$(P):GetOutputReadings") {
+    field(DTYP, "stream")
+    field(SDIS, "$(P):Disable")
+    field(INP,  "@SQC-310.proto get_output_readings $(PORT)")
+    field(PINI, "YES")
+}
+
+record(stringin, "$(P):GetSensorReadings") {
+    field(DTYP, "stream")
+    field(SDIS, "$(P):Disable")
+    field(INP,  "@SQC-310.proto get_sensor_readings $(PORT)")
+    field(PINI, "YES")
+}
+
+# The following records are redirected to by the get_run_state protocol
+
+record(mbbi,"$(P):State_RBV") {
+    field(DTYP, "Soft Channel")
+    field(ZRVL, "0")
+    field(ZRST, "Stopped")
+    field(ONVL, "1")
+    field(ONST, "Crystal Verify")
+    field(TWVL, "2")
+    field(THST, "Initialise Layer")
+    field(THVL, "3")
+    field(THST, "Manual Start Layer")
+}
+
+record(calc, "$(P):Running_RBV") {
+    field(INPA, "$(P):State_RBV CP")
+    field(CALC, "A=0?0:1")
+}
+
+ record(longin, "$(P):RunTime_RBV") {
+    field(EGU,  "s")
+}
+
+record(longin, "$(P):ProcessNumber_RBV") {
+}
+
+record(longin, "$(P):ActiveLayer_RBV") {
+}
+
+record(bi, "$(P):ControlMode_RBV") {
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "Manual")
+    field(ONAM, "Automatic")
+}
+
+# Run Controls
+
+record(bo, "$(P):StartProcess")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@SQC-310.proto start_process $(PORT)")
+}
+
+record(bo, "$(P):ResetProcess")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@SQC-310.proto reset_process $(PORT)")
+}
+
+record(bo, "$(P):ZeroThickness")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@SQC-310.proto zero_thickness $(PORT)")
+}
+
+record(bo, "$(P):ZeroTime")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@SQC-310.proto zero_time $(PORT)")
+}
+
+# Sensors
+
+substitute "R=1"
+include "SQC-310_sensor.template"
+
+substitute "R=2"
+include "SQC-310_sensor.template"
+
+substitute "R=3"
+include "SQC-310_sensor.template"
+
+substitute "R=4"
+include "SQC-310_sensor.template"
+
+# Materials
+
+substitute "R=1"
+include "SQC-310_material.template"
+
+substitute "R=2"
+include "SQC-310_material.template"
+
+substitute "R=3"
+include "SQC-310_material.template"
+
+substitute "R=4"
+include "SQC-310_material.template"
+
+substitute "R=5"
+include "SQC-310_material.template"
+
+substitute "R=6"
+include "SQC-310_material.template"
+
+substitute "R=7"
+include "SQC-310_material.template"
+
+substitute "R=8"
+include "SQC-310_material.template"
+
+substitute "R=9"
+include "SQC-310_material.template"

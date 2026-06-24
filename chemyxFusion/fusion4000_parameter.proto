@@ -1,0 +1,253 @@
+# Communication protocol file for fusion Pump 4000
+# Omar Elamin & Mateusz Hoppe
+# 2021
+
+
+OutTerminator = CR LF;
+InTerminator = LF;
+
+ReplyTimeout = 100;
+WriteTimeout = 100;
+ReadTimeout  = 100;
+
+
+getUnits1 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getDiameter1 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getRate1 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getTime1 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getVolume1 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getDelay1 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getUnits2 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getDiameter2 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getRate2 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getTime2 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d";
+}
+
+getVolume2 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %f ";
+    in "\rdelay = %*d";
+}
+
+getDelay2 {
+    out "view parameter";
+    in "view parameter\r";
+    in " ";
+    in "\rPump 1: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %*d ";
+    in "\rPump 2: ";
+    in "\runit = %*d ";
+    in "\rdia = %*f ";
+    in "\rrate = %*f ";
+    in "\rtime = %*f ";
+    in "\rvolume = %*f ";
+    in "\rdelay = %d";
+}
+

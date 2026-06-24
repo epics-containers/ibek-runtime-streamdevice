@@ -1,0 +1,148 @@
+#######################################################################
+## \file debenOF.proto
+## \brief Stream device protocol for Deben open-frame rig
+## \details Baud: 115200, no parity, no handshaking, no crossover.
+## \author Andrew Wilson
+#######################################################################
+
+Terminator   = CR;
+
+LockTimeout  = 500;
+ReadTimeout  = 500;
+ReplyTimeout = 50;
+ReadTimeout  = 50;
+ExtraInput   = Ignore;
+separator    = "/";
+
+## \name Setup
+## \{
+
+## Full system reset
+reset{
+     out "#w/38/42"; 
+}
+
+## Power on servos
+servoOn{
+     out "#w/9/4";
+}
+
+## Power off servos
+servoOff{
+     out "#w/9/2";
+}
+
+## \}
+
+
+## \name Streamed status info
+## \details These entries are attached to I/O Intr records which process 
+## whenever they receive the right pattern
+## \{
+
+
+
+
+## Parse status
+wholeStatus{
+#	ignoreTheRest = 	"%*#s";
+#   	st = "#7/0/%(\$1:TIMESTAMP)i,%(\$1:TENSIONFORCE)f,%(\$1:TORSIONFORCE)f,%(\$1:TOP:RBV)f,%(\$1:BOT:RBV)f,%(\$1:LIN:RBV)f";
+#   in $stat0 "%(\$1:TIMESTAMP)i,%(\$1:TENSIONFORCE)f,%(\$1:TORSIONFORCE)f,%(\$1:TOP:RBV)f,%(\$1:BOT:RBV)f,%(\$1:LIN:RBV)f,%i" $ignoreTheRest;
+    
+#    in "#7/0/%(\$1:TIMESTAMP)i,%(\$1:TENSIONFORCE)f,%(\$1:TORSIONFORCE)f,%(\$1:TOP:RBV)f,%(\$1:BOT:RBV)f,%(\$1:LIN:RBV)f,%i,%*f%*#s";
+#    in "#7/0/%(\$1:TIMESTAMP)i,%(\$1:TENSIONFORCE)f,%(\$1:TORSIONFORCE)f,%(\$1:TOP:RBV)f,%(\$1:BOT:RBV)f,%(\$1:LIN:RBV)f,%i,%*f,%(\$1:REPLY)s";
+    in "#7/0/%(\$1:TIMESTAMP)i,%(\$1:TENSIONFORCE)f,%(\$1:TORSIONFORCE)f,%(\$1:TOP:RBV)f,%(\$1:BOT:RBV)f,%(\$1:LIN:RBV)f,%i,%*f,%*[x#]%(\$1:REPLY)?s";
+# $ignoreTheRest;
+}
+
+## \}
+
+## Read a register
+queryTopPos{
+	out "#r/4/0";
+}
+
+## \name Top motion control
+## \{
+
+## Issue top position demand
+moveTop{
+    out "#w/4/%.4f";
+}
+
+## Issue top speed demand
+setSpeedTop{
+    out "#w/1/%.4f";
+}
+
+## \}
+
+## \name Bottom motion control
+## \{
+
+## Issue bottom position demand
+moveBottom{
+    out "#w/5/%.4f";
+}
+## Issue bottom speed demand
+setSpeedBottom{
+    out "#w/2/%.4f";
+}
+
+## \}
+
+## \name Linear motion control
+## \{
+
+## Set linear mode to position control and issue linear position demand
+moveLinear{
+	out "#w/55/0"; # Set linear mode to "Positin Control"
+	wait 50;
+    out "#w/6/%.4f"; # Issue position demand
+}
+## Issue linear speed demand
+setSpeedLinear{
+    out "#w/3/%.4f";
+}
+
+## \}
+
+
+## Global stop command
+stop{
+    out "#w/10/4";
+}
+
+## \name Set rotation mode:
+## \details    #w/11/0    Mode 0:   The top and bottom rotation positions can be set individually and independently
+##             #w/11/1    Mode 1:   The top rotation will follow the bottom rotation at the same speed regardless of what commands are sent to the top rotation registers.  
+##                          This moves both jaws together and maintains torsion load.
+##             #w/11/2    Mode 2:   Same as mode 1 above except the control for the bottom rotation angle is from an external encoder connected to X9 on the rear panel.
+## \{
+
+## Set top/bottom rotation independent
+rotationInd {
+	out "#w/11/0"
+}
+## Set top/bottom rotation fixed
+rotationFixed {
+	out "#w/11/1"
+}
+## Zero top axis position
+setOriginTop {
+	out "#w/12/1"
+}
+
+## \}
+
+## \name Force control
+## \{
+
+## Set hold force demand and then enable force control mode to execute it
+holdForce {
+    out "#w/57/%.4f"; # Issue hold force demand first
+	wait 50;
+	out "#w/55/1"; # Then set linear mode to "Force Control"
+}
+
+## \}

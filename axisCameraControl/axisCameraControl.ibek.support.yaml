@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: axisCameraControl
+
+entity_models:
+  - name: axisCameraControl
+    description: |-
+      Control template for an Axis web camera (Pan/Tilt/Zoom control)
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn http port
+      IPADDR:
+        type: str
+        description: |-
+          IP address of the camera
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: axisCameraControl.template
+        args:
+          .*:

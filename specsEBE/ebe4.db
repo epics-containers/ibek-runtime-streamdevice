@@ -1,0 +1,1787 @@
+################################################################
+#
+# Specs EBE-4 template file.
+#
+# Macros:
+#   P - Prefix for PV name
+#   PORT - Bus/Port Address (eg. ASYN Port).
+#   SCAN - SCAN rate for read parameters.
+#
+################################################################
+
+################################################################
+# Builder Tags
+################################################################
+
+# Macros:
+# % macro, P, Device Prefix
+# % macro, PORT, Asyn Port name
+# % macro, SCAN, Poll rate
+
+# This associates the template with an edm screen
+# % gui, $(PORT), edm, ebe4.edl, P=$(P)
+# % gui, , boydetail, ebeApp_opi/ebe4.opi, P=$(P)
+
+################################################################
+# Disable Record
+################################################################
+
+# /// Disable communication - Stop errors when device is not connected
+record(bo, "$(P):DISABLE") {
+  field(DESC, "Disable communication")
+  field(PINI, "YES")
+  field(VAL, "1")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+################################################################
+# Read Only records
+################################################################
+
+# /// Device name
+record(stringin, "$(P):DEVICENAME") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@ebe4.proto getDeviceName $(PORT) 0")
+  field(PINI, "YES")
+  field(SCAN, "10 second")
+}
+
+# /// Device uptime
+record(ai, "$(P):UPTIME") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@ebe4.proto getUptime $(PORT) 0")
+  field(PINI, "YES")
+  field(SCAN, "10 second")
+}
+
+# /// Water interlock
+#% archiver 10 Monitor
+#% alh
+record(bi, "$(P):WATER") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@ebe4.proto getInt(13) $(PORT) 0")
+  field(ZNAM, "Tripped")
+  field(ONAM, "Safe")
+  field(ZSV, "MAJOR")
+  field(SCAN, "$(SCAN) second")
+}
+
+# /// IL2 interlock
+#% archiver 10 Monitor
+#% alh
+record(bi, "$(P):IL2") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@ebe4.proto getInt(14) $(PORT) 0")
+  field(ZNAM, "Tripped")
+  field(ONAM, "Safe")
+  field(ZSV, "MAJOR")
+  field(SCAN, "$(SCAN) second")
+}
+
+# /// Vacuum interlock
+#% archiver 10 Monitor
+#% alh
+record(bi, "$(P):VACUUM") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@ebe4.proto getInt(15) $(PORT) 0")
+  field(ZNAM, "Tripped")
+  field(ONAM, "Safe")
+  field(ZSV, "MAJOR")
+  field(SCAN, "$(SCAN) second")
+}
+
+# /// High voltage supply current
+#% archiver 10 Monitor
+record(ai, "$(P):IMON") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@ebe4.proto getDouble(18) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+  field(ADEL, 0.001)
+}
+
+################################################################
+# Read/Write records
+################################################################
+
+# /// Set remote mode
+record(bo, "$(P):MODE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Remote mode set")
+  field(OUT, "@ebe4.proto setRemoteMode($(P):RESPONSE) $(PORT) 0")
+  field(ZNAM, "Local")
+  field(ONAM, "Remote")
+  field(VAL, "1")
+}
+
+# /// Clear error status
+record(bo, "$(P):CLEAR_ERROR") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Clear error status")
+  field(OUT, "@ebe4.proto resetErrorFlags($(P):RESPONSE) $(PORT) 0")
+}
+
+# VOUT_SDIS exists so that we can disable setting the HV level based on multiple inputs.
+# We don't allow setting the HV level if it is not already toggled on, otherwise the device would
+# switch it on and not report it properly. We also want to override this with the comms DISABLE PV.
+#
+# Logic:
+#
+# if DISABLE = 1
+#     // Comms disabled - disable
+#     return 1
+# else
+#     if VSTATE = 1
+#         // Comms enabled and HV on - enable
+#         return 0
+#     else
+#         // Comms enabled, but HV not on, so we don't want to set level - disable
+#         return 1
+#
+# Put CP on calc INPX fields so that they monitor and update constantly
+# Put PP on VOUT:SDIS so that VOUT_SDIS is processed each time the value is read in
+
+# /// SDIS for VOUT
+record(calc, "$(P):VOUT_SDIS") {
+  field(INPA, "$(P):DISABLE CP")
+  field(INPB, "$(P):VSTATE CP")
+  field(CALC, "A=1?1:B=1?0:1")
+}
+# /// High voltage
+record(ao, "$(P):VOUT") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):VOUT_SDIS PP")
+  field(DESC, "High voltage set")
+  field(OUT, "@ebe4.proto setDouble(17,$(P):RESPONSE) $(PORT) 0")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):VMON") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@ebe4.proto getDouble(19) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "V")
+  field(ADEL, 0.001)
+}
+
+# /// Maximum voltage
+#% autosave 1 VAL
+record(ao, "$(P):VMAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "High voltage limit set")
+  field(OUT, "@ebe4.proto setDouble(21,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):VMAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "High voltage limit get")
+  field(INP, "@ebe4.proto getDouble(21) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "V")
+  field(ADEL, "1")
+}
+
+# /// Enable/Disable high voltage supply
+record(bo, "$(P):VSTATE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "High voltage enable/disable")
+  field(OUT, "@ebe4.proto setInt(23,$(P):RESPONSE) $(PORT) 0")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+#% archiver 10 Monitor
+record(bi, "$(P):VSTATE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "High voltage enable/disable")
+  field(INP, "@ebe4.proto getInt(23) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# /// Shutter position
+record(mbbo, "$(P):SHUTTER") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Shutter position")
+  field(OUT, "@ebe4.proto setInt(128,$(P):RESPONSE) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "1, 2 & 3 Open")
+  field(ONVL, "1")
+  field(ONST, "Pocket 2 Open")
+  field(TWVL, "2")
+  field(TWST, "All Closed")
+  field(THVL, "3")
+  field(THST, "1 & 4 Open")
+  field(FRVL, "4")
+  field(FRST, "1, 2 & 4 Open")
+  field(FVVL, "5")
+  field(FVST, "All Open")
+}
+#% archiver 10 Monitor
+record(mbbi, "$(P):SHUTTER_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Shutter position")
+  field(INP, "@ebe4.proto getInt(128) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "1, 2 & 3 Open")
+  field(ONVL, "1")
+  field(ONST, "Pocket 2 Open")
+  field(TWVL, "2")
+  field(TWST, "All Closed")
+  field(THVL, "3")
+  field(THST, "1 & 4 Open")
+  field(FRVL, "4")
+  field(FRST, "1, 2 & 4 Open")
+  field(FVVL, "5")
+  field(FVST, "All Open")
+}
+
+#################################################################
+# Generic protocol PV, to send any command
+#################################################################
+
+# /// Generic commands
+# Do a caput on this, and do a subsequent caget to get the response. Max 39 chars.
+record(stringin, "$(P):RESPONSE") {
+  field(DESC, "Holds command response.")
+}
+
+# /// Generic command. This holds the command and stores it
+record(stringout, "$(P):COMMAND") {
+  field(DTYP, "stream")
+  field(DESC, "Holds command string.")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@ebe4.proto gen($(P):RESPONSE) $(PORT) 0")
+}
+################################################################
+#
+# Specs EBE-4 pocket template file.
+#
+# Macros:
+#   P - Prefix for PV name
+#   PORT - Bus/Port Address (eg. ASYN Port).
+#   SCAN - SCAN rate for read parameters.
+#
+################################################################
+
+################################################################
+# Builder Tags
+################################################################
+
+# Macros:
+# % macro, P, Device Prefix
+# % macro, PORT, Asyn Port name
+# % macro, SCAN, Poll rate
+
+################################################################
+# Read Only records
+################################################################
+
+# /// Emission Regulation Status
+#% archiver 10 Monitor
+record(mbbi, "$(P):1:EMISSION_REG_STA") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Emission regulation status")
+  field(INP, "@ebe4.proto getInt(38) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Not in Use")
+  field(ONVL, "1")
+  field(ONST, "In Progress")
+  field(TWVL, "2")
+  field(TWST, "Regulating")
+}
+
+# /// Flux Regulation Status
+#% archiver 10 Monitor
+record(mbbi, "$(P):1:FLUX_REG_STA") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Flux regulation status")
+  field(INP, "@ebe4.proto getInt(46) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Not in Use")
+  field(ONVL, "1")
+  field(ONST, "In Progress")
+  field(TWVL, "2")
+  field(TWST, "Regulating")
+}
+
+################################################################
+# Read/Write records
+################################################################
+
+# /// Pocket Label
+#% autosave 1 VAL
+record(stringout, "$(P):1:LABEL") {
+  field(DESC, "User label for pocket")
+}
+
+# /// Regulation Type
+record(mbbo, "$(P):1:FILAMENT_REG_TYPE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Regulation type set")
+  field(OUT, "@ebe4.proto setInt(34,$(P):RESPONSE) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "Current")
+  field(ONVL, "1")
+  field(ONST, "Emission")
+  field(TWVL, "2")
+  field(TWST, "Flux")
+}
+#% archiver 10 Monitor
+record(mbbi, "$(P):1:FILAMENT_REG_TYPE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Regulation type get")
+  field(INP, "@ebe4.proto getInt(34) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Current")
+  field(ONVL, "1")
+  field(ONST, "Emission")
+  field(TWVL, "2")
+  field(TWST, "Flux")
+}
+
+# Current Parameters ##########################################
+
+# /// Filament Current
+record(ao, "$(P):1:CURRENT") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament current set")
+  field(OUT, "@ebe4.proto setDouble(24,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+#% archiver 10 Monitor
+record(ai, "$(P):1:CURRENT_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament current get")
+  field(INP, "@ebe4.proto getDouble(26) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+  field(ADEL, 0.001)
+}
+
+# /// Filament Max
+#% autosave 1 VAL
+record(ao, "$(P):1:CURRENT_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament max current set")
+  field(OUT, "@ebe4.proto setDouble(31,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:CURRENT_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament max current get")
+  field(INP, "@ebe4.proto getDouble(31) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+}
+
+# /// Filament Standby Current
+#% autosave 1 VAL
+record(ao, "$(P):1:CURRENT_STANDBY") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament standby current set")
+  field(OUT, "@ebe4.proto setDouble(35,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:CURRENT_STANDBY_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament standby current get")
+  field(INP, "@ebe4.proto getDouble(35) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+}
+
+# Emission Parameters ##########################################
+
+# /// Filament Emission
+record(ao, "$(P):1:EMISSION") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission set")
+  field(OUT, "@ebe4.proto setDouble(30,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):1:EMISSION_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission get")
+  field(INP, "@ebe4.proto getDouble(25) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "mA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+  field(ADEL, 0.001)
+}
+
+# /// Emission Max
+#% autosave 1 VAL
+record(ao, "$(P):1:EMISSION_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max set")
+  field(OUT, "@ebe4.proto setDouble(36,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+record(ai, "$(P):1:EMISSION_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max get")
+  field(INP, "@ebe4.proto getDouble(36) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "mA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+
+# /// Emission Power Max
+#% autosave 1 VAL
+record(ao, "$(P):1:EMISSION_PMAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max power set")
+  field(OUT, "@ebe4.proto setDouble(32,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:EMISSION_PMAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max power get")
+  field(INP, "@ebe4.proto getDouble(32) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "W")
+}
+
+# /// Emission PVal
+#% autosave 1 VAL
+record(ao, "$(P):1:EMISSION_PVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission PVal set")
+  field(OUT, "@ebe4.proto setDouble(39,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:EMISSION_PVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission PVal get")
+  field(INP, "@ebe4.proto getDouble(39) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Emission IVal
+#% autosave 1 VAL
+record(ao, "$(P):1:EMISSION_IVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission IVal set")
+  field(OUT, "@ebe4.proto setDouble(40,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:EMISSION_IVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission IVal get")
+  field(INP, "@ebe4.proto getDouble(40) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Emission Time Base
+#% autosave 1 VAL
+record(ao, "$(P):1:EMISSION_TIME_BASE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission time base set")
+  field(OUT, "@ebe4.proto setDouble(41,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:EMISSION_TIME_BASE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission time base get")
+  field(INP, "@ebe4.proto getDouble(41) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# Flux Parameters ##############################################
+
+# /// Filament Flux
+record(ao, "$(P):1:FLUX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux set")
+  field(OUT, "@ebe4.proto setDouble(44,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):1:FLUX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux get")
+  field(INP, "@ebe4.proto getDouble(43) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "nA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+  field(ADEL, 0.01)
+}
+
+# /// Flux Max
+#% autosave 1 VAL
+record(ao, "$(P):1:FLUX_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux max set")
+  field(OUT, "@ebe4.proto setDouble(45,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+record(ai, "$(P):1:FLUX_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux max get")
+  field(INP, "@ebe4.proto getDouble(45) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "nA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+
+# /// Flux PVal
+#% autosave 1 VAL
+record(ao, "$(P):1:FLUX_PVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux PVal set")
+  field(OUT, "@ebe4.proto setDouble(47,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:FLUX_PVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux PVal get")
+  field(INP, "@ebe4.proto getDouble(47) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Flux IVal
+#% autosave 1 VAL
+record(ao, "$(P):1:FLUX_IVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux IVal set")
+  field(OUT, "@ebe4.proto setDouble(48,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:FLUX_IVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux IVal get")
+  field(INP, "@ebe4.proto getDouble(48) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Flux Time Base
+#% autosave 1 VAL
+record(ao, "$(P):1:FLUX_TIME_BASE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux time base set")
+  field(OUT, "@ebe4.proto setDouble(49,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):1:FLUX_TIME_BASE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux time base get")
+  field(INP, "@ebe4.proto getDouble(49) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+################################################################
+#
+# Specs EBE-4 pocket template file.
+#
+# Macros:
+#   P - Prefix for PV name
+#   PORT - Bus/Port Address (eg. ASYN Port).
+#   SCAN - SCAN rate for read parameters.
+#
+################################################################
+
+################################################################
+# Builder Tags
+################################################################
+
+# Macros:
+# % macro, P, Device Prefix
+# % macro, PORT, Asyn Port name
+# % macro, SCAN, Poll rate
+
+################################################################
+# Read Only records
+################################################################
+
+# /// Emission Regulation Status
+#% archiver 10 Monitor
+record(mbbi, "$(P):2:EMISSION_REG_STA") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Emission regulation status")
+  field(INP, "@ebe4.proto getInt(64) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Not in Use")
+  field(ONVL, "1")
+  field(ONST, "In Progress")
+  field(TWVL, "2")
+  field(TWST, "Regulating")
+}
+
+# /// Flux Regulation Status
+#% archiver 10 Monitor
+record(mbbi, "$(P):2:FLUX_REG_STA") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Flux regulation status")
+  field(INP, "@ebe4.proto getInt(72) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Not in Use")
+  field(ONVL, "1")
+  field(ONST, "In Progress")
+  field(TWVL, "2")
+  field(TWST, "Regulating")
+}
+
+################################################################
+# Read/Write records
+################################################################
+
+# /// Pocket Label
+#% autosave 1 VAL
+record(stringout, "$(P):2:LABEL") {
+  field(DESC, "User label for pocket")
+}
+
+# /// Regulation Type
+record(mbbo, "$(P):2:FILAMENT_REG_TYPE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Regulation type set")
+  field(OUT, "@ebe4.proto setInt(60,$(P):RESPONSE) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "Current")
+  field(ONVL, "1")
+  field(ONST, "Emission")
+  field(TWVL, "2")
+  field(TWST, "Flux")
+}
+#% archiver 10 Monitor
+record(mbbi, "$(P):2:FILAMENT_REG_TYPE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Regulation type get")
+  field(INP, "@ebe4.proto getInt(60) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Current")
+  field(ONVL, "1")
+  field(ONST, "Emission")
+  field(TWVL, "2")
+  field(TWST, "Flux")
+}
+
+# Current Parameters ##########################################
+
+# /// Filament Current
+record(ao, "$(P):2:CURRENT") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament current set")
+  field(OUT, "@ebe4.proto setDouble(50,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+#% archiver 10 Monitor
+record(ai, "$(P):2:CURRENT_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament current get")
+  field(INP, "@ebe4.proto getDouble(52) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+  field(ADEL, 0.001)
+}
+
+# /// Filament Max
+#% autosave 1 VAL
+record(ao, "$(P):2:CURRENT_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament max current set")
+  field(OUT, "@ebe4.proto setDouble(57,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:CURRENT_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament max current get")
+  field(INP, "@ebe4.proto getDouble(57) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+}
+
+# /// Filament Standby Current
+#% autosave 1 VAL
+record(ao, "$(P):2:CURRENT_STANDBY") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament standby current set")
+  field(OUT, "@ebe4.proto setDouble(61,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:CURRENT_STANDBY_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament standby current get")
+  field(INP, "@ebe4.proto getDouble(61) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+}
+
+# Emission Parameters ##########################################
+
+# /// Filament Emission
+record(ao, "$(P):2:EMISSION") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission set")
+  field(OUT, "@ebe4.proto setDouble(56,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):2:EMISSION_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission get")
+  field(INP, "@ebe4.proto getDouble(51) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "mA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+  field(ADEL, 0.001)
+}
+
+# /// Emission Max
+#% autosave 1 VAL
+record(ao, "$(P):2:EMISSION_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max set")
+  field(OUT, "@ebe4.proto setDouble(62,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+record(ai, "$(P):2:EMISSION_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max get")
+  field(INP, "@ebe4.proto getDouble(62) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "mA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+
+# /// Emission Power Max
+#% autosave 1 VAL
+record(ao, "$(P):2:EMISSION_PMAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max power set")
+  field(OUT, "@ebe4.proto setDouble(58,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:EMISSION_PMAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max power get")
+  field(INP, "@ebe4.proto getDouble(58) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "W")
+}
+
+# /// Emission PVal
+#% autosave 1 VAL
+record(ao, "$(P):2:EMISSION_PVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission PVal set")
+  field(OUT, "@ebe4.proto setDouble(65,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:EMISSION_PVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission PVal get")
+  field(INP, "@ebe4.proto getDouble(65) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Emission IVal
+#% autosave 1 VAL
+record(ao, "$(P):2:EMISSION_IVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission IVal set")
+  field(OUT, "@ebe4.proto setDouble(66,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:EMISSION_IVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission IVal get")
+  field(INP, "@ebe4.proto getDouble(66) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Emission Time Base
+#% autosave 1 VAL
+record(ao, "$(P):2:EMISSION_TIME_BASE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission time base set")
+  field(OUT, "@ebe4.proto setDouble(67,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:EMISSION_TIME_BASE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission time base get")
+  field(INP, "@ebe4.proto getDouble(67) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# Flux Parameters ##############################################
+
+# /// Filament Flux
+record(ao, "$(P):2:FLUX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux set")
+  field(OUT, "@ebe4.proto setDouble(70,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):2:FLUX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux get")
+  field(INP, "@ebe4.proto getDouble(69) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "nA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+  field(ADEL, 0.01)
+}
+
+# /// Flux Max
+#% autosave 1 VAL
+record(ao, "$(P):2:FLUX_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux max set")
+  field(OUT, "@ebe4.proto setDouble(71,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+record(ai, "$(P):2:FLUX_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux max get")
+  field(INP, "@ebe4.proto getDouble(71) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "nA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+
+# /// Flux PVal
+#% autosave 1 VAL
+record(ao, "$(P):2:FLUX_PVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux PVal set")
+  field(OUT, "@ebe4.proto setDouble(73,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:FLUX_PVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux PVal get")
+  field(INP, "@ebe4.proto getDouble(73) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Flux IVal
+#% autosave 1 VAL
+record(ao, "$(P):2:FLUX_IVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux IVal set")
+  field(OUT, "@ebe4.proto setDouble(74,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:FLUX_IVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux IVal get")
+  field(INP, "@ebe4.proto getDouble(74) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Flux Time Base
+#% autosave 1 VAL
+record(ao, "$(P):2:FLUX_TIME_BASE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux time base set")
+  field(OUT, "@ebe4.proto setDouble(75,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):2:FLUX_TIME_BASE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux time base get")
+  field(INP, "@ebe4.proto getDouble(75) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+################################################################
+#
+# Specs EBE-4 pocket template file.
+#
+# Macros:
+#   P - Prefix for PV name
+#   PORT - Bus/Port Address (eg. ASYN Port).
+#   SCAN - SCAN rate for read parameters.
+#
+################################################################
+
+################################################################
+# Builder Tags
+################################################################
+
+# Macros:
+# % macro, P, Device Prefix
+# % macro, PORT, Asyn Port name
+# % macro, SCAN, Poll rate
+
+################################################################
+# Read Only records
+################################################################
+
+# /// Emission Regulation Status
+#% archiver 10 Monitor
+record(mbbi, "$(P):3:EMISSION_REG_STA") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Emission regulation status")
+  field(INP, "@ebe4.proto getInt(90) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Not in Use")
+  field(ONVL, "1")
+  field(ONST, "In Progress")
+  field(TWVL, "2")
+  field(TWST, "Regulating")
+}
+
+# /// Flux Regulation Status
+#% archiver 10 Monitor
+record(mbbi, "$(P):3:FLUX_REG_STA") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Flux regulation status")
+  field(INP, "@ebe4.proto getInt(98) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Not in Use")
+  field(ONVL, "1")
+  field(ONST, "In Progress")
+  field(TWVL, "2")
+  field(TWST, "Regulating")
+}
+
+################################################################
+# Read/Write records
+################################################################
+
+# /// Pocket Label
+#% autosave 1 VAL
+record(stringout, "$(P):3:LABEL") {
+  field(DESC, "User label for pocket")
+}
+
+# /// Regulation Type
+record(mbbo, "$(P):3:FILAMENT_REG_TYPE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Regulation type set")
+  field(OUT, "@ebe4.proto setInt(86,$(P):RESPONSE) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "Current")
+  field(ONVL, "1")
+  field(ONST, "Emission")
+  field(TWVL, "2")
+  field(TWST, "Flux")
+}
+#% archiver 10 Monitor
+record(mbbi, "$(P):3:FILAMENT_REG_TYPE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Regulation type get")
+  field(INP, "@ebe4.proto getInt(86) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Current")
+  field(ONVL, "1")
+  field(ONST, "Emission")
+  field(TWVL, "2")
+  field(TWST, "Flux")
+}
+
+# Current Parameters ##########################################
+
+# /// Filament Current
+record(ao, "$(P):3:CURRENT") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament current set")
+  field(OUT, "@ebe4.proto setDouble(76,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+#% archiver 10 Monitor
+record(ai, "$(P):3:CURRENT_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament current get")
+  field(INP, "@ebe4.proto getDouble(78) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+  field(ADEL, 0.001)
+}
+
+# /// Filament Max
+#% autosave 1 VAL
+record(ao, "$(P):3:CURRENT_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament max current set")
+  field(OUT, "@ebe4.proto setDouble(83,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:CURRENT_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament max current get")
+  field(INP, "@ebe4.proto getDouble(83) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+}
+
+# /// Filament Standby Current
+#% autosave 1 VAL
+record(ao, "$(P):3:CURRENT_STANDBY") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament standby current set")
+  field(OUT, "@ebe4.proto setDouble(87,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:CURRENT_STANDBY_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament standby current get")
+  field(INP, "@ebe4.proto getDouble(87) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+}
+
+# Emission Parameters ##########################################
+
+# /// Filament Emission
+record(ao, "$(P):3:EMISSION") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission set")
+  field(OUT, "@ebe4.proto setDouble(82,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):3:EMISSION_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission get")
+  field(INP, "@ebe4.proto getDouble(77) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "mA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+  field(ADEL, 0.001)
+}
+
+# /// Emission Max
+#% autosave 1 VAL
+record(ao, "$(P):3:EMISSION_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max set")
+  field(OUT, "@ebe4.proto setDouble(88,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+record(ai, "$(P):3:EMISSION_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max get")
+  field(INP, "@ebe4.proto getDouble(88) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "mA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+
+# /// Emission Power Max
+#% autosave 1 VAL
+record(ao, "$(P):3:EMISSION_PMAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max power set")
+  field(OUT, "@ebe4.proto setDouble(84,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:EMISSION_PMAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max power get")
+  field(INP, "@ebe4.proto getDouble(84) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "W")
+}
+
+# /// Emission PVal
+#% autosave 1 VAL
+record(ao, "$(P):3:EMISSION_PVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission PVal set")
+  field(OUT, "@ebe4.proto setDouble(91,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:EMISSION_PVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission PVal get")
+  field(INP, "@ebe4.proto getDouble(91) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Emission IVal
+#% autosave 1 VAL
+record(ao, "$(P):3:EMISSION_IVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission IVal set")
+  field(OUT, "@ebe4.proto setDouble(92,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:EMISSION_IVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission IVal get")
+  field(INP, "@ebe4.proto getDouble(92) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Emission Time Base
+#% autosave 1 VAL
+record(ao, "$(P):3:EMISSION_TIME_BASE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission time base set")
+  field(OUT, "@ebe4.proto setDouble(93,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:EMISSION_TIME_BASE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission time base get")
+  field(INP, "@ebe4.proto getDouble(93) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# Flux Parameters ##############################################
+
+# /// Filament Flux
+record(ao, "$(P):3:FLUX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux set")
+  field(OUT, "@ebe4.proto setDouble(96,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):3:FLUX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux get")
+  field(INP, "@ebe4.proto getDouble(95) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "nA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+  field(ADEL, 0.01)
+}
+
+# /// Flux Max
+#% autosave 1 VAL
+record(ao, "$(P):3:FLUX_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux max set")
+  field(OUT, "@ebe4.proto setDouble(97,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+record(ai, "$(P):3:FLUX_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux max get")
+  field(INP, "@ebe4.proto getDouble(97) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "nA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+
+# /// Flux PVal
+#% autosave 1 VAL
+record(ao, "$(P):3:FLUX_PVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux PVal set")
+  field(OUT, "@ebe4.proto setDouble(99,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:FLUX_PVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux PVal get")
+  field(INP, "@ebe4.proto getDouble(99) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Flux IVal
+#% autosave 1 VAL
+record(ao, "$(P):3:FLUX_IVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux IVal set")
+  field(OUT, "@ebe4.proto setDouble(100,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:FLUX_IVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux IVal get")
+  field(INP, "@ebe4.proto getDouble(100) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Flux Time Base
+#% autosave 1 VAL
+record(ao, "$(P):3:FLUX_TIME_BASE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux time base set")
+  field(OUT, "@ebe4.proto setDouble(101,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):3:FLUX_TIME_BASE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux time base get")
+  field(INP, "@ebe4.proto getDouble(101) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+################################################################
+#
+# Specs EBE-4 pocket template file.
+#
+# Macros:
+#   P - Prefix for PV name
+#   PORT - Bus/Port Address (eg. ASYN Port).
+#   SCAN - SCAN rate for read parameters.
+#
+################################################################
+
+################################################################
+# Builder Tags
+################################################################
+
+# Macros:
+# % macro, P, Device Prefix
+# % macro, PORT, Asyn Port name
+# % macro, SCAN, Poll rate
+
+################################################################
+# Read Only records
+################################################################
+
+# /// Emission Regulation Status
+#% archiver 10 Monitor
+record(mbbi, "$(P):4:EMISSION_REG_STA") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Emission regulation status")
+  field(INP, "@ebe4.proto getInt(116) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Not in Use")
+  field(ONVL, "1")
+  field(ONST, "In Progress")
+  field(TWVL, "2")
+  field(TWST, "Regulating")
+}
+
+# /// Flux Regulation Status
+#% archiver 10 Monitor
+record(mbbi, "$(P):4:FLUX_REG_STA") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Flux regulation status")
+  field(INP, "@ebe4.proto getInt(124) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Not in Use")
+  field(ONVL, "1")
+  field(ONST, "In Progress")
+  field(TWVL, "2")
+  field(TWST, "Regulating")
+}
+
+################################################################
+# Read/Write records
+################################################################
+
+# /// Pocket Label
+#% autosave 1 VAL
+record(stringout, "$(P):4:LABEL") {
+  field(DESC, "User label for pocket")
+}
+
+# /// Regulation Type
+record(mbbo, "$(P):4:FILAMENT_REG_TYPE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Regulation type set")
+  field(OUT, "@ebe4.proto setInt(112,$(P):RESPONSE) $(PORT) 0")
+  field(ZRVL, "0")
+  field(ZRST, "Current")
+  field(ONVL, "1")
+  field(ONST, "Emission")
+  field(TWVL, "2")
+  field(TWST, "Flux")
+}
+#% archiver 10 Monitor
+record(mbbi, "$(P):4:FILAMENT_REG_TYPE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Regulation type get")
+  field(INP, "@ebe4.proto getInt(112) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(ZRVL, "0")
+  field(ZRST, "Current")
+  field(ONVL, "1")
+  field(ONST, "Emission")
+  field(TWVL, "2")
+  field(TWST, "Flux")
+}
+
+# Current Parameters ##########################################
+
+# /// Filament Current
+record(ao, "$(P):4:CURRENT") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament current set")
+  field(OUT, "@ebe4.proto setDouble(102,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+#% archiver 10 Monitor
+record(ai, "$(P):4:CURRENT_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament current get")
+  field(INP, "@ebe4.proto getDouble(104) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+  field(ADEL, 0.001)
+}
+
+# /// Filament Max
+#% autosave 1 VAL
+record(ao, "$(P):4:CURRENT_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament max current set")
+  field(OUT, "@ebe4.proto setDouble(109,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:CURRENT_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament max current get")
+  field(INP, "@ebe4.proto getDouble(109) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+}
+
+# /// Filament Standby Current
+#% autosave 1 VAL
+record(ao, "$(P):4:CURRENT_STANDBY") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament standby current set")
+  field(OUT, "@ebe4.proto setDouble(113,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:CURRENT_STANDBY_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament standby current get")
+  field(INP, "@ebe4.proto getDouble(113) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "A")
+}
+
+# Emission Parameters ##########################################
+
+# /// Filament Emission
+record(ao, "$(P):4:EMISSION") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission set")
+  field(OUT, "@ebe4.proto setDouble(108,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):4:EMISSION_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission get")
+  field(INP, "@ebe4.proto getDouble(103) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "mA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+  field(ADEL, 0.001)
+}
+
+# /// Emission Max
+#% autosave 1 VAL
+record(ao, "$(P):4:EMISSION_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max set")
+  field(OUT, "@ebe4.proto setDouble(114,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+record(ai, "$(P):4:EMISSION_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max get")
+  field(INP, "@ebe4.proto getDouble(114) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "mA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000")
+}
+
+# /// Emission Power Max
+#% autosave 1 VAL
+record(ao, "$(P):4:EMISSION_PMAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max power set")
+  field(OUT, "@ebe4.proto setDouble(110,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:EMISSION_PMAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission max power get")
+  field(INP, "@ebe4.proto getDouble(110) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "W")
+}
+
+# /// Emission PVal
+#% autosave 1 VAL
+record(ao, "$(P):4:EMISSION_PVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission PVal set")
+  field(OUT, "@ebe4.proto setDouble(117,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:EMISSION_PVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission PVal get")
+  field(INP, "@ebe4.proto getDouble(117) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Emission IVal
+#% autosave 1 VAL
+record(ao, "$(P):4:EMISSION_IVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission IVal set")
+  field(OUT, "@ebe4.proto setDouble(118,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:EMISSION_IVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission IVal get")
+  field(INP, "@ebe4.proto getDouble(118) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Emission Time Base
+#% autosave 1 VAL
+record(ao, "$(P):4:EMISSION_TIME_BASE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission time base set")
+  field(OUT, "@ebe4.proto setDouble(119,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:EMISSION_TIME_BASE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament emission time base get")
+  field(INP, "@ebe4.proto getDouble(119) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# Flux Parameters ##############################################
+
+# /// Filament Flux
+record(ao, "$(P):4:FLUX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux set")
+  field(OUT, "@ebe4.proto setDouble(122,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+#% archiver 10 Monitor
+record(ai, "$(P):4:FLUX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux get")
+  field(INP, "@ebe4.proto getDouble(121) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "nA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+  field(ADEL, 0.01)
+}
+
+# /// Flux Max
+#% autosave 1 VAL
+record(ao, "$(P):4:FLUX_MAX") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux max set")
+  field(OUT, "@ebe4.proto setDouble(123,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+record(ai, "$(P):4:FLUX_MAX_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux max get")
+  field(INP, "@ebe4.proto getDouble(123) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+  field(EGU, "nA")
+  field(LINR, "LINEAR")
+  field(ASLO, "1000000000")
+}
+
+# /// Flux PVal
+#% autosave 1 VAL
+record(ao, "$(P):4:FLUX_PVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux PVal set")
+  field(OUT, "@ebe4.proto setDouble(125,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:FLUX_PVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux PVal get")
+  field(INP, "@ebe4.proto getDouble(125) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Flux IVal
+#% autosave 1 VAL
+record(ao, "$(P):4:FLUX_IVAL") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux IVal set")
+  field(OUT, "@ebe4.proto setDouble(126,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:FLUX_IVAL_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux IVal get")
+  field(INP, "@ebe4.proto getDouble(126) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}
+
+# /// Flux Time Base
+#% autosave 1 VAL
+record(ao, "$(P):4:FLUX_TIME_BASE") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux time base set")
+  field(OUT, "@ebe4.proto setDouble(127,$(P):RESPONSE) $(PORT) 0")
+  field(PREC, 2)
+}
+record(ai, "$(P):4:FLUX_TIME_BASE_RBV") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Filament flux time base get")
+  field(INP, "@ebe4.proto getDouble(127) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, 2)
+}

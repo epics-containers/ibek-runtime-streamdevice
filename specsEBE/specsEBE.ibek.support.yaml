@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: specsEBE
+
+entity_models:
+  - name: EBE4
+    description: |-
+      Specs EBE-4 template file.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port name
+      SCAN:
+        type: int
+        description: |-
+          Poll rate
+    databases:
+      - file: ebe4.db
+        args:
+          .*:

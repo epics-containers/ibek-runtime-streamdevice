@@ -1,0 +1,152 @@
+################################################################
+#
+# Lakeshore 218 Temperature Monitor template file.
+#
+# Macros:
+# % macro, P, prefix for PV name
+# % macro, PORT, Bus/Port Address (eg. ASYN Port).
+# % macro, ADDR,  Address on the bus (optional)
+# % macro, TEMPSCAN, SCAN rate for the temperature/voltage readings
+# % macro, SCAN, SCAN rate for non-temperature/voltage parameters.
+# % macro, name, name for the gui element
+# % macro, lakeshore218Path, path for the documentation, e.g. /dls_sw/prod/R3.14.12.3/support/lakeshore218/2-2-1
+# % macro, Description, main use of this device (defaults to Temperature Controller)
+# % macro, CH1_label, what is channel 1 measuring? Defaults to Channel 1
+# % macro, CH2_label, what is channel 2 measuring? Defaults to Channel 2
+# % macro, CH3_label, what is channel 3 measuring? Defaults to Channel 3
+# % macro, CH4_label, what is channel 4 measuring? Defaults to Channel 4
+# % macro, CH5_label, what is channel 5 measuring? Defaults to Channel 5
+# % macro, CH6_label, what is channel 6 measuring? Defaults to Channel 6
+# % macro, CH7_label, what is channel 7 measuring? Defaults to Channel 7
+# % macro, CH8_label, what is channel 8 measuring? Defaults to Channel 8
+# % gui, $(name=LAKESHORE218), edm, lakeshore218.edl, lakeshore=$(P),lakeshore218Path=$(lakeshore218Path)
+#
+# Notes: The temperatures in Kelvin are archived once every 10 secs.
+#        The channel-dependent PVs are in lakeshore218channel.template
+#        included eight times (once per channel) in this template
+################################################################
+
+#
+# % autosave 1 VAL
+#
+record(bo, "$(P):DISABLE") {
+  field(DESC, "Disable comms")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+################################################################
+# Read records
+################################################################
+
+## 
+## Read the ID string from the device.
+##
+record(stringin, "$(P):ID") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore218.proto getID $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+}
+
+# reads all channels simultaneously
+record(ai, "$(P):SRDG0") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "All channel sensors")
+  field(INP, "@lakeshore218.proto getAllSRDG(0,$(P)) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "K")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"-1")
+  field(LOLO,"-1")
+  field(FLNK, "$(P):SRDG1")
+}
+
+record(ai, "$(P):SRDG1") {
+  field(INP, "$(P):SRDG0")
+}
+
+record(ai, "$(P):KRDG0") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "All channel temperature")
+  field(INP, "@lakeshore218.proto getAllKRDG(0,$(P)) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "K")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"-1")
+  field(LOLO,"-1")
+  field(FLNK, "$(P):KRDG1")
+}
+
+record(ai, "$(P):KRDG1") {
+  field(INP, "$(P):KRDG0")
+}
+
+record(stringout, "$(P):DESCRIPTION") {
+    field(DESC, "main purpose of this device")
+    field(VAL,  "$(Description=Temperature Controller)")
+    field(PINI, "YES")
+}
+
+
+################################################################
+# Now include the loop dependant records, for PID loops 1 and 2.
+################################################################
+
+substitute "CHANNEL=1"
+substitute "LABEL=$(CH1_label=Channel 1)"
+include "lakeshore218channel.template"
+substitute "CHANNEL=2"
+substitute "LABEL=$(CH2_label=Channel 2)"
+include "lakeshore218channel.template"
+substitute "CHANNEL=3"
+substitute "LABEL=$(CH3_label=Channel 3)"
+include "lakeshore218channel.template"
+substitute "CHANNEL=4"
+substitute "LABEL=$(CH4_label=Channel 4)"
+include "lakeshore218channel.template"
+substitute "CHANNEL=5"
+substitute "LABEL=$(CH5_label=Channel 5)"
+include "lakeshore218channel.template"
+substitute "CHANNEL=6"
+substitute "LABEL=$(CH6_label=Channel 6)"
+include "lakeshore218channel.template"
+substitute "CHANNEL=7"
+substitute "LABEL=$(CH7_label=Channel 7)"
+include "lakeshore218channel.template"
+substitute "CHANNEL=8"
+substitute "LABEL=$(CH8_label=Channel 8)"
+include "lakeshore218channel.template"
+
+
+##
+## Generic Asyn record for reading parameters.
+##
+record(asyn,"$(P):ASYN")
+{
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"$(ADDR)")
+    field(OMAX,"1024")
+    field(IMAX,"1024")
+}
+

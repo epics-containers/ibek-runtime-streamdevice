@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: specsXRC1000
+
+entity_models:
+  - name: specsXRC1000
+    description: |-
+      SPECS XRC1000 X-ray source controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          terminal server asyn serial port number
+    databases:
+      - file: specsXRC1000.template
+        args:
+          .*:
