@@ -1,0 +1,16 @@
+#==========================================================
+# CSS screens
+#==========================================================
+
+#==============================================================================
+# Macros
+#==============================================================================
+# % macro, name, Object name
+# % macro, P,    Device PV prefix
+# % macro, R,    Device PV suffix
+# % macro, DESC, Description
+#==============================================================================
+
+# % gui, $(name=), boydetail, ChillaxApp_opi/chillax.opi, P=$(P),R=$(R),DESC=$(DESC)
+# % gui, $(name=), boyembed, ChillaxApp_opi/chillax_embed_box.opi, P=$(P),R=$(R),DESC=$(DESC)
+# % gui, $(name=), boyembed, ChillaxApp_opi/chillax_embed.opi, P=$(P),R=$(R),DESC=$(DESC)

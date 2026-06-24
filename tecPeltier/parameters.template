@@ -1,0 +1,13 @@
+# Start of support/tecPeltier/tecPeltier/Db/parameters.template
+# Original Author: Lee Hudson 2018
+
+# Stores a string representation of the paramter ID in hex
+
+# P, Device P
+# PARAM, Name for the paramter
+# PARAM_ID, ID of the paramter in hex, eg 03E8 for object temperature
+
+record(stringin, "$(P):$(PARAM)_ID") {
+  field(VAL, "$(PARAM_ID)")
+}
+# End of support/tecPeltier/tecPeltier/Db/parameters.template

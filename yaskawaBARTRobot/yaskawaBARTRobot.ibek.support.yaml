@@ -1,0 +1,343 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: yaskawaBARTRobot 0-1
+# Source: /dls_sw/prod/R3.14.12.7/support/yaskawaBARTRobot/0-1
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/yaskawaBARTRobot/ release.
+
+module: yaskawaBARTRobot
+
+entity_models:
+  - name: yaskawaPosition
+    description: |-
+      Define yaskawa robot controller Position variables that can be set and read in EPICS
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      VAR:
+        type: str
+        description: |-
+          P Variable to read/write
+      SCAN:
+        type: str
+        description: |-
+          Scan rate or readback
+    databases:
+      - file: yaskawaPosition.template
+        args:
+          .*:
+
+  - name: yaskawaLong
+    description: |-
+      Define yaskawa robot controller Long (int32) variables that can be set and read in EPICS.
+      Yaskawa refers to these as a "double precision variables"
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      VAR:
+        type: str
+        description: |-
+          Long integer (int32) to read/write. D Variable (e.g. D001) as Yaskawa refers to these as double precision variables.
+      DISWRITE:
+        type: str
+        description: |-
+          When the given PV is equal to DISV this variable cannot be written to. Default can't just be set to the prefix otherwise record will not be processed. STA2=64 is used as this prevents this variable being changed when the robot servo is on.
+        default: STA2
+      DISV:
+        type: str
+        description: |-
+          Value that DISWRITE is compared to
+        default: "64"
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      DRVL:
+        type: float
+        description: |-
+          Low limit
+      DRVH:
+        type: float
+        description: |-
+          High limit
+      DESC:
+        type: str
+        description: |-
+          Variable's description
+        default: ""
+    databases:
+      - file: yaskawaLong.template
+        args:
+          .*:
+
+  - name: yaskawaLongNoSync
+    description: |-
+      Define yaskawa robot controller Long (int32) variables that can be set and read in EPICS
+      without syncing the target value with the RBV.
+      Yaskawa refers to these as a "double precision variables"
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      VAR:
+        type: str
+        description: |-
+          Long integer (int32) to read/write but without sync of target value to RBV. D Variable (e.g. D001) as Yaskawa refers to these as double precision variables.
+      DISWRITE:
+        type: str
+        description: |-
+          When the given PV is equal to DISV this variable cannot be written to. Default can't just be set to the prefix otherwise record will not be processed. STA2=64 is used as this prevents this variable being changed when the robot servo is on.
+        default: STA2
+      DISV:
+        type: str
+        description: |-
+          Value that DISWRITE PV is compared to
+        default: "64"
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      DRVL:
+        type: float
+        description: |-
+          Low limit
+      DRVH:
+        type: float
+        description: |-
+          High limit
+      DESC:
+        type: str
+        description: |-
+          Variable's description
+        default: ""
+    databases:
+      - file: yaskawaLongNoSync.template
+        args:
+          .*:
+
+  - name: yaskawaLongReadOnly
+    description: |-
+      Define yaskawa robot controller Long (int32) variables that can not be changed from EPICS.
+      Yaskawa refers to these as a "double precision variables"
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      VAR:
+        type: str
+        description: |-
+          Long integer (int32) just for reading from robot controller. D Variable (e.g. D001) as Yaskawa refers to these as double precision variables.
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      DESC:
+        type: str
+        description: |-
+          Variable's description
+        default: ""
+    databases:
+      - file: yaskawaLongReadOnly.template
+        args:
+          .*:
+
+  - name: yaskawaByte
+    description: |-
+      Define yaskawa robot controller Byte variables that can be set and read in EPICS
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      VAR:
+        type: str
+        description: |-
+          B Variable (Byte) to read/write (e.g. B001)
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      DRVL:
+        type: float
+        description: |-
+          Low limit
+      DRVH:
+        type: float
+        description: |-
+          High limit
+      DESC:
+        type: str
+        description: |-
+          Variable's description
+        default: ""
+    databases:
+      - file: yaskawaByte.template
+        args:
+          .*:
+
+  - name: yaskawaInput
+    description: |-
+      Define yaskawa robot controller Network Inputs that can be set in EPICS, typically 27010-29567
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      VAR:
+        type: str
+        description: |-
+          Network Input to read/write (e.g. I27010)
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      DESC:
+        type: str
+        description: |-
+          Byte description
+        default: ""
+      DESC0:
+        type: str
+        description: |-
+          Input bit 0 description
+        default: ""
+      DESC1:
+        type: str
+        description: |-
+          Input bit 1 description
+        default: ""
+      DESC2:
+        type: str
+        description: |-
+          Input bit 2 description
+        default: ""
+      DESC3:
+        type: str
+        description: |-
+          Input bit 3 description
+        default: ""
+      DESC4:
+        type: str
+        description: |-
+          Input bit 4 description
+        default: ""
+      DESC5:
+        type: str
+        description: |-
+          Input bit 5 description
+        default: ""
+      DESC6:
+        type: str
+        description: |-
+          Input bit 6 description
+        default: ""
+      DESC7:
+        type: str
+        description: |-
+          Input bit 7 description
+        default: ""
+    databases:
+      - file: yaskawaInput.template
+        args:
+          .*:
+
+  - name: yaskawaOutput
+    description: |-
+      Define yaskawa robot controller Network Outputs that can be read from EPICS, typically 37010-39567
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      VAR:
+        type: str
+        description: |-
+          Network Output to read (e.g. O37010)
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      DESC:
+        type: str
+        description: |-
+          Byte description
+        default: ""
+      DESC0:
+        type: str
+        description: |-
+          Output bit 0 description
+        default: ""
+      DESC1:
+        type: str
+        description: |-
+          Output bit 1 description
+        default: ""
+      DESC2:
+        type: str
+        description: |-
+          Output bit 2 description
+        default: ""
+      DESC3:
+        type: str
+        description: |-
+          Output bit 3 description
+        default: ""
+      DESC4:
+        type: str
+        description: |-
+          Output bit 4 description
+        default: ""
+      DESC5:
+        type: str
+        description: |-
+          Output bit 5 description
+        default: ""
+      DESC6:
+        type: str
+        description: |-
+          Output bit 6 description
+        default: ""
+      DESC7:
+        type: str
+        description: |-
+          Output bit 7 description
+        default: ""
+    databases:
+      - file: yaskawaOutput.template
+        args:
+          .*:

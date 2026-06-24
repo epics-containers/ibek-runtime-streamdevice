@@ -1,0 +1,235 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: tecPeltier 1-6
+# Source: /dls_sw/prod/R3.14.12.7/support/tecPeltier/1-6
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/tecPeltier/ release.
+
+module: tecPeltier
+
+entity_models:
+  - name: parameters
+    description: |-
+      Stores a string representation of the parameter ID in hex
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device P
+      PARAM:
+        type: str
+        description: |-
+          Name for the parameter
+      PARAM_ID:
+        type: str
+        description: |-
+          ID of the parameter in hex, eg 03E8 for object temperature
+    databases:
+      - file: parameters.template
+        args:
+          .*:
+
+  - name: read_channel_parameter
+    description: |-
+      Reads the parameter specified in $(P):$(PARAM)_ID, converts it into the
+      desired format / data type and presents it in an _RBV PV
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device P
+      PORT:
+        type: str
+        description: |-
+          Asyn port for the TEC Controller
+      PARAM:
+        type: str
+        description: |-
+          Name for the parameter, must be the same as the $(PARAM) for the parameters.template
+      EGU:
+        type: str
+        description: |-
+          Units
+      PREC:
+        type: int
+        description: |-
+          Precision
+      CONVERT:
+        type: str
+        description: |-
+          Name of the method used by the aSub to convert the response into the desired format / data type
+      FORMAT:
+        type: str
+        description: |-
+          Data type of the response
+      SCAN:
+        type: str
+        description: |-
+          Scan
+    databases:
+      - file: read_channel_parameter.template
+        args:
+          .*:
+
+  - name: read_firmware
+    description: |-
+      Reads the firmware version of the specified controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device P
+      PORT:
+        type: str
+        description: |-
+          Asyn port for the TEC Controller
+      ADDR:
+        type: int
+        description: |-
+          Address of the TEC controller
+      SCAN:
+        type: str
+        description: |-
+          Scan
+    databases:
+      - file: read_firmware.template
+        args:
+          .*:
+
+  - name: read_parameter
+    description: |-
+      Reads the parameter specified in $(P):$(PARAM)_ID, converts it into the
+      desired format / data type and presents it in an _RBV PV
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device P
+      PORT:
+        type: str
+        description: |-
+          Asyn port for the TEC Controller
+      PARAM:
+        type: str
+        description: |-
+          Name for the parameter, must be the same as the $(PARAM) for the parameters.template
+      EGU:
+        type: str
+        description: |-
+          Units
+      PREC:
+        type: int
+        description: |-
+          Precision
+      CONVERT:
+        type: str
+        description: |-
+          Name of the method used by the aSub to convert the response into the desired format / data type
+      FORMAT:
+        type: str
+        description: |-
+          Data type of the response
+      CHAN:
+        type: int
+        description: |-
+          Channel of the TEC controller (1 or 2)
+      SCAN:
+        type: str
+        description: |-
+          Scan
+    databases:
+      - file: read_parameter.template
+        args:
+          .*:
+
+  - name: write_channel_parameter
+    description: |-
+      Writes the value in _DMD to the parameter specified in $(P):$(PARAM)_ID
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device P
+      PORT:
+        type: str
+        description: |-
+          Asyn port for the TEC Controller
+      PARAM:
+        type: str
+        description: |-
+          Name for the parameter, must be the same as the $(PARAM) for the parameters.template
+      CONVERT:
+        type: str
+        description: |-
+          Name of the method used by the aSub to convert the input into the desired output
+      IN_FORMAT:
+        type: str
+        description: |-
+          Input data type
+      OUT_FORMAT:
+        type: str
+        description: |-
+          Output data type
+      DRVH:
+        type: float
+        description: |-
+          Drive high limit
+      DRVL:
+        type: float
+        description: |-
+          Drive low limit
+    databases:
+      - file: write_channel_parameter.template
+        args:
+          .*:
+
+  - name: tecPeltier
+    description: |-
+      TEC Peltier controllers mounted over LTR-1200 unit
+    parameters:
+      name:
+        type: id
+        description: |-
+          Gui tag
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port
+      ADDR:
+        type: str
+        description: |-
+          Address in LTR-1200 (only odd addresses available: 1, 3, 5, 7)
+      SCAN:
+        type: str
+        description: |-
+          Scan rate (Passive, I/O Intr, Event, 10 second, 5 second, 2 second, 1 second, .5 second, .2 second, .1 second)
+
+  - name: tec1122
+    description: |-
+      TEC 1122 Peltier controller as standalone, without LTR-1200
+    parameters:
+      name:
+        type: id
+        description: |-
+          Gui tag
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port
+      ADDR:
+        type: str
+        description: |-
+          Board address (1, 2, 3, 4, 5, 6, 7)
+      SCAN:
+        type: str
+        description: |-
+          Scan rate (Passive, I/O Intr, Event, 10 second, 5 second, 2 second, 1 second, .5 second, .2 second, .1 second)

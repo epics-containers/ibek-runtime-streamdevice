@@ -1,0 +1,2105 @@
+
+record (ai,"$(P):$(R):V:BYP:STAT"){
+        field (DESC, "bypass valve status")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#974A4,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):T:FWD:STAT"){
+        field (DESC, "forward temp")
+        field (EGU, "K")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#96D24,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):T:RET:STAT"){
+        field (DESC, "return temp")
+        field (EGU, "K")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#96ED8,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):T:USR:STAT"){
+        field (DESC, "user temp")
+        field (EGU, "K")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#982C0,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):P:PV:INST:STAT"){
+        field (DESC, "PV pressure")
+        field (EGU, "bar")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#97818,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):P:FWD:INST:STAT"){
+        field (DESC, "forward pressure")
+        field (EGU, "bar")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#97664,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):P:USR:STAT"){
+        field (DESC, "user pressure")
+        field (EGU, "bar")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#98474,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):F:RET:STAT"){
+        field (DESC, "LN2 Flow")
+        field (EGU, "l/min")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#97240,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):FQ:P:STAT"){
+        field (DESC, "pump freq")
+        field (EGU, "Hz")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#1028F8,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):V:BYP:CD:STAT"){
+        field (DESC, "bypass valve cooldown value")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102488,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):V:BYP:OP:STAT"){
+        field (DESC, "bypass valve operation value")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102490,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):FQ:P:CD:STAT"){
+        field (DESC, "pump freq cooldown value")
+        field (EGU, "Hz")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#10248C,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):FQ:P:OP:STAT"){
+        field (DESC, "pump freq operation value")
+        field (EGU, "Hz")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102494,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):P:PV:OP:STAT"){
+        field (DESC, "PV pressure operation value")
+        field (EGU, "bar")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102498,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):L:PV:OP:STAT"){
+        field (DESC, "PV level operation value")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#10249C,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):TM:CL:1P:STAT"){
+        field (DESC, "purg time V-n2p consum V-cl1r")
+        field (EGU, "min")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#10144A,2,2) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):TM:PV:3P:STAT"){
+        field (DESC, "purg time V-n2p V-fwd PV V-pv")
+        field (EGU, "min")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102484,2,2) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):TM:PV:4P:STAT"){
+        field (DESC, "purg time V-n2p consum V-ret V-pv ")
+        field (EGU, "min")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102486,2,2) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):TM:PSUM:STAT"){
+        field (DESC, "overall purging time")
+        field (EGU, "min")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#99694,2,18) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):HL:CL:STAT"){
+        field (DESC, "Heat load at consumer ")
+        field (EGU, "W")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#99698,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):L:SC:HL:STAT"){
+        field (DESC, "high fill level subcooler")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#10247C,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):L:SC:LL:STAT"){
+        field (DESC, "low fill level subcooler")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102480,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):L:PV:LL:STAT"){
+        field (DESC, "PV low level")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#1024A0,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):L:PV:HL:STAT"){
+        field (DESC, "PV high level")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#1024A4,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):T:RET:WU:STAT"){
+        field (DESC, "temp warm-up")
+        field (EGU, "K")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#1024AC,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):T:RET:HL:STAT"){
+        field (DESC, "temp warm-up upper limit")
+        field (EGU, "K")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#1024A8,2,2) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):AL:ALW:ACT:STAT"){
+        field (DESC, "actual alarms and warnings")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#1024F4,2,18) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):P:PV:SP:STAT"){
+        field (DESC, "pressure vessel setpoint")
+        field (EGU, "bar")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#96C50,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):L:PV:STAT"){
+        field (DESC, "avg LN2 level PV")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102AA0,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):P:FWD:STAT"){
+        field (DESC, "avg forward pressure value")
+        field (EGU, "bar")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#97E04,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):P:PV:STAT"){
+        field (DESC, "avg PV pressure value")
+        field (EGU, "bar")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#97C54,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):AP:AF:TI_SC_AFI:STAT"){
+        field (DESC, "triggered autofill interval")
+        field (EGU, "min")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#1024F8,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):AP:AF:TI_SC_AFH:STAT"){
+        field (DESC, "triggered autofill hour")
+        field (EGU, "hr")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#1024FC,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):AP:AF:TI_SC_AFM:STAT"){
+        field (DESC, "triggered autofill min")
+        field (EGU, "min")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102500,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):L:SC:STAT"){
+        field (DESC, "avg LN2 level SC")
+        field (EGU, "%")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#102F00,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (ai,"$(P):$(R):AP:AF:INT:STAT"){
+        field (DESC, "next autofill")
+        field (EGU, "min")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getai(16#4040,16#103130,4,4) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+}
+
+
+
+
+
+record (stringin,"$(P):$(R):alarms"){
+        field (DESC, "chillax alarms & warnings")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getalarm(16#4040,16#1024F4,2,18) $(PORT)")
+        field (SCAN, ".5 second")
+	field (PINI, "YES")
+}
+
+
+
+
+record (ao,"$(P):$(R):V:BYP:CTL"){
+       field (DESC, "bypass valve setpoint")
+       field (EGU, "%")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102C10,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "100")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):FQ:P:CTL"){
+       field (DESC, "pump freq setpoint")
+       field (EGU, "Hz")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#96C58,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "90")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):FQ:P:OP:CTL"){
+       field (DESC, "pump freq operation setpoint")
+       field (EGU, "Hz")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102494,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "90")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):V:BYP:CD:CTL"){
+       field (DESC, "bypass valve cooldown setpoint")
+       field (EGU, "%")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102488,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "100")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):V:BYP:OP:CTL"){
+       field (DESC, "bypass valve operation setpoint")
+       field (EGU, "%")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102490,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "100")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):FQ:P:CD:CTL"){
+       field (DESC, "pump freq cooldown setpoint")
+       field (EGU, "Hz")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#10248C,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "90")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):P:PV:OP:CTL"){
+       field (DESC, "pressure vessel operation setpoint")
+       field (EGU, "bar")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102498,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "10")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):P:PV:CTL"){
+       field (DESC, "pressure vessel setpoint")
+       field (EGU, "bar")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#96C50,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "10")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):L:PV:OP:CTL"){
+       field (DESC, "pressure vessel level operation setpoint")
+       field (EGU, "%")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#10249C,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "100")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):TM:CL:1P:CTL"){
+       field (DESC, "purg time V-n2p consum V-cl1r")
+       field (EGU, "min")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#10144A,2,2) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "30")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):TM:PV:3P:CTL"){
+       field (DESC, "purg time V-n2p V-fwd PV V-pv")
+       field (EGU, "min")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102484,2,2) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "30")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):TM:PV:4P:CTL"){
+       field (DESC, "purg time V-n2p consum V-ret V-pv")
+       field (EGU, "min")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102486,2,2) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "30")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):L:SC:HL:CTL"){
+       field (DESC, "high fill level subcooler")
+       field (EGU, "%")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#10247C,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "100")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):L:SC:LL:CTL"){
+       field (DESC, "low fill level subcooler")
+       field (EGU, "%")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102480,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "100")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):L:PV:LL:CTL"){
+       field (DESC, "PV low level")
+       field (EGU, "%")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#1024A0,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "100")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):L:PV:HL:CTL"){
+       field (DESC, "PV high level")
+       field (EGU, "%")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#1024A4,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "100")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):T:RET:WU:CTL"){
+       field (DESC, "temp warm-up")
+       field (EGU, "K")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#1024AC,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "300")
+       field (DRVL, "200")	
+}
+
+
+
+record (ao,"$(P):$(R):T:RET:HL:CTL"){
+       field (DESC, "temp return upper limit")
+       field (EGU, "K")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#1024A8,2,2) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "130")
+       field (DRVL, "80")	
+}
+
+
+
+record (ao,"$(P):$(R):AP:AF:TI_SC_AFI:CTL"){
+       field (DESC, "triggered autofill interval")
+       field (EGU, "min")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#1024F8,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "1440")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):AP:AF:TI_SC_AFH:CTL"){
+       field (DESC, "triggered autofill hour")
+       field (EGU, "hr")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#1024FC,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "23")
+       field (DRVL, "0")	
+}
+
+
+
+record (ao,"$(P):$(R):AP:AF:TI_SC_AFM:CTL"){
+       field (DESC, "triggered autofill min")
+       field (EGU, "min")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setao(16#4040,16#102500,4,4) $(PORT)")
+       field (SCAN, "Passive")
+       field (HIGH, "1")
+       field (LOW, "0")
+       field (HSV, "NO_ALARM")
+       field (LSV, "MAJOR")
+       field (DRVH, "59")
+       field (DRVL, "0")	
+}
+
+
+
+
+record (bi, "$(P):$(R):EXHTR:STAT"){
+       field (DESC, "exhaust heater status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#103148,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):V:PV:FILL:STAT"){
+       field (DESC, "fill valve closed loop status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#97548,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):V:SC:FILL:STAT"){
+       field (DESC, "fill valve subcooler status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#981D4,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):V:PV:PR:STAT"){
+       field (DESC, "PV release valve status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#9822C,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):V:FWD:STAT"){
+       field (DESC, "forward valve status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#97410,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):V:RET:STAT"){
+       field (DESC, "return valve status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#97468,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):V:CL1:PR:STAT"){
+       field (DESC, "P release valve consum status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#975A0,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):V:N2P:STAT"){
+       field (DESC, "purge valve status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#98284,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):CHK:CBL:STAT"){
+       field (DESC, "check cable status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#98AA4,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):CHK:AIR:STAT"){
+       field (DESC, "check air pressure status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#98AA5,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):CHK:ENA:STAT"){
+       field (DESC, "check enable status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#96BF0,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):CHK:NOUPS:STAT"){
+       field (DESC, "check UPS status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#96BF1,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):CHK:NOALA:STAT"){
+       field (DESC, "check ALARM status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#96BF6,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):CHK:NOHA:STAT"){
+       field (DESC, "check hi ALARM status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#96BF7,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):CHK:NOLA:STAT"){
+       field (DESC, "check low ALARM status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#96BF8,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:AF:STAT"){
+       field (DESC, "auto fill status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#1027EF,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:CD:STAT"){
+       field (DESC, "auto cooldown status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#1027F0,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:PU:STAT"){
+       field (DESC, "auto purge status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#1027F3,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:WU:STAT"){
+       field (DESC, "auto warmup status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#1027F2,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:RF:STAT"){
+       field (DESC, "auto refill PV statusl")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#1027F1,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:STOP:STAT"){
+       field (DESC, "auto system stop status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#1027ED,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:STOPACTIVE:STAT"){
+       field (DESC, "auto stop active status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#9969E,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:STOPALARM:STAT"){
+       field (DESC, "")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#8E20B,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):LN2:PUMP:STAT"){
+       field (DESC, "LN2 pump control")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#1028B3,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):LN2:PUMP:RST:STAT"){
+       field (DESC, "LN2 pump fault reset")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#1028C6,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):P:PV:PID:STAT"){
+       field (DESC, "PV PID control on/off")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#96C4C,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:CD:DISA:STAT"){
+       field (DESC, "AP cooldown disabled")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#98BE6,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:PU:DISA:STAT"){
+       field (DESC, "AP purge disabled")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#98BE5,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:RF:DISA:STAT"){
+       field (DESC, "AP revillPV disabled")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#98BE7,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:WU:DISA:STAT"){
+       field (DESC, "AP warmup disabled")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#98BE8,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):AP:MAN:DISA:STAT"){
+       field (DESC, "manual unputs disabled")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#98BE4,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):LOCAL:STAT"){
+       field (DESC, "LOCAL operation enabled")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#F030,16#1024F6,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (bi, "$(P):$(R):CHK:RDY:STAT"){
+       field (DESC, "$(R) ready status")
+       field (DTYP, "stream")
+       field (INP, "@chillax.proto getbi(16#4040,16#96BF9,1,33) $(PORT)")
+       field (SCAN, "1 second")
+       field (PINI, "YES")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):EXHTR:CTL") {
+       field (DESC, "exhaust heater control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#103149,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):V:PV:FILL:CTL") {
+       field (DESC, "fill valve closed loop control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#102C73,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):V:SC:FILL:CTL") {
+       field (DESC, "fill valve subcooler control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#102F33,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):V:PV:PR:CTL") {
+       field (DESC, "PV release valve control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#102F83,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):V:FWD:CTL") {
+       field (DESC, "forward valve control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#102B63,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):V:RET:CTL") {
+       field (DESC, "return valve control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#102BB3,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):V:CL1:PR:CTL") {
+       field (DESC, "P release valve consumer control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#102$(R)3,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):V:N2P:CTL") {
+       field (DESC, "purge valve control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#102FD3,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):P:PV:PID:CTL") {
+       field (DESC, "PV PID control on/off")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#96C4C,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):AP:AF:CTL") {
+       field (DESC, "auto fill control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#1027EF,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):AP:CD:CTL") {
+       field (DESC, "auto cooldown control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#1027F0,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):AP:PU:CTL") {
+       field (DESC, "auto purge control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#1027F3,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):AP:WU:CTL") {
+       field (DESC, "auto warmup control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#1027F2,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):AP:RF:CTL") {
+       field (DESC, "auto refill PV controll")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#1027F1,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):AP:STOP:CTL") {
+       field (DESC, "auto system stop control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#101449,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):LN2:PUMP:CTL") {
+       field (DESC, "LN2 pump control")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#1028B3,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):LN2:PUMP:RST:CTL") {
+       field (DESC, "LN2 pump fault reset")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#1028B1,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):AP:AF:TB_ENA:CTL") {
+       field (DESC, "Enable timed AF")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#10312C,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+record (bo, "$(P):$(R):AP:AF:TRIG_FILL:CTL") {
+       field (DESC, "Trigger SC Fill")
+       field (DTYP, "stream")
+       field (OUT, "@chillax.proto setbo(16#4040,16#10312D,1,33) $(PORT)")
+       field (SCAN, "Passive")
+       field (ONAM, "ON")
+       field (ZNAM, "OFF")
+       field (DISV, "1")
+       field (OSV, "NO_ALARM")
+       field (ZSV, "MAJOR")
+}
+
+
+
+record (longin,"$(P):$(R):AL:ALARM1:TIME:STAT"){
+        field (DESC, "alarm 1 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E664,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:ALARM2:TIME:STAT"){
+        field (DESC, "alarm 2 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E670,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:ALARM3:TIME:STAT"){
+        field (DESC, "alarm 3 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E67C,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:ALARM4:TIME:STAT"){
+        field (DESC, "alarm 4 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E688,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:ALARM5:TIME:STAT"){
+        field (DESC, "alarm 5 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E694,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:ALARM6:TIME:STAT"){
+        field (DESC, "alarm 6 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E6A0,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:ALARM7:TIME:STAT"){
+        field (DESC, "alarm 7 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E6AC,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:ALARM8:TIME:STAT"){
+        field (DESC, "alarm 8 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E6B8,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:WARN1:TIME:STAT"){
+        field (DESC, "warn 1 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E6C4,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:WARN2:TIME:STAT"){
+        field (DESC, "warn 2 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E6D0,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:WARN3:TIME:STAT"){
+        field (DESC, "warn 3 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E6DC,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:WARN4:TIME:STAT"){
+        field (DESC, "warn 4 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E6E8,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:WARN5:TIME:STAT"){
+        field (DESC, "warn 5 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E6F4,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (longin,"$(P):$(R):AL:WARN6:TIME:STAT"){
+        field (DESC, "warn 6 set time")
+        field (EGU, "")
+        field (DTYP, "stream")
+        field (INP, "@chillax.proto getlong(16#4040,16#8E700,4,19) $(PORT)")
+        field (SCAN, "1 second")
+        field (HIGH, "1")
+        field (LOW, "0")
+        field (HSV, "NO_ALARM")
+        field (LSV, "MAJOR")
+	field (PINI,"YES")
+}
+
+
+
+
+
+record (calcout, "$(P):$(R):power"){
+	field(DESC, "consumed power")
+	field(EGU, "W")
+	field(INPA, "$(P):$(R):F:RET:STAT")
+	field(INPB, "$(P):$(R):T:RET:STAT")
+	field(INPC, "$(P):$(R):T:FWD:STAT")
+	field(CALC, "(A*27.5*(B-C))")
+        field(PREC, "2")
+	field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):AP:status"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):AP:CD:DISA:STAT PP MS")
+        field(INPB, "$(P):$(R):AP:PU:DISA:STAT PP MS")
+        field(INPC, "$(P):$(R):AP:RF:DISA:STAT PP MS")
+        field(INPD, "$(P):$(R):AP:WU:DISA:STAT PP MS")
+        field(INPE, "$(P):$(R):AP:MAN:DISA:STAT PP MS")
+        field(CALC, "A|B|C|D|E")
+        field(SCAN, ".5 second")
+        field(OUT,  "$(P):$(R):AP:DISABLE PP MS") 
+        field(OOPT, "On Change")
+        field(DOPT, "Use CALC")
+}
+
+record (dfanout, "$(P):$(R):AP:DISABLE"){
+	field(DESC, "disable APs")
+	field(OUTA, "$(P):$(R):AP:CD:CTL.DISA")
+        field(OUTB, "$(P):$(R):AP:PU:CTL.DISA")
+        field(OUTC, "$(P):$(R):AP:RF:CTL.DISA")
+        field(OUTD, "$(P):$(R):AP:WU:CTL.DISA")
+	field(OUTE, "$(P):$(R):P:PV:PID:CTL.DISA")
+        field(OUTF, "$(P):$(R):LN2:PUMP:CTL.DISA")
+        field(OUTG, "$(P):$(R):VLV:DISABLE")
+	field(FLNK, "$(P):$(R):VLV:DISABLE")
+}
+
+record (dfanout, "$(P):$(R):VLV:DISABLE"){
+        field(DESC, "disable valves")
+        field(OUTA, "$(P):$(R):V:PV:FILL:CTL.DISA")
+        field(OUTB, "$(P):$(R):V:SC:FILL:CTL.DISA")
+        field(OUTC, "$(P):$(R):V:PV:PR:CTL.DISA")
+        field(OUTD, "$(P):$(R):V:FWD:CTL.DISA")
+        field(OUTE, "$(P):$(R):V:RET:CTL.DISA")
+        field(OUTF, "$(P):$(R):V:N2P:CTL.DISA")
+	field(OUTG, "$(P):$(R):V:CL1:PR:CTL.DISA")
+        field(OUTH, "$(P):$(R)::V:BYP:CTL.DISA")
+}
+
+
+record (calcout, "$(P):$(R):alarm1"){
+	field(DTYP, "Soft Channel")
+	field(INPA, "$(P):$(R):alarms.VAL PP MS")
+	field(CALC, "(A>>0)&1")
+	field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):alarm2"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>1)&1")
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):alarm3"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>2)&1")
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):alarm4"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>3)&1")
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):alarm5"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>4)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):alarm6"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>5)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):alarm7"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>6)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):alarm8"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>13)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):warn1"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>7)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):warn2"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>8)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):warn3"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>9)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):warn4"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>10)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):warn5"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>11)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (calcout, "$(P):$(R):warn6"){
+        field(DTYP, "Soft Channel")
+        field(INPA, "$(P):$(R):alarms.VAL PP MS")
+        field(CALC, "(A>>12)&1") 
+        field(SCAN, ".5 second")
+}
+
+record (stringin, "$(P):$(R):time"){
+        field(DESC, "Current time and date")
+        field(DTYP, "Soft Timestamp")
+        field(INP, "@%Y-%m-%d %H:%M:%S.%03f")
+}
+
+record (stringin, "$(P):$(R):alarm1time"){
+	field(DESC, "alarm1 time and date")
+}
+
+record (stringin, "$(P):$(R):alarm2time"){
+        field(DESC, "alarm2 time and date")
+}
+
+record (stringin, "$(P):$(R):alarm3time"){
+        field(DESC, "alarm3 time and date")
+}
+
+record (stringin, "$(P):$(R):alarm4time"){
+        field(DESC, "alarm4 time and date")
+}
+
+record (stringin, "$(P):$(R):alarm5time"){
+        field(DESC, "alarm5 time and date")
+}
+
+record (stringin, "$(P):$(R):alarm6time"){
+        field(DESC, "alarm6 time and date")
+}
+
+record (stringin, "$(P):$(R):alarm7time"){
+        field(DESC, "alarm7 time and date")
+}
+
+record (stringin, "$(P):$(R):alarm8time"){
+        field(DESC, "alarm8 time and date")
+}
+
+record (stringin, "$(P):$(R):warn1time"){
+        field(DESC, "warning1 time and date")
+        field(DTYP, "Soft Timestamp")
+}
+record (stringin, "$(P):$(R):warn2time"){
+        field(DESC, "warning2 time and date")
+}
+
+record (stringin, "$(P):$(R):warn3time"){
+        field(DESC, "warning3 time and date")
+}
+
+record (stringin, "$(P):$(R):warn4time"){
+        field(DESC, "warning4 time and date")
+}
+
+record (stringin, "$(P):$(R):warn5time"){
+        field(DESC, "warning5 time and date")
+}
+
+record (stringin, "$(P):$(R):warn6time"){
+        field(DESC, "warning6 time and date")
+}
+
+record (stringin, "$(P):$(R):now"){
+        field(DESC, "current time and date")
+        field(DTYP, "Soft Timestamp")
+        field(INP, "@%Y-%m-%d %H:%M:%S")
+        field(SCAN, ".5 second")
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+ 

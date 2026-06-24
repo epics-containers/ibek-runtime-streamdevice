@@ -1,0 +1,93 @@
+# digitelSpc.db
+#% macro, __doc__, Template database for digitel SPC - Controller
+#
+# substitutions:
+#% macro, device, device name
+#% macro, port, asyn serial port number
+#% macro, unit, unit number for multi-drop serial
+################################################################################
+# Get Model Number
+#
+#% controldesk Model Number readback
+#
+record(stringin, "$(device):MODEL") 
+{
+    field(DESC, "Model Number")
+    field(DTYP, "stream")
+    field(INP,  "@digitelSpc.proto model($(unit=01)) $(port)")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Get Version
+#
+#% controldesk Firmware Revision readback
+#
+record(stringin, "$(device):VERSION") 
+{
+    field(DESC, "Firmware Revision")
+    field(DTYP, "stream")
+    field(INP,  "@digitelSpc.proto version($(unit=01)) $(port)")
+    field(SCAN, "10 second")
+    field(FLNK, "$(device):VERSION_CHECK PP")
+}
+
+# Records to print to IOC console if FW needs updating
+record(stringin, "$(device):DEV") {field(VAL, "$(device)")}
+record(aSub, "$(device):VERSION_CHECK"){
+    field(PINI, "NO")
+    field(SCAN, "Passive")
+    field(INPA, "$(device):VERSION")
+    field(INPB, "$(device):DEV")
+    field(FTA, "STRING")
+    field(FTB, "STRING")
+    field(SNAM, "versionCheck")
+}
+################################################################################
+# Automatically Restart on power up
+#
+record(mbbo, "$(device):SETAUTOST")
+{
+    field(DESC, "Auto Restart")
+    field(DTYP, "stream")
+    field(OUT,  "@digitelSpc.proto setautost($(unit=01)) $(port)")
+    field(ZRST, "No")
+    field(ONST, "Yes")
+    field(TWST, "Power")
+    field(DOL,  "0")
+    field(PINI, "YES")
+}
+record(mbbi, "$(device):AUTOST")
+{
+    field(DESC, "Auto Restart")
+    field(DTYP, "stream")
+    field(INP,  "@digitelSpc.proto autost($(unit=01)) $(port)")
+    field(SCAN, "10 second")
+    field(ZRST, "No")
+    field(ONST, "Yes")
+    field(TWST, "Power")
+}
+
+################################################################################
+# Reset Software
+#
+#% archiver 10 Monitor
+#% controldesk Reset Software scon
+#
+record(bo, "$(device):RESET")
+{
+    field(DESC, "Reset Software")
+    field(DTYP, "stream")
+    field(OUT,  "@digitelSpc.proto reset($(unit=01)) $(port)")
+    field(ZNAM, "Reset")
+    field(ONAM, "Reset")
+}
+################################################################################
+
+record(stringin, "$(device):DEBUG")
+{
+    field(DESC, "Generic command")
+    field(DTYP, "stream")
+    field(INP,  "@digitelSpc.proto debug($(unit=01)) $(port)")
+    field(SCAN, "Passive")
+}
+

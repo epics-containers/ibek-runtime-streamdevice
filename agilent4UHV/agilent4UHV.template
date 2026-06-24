@@ -1,0 +1,121 @@
+# agilent4uhvCtlr.template
+# Template database for the Agilent 4UHV Ion Pump Controller 
+# Pete Owens 4/6/2015
+#
+# substitutions:
+# device  - device name
+# port    - asyn port
+#
+#% macro, device, device name
+#% macro, name, Object name and gui association name
+#% macro, port, asyn serial port number
+
+
+# % gui, $(name=), edm, agilent4UHV.edl, device=$(device)
+################################################################################
+# Controller Model
+#
+record(stringin, "$(device):MODEL")
+{
+    field(DESC, "Controller Model")
+    field(DTYP, "stream")
+    field(INP,  "@agilent4UHV.proto get_model $(port)")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Controller Serial Number
+#
+record(stringin, "$(device):SERIAL")
+{
+    field(DESC, "Serial Number")
+    field(DTYP, "stream")
+    field(INP,  "@agilent4UHV.proto get_serial $(port)")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Measurement Unit
+#
+record(mbbo, "$(device):UNIT_SP")
+{
+    field(DESC, "State")
+    field(DTYP, "stream")
+    field(OUT,  "@agilent4UHV.proto set_unit $(port)")
+    field(ZRST, "Torr")
+    field(ONST, "mbar")
+    field(TWST, "Pa")
+}
+record(mbbi, "$(device):UNIT_RB")
+{
+    field(DESC, "State")
+    field(DTYP, "stream")
+    field(INP,  "@agilent4UHV.proto get_unit $(port)")
+    field(SCAN, "10 second")
+    field(ZRST, "Torr")
+    field(ONST, "mbar")
+    field(TWST, "Pa")
+}
+################################################################################
+# Operating Mode (Autostart On/Off)
+#
+record(bo, "$(device):MODE_SP")
+{
+    field(DESC, "Autostart")
+    field(DTYP, "stream")
+    field(OUT,  "@agilent4UHV.proto set_mode $(port)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+record(bi, "$(device):MODE_RB")
+{
+    field(DESC, "Autostart")
+    field(DTYP, "stream")
+    field(INP,  "@agilent4UHV.proto get_mode $(port)")
+    field(SCAN, "10 second")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+################################################################################
+# Protect
+#
+record(longin, "$(device):PROT")
+{
+    field(DESC, "Protect")
+    field(DTYP, "stream")
+    field(INP,  "@agilent4UHV.proto get_prot $(port)")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Step
+#
+record(longin, "$(device):STEP")
+{
+    field(DESC, "Step Mode")
+    field(DTYP, "stream")
+    field(INP,  "@agilent4UHV.proto get_step $(port)")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Temperature FAN
+# 0-200 C
+#
+record(longin, "$(device):TEMPFAN")
+{
+    field(DESC, "Temperature FAN")
+    field(DTYP, "stream")
+    field(INP,  "@agilent4UHV.proto get_tempf $(port)")
+    field(SCAN, "10 second")
+    field(EGU,  "C")
+    field(LOPR, "0")
+    field(HOPR, "200")
+    field(LOW,  "0")
+    field(HIGH, "200")
+    field(LOLO, "-1")
+    field(HIHI, "201")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+
+################################################################################

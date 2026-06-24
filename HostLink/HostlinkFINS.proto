@@ -1,0 +1,287 @@
+# Streams protocol file for Hostlink protocol
+# As used by OMRON CJ1 PLCs
+
+# Example of use:
+# INP="@Hostlink.proto read(0051) ASYNPORT"
+
+header = "@00";
+locktimeout = 10000;
+term = "%0<xor>*";
+terminator = "\r";
+ReadTimeout = 500;
+ReplyTimeout = 3000;
+
+### FINS messages in a HostLink wrapper ########################################
+
+# The text portion of the response's first frame can contain up to 30 words.
+# This protocol file does not handle multiple response frames.
+
+DM = "82";
+IO = "B0";
+AR = "B3";
+CT = "89";
+
+### CPU UNIT DATA READ 05 02 ###################################################
+
+#@00FA00000000005020070*[D]
+#@00FA0040000000050200008100434A314D5F4350553132202020202020202020203F*[D]
+
+CPU_UNIT_DATA_READ
+{
+	out $header,"FA000000000050200", $term;
+	in  $header,"FA00%*20c%2x%*s*\r";
+}
+			  
+### CPU UNIT STATUS READ 06 01 #################################################
+
+#@00FA000000000060170*
+#@00FA004000000006010000050200000000000000002020202020202020202020202020202043*[D]
+
+CPU_UNIT_STATUS_READ
+{
+	out $header,"FA0000000000601", $term;
+	in  $header,"FA00%*16c%*2x%(A)2x%(B)4x%(C)4x%*40c", $term;
+}
+
+### CYCLE TIME READ 06 20 ######################################################
+
+#@00FA00000000006200172*
+#@00FA00400000000620000000000014000000210000001242*
+
+CYCLE_TIME_READ
+{
+	out $header, "FA000000000062001", $term;
+
+	in  $header, "FA00400000000620%*4x" "%(A)8x" "%(B)8x" "%(C)8x", $term;
+	
+	@mismatch { in $header,"FA004000000006202203", $term; }
+} 
+			  
+CYCLE_TIME_READ_RESET
+{
+	out $header, "FA000000000062000", $term;
+	in  $header, "FA00400000000620%*4x", $term;
+}
+
+### STOP 04 02 #################################################################
+
+STOP
+{
+	out $header,"FA0000000000402FFFF", $term;
+	in  $header,"FA00400000000402%*4x", $term;
+}
+
+### RUN 04 01 ##################################################################
+
+RUN
+{
+	out $header,"FA0000000000401FFFF04", $term;
+	in  $header,"FA00400000000401%*4x", $term;
+}
+			  
+### RUN 04 01 ##################################################################
+
+MONITOR
+{
+	out $header,"FA0000000000401FFFF02", $term;
+	in  $header,"FA00400000000401%*4x", $term;
+}
+
+### MEMORY AREA READ 01 01 #####################################################
+
+# Address is 4 hex digits. The bit number is fixed at 00
+
+MEMORY_AREA_READ = "FA0000000000101";
+MEMORY_AREA_READ_RESP = "FA00400000000101%*4x";
+
+FINS_readDM
+{
+	out $header, $MEMORY_AREA_READ, $DM, "\$1", "00", "0001", $term;
+
+	in  $header, "FA00400000000101%*4x", "%4x", $term;
+}
+			
+FINS_readDM16
+{
+	FINS_readDM;
+}
+
+FINS_readDM32
+{
+	out $header, $MEMORY_AREA_READ, $DM, "\$1", "00", "0002", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%8x", $term;
+}
+
+# start address 4 hex digits, number of 16 bit words
+
+FINS_readDMarray
+{
+	out $header, $MEMORY_AREA_READ, $DM, "\$1", "00", "\$2", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%4x", $term;
+	
+	separator = "";
+}
+
+FINS_readDMstring
+{
+	out $header, $MEMORY_AREA_READ, $DM, "\$1", "00", "\$2", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%2x", $term;
+	
+	separator = "";
+}
+
+FINS_readAR
+{
+	out $header, $MEMORY_AREA_READ, $AR, "\$1", "00", "0001", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%4x", $term;
+}
+
+FINS_readAR16
+{
+	FINS_readAR;
+}
+
+FINS_readAR32
+{
+	out $header, $MEMORY_AREA_READ, $AR, "\$1", "00", "0002", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%8x", $term;
+}
+
+# start, number of 16 bit words
+
+FINS_readARarray
+{
+	out $header, $MEMORY_AREA_READ, $AR, "\$1", "00", "\$2", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%4x", $term;
+	
+	separator = "";
+}
+
+FINS_readIO
+{
+	out $header, $MEMORY_AREA_READ, $IO, "\$1", "00", "0001", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%4x", $term;
+}
+
+FINS_readIO16
+{
+	FINS_readIO;
+}
+
+FINS_readIO32
+{
+	out $header, $MEMORY_AREA_READ, $IO, "\$1", "00", "0002", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%8x", $term;
+}
+
+# start, number of 16 bit words
+
+FINS_readIOarray
+{
+	out $header, $MEMORY_AREA_READ, $IO, "\$1", "00", "\$2", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%4x", $term;
+	
+	separator = "";
+}
+
+# Timers 0000 - 2047, Counters 2048 - 4095 (add 2048 to counter number)
+
+FINS_readCounterTimer
+{
+	out $header, $MEMORY_AREA_READ, $CT, "\$1", "00", "0001", $term;
+	
+	in  $header, "FA00400000000101%*4x", "%4x", $term
+}
+
+### MULTIPLE MEMORY AREA READ 01 04 - Address in hex ###########################
+
+MULTIPLE_MEMORY_AREA_READ = "FA0000000000104";
+MULTIPLE_MEMORY_AREA_READ_RESP = "FA00400000000104%*4x";
+
+# 514 power ints
+# 523 power on
+# 336 alloc units	bits 0-4
+# 510 start		0-7 secs, 8-15 mins
+# 511 start		0-7 hour, 8-15 day
+
+# dm0 id
+# dm1 software vers
+
+# These protocols require a calcout record.
+
+# This reads AR0336 (150h), AE510 (1FEh), AR511 (1FFh)
+# Address is in hex with 00 bit number
+
+MULTI_READ_1
+{
+	out $header, $MULTIPLE_MEMORY_AREA_READ, $AR, "015000", $AR, "01FE00", $AR, "01FF00", $term;
+	in  $header, "FA00400000000104%*4x", "%*2x%*2x%(A)2x", "%*2x%(B)2d%(C)2d", "%*2x%(D)2d%(E)2d", $term;
+}
+
+# This reads AR0514 (202h), AR0523 (20Bh), DM0000 (serial ID), DM0001 (software ID)
+# Address is in hex with 00 bit number
+
+MULTI_READ_2
+{
+	out $header, $MULTIPLE_MEMORY_AREA_READ, $AR, "020200", $AR, "020B00", $DM, "000000", $DM, "000100", $term;
+	in  $header, "FA00400000000104%*4x", "%*2x%(A)4x", "%*2x%(B)4x", "%*2x%(C)4x", "%*2x%(D)4d", $term
+}
+
+### MEMORY AREA WRITE 01 02 ####################################################
+
+MEMORY_AREA_WRITE = "FA0000000000102";
+MEMORY_AREA_WRITE_RESP = "FA00400000000102%*4x";
+
+FINS_writeDM
+{
+	out $header $MEMORY_AREA_WRITE $DM "\$1" "00" "0001" "%04X" $term;
+	
+	in  $header "FA00400000000102%*4x" $term;
+}
+
+FINS_writeDM16
+{
+	FINS_writeDM;
+}
+
+FINS_writeDM32
+{
+	out $header $MEMORY_AREA_WRITE $DM "\$1" "00" "0002" "%08X" $term;
+	
+	in  $header "FA00400000000102%*4x" $term;
+}
+
+# start address, number of 16 bit words, use aao record
+
+FINS_writeDMarray
+{
+	out $header $MEMORY_AREA_WRITE $DM "\$1" "00" "\$2" "%04X" $term;
+	
+	in  $header "FA00400000000102%*4x" $term;
+}
+
+FINS_writeDMstring
+{
+	out $header $MEMORY_AREA_WRITE $DM "\$1" "00" "\$2" "%02x" $term;
+	
+	in  $header "FA00400000000102%*4x" $term;
+	
+	separator = "";
+}
+
+### CLOCK READ 07 01 ###########################################################
+
+CLOCK_READ
+{
+	out $header, "FA0000000000701", $term;
+	in  $header, "FA00400000000701%*4x", "%(A)2d" "%(B)2d" "%(C)2d" "%(D)2d" "%(E)2d" "%(F)2d" "%(G)2d" $term;
+}

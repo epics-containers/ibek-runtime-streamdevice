@@ -1,0 +1,393 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: digitelMpc 6-24
+# Source: /dls_sw/prod/R3.14.12.7/support/digitelMpc/6-24
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/digitelMpc/ release.
+
+module: digitelMpc
+
+entity_models:
+  - name: _digitelMpcTemplate
+    description: |-
+      Template database for digitel MPC - Controller
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial
+        default: "01"
+      proto:
+        type: str
+        description: |-
+          StreamDevice Protocol definition file. Defaults to digitelMpc.proto
+        default: digitelMpc.proto
+    databases:
+      - file: digitelMpc.template
+        args:
+          .*:
+  - name: digitelMpc
+    description: |-
+      digitel MPC Controller (multi-drop serial vacuum pump controller).
+    parameters:
+      name:
+        type: id
+        description: |-
+          Gui tag
+      device:
+        type: str
+        description: |-
+          Device name
+      port:
+        type: str
+        description: |-
+          Asyn port
+      unit:
+        type: str
+        description: |-
+          Unit number for multi drop serial
+        default: "01"
+      proto:
+        type: str
+        description: |-
+          Protocol file to use (digitelMpc.proto or digitelMpcq.proto)
+        default: digitelMpc.proto
+  - name: digitelMpcTsp
+    description: |-
+      Template database for digitel MPC - Titanium Sublimation Pump
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+      port:
+        type: str
+        description: |-
+          asyn seral port number (e.g. ty_40_0)
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial
+      ctlsrc:
+        type: int
+        description: |-
+          control source (0 = service, 1 = Ion Pump 1, 2 = Ion Pump 2)
+      protocol:
+        type: str
+        description: |-
+          name of protocol file, either digitelMpc.proto or digitelMpcDual.proto
+        default: digitelMpc.proto
+      totmax:
+        type: int
+        description: |-
+          cycle max off time (default 600 mins)
+        default: 600
+      tcmax:
+        type: int
+        description: |-
+          max number of cycles (default 20)
+        default: 20
+    databases:
+      - file: digitelMpcTsp.template
+        args:
+          .*:
+  - name: digitelMpcqTsp
+    description: |-
+      Template database for digitel MPCq - Titanium Sublimation Pump
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+      port:
+        type: str
+        description: |-
+          asyn seral port number (e.g. ty_40_0)
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial
+      ctlsrc:
+        type: int
+        description: |-
+          control source (0 = service, 1 = Ion Pump 1, 2 = Ion Pump 2)
+      protocol:
+        type: str
+        description: |-
+          name of protocol file, either digitelMpcq.proto or digitelMpcDual.proto
+        default: digitelMpcq.proto
+      totmax:
+        type: int
+        description: |-
+          cycle max off time (default 600 mins)
+        default: 600
+      tcmax:
+        type: int
+        description: |-
+          max number of cycles (default 20)
+        default: 20
+    databases:
+      - file: digitelMpcqTsp.template
+        args:
+          .*:
+  - name: _digitelMpcIonpTemplate
+    description: |-
+      Template database for digitel MPC - Ion Pump
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial (2 hex digits - 05 by default)
+        default: "05"
+      pump:
+        type: int
+        description: |-
+          ion pump number (1 or 2)
+      size:
+        type: float
+        description: |-
+          pump size (l/s)
+      sp1on:
+        type: float
+        description: |-
+          setpoint1 on
+        default: 1.0e-7
+      sp1off:
+        type: float
+        description: |-
+          setpoint1 off
+        default: 2.0e-7
+      sp2on:
+        type: float
+        description: |-
+          setpoint2 on
+        default: 1.0e-7
+      sp2off:
+        type: float
+        description: |-
+          setpoint2 off
+        default: 2.0e-7
+      alh:
+        type: str
+        description: |-
+          alarm handler tag (Defaults to None) c.f. mp49's commit 80833
+        default: None
+      text:
+        type: str
+        description: |-
+          Text to display in the ion pump controller window.
+        default: $(device)
+      proto:
+        type: str
+        description: |-
+          StreamDevice Protocol definition file. Defaults to digitelMpc.proto
+        default: digitelMpc.proto
+    databases:
+      - file: digitelMpcIonp.template
+        args:
+          .*:
+  - name: digitelMpcIonp
+    description: |-
+      Template database for digitel MPC - Ion Pump
+    parameters:
+      MPC:
+        type: str
+        description: |-
+          digitelMPC object
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial (2 hex digits - 05 by default)
+        default: "05"
+      proto:
+        type: str
+        description: |-
+          StreamDevice Protocol definition file. Defaults to digitelMpc.proto
+        default: digitelMpc.proto
+      device:
+        type: str
+        description: |-
+          device name
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+      pump:
+        type: int
+        description: |-
+          ion pump number (1 or 2)
+      size:
+        type: float
+        description: |-
+          pump size (l/s)
+      sp1on:
+        type: float
+        description: |-
+          setpoint1 on
+        default: 1.0e-7
+      sp1off:
+        type: float
+        description: |-
+          setpoint1 off
+        default: 2.0e-7
+      sp2on:
+        type: float
+        description: |-
+          setpoint2 on
+        default: 1.0e-7
+      sp2off:
+        type: float
+        description: |-
+          setpoint2 off
+        default: 2.0e-7
+      alh:
+        type: str
+        description: |-
+          alarm handler tag (Defaults to None) c.f. mp49's commit 80833
+        default: None
+      text:
+        type: str
+        description: |-
+          Text to display in the ion pump controller window.
+        default: $(device)
+    databases:
+      - file: digitelMpcIonp.template
+        args:
+          .*:
+  - name: digitelMpcIonpGroup
+    description: |-
+      Template database for a group of up to 8 digitel MPC Ion Pumps
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      delay:
+        type: int
+        description: |-
+          delay between starting pumps
+      ionp1:
+        type: str
+        description: |-
+          Ion pump 1 device name
+      ionp2:
+        type: str
+        description: |-
+          Ion pump 2 device name
+      ionp3:
+        type: str
+        description: |-
+          Ion pump 3 device name
+      ionp4:
+        type: str
+        description: |-
+          Ion pump 4 device name
+      ionp5:
+        type: str
+        description: |-
+          Ion pump 5 device name
+      ionp6:
+        type: str
+        description: |-
+          Ion pump 6 device name
+      ionp7:
+        type: str
+        description: |-
+          Ion pump 7 device name
+      ionp8:
+        type: str
+        description: |-
+          Ion pump 8 device name
+    databases:
+      - file: digitelMpcIonpGroup.template
+        args:
+          .*:
+  - name: digitelMpcTspGroup
+    description: |-
+      Template database for a group of up to 8 digitel MPC TSPs
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      tsp1:
+        type: str
+        description: |-
+          TSP 1 device name
+      tsp2:
+        type: str
+        description: |-
+          TSP 2 device name
+      tsp3:
+        type: str
+        description: |-
+          TSP 3 device name
+      tsp4:
+        type: str
+        description: |-
+          TSP 4 device name
+      tsp5:
+        type: str
+        description: |-
+          TSP 5 device name
+      tsp6:
+        type: str
+        description: |-
+          TSP 6 device name
+      tsp7:
+        type: str
+        description: |-
+          TSP 7 device name
+      tsp8:
+        type: str
+        description: |-
+          TSP 8 device name
+    databases:
+      - file: digitelMpcTspGroup.template
+        args:
+          .*:
+  - name: dummyIonp
+    description: |-
+      Template database for dummy Ion Pump.
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+    databases:
+      - file: dummyIonp.template
+        args:
+          .*:

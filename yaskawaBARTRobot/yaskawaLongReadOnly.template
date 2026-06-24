@@ -1,0 +1,16 @@
+#% archiver 1 Monitor
+# % macro, P, Device Prefix
+# % macro, STREAMS_PORT, Asyn Port
+# % macro, VAR, Long integer (int32) just for reading from robot controller.  D Variable (e.g. D001) as Yaskawa refers to these as double precision variables.
+# % macro, SCAN, Scan rate
+# % macro, DESC, Variable's description
+
+#% archiver 10 Monitor
+record(ai, "$(P):D$(VAR)_RBV") {
+    field(DESC, "$(DESC=)")
+    field(DISP, "1")
+    field(DTYP, "stream")
+    field(INP, "@yaskawa.proto readd($(P),$(VAR)) $(STREAMS_PORT)")
+    field(PREC, "0")
+    field(SCAN, "$(SCAN)")
+}

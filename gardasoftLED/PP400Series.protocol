@@ -1,0 +1,58 @@
+# Protocol file for the Gardasoft Vision PP612 LED lighting controller
+# Version: 1.0
+# Date:    22-08-2007
+
+# Please refer to the Gardasoft Vision User Manual Revision 11
+
+OutTerminator = CR;
+InTerminator = LF CR ">";
+replytimeout = 1000;
+readtimeout  = 2000;
+
+#####################
+
+status { out "ST\$2" ; in "ST\$2\n\rCH %(\$1:CH\$2:NUMBER_RBV)d, MD %(\$1:CH\$2:MODE_RBV)d, CS %(\$1:CH\$2:MAX_CURRENT_RBV)fA, SE%*[^0-9]%(\$1:CH\$2:BRIGHTNESS_RBV)f, DL%*[^0-9]%(\$1:CH\$2:DELAY_VALUE_RBV)f%(\$1:CH\$2:DELAY_UNIT_RBV)?2c, PU %(\$1:CH\$2:WIDTH_VALUE_RBV)f%(\$1:CH\$2:WIDTH_UNIT_RBV)?2c, PW %(\$1:PW)d, ST %(\$1:ST)d, EV%*[^0-9]%(\$1:CH\$2:VOLTAGE_RBV)fV, IP %(\$1:CH\$2:TRIGGER_INPUT_RBV)d, FL %(\$1:CH\$2:FLAGS_RBV)d"; }
+
+# Hidden command
+#diagnosticStatus { out "DT" ; in "DT\n\rCur %fA, VoR  %fV, CuR %fA, DSt %d, Dis %d, CSe %fA, EVl  %fV, CSt %d, Inp %d, Ret %fms, Flg %d, DAC %d, Connected, Ad %(\$1:MY_STRING_RBV)s\n\rCur %fA, #VoR  %fV, CuR %fA, DSt %d, Dis %d, CSe %fA, EVl  %fV, CSt %d, Inp %d, Ret %fms, Flg %d, DAC %d, Connected, Ad %(\$1:MY_STRING2_RBV)s" ; }
+#Cur %fA, VoR  %fV, CuR %fA, DSt %d, Dis %d, CSe %fA, EVl  %fV, CSt %d, Inp %d, Ret %(\$1:CH1:RETRIGGER_RBV)fms, Flg %d, DAC %d, Connected, Ad 192."; }
+
+generalStatus { out "ST0" ; in "ST0\n\rTM %(\$1:TM)d, TP   %(\$1:TP)fus"; }
+
+# Save settings to the controller's
+# non-volatile memory
+save {
+	out "AW";
+	in "AW";
+}
+
+# resetErrors can be expanded
+
+# Clear errors.  The errors that were cleared
+# are saved as a String
+resetErrors {
+	out "GR";
+	in "GR%s";
+}
+
+setFlags { out "RE\$2,%(\$1:CH\$2:\$3)d" ; in "RE\$2,%d" ; }
+
+setTriggerInput { out "RP\$2,%(\$1:CH\$2:\$3)d" ; in "RP\$2,%d" ; }
+
+setMaxCurrent { out "RR\$2,%(\$1:CH\$2:\$3)f" ; in "RR\$2,%f" ; }
+
+getVersion { out "VR" ; in "VR%(\$1:MODEL_RBV)s %(\$1:HW_VERSION_RBV)s %(\$1:FW_VERSION_RBV)s" ; }
+
+fireTrigger { out "TR\$2" ; in "TR\$2" ; }
+
+setInternalTrigger { out "TT%(\$1:\$2)d,%(\$1:\$3)d" ; in "TT%(\$1:TRIG_STATE_RBV)d,%(\$1:PERIOD_RBV)d" ; }
+
+setContinuous { out "RS\$2,%(\$1:CH\$2:\$3)s" ; in "RS\$2,%d" ; }
+
+setSwitched { out "RW\$2,%(\$1:CH\$2:\$3)s" ; in "RW\$2,%d" ; }
+
+setPulsed { out "RT\$2,%(\$1:CH\$2:\$3)f,%(\$1:CH\$2:\$4)f,%(\$1:CH\$2:\$5)d" ; in "RT\$2,%f,%f,%d" ; }
+
+######################
+
+

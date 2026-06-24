@@ -1,0 +1,151 @@
+# % macro, P, Device prefix
+# % macro, Q, Device suffix
+# % macro, C, Axis Name
+# % macro, AXIS, Axis number for daisy chained stages (1-16), default is 1
+# % macro, PORT, Asyn port for I/O with controller
+# % macro, EGU,  engineering units for value of move commands to controller, defaults to mm
+# % gui, $(name=), edm, PI-C877.edl, P=$(P), Q=$(Q), C=$(C), AXIS=$(AXIS), PORT=$(PORT), EGU=$(EGU)
+
+######################################################################
+# controller status
+record(stringin, "$(P)$(Q):IDN:RD") {
+    field(DESC, "Read device identity and firmware number")
+    field(SCAN, "Passive")
+    field(DTYP, "stream")
+    field(INP,  "@C877.proto get_version $(PORT)")
+    field(PINI, "YES")
+}
+
+record(ai, "$(P)$(Q):ERR:RD") {
+  field(DESC, "Reports error code")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP,  "@C877.proto get_last_error() $(PORT)")
+  field(PINI, "YES")
+}
+
+
+record(stringout, "$(P)$(Q):FREE_CMD") {
+  field(DESC, "Free Command Line")
+  field(DTYP, "stream")
+  field(OUT,  "@C877.proto freeCommand($(P)$(Q)) $(PORT)")
+}
+ 
+record(waveform, "$(P)$(Q):CMD_RESPONSE") {
+  field(DESC, "Response from Free Command")
+  field(NELM, "2000")
+  field(FTVL, "STRING")
+}
+
+
+######################################################################
+# axis control mode
+record(bi, "$(P)$(Q)$(C):SVO:RD") {
+  field(DESC, "Read servo settings $(AXIS=1)")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+  field(INP,  "@C877.proto get_servo_mode($(AXIS=1)) $(PORT)")
+  field(PINI, "YES")
+}
+
+record(bo, "$(P)$(Q)$(C):SVO:WR") {
+  field(DESC, "Set servo settings $(AXIS=1)")
+  field(DTYP, "stream")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+  field(OUT,  "@C877.proto set_servo_mode($(AXIS=1)) $(PORT)")
+  field(FLNK, "$(P)$(Q)$(C):SVO:RD PP MS")
+}
+
+record(mbbiDirect, "$(P)$(Q)$(C):SRG:RD")
+{
+  field(DESC, "Read status register")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP,  "@C877.proto get_status_register($(AXIS=1)) $(PORT)")
+  field(NOBT, "16")
+}
+######################################################################
+# reference point
+record(bi, "$(P)$(Q)$(C):REF:MODE") {
+  field(DESC, "reference mode, 0=manual, 1=auto")
+  field(SCAN, "Passive")
+  field(ZNAM, "0")
+  field(ONAM, "1")
+  field(INP,  "@C877.proto get_reference_mode($(AXIS=1)) $(PORT)")
+  field(PINI, "YES")
+}
+
+record(bi, "$(P)$(Q)$(C):REF:RD") {
+  field(DESC, "Read if axis has been referenced")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(ZNAM, "NO")
+  field(ONAM, "YES")
+  field(INP,  "@C877.proto get_reference_result($(AXIS=1)) $(PORT)")
+  field(PINI, "YES")
+}
+
+record(bo, "$(P)$(Q)$(C):REF:DOMOVE") {
+  field(DESC, "Do a ref move to neg limit then home")
+  field(DTYP, "stream")
+  field(OUT,  "@C877.proto do_reference_move($(AXIS=1)) $(PORT)")
+}
+
+######################################################################
+# closed loop control mode
+record(ai, "$(P)$(Q)$(C):MOV:RD") {
+  field(DESC, "Read demand position $(AXIS=1)")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP,  "@C877.proto get_demand_pos($(AXIS=1)) $(PORT)")
+  field(PREC, "6")
+  field(EGU,  "$(EGU=mm)")
+  field(FLNK, "$(P)$(Q)$(C):POS:RD PP")
+  field(PINI, "YES")
+}
+
+record(ao, "$(P)$(Q)$(C):MOV:WR") {
+  field(DESC, "Set demand position $(AXIS=1)")
+  field(DTYP, "stream")
+  field(OUT,  "@C877.proto set_demand_pos($(AXIS=1)) $(PORT)")
+  field(PREC, "3")
+#  field(EGU,  "$(EGU=mm)")
+  field(FLNK, "$(P)$(Q)$(C):MOV:RD PP")
+}
+
+record(ai, "$(P)$(Q)$(C):TWEAK_STEP") {
+  field(DESC, "Tweak step size")
+}
+
+record(ao, "$(P)$(Q)$(C):MVR:WR") {
+  field(DESC, "Set relative position $(AXIS=1)")
+  field(DTYP, "stream")
+  field(OUT,  "@C877.proto set_relative_pos($(AXIS=1)) $(PORT)")
+  field(PREC, "3")
+#  field(EGU,  "$(EGU=mm)")
+  field(FLNK, "$(P)$(Q)$(C):MOV:RD PP")
+}
+
+
+
+record(ai, "$(P)$(Q)$(C):POS:RD") {
+  field(DESC, "Read current position $(AXIS=1)")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP,  "@C877.proto get_current_pos($(AXIS=1)) $(PORT)")
+  field(PREC, "6")
+  field(EGU,  "$(EGU=mm)")
+  field(FLNK, "$(P)$(Q)$(C):ONT:RD PP")
+}
+
+record(bi, "$(P)$(Q)$(C):ONT:RD") {
+  field(DESC, "Read target status $(AXIS=1)")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+  field(INP,  "@C877.proto get_servo_on_target($(AXIS=1)) $(PORT)")
+}

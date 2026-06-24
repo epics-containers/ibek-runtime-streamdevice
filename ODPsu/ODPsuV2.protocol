@@ -1,0 +1,204 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for Oxy Dan Bimorph PSU
+#
+# Created on 17/12/2007 for new version of PSU delivered for I24
+# See document number 47544-21 Appendix A for the command specification
+# Main changes are:
+# - Voltage demands are now specified in hexadecimal
+# - Format demands are now sent down per bank
+
+terminator   = LF;
+replytimeout = 1000;
+readtimeout  = 500;
+locktimeout = 60000;
+extrainput   = Ignore;
+separator = ",";
+
+# Slew get/set
+setslew{ out ":CONF:SLEW %d"; in "\6:CONF:SLEW";}
+getslew{ out ":CONF:SLEW?"; in "\6:CONF:SLEW %d";}
+
+# Voltage demand get/set per channel
+# $1 = channel number, $2 = device name
+setvd{ out ":CONF:DEMA\$1 %(\$2:V\$1D:CALC.VAL)d%X"; in "\6%(\$2:STATUS.VAL){FAIL|SLEWING}";}
+getvdreq{ out ":CONF:DEMA\$1?"; in "\6:CONF:DEMA%*d %*1i%(\$2:V\$1DR.RVAL)X"}
+
+# The demand readbacks process on I/O interrupt
+getvd0{ in ":CONF:DEMA00 %s"; }
+getvd1{ in ":CONF:DEMA01 %s"; }
+getvd2{ in ":CONF:DEMA02 %s"; }
+getvd3{ in ":CONF:DEMA03 %s"; }
+getvd4{ in ":CONF:DEMA04 %s"; }
+getvd5{ in ":CONF:DEMA05 %s"; }
+getvd6{ in ":CONF:DEMA06 %s"; }
+getvd7{ in ":CONF:DEMA07 %s"; }
+getvd8{ in ":CONF:DEMA08 %s"; }
+getvd9{ in ":CONF:DEMA09 %s"; }
+getvd10{ in ":CONF:DEMA10 %s"; }
+getvd11{ in ":CONF:DEMA11 %s"; }
+getvd12{ in ":CONF:DEMA12 %s"; }
+getvd13{ in ":CONF:DEMA13 %s"; }
+getvd14{ in ":CONF:DEMA14 %s"; }
+getvd15{ in ":CONF:DEMA15 %s"; }
+getvd16{ in ":CONF:DEMA16 %s"; }
+getvd17{ in ":CONF:DEMA17 %s"; }
+getvd18{ in ":CONF:DEMA18 %s"; }
+getvd19{ in ":CONF:DEMA19 %s"; }
+getvd20{ in ":CONF:DEMA20 %s"; }
+getvd21{ in ":CONF:DEMA21 %s"; }
+getvd22{ in ":CONF:DEMA22 %s"; }
+getvd23{ in ":CONF:DEMA23 %s"; }
+
+
+# Retrieve all voltage demands for a format (0-7)
+# $1 = device name
+# NB: Must have all 24 channels configured in EPICS
+# For now, ignore bank and active bit part of readback
+getvdformat{ out ":CONF:FORM%d?"; readtimeout=100000; in "\6:CONF:FORM%*d %*1i%(\$1:FMT:V0DR.RVAL)X,"
+	"%*1i%(\$1:FMT:V1DR.RVAL)X,%*1i%(\$1:FMT:V2DR.RVAL)X,%*1i%(\$1:FMT:V3DR.RVAL)X,%*1i%(\$1:FMT:V4DR.RVAL)X,"
+	"%*1i%(\$1:FMT:V5DR.RVAL)X,%*1i%(\$1:FMT:V6DR.RVAL)X,%*1i%(\$1:FMT:V7DR.RVAL)X,%*1i%(\$1:FMT:V8DR.RVAL)X,"
+	"%*1i%(\$1:FMT:V9DR.RVAL)X,%*1i%(\$1:FMT:V10DR.RVAL)X,%*1i%(\$1:FMT:V11DR.RVAL)X,%*1i%(\$1:FMT:V12DR.RVAL)X,"
+	"%*1i%(\$1:FMT:V13DR.RVAL)X,%*1i%(\$1:FMT:V14DR.RVAL)X,%*1i%(\$1:FMT:V15DR.RVAL)X,%*1i%(\$1:FMT:V16DR.RVAL)X,"
+	"%*1i%(\$1:FMT:V17DR.RVAL)X,%*1i%(\$1:FMT:V18DR.RVAL)X,%*1i%(\$1:FMT:V19DR.RVAL)X,%*1i%(\$1:FMT:V20DR.RVAL)X,"
+	"%*1i%(\$1:FMT:V21DR.RVAL)X,%*1i%(\$1:FMT:V22DR.RVAL)X,%*1i%(\$1:FMT:V23DR.RVAL)X";
+}
+
+# Set a bank(0or1) of voltage demands for a format (0-7)
+setvdformat0{ outterminator = ""; out ":CONF:FORM%d ";}
+setvdformat1{ outterminator = ""; out "%d ";}
+setvdformat2{ outterminator = ""; out "%(\$2:V\$1D:CALC.VAL)d%X,";}
+setvdformat3{ out "%(\$2:V\$1D:CALC.VAL)d%X"; in "\6SUCCESS";}
+
+
+# Set/get active format (0-7)
+setformat{out ":CONF:FORM%d"; readtimeout=45000; in "\6%(\$1:STATUS.VAL){FAIL|SLEWING}";}
+getformat{out ":CONF:FORM?"; in "\6:CONF:FORM%d";}
+
+# Reset formats to factory defaults (outputs must be off)
+resetformat{out ":CONF:RST:FORM"; readtimeout=45000; in "\6SUCCESS";}
+
+# Set current formats as the factory defaults
+setformatdefaults{out ":CONF:FACT"; readtimeout=45000; in "\6SUCCESS";}
+ 
+# Set/get the increment/decrement voltage step
+setstep{ out ":CONF:STEP %03X"; in "\6SUCCESS"; }
+getstep{ out ":CONF:STEP?"; in "\6:CONF:STEP %03X"; }
+
+# Increment/decrement voltage demand per channel
+# Not used
+incv{ out ":CONF:DEMA\$1 UP"; readtimeout=45000; in "\6:CONF:DEMA\%d UP"}
+decv{ out ":CONF:DEMA\$1 DOWN"; readtimeout=45000; in "\6:CONF:DEMA\%d DOWN"}
+
+# Increment/decrement voltage demand for a bank
+incvbank{ out ":CONF:DEMAALL\$1 UP"; readtimeout=45000; in "\6%(\$2:STATUS.VAL){FAIL|SLEWING}"}
+decvbank{ out ":CONF:DEMAALL\$1 DOWN"; readtimeout=45000; in "\6%(\$2:STATUS.VAL){FAIL|SLEWING}"}
+
+# Get voltage reading per channel
+getv{ out ":READ:OUTP\$1?"; in "\6:READ:OUTP%*d %d"}
+
+# Get all voltage reading per channel
+getvall{ out ":READ:OUTPALL?"; readtimeout=45000; in "\6:READ:OUTPALL"}
+getvall0{ readtimeout=45000; in "\6:READ:OUTPALL %d"}
+getvall1{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%d"}
+getvall2{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%d"}
+getvall3{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%d"}
+getvall4{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%d"}
+getvall5{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%d"}
+getvall6{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall7{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall8{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall9{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall10{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall11{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall12{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall13{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall14{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall15{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall16{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall17{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall18{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall19{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall20{ readtimeout=45000; in "\6:READ:OUTPALL "
+	"%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%d"
+}
+getvall21{ readtimeout=45000; in "\6:READ:OUTPALL "
+	"%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%d"
+}
+getvall22{ readtimeout=45000; in "\6:READ:OUTPALL "
+	"%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%*d,%d"
+}
+getvall23{ readtimeout=45000; in "\6:READ:OUTPALL "
+	"%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%*d,%*d,%d"
+}
+
+# Turn output on or off
+outputon{ out "%{:CONF:OUTP OFF |:CONF:OUTP ON }"; in "\6%(\$1:STATUS.VAL){FAIL|SLEWING}";}
+
+# Response when slewing has finished or failed
+finished{ in "%{FAIL|DUMMY|SUCCESS}"; }
+
+# Set/get min/max bank limits
+setmax{ out ":CONF:RANG:MAX\$1 %X"; in "\6SUCCESS";}
+getmax{ out ":CONF:RANG:MAX\$1?"; in "\6:CONF:RANG:MAX%*d %X";}
+setmin{ out ":CONF:RANG:MIN\$1 %X"; in "\6SUCCESS";}
+getmin{ out ":CONF:RANG:MIN\$1?"; in "\6:CONF:RANG:MIN%*d %X";}
+
+# Set unit autostart on or off
+autostarton{ out "%{:CONF:STAR:AUTO OFF |:CONF:STAR:AUTO ON}"; in "\6SUCCESS";}
+
+# Set/get correction function parameters for a bank (0 or 1)
+getfunctionw{ out ":CONF:FUNC\$1?"; in "\6:CONF:FUNC%*d %*d %f";}
+getfunctionitvl{ readtimeout=45000; in "\6:CONF:FUNC%*d %d";}
+setfunctionfirst{ outterminator = ""; out ":CONF:FUNC\$1 %d ";}
+setfunctionnext{ outterminator = ""; out "%f,";}
+setfunctionlast{ out "%f"; in "\6SUCCESS";}
+
+# Turn correction function on or off
+correctionon{ out "%{:CONF:STAR:FUNC OFF |:CONF:STAR:FUNC ON}"; in "\6SUCCESS";}
+
+# Set/get date
+#TODO
+
+# Set/get time
+#TODO
+
+# Get time since first power on (hours)
+getoperatingtime{ out ":CONF:OTFP?"; in "\6:CONF:OTFP %f";}
+
+# Get time since last reset (secs)
+getresettime{ out ":CONF:OTLR?"; in "\6:CONF:OTLR %f";}
+# Reset time since last reset count
+resettime{ out ":CONF:RST:TIME"; in "\6SUCCESS";}
+
+# Get unit setup
+# For some reason this doesn't work with %s
+getsetupw{ readtimeout=45000; out ":CONF:SETP?"; in "\6:CONF:SETP %[.A-Z0-9]"}
+
+# Get unit status
+getstatusw{out ":CONF:STAT?"; in "\6:CONF:STAT %d"}
+
+# Set/get hysteresis point
+sethyst{ out ":CONF:HYST %d"; in "\6SUCCESS"; }
+gethyst{ out ":CONF:HYST?"; in "\6:CONF:HYST %d"; }
+
+#Turn hysteresis mode on or off
+hyston{ out "%{:CONF:STAR:HYST OFF |:CONF:STAR:HYST ON}"; in "\6SUCCESS";}
+
+# Secondary slew get/set
+setslew2{ out ":CONF:SLEW:SEC %d"; in "\6:CONF:SLEW:SEC";}
+getslew2{ out ":CONF:SLEW:SEC?"; in "\6:CONF:SLEW:SEC %d";}
+
+# Get error log
+# NB this only returns the first error at present
+geterr{ out ":CONF:ERR?"; interminator=""; readtimeout=1000; in "ERR %s" CR;}
+
+#################################################################################

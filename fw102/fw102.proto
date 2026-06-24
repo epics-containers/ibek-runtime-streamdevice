@@ -1,0 +1,19 @@
+# Communication protocol for FW102 Filter Wheel
+# Oliver Copping
+# 2023
+
+Terminator = "\r"; # CR
+InTerminatorExtra = "> ";
+OutTerminator = $Terminator;
+InTerminator = $Terminator$InTerminatorExtra; # CR + '> '
+
+ReplyTimeout = 1000;
+WriteTimeout = 1000;
+ReadTimeout  = 1000;
+
+getID       { out "*idn?"; in "*idn?\r%[ .a-zA-Z0-9]"; }
+
+getPos      { out "pos?"; in "pos?\r%[0-9]"; }
+
+setPos      { out "pos=%i"; }
+

@@ -1,0 +1,24 @@
+# d2ptg_cal_scan_list.template
+# Template to be instantiated by 16 times regardless of D2AFEs in use. This is to create a complete FLNK list.
+# If a D2AFE is present then it will overwrite these records with records that have a function
+# % macro, P, Device prefix
+# % macro, NEXT, PV of CAL:MON for next D2AFE.
+record(ao, "$(P,undefined):AFE:CAL:MON"){
+  field(SCAN, "Passive")
+  field(FLNK, "$(P,undefined):AFE:FW_REQUEST")
+}
+
+record(bi, "$(P,undefined):AFE:FW_REQUEST") {
+  field(SCAN, "Passive")
+  field(FLNK, "$(P,undefined):AFE:EID_REQUEST")
+}
+
+record(stringout, "$(P,undefined):AFE:EID_REQUEST") {
+  field(SCAN, "Passive")
+  field(FLNK, "$(P,undefined):AFE:CALID_REQUEST")
+}
+
+record(stringout, "$(P,undefined):AFE:CALID_REQUEST") {
+  field(SCAN, "Passive")
+  field(FLNK, "$(NEXT,undefined)")
+}

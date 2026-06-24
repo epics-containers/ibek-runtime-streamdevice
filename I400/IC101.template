@@ -1,0 +1,420 @@
+#==============================================================================
+# IC101 Template
+#
+# Ben Bradnick, Diamond Light Source
+#
+#
+# MACROS
+# % macro, name,   GUI object name
+# % macro, P,      Device prefix
+# % macro, port,   Asyn port
+# % macro, MAXEXT, Limit maximum external voltage
+# % macro, CAP0,   Capacitor 0 string
+# % macro, CAP1,   Capacitor 1 string
+#
+#
+# GUI
+# % gui, $(name), edm, IC101-top.edl, P=$(P)
+include "IC101_detail.template"
+#
+#==============================================================================
+
+# IDENTITY
+
+record(stringin, "$(P):MANUFACTURER") {
+  field(DESC, "Manufacturer")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto manufacturer() $(port) 0")
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):MODEL") {
+  field(DESC, "Model")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto model() $(port) 0")
+  field(SCAN, "I/O Intr")
+}
+
+record(stringin, "$(P):SERIAL") {
+  field(DESC, "Serial number")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto serial() $(port) 0")
+  field(SCAN, "I/O Intr")
+}
+
+record(stringin, "$(P):FIRMWARE") {
+  field(DESC, "Firmware version")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto firmware() $(port) 0")
+  field(SCAN, "I/O Intr")
+}
+
+
+# SYSTEM
+
+# Admin
+
+record(longout, "$(P):ADMIN") {
+  field(DESC, "Admin password")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto admin($(P):ADMIN_RBV) $(port) 0")
+}
+
+record(longin, "$(P):ADMIN_RBV") {
+  field(DESC, "Admin reply status")
+  field(DTYP, "Soft Channel")
+}
+
+record(calcout, "$(P):ADMIN_CALC") {
+  field(DESC, "Check if admin pass was correct")
+  field(INPA, "$(P):ADMIN_RBV CP")
+  field(CALC, "A=6?1:0")
+  field(OUT,  "$(P):ADMIN_STATUS PP")
+  field(OOPT, "Every Time")
+}
+
+record(bi, "$(P):ADMIN_STATUS") {
+  field(DESC, "Admin status")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+}
+
+record(seq, "$(P):SEQPASS_RESET") {
+  field(DESC, "Reset password")
+  field(DOL1, "0")
+  field(LNK1, "$(P):ADMIN PP")
+}
+
+# Settings
+
+record(bo, "$(P):SAVE") {
+  field(DESC, "Save settings")
+  field(DTYP, "stream")
+  field(OUT, "@IC101.proto save() $(port) 0")
+  field(VAL, "1")
+}
+
+record(bo, "$(P):RECALL") {
+  field(DESC, "Recall settings")
+  field(DTYP, "stream")
+  field(OUT, "@IC101.proto recall() $(port) 0")
+  field(VAL, "1")
+}
+
+record(seq, "$(P):SEQRESET") {
+  field(DESC, "Reset amplifier")
+  field(DOL1, "1")
+  field(LNK1, "$(P):RUNNING PP")
+  field(DLY2, "0.1")
+  field(LNK2, "$(P):RESET.PROC PP")
+  field(DLY3, "5.0")
+  field(LNK3, "$(P):SEQINIT.PROC PP")
+}
+
+# Reset
+
+record(bo, "$(P):RESET") {
+  field(DESC, "Reset device")
+  field(DTYP, "stream")
+  field(OUT, "@IC101.proto reset() $(port) 0")
+  field(VAL, "1")
+}
+
+# Communication settings
+
+record(seq, "$(P):COMMS") {
+  field(DESC, "Initialise comm settings")
+  field(DLY1, "0.1")
+  field(DOL1, "12345")
+  field(LNK1, "$(P):ADMIN PP")
+  field(DLY2, "0.1")
+  field(LNK2, "$(P):TIMEOUT.PROC PP")
+  field(DLY3, "0.1")
+  field(LNK3, "$(P):CHECKSUM.PROC PP")
+}
+
+record(longout, "$(P):CHECKSUM") {
+  field(DESC, "Disable checksums")
+  field(DTYP, "stream")
+  field(OUT, "@IC101.proto check() $(port) 0")
+}
+
+record(longout, "$(P):TIMEOUT") {
+  field(DESC, "Disable timeout")
+  field(DTYP, "stream")
+  field(OUT, "@IC101.proto timeout() $(port) 0")
+}
+
+
+# INITIALISATION
+
+record(bo, "$(P):RUNNING") {
+  field(DESC, "Gate for initialising")
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Running")
+  field(ONAM, "Disabled")
+  field(VAL,  "1")
+}
+
+record(seq, "$(P):SEQINIT") {
+  field(DESC, "Initialise amplifier")
+  field(PINI, "YES")
+  field(DOL1, "1")
+  field(LNK1, "$(P):RUNNING PP")
+  field(DLY2, "0.5")
+  field(LNK2, "$(P):COMMS.PROC PP")
+  field(DLY3, "0.5")
+  field(LNK3, "$(P):RECALL.PROC PP")
+  field(DLY4, "0.5")
+  field(LNK4, "$(P):RECALLCALIB.PROC PP")
+  field(DLY5, "0.5")
+  field(LNK5, "$(P):INIT.PROC PP")
+  field(DLY6, "1.0")
+  field(DOL6, "0")
+  field(LNK6, "$(P):RUNNING PP")
+  field(FLNK, "$(P):SEQPASS_RESET PP")
+}
+
+record(bo, "$(P):INIT") {
+  field(DESC, "Initialise device")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto init() $(port) 0")
+  field(VAL,  "1")
+}
+
+record(bo, "$(P):ABORT") {
+  field(DESC, "Abort measurement")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto abort() $(port) 0")
+  field(VAL,  "1")
+}
+
+# CALIBRATION
+
+record(bo, "$(P):CALIB") {
+  field(DESC, "Calibrate device")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto doCalib() $(port) 0")
+  field(VAL,  "1")
+}
+
+record(bo, "$(P):SAVECALIB") {
+  field(DESC, "Save calibration settings")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto saveCalib() $(port) 0")
+  field(VAL,  "1")
+}
+
+record(bo, "$(P):RECALLCALIB") {
+  field(DESC, "Recall calibration settings")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto recallCalib() $(port) 0")
+  field(VAL,  "1")
+}
+
+# Internal source
+
+record(bo, "$(P):SOURCE") {
+  field(DESC, "Set calibration source")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto setSource() $(port) 0")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+record(bi, "$(P):SOURCE_RBV") {
+  field(DESC, "Calibration source")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getSource() $(port) 0")
+  field(SCAN, "1 second")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+  field(SDIS, "$(P):RUNNING")
+}
+
+# Gain values
+
+record(ai, "$(P):GAIN1") {
+  field(DESC, "Gain for first channel")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getFirstGain() $(port) 0")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(SDIS, "$(P):RUNNING")
+}
+
+record(ai, "$(P):GAIN2") {
+  field(DESC, "Gain for second channel")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getSecondGain() $(port) 0")
+  field(SCAN, "I/O Intr")
+  field(PREC, "4")
+  field(SDIS, "$(P):RUNNING")
+}
+
+# CONFIGURATION
+
+# Capacitors
+
+# % autosave 2 VAL
+record(bo, "$(P):CAP") {
+  field(DESC, "Set capacitor")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto setCap() $(port) 0")
+  field(ZNAM, "$(CAP0)")
+  field(ONAM, "$(CAP1)")
+}
+
+record(bi, "$(P):CAP_RBV") {
+  field(DESC, "Capacitor")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getCap() $(port) 0")
+  field(SCAN, "1 second")
+  field(ZNAM, "$(CAP0)")
+  field(ONAM, "$(CAP1)")
+  field(SDIS, "$(P):RUNNING")
+}
+
+record(ai, "$(P):CAP:VALUE") {
+  field(DESC, "Capacitance value")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getCapValue() $(port) 0")
+  field(SCAN, "I/O Intr")
+  field(PREC, "2")
+  field(EGU,  "F")
+  field(SDIS, "$(P):RUNNING")
+}
+
+# External voltages
+
+# % autosave 2 VAL
+record(longout, "$(P):HV:MAX") {
+  field(DESC, "Set max external HV")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto setMaxExtHV() $(port) 0")
+  field(DRVH, "$(MAXEXT)")
+  field(EGU,  "V")
+}
+
+record(longin, "$(P):HV:MAX_RBV") {
+  field(DESC, "Max external HV")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getMaxExtHV() $(port) 0")
+  field(SCAN, "1 second")
+  field(EGU,  "V")
+  field(SDIS, "$(P):RUNNING")
+}
+
+record(longout, "$(P):HV") {
+  field(DESC, "Set external HV")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto setExtHV() $(port) 0")
+  field(EGU,  "V")
+}
+
+record(longin, "$(P):HV_RBV") {
+  field(DESC, "External HV")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getExtHV() $(port) 0")
+  field(SCAN, "1 second")
+  field(EGU,  "V")
+  field(SDIS, "$(P):RUNNING")
+}
+
+# Integration period
+
+# % autosave 2 VAL
+record(ao, "$(P):PERIOD") {
+  field(DESC, "Set integration period")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto setIntPeriod() $(port) 0")
+  field(PREC, "4")
+  field(EGU,  "s")
+  field(DRVH, "65")
+  field(DRVL, "5e-6")
+}
+
+record(ai, "$(P):PERIOD_RBV") {
+  field(DESC, "Integration period")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getIntPeriod() $(port) 0")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(EGU,  "s")
+  field(SDIS, "$(P):RUNNING")
+}
+
+# Current range
+
+record(ao, "$(P):RANGE") {
+  field(DESC, "Set current range")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto setCurrRange() $(port) 0")
+  field(PREC, "5")
+  field(EGU,  "s")
+}
+
+record(ai, "$(P):RANGE_RBV") {
+  field(DESC, "Current range")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto getCurrRange() $(port) 0")
+  field(SCAN, "1 second")
+  field(PREC, "5")
+  field(EGU,  "A")
+  field(SDIS, "$(P):RUNNING")
+}
+
+
+# MEASUREMENTS
+
+# Current
+
+record(ai, "$(P):CURRENT_RBV") {
+  field(DESC, "Current")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto readCurr() $(port) 0")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(EGU,  "A")
+  field(SDIS, "$(P):RUNNING")
+}
+
+# Charge
+
+record(ai, "$(P):CHARGE_RBV") {
+  field(DESC, "Charge")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto readChar() $(port) 0")
+  field(SCAN, "1 second")
+  field(PREC, "4")
+  field(EGU,  "C")
+  field(SDIS, "$(P):RUNNING")
+}
+
+# Digitals
+
+record(longin, "$(P):DIGITALS_RBV") {
+  field(DESC, "Charge")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto readDigi() $(port) 0")
+  field(SCAN, "1 second")
+  field(SDIS, "$(P):RUNNING")
+}
+
+
+# MISCELLANEOUS
+
+# Manual messaging
+
+record(stringout, "$(P):MESSAGE") {
+  field(DESC, "Send message")
+  field(DTYP, "stream")
+  field(OUT,  "@IC101.proto sendMessage() $(port) 0")
+}
+
+record(stringin, "$(P):MESSAGE_RBV") {
+  field(DESC, "Read message reply")
+  field(DTYP, "stream")
+  field(INP,  "@IC101.proto readMessage() $(port) 0")
+  field(SCAN, "I/O Intr")
+}

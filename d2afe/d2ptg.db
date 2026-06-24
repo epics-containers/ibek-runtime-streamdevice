@@ -1,0 +1,5 @@
+record(ai, "$(P,undefined):MASK")
+{
+    field(VAL, "$(D2AFE_MASK,undefined)")
+    field(PINI, "YES")
+}

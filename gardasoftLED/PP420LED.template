@@ -1,0 +1,280 @@
+# Only one instance created for the entire controller.
+
+# % macro, P, Domain
+# % macro, STREAMS_PORT, Asyn port name for stream device
+# % macro, name, gui element name
+# % gui, $(name).LED, edm, PP400Series.edl, P=$(P)
+
+record(ao, "$(P):SAVE")
+{
+  field(DESC, "Save Settings to Memory")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol save($(P)) $(STREAMS_PORT)")
+}
+
+########################## Versions ######################
+
+record(ao, "$(P):VERSION")
+{
+  field(DESC, "Get Version Number")
+  field(DTYP, "stream")
+  field(PINI, "YES")
+  field(OUT,  "@PP400Series.protocol getVersion($(P)) $(STREAMS_PORT)")
+}
+
+record(stringin, "$(P):MODEL_RBV")
+{
+  field(DESC, "Model Number")
+}
+
+record(stringin, "$(P):HW_VERSION_RBV")
+{
+  field(DESC, "Hardware Version Number")
+}
+
+record(stringin, "$(P):FW_VERSION_RBV")
+{
+  field(DESC, "Firmware Version Number")
+}
+
+##################### Internal Trigger ######################
+
+record(bo, "$(P):TRIG_STATE")
+{
+  field(DESC, "Internal Trigger State")
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(FLNK, "$(P):INTERNAL_TRIGGER PP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(P):PERIOD")
+{
+  field(DESC, "Internal Trigger Period")
+  field(PINI, "YES")
+  field(FLNK, "$(P):INTERNAL_TRIGGER PP")
+}
+
+record(ao, "$(P):INTERNAL_TRIGGER")
+{
+  field(DESC, "Set Internal Trigger Mode")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol setInternalTrigger($(P),TRIG_STATE,PERIOD) $(STREAMS_PORT)")
+}
+
+record(bi, "$(P):TRIG_STATE_RBV")
+{
+  field(DESC, "Internal Trigger State")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+}
+
+record(ai, "$(P):PERIOD_RBV")
+{
+  field(DESC, "Internal Trigger Period")
+  field(EGU, "ms")
+}
+
+################### Unknown Statuses ############################
+
+record(ai, "$(P):PW")
+{
+  field(DESC, "PW")
+}
+
+record(ai, "$(P):ST")
+{
+  field(DESC, "ST")
+}
+
+record(ai, "$(P):TM")
+{
+  field(DESC, "TM")
+}
+
+record(ai, "$(P):TP")
+{
+  field(DESC, "TP")
+}
+
+################### Global Brightness ############################
+
+#% autosave 1 VAL
+record(ao, "$(P):BRIGHTNESS")
+{
+  field(DESC, "Global Brightness for All Channels")
+  field(OUT, "$(P):BRIGHTNESS_APPLY PP")
+  field(DRVH, "100")
+  field(DRVL, "0")
+}
+
+# Links are setup by individual channel
+record(dfanout, "$(P):BRIGHTNESS_APPLY")
+{
+  field(DESC, "Push the Global Brightness to Channels")
+  field(OMSL, "supervisory")
+  field(OUTA, "$(P):CH1:BRIGHTNESS PP")
+  field(OUTB, "$(P):CH2:BRIGHTNESS PP")
+  field(OUTC, "$(P):CH3:BRIGHTNESS PP")
+  field(OUTD, "$(P):CH4:BRIGHTNESS PP")
+}
+
+# Links are setup by individual channel
+record(calc, "$(P):BRIGHTNESS_IS_OFF")
+{
+  field(DESC, "Flag if Brightness Off on All Channels")
+  field(CALC, "A==0 && B==0 && C==0 && D==0")
+  field(INPA, "$(P):CH1:BRIGHTNESS")
+  field(INPB, "$(P):CH2:BRIGHTNESS")
+  field(INPC, "$(P):CH3:BRIGHTNESS")
+  field(INPD, "$(P):CH4:BRIGHTNESS")
+}
+
+record(sseq, "$(P):BRIGHTNESS_OFF")
+{
+  field(DESC, "Brightness Off for All Channels")
+  field(DOL1, "1")
+  field(LNK1, "$(P):SAVE_ON_BRIGHTNESS.PROC CA")
+  field(WAIT1,"Wait")
+  field(DOL2, "0")
+  field(LNK2, "$(P):BRIGHTNESS CA")
+  field(WAIT2, "Wait")
+}
+
+record(calcout, "$(P):SAVE_ON_BRIGHTNESS")
+{
+  field(DESC, "Save Current Brightness ON Settings")
+  field(CALC, "A")
+  field(INPA, "$(P):BRIGHTNESS_IS_OFF PP")
+  field(OOPT, "When Zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "1")
+  field(OUT, "$(P):SAVE_BRIGHTNESS.PROC")
+}
+
+# Links are setup by individual channel
+record(fanout, "$(P):SAVE_BRIGHTNESS")
+{
+  field(LNK1, "$(P):CH1:SAVE_BRIGHTNESS")
+  field(LNK2, "$(P):CH2:SAVE_BRIGHTNESS")
+  field(LNK3, "$(P):CH3:SAVE_BRIGHTNESS")
+  field(LNK4, "$(P):CH4:SAVE_BRIGHTNESS")
+}
+
+record(calcout, "$(P):BRIGHTNESS_ON")
+{
+  field(DESC, "Brightness On for All Ch at Latest Value")
+  field(CALC, "A")
+  field(INPA, "$(P):BRIGHTNESS_IS_OFF PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "1")
+  field(OUT, "$(P):RESTORE_BRIGHTNESS.PROC")
+}
+
+# Links are setup by individual channel
+record(fanout, "$(P):RESTORE_BRIGHTNESS")
+{
+  field(LNK1, "$(P):CH1:RESTORE_BRIGHTNESS")
+  field(LNK2, "$(P):CH2:RESTORE_BRIGHTNESS")
+  field(LNK3, "$(P):CH3:RESTORE_BRIGHTNESS")
+  field(LNK4, "$(P):CH4:RESTORE_BRIGHTNESS")
+}
+
+################### Global Mode ############################
+
+record(mbbo, "$(P):MODE")
+{
+  field(DESC, "Global Mode for All Channels")
+  field(ZRST, "Continuous")
+  field(ONST, "Pulsed")
+  field(TWST, "Switched")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(TWVL, "3")
+  field(OUT, "$(P):MODE_APPLY PP")
+}
+
+# Links are setup by individual channel
+record(dfanout, "$(P):MODE_APPLY")
+{
+  field(DESC, "Push the Global Mode to Channels")
+  field(OMSL, "supervisory")
+  field(OUTA, "$(P):CH1:MODE PP")
+  field(OUTB, "$(P):CH2:MODE PP")
+  field(OUTC, "$(P):CH3:MODE PP")
+  field(OUTD, "$(P):CH4:MODE PP")
+}
+
+################### Global Apply ############################
+
+# Links are setup by individual channel
+record(fanout, "$(P):APPLY")
+{
+  field(DESC, "Apply Settings")
+  field(LNK1, "$(P):CH1:APPLY")
+  field(LNK2, "$(P):CH2:APPLY")
+  field(LNK3, "$(P):CH3:APPLY")
+  field(LNK4, "$(P):CH4:APPLY")
+}
+
+record(mbbi, "$(P):PROFILE_TO_EDIT_SEL")
+{
+  field(DESC, "Select Profile to Edit")
+  field(ZRST, "Profile 1")
+  field(ONST, "Profile 2")
+  field(TWST, "Profile 3")
+  field(THST, "Profile 4")
+  field(FRST, "Profile 5")
+  field(FVST, "Profile 6")
+  field(VAL, "0")
+  field(PINI, "YES")
+}
+
+# TODO AUTOSAVE
+record(mbbo, "$(P):PROFILE_TO_LOAD_SEL")
+{
+  field(DESC, "Select Profile to Load")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRST, "Profile 1")
+  field(ONST, "Profile 2")
+  field(TWST, "Profile 3")
+  field(THST, "Profile 4")
+  field(FRST, "Profile 5")
+  field(FVST, "Profile 6")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(TWVL, "3")
+  field(THVL, "4")
+  field(FRVL, "5")
+  field(FVVL, "6")
+  field(VAL, "0")
+  field(OUT, "$(P):LOAD_PROFILE.SELN PP")
+}
+
+record(fanout, "$(P):LOAD_PROFILE")
+{
+  field(DESC, "Load Selected Profile")
+  field(SELM, "Specified")
+  field(LNK1, "$(P):PR1:LOAD")
+  field(LNK2, "$(P):PR2:LOAD")
+  field(LNK3, "$(P):PR3:LOAD")
+  field(LNK4, "$(P):PR4:LOAD")
+  field(LNK5, "$(P):PR5:LOAD")
+  field(LNK6, "$(P):PR6:LOAD")
+}
+
+record(sseq, "$(P):APPLY_PROFILE")
+{
+  field(DESC, "Load and Apply Selected Profile")
+  field(DOL1, "1")
+  field(LNK1, "$(P):LOAD_PROFILE.PROC CA")
+  field(WAIT1,"Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):APPLY CA")
+  field(WAIT2, "Wait")
+}
+
+
+

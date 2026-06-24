@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: jena 4-3
+# Source: /dls_sw/prod/R3.14.12.7/support/jena/4-3
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/jena/ release.
+
+module: jena
+
+entity_models:
+  - name: aoPiezoControl
+    description: |-
+      Jena piezo control analogue output via Hytec ADC/DAC channels
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      OUT:
+        type: str
+        description: |-
+          Output channel link for the ao record
+      INP:
+        type: str
+        description: |-
+          Input channel link for the ai readback record
+      OUTEGUF:
+        type: float
+        description: |-
+          Output engineering units full scale value
+      OUTEGUL:
+        type: float
+        description: |-
+          Output engineering units low value
+      INEGUF:
+        type: float
+        description: |-
+          Input engineering units full scale value
+      INEGUL:
+        type: float
+        description: |-
+          Input engineering units low value
+      DRVH:
+        type: float
+        description: |-
+          Drive high limit
+      DRVL:
+        type: float
+        description: |-
+          Drive low limit
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      PREC:
+        type: int
+        description: |-
+          Display precision
+    databases:
+      - file: aoPiezoControl.template
+        args:
+          .*:
+  - name: edaMotor
+    description: |-
+      Jena EDA piezo channel presented as a soft motor record
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      CH:
+        type: int
+        description: |-
+          EDA channel number
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+      MRES:
+        type: float
+        description: |-
+          Motor resolution
+      RRES:
+        type: float
+        description: |-
+          Readback resolution
+      DHLM:
+        type: float
+        description: |-
+          Dial high limit
+      MAXADC:
+        type: float
+        description: |-
+          Maximum ADC / output voltage
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      DESC:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: edaMotor.template
+        args:
+          .*:
+  - name: edaSimple
+    description: |-
+      Jena EDA piezo channel with simple demand and readback records
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      CH:
+        type: int
+        description: |-
+          EDA channel number
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+    databases:
+      - file: edaSimple.template
+        args:
+          .*:
+  - name: eda
+    description: |-
+      Jena EDA controller status and activation records
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+    databases:
+      - file: eda.template
+        args:
+          .*:

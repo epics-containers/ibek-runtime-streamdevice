@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: QPC 2-3
+# Source: /dls_sw/prod/R3.14.12.7/support/QPC/2-3
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/QPC/ release.
+
+module: QPC
+
+entity_models:
+  - name: digitelQpc
+    description: |-
+      Digitel QPC ion pump controller (single QPC controller)
+    parameters:
+      QPC:
+        type: str
+        description: |-
+          QPC Controller PV part name
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial (2 hex digits - 01 by default)
+        default: "01"
+    databases:
+      - file: digitelQPCController.template
+        args:
+          .*:

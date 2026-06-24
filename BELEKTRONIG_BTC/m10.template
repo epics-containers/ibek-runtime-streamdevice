@@ -1,0 +1,174 @@
+
+#% macro, P, Device name
+#% macro, R, Heater name
+#% macro, DESC, Description
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boydetail, m10App_opi/m10.opi, P=$(P),R=$(R),DESC=$(DESC)
+# % gui, $(name=), boyembed, m10App_opi/m10_embed_box.opi, P=$(P),R=$(R),DESC=$(DESC)
+# % gui, $(name=), boyembed, m10App_opi/m10_embed.opi, P=$(P),R=$(R),DESC=$(DESC)
+
+# % archiver 10 Monitor
+record (ai,"$(P):$(R):T"){
+        field (EGU, "deg C")
+		field (DESC, "Actual $(R)")	
+        field (LINR, "LINEAR")
+		field (PREC, "3")
+        field (ESLO, "1e-3")
+        field (DTYP, "stream")
+        field (INP, "@m10.proto actual $(PORT)")
+        field (SCAN, ".2 second")
+		field (FLNK, "$(P):$(R):error PP")
+	
+}
+
+
+record (calc,"$(P):$(R):error"){
+	field (INPA, "$(P):$(R):T")
+	field (INPB, "$(P):$(R):SP")
+	field (CALC, "(B==0)?1:(A-B)/B")
+}
+
+
+# % archiver 10 Monitor
+record (ai,"$(P):$(R):power"){
+        field (EGU, "%")
+		field (PREC, "1")
+		field (DESC, "rel. Power")	
+        field (LINR, "LINEAR")
+		field (ESLO, "1.52590218967e-3")
+        field (DTYP, "stream")
+        field (INP, "@m10.proto power_read $(PORT)")
+        field (SCAN, ".5 second")
+}
+
+record (ao,"$(P):$(R):power:set"){
+        field (EGU, "%")
+		field (PREC, "1")
+		field (DESC, "rel. Power")	
+        field (LINR, "LINEAR")
+		field (ESLO, "1.52590218967e-3")
+        field (DTYP, "stream")
+        field (OUT, "@m10.proto power $(PORT)")
+}
+
+# % archiver 10 Monitor
+record (ai,"$(P):$(R):current"){
+        field (EGU, "mA")
+		field (PREC, "1")
+		field (DESC, "Current")	
+        field (DTYP, "stream")
+        field (INP, "@m10.proto current $(PORT)")
+        field (SCAN, ".5 second")
+}
+
+
+# % archiver 10 Monitor
+record (ai,"$(P):$(R):mode"){
+        field (EGU, "Mode")
+		field (PREC, "0")
+		field (DESC, "0=man, 1=heat, 2=cool, 3=h/c")	
+        field (LINR, "LINEAR")
+        field (DTYP, "stream")
+        field (INP, "@m10.proto mode_read $(PORT)")
+		field (PINI, "YES")
+}
+
+record (ao,"$(P):$(R):mode:set"){
+        field (EGU, "Mode")
+		field (PREC, "0")
+		field (DESC, "0=man, 1=heat, 2=cool, 3=h/c")	
+        field (DTYP, "stream")
+        field (OUT, "@m10.proto mode $(PORT)")
+		field (FLNK,"$(P):$(R):mode PP")
+}
+
+# % archiver 10 Monitor
+record (ai,"$(P):$(R):SP"){
+        field (EGU, "deg C")
+		field (PREC, "3")
+		field (DESC, "Setpoint")	
+        field (LINR, "LINEAR")
+        field (ESLO, "1e-3")
+        field (DTYP, "stream")
+        field (INP, "@m10.proto setpoint_read $(PORT)")
+		field (PINI, "YES")
+}
+
+
+record (ao,"$(P):$(R):SP:set"){
+        field (DESC, "$(R)")
+		field (PREC, "3")
+        field (EGU, "deg C")
+        field (LINR, "LINEAR")
+        field (ESLO, "1e-3")
+        field (DTYP, "stream")
+		field (FLNK, "$(P):$(R):SP PP")
+        field (OUT, "@m10.proto setpoint $(PORT)")
+}
+
+record (ai,"$(P):$(R):P"){
+        field (DESC, "Proportional")
+		field (PREC, "1")
+        field (EGU, "1/deg C")
+        field (LINR, "LINEAR")
+        field (ESLO, "1e-2")
+        field (DTYP, "stream")
+        field (INP, "@m10.proto proportional_read $(PORT)")
+		field (PINI, "YES")
+}
+
+
+record (ao,"$(P):$(R):P:set"){
+        field (DESC, "Proportional")
+		field (PREC, "1")
+        field (EGU, "1/deg C")
+        field (LINR, "LINEAR")
+        field (ESLO, "1e-2")
+		field (FLNK, "$(P):$(R):P PP")
+        field (DTYP, "stream")
+        field (OUT, "@m10.proto proportional $(PORT)")
+}
+
+record (ai,"$(P):$(R):I"){
+        field (DESC, "Integral")
+		field (PREC, "1")
+        field (EGU, "s")
+        field (LINR, "LINEAR")
+        field (DTYP, "stream")
+		field (INP, "@m10.proto integral_read $(PORT)")
+		field (PINI, "YES")
+}
+
+record (ao,"$(P):$(R):I:set"){
+        field (DESC, "Integral")
+		field (PREC, "1")
+        field (EGU, "s")
+        field (LINR, "LINEAR")
+        field (DTYP, "stream")
+		field (FLNK, "$(P):$(R):I PP")
+        field (OUT, "@m10.proto integral $(PORT)")
+}
+
+
+record (ai,"$(P):$(R):D"){
+        field (DESC, "Differential")
+	    field (PREC, "1")
+        field (EGU, "s")
+        field (LINR, "LINEAR")
+        field (ESLO, "1e-1")
+        field (DTYP, "stream")
+        field (INP, "@m10.proto differential_read $(PORT)")
+	field (PINI, "YES")
+}
+
+record (ao,"$(P):$(R):D:set"){
+        field (DESC, "Differential")
+	    field (PREC, "1")
+        field (EGU, "s")
+        field (LINR, "LINEAR")
+        field (ESLO, "1e-1")
+        field (DTYP, "stream")
+        field (OUT, "@m10.proto differential $(PORT)")
+	field (FLNK, "$(P):$(R):D PP")
+}

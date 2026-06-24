@@ -1,0 +1,743 @@
+#
+# I400 database
+#
+# M. Walters Tessella/Diamond light Source
+#
+#
+# % macro, P, Device prefix
+# % macro, port, Asyn port
+# % macro, MAXSIG, Max signal
+# % macro, MAXEXT, Max ext
+# % macro, YGAIN, Y Gain
+# % macro, XGAIN, X Gain
+# % macro, CAP0, Capacitor 0 string
+# % macro, CAP1, Capacitor 1 string
+# % macro, gda_name, GDA Name
+# % macro, gda_desc, GDA Description
+#% gdatag,template,currAmpQuad,$(gda_name=),$(gda_desc=)
+#% gdatag,template,bpm,$(gda_bpm_name),$(gda_bpm_desc)
+
+record(transform, "$(P):SETMAX") {
+  field(DESC, "Set limits on max hv")
+  field(A, "$(MAXSIG)")
+  field(CLCB, "A>0?A:0")
+  field(OUTB, "$(P):SETSMH.DRVH")
+  field(CLCC, "A<0?A:0")
+  field(OUTC, "$(P):SETSMH.DRVL")
+  field(D, "$(MAXEXT)")
+  field(CLCE, "D>0?D:0")
+  field(OUTE, "$(P):SETEMH.DRVH")
+  field(CLCF, "D<0?D:0")
+  field(OUTF, "$(P):SETEMH.DRVL")
+  field(PINI, "YES")
+}
+
+record(longout, "$(P):ADMIN") {
+  field(DESC, "Enter admin mode")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) admin() $(port) 0")
+  field(SDIS, "$(P):ADMIN")
+  field(DISV, "0")
+}
+
+record(bo, "$(P):CALIB") {
+  field(DESC, "Calibrate device")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) doCalib() $(port) 0")
+  field(VAL, "1")
+}
+
+record(bo, "$(P):SAVCALIB") {
+  field(DESC, "Save calibration settings")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) saveCalib() $(port) 0")
+  field(VAL, "1")
+}
+
+record(bo, "$(P):SAV") {
+  field(DESC, "Save settings")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) save() $(port) 0")
+  field(VAL, "1")
+}
+
+record(longin, "$(P):INITEMH") {
+  field(DESC, "Initialise max external HV")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):INITEMH2")
+  field(INP, "@$(PROTO=I400.proto) getMaxExtHV() $(port) 0")
+}
+
+record(longout, "$(P):INITEMH2") {
+  field(DESC, "Set setpoint on startup")
+  field(OUT, "$(P):SETEMH.VAL PP")
+  field(DOL, "$(P):INITEMH.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(longout, "$(P):SETEMH") {
+  field(DESC, "Set max external HV")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) setMaxExtHV() $(port) 0")
+  field(EGU, "V")
+  field(SDIS, "$(P):ADMIN")
+  field(DISV, "0")
+}
+
+record(longin, "$(P):GETEMH") {
+  field(DESC, "Get max external HV")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@$(PROTO=I400.proto) getMaxExtHV() $(port) 0")
+  field(EGU, "V")
+  field(SDIS, "$(P):RUNNING")
+  field(FLNK, "$(P):SETEHL")
+}
+
+record(longin, "$(P):INITSMH") {
+  field(DESC, "Initialise max signal HV")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):INITSMH2")
+  field(INP, "@$(PROTO=I400.proto) getMaxSigHV() $(port) 0")
+}
+
+record(longout, "$(P):INITSMH2") {
+  field(DESC, "Set setpoint on startup")
+  field(OUT, "$(P):SETSMH.VAL PP")
+  field(DOL, "$(P):INITSMH.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(longout, "$(P):SETSMH") {
+  field(DESC, "Set max signal HV")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) setMaxSigHV() $(port) 0")
+  field(EGU, "V")
+  field(SDIS, "$(P):ADMIN")
+  field(DISV, "0")
+}
+
+record(longin, "$(P):GETSMH") {
+  field(DESC, "Get max signal HV")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@$(PROTO=I400.proto) getMaxSigHV() $(port) 0")
+  field(EGU, "V")
+  field(SDIS, "$(P):RUNNING")
+  field(FLNK, "$(P):SETSHL")
+}
+
+record(seq, "$(P):SEQRESET") {
+  field(DESC, "Reset amplifier")
+  field(DOL1, "1")
+  field(LNK1, "$(P):RUNNING PP")
+  field(DLY2, "0.1")
+  field(LNK2, "$(P):RESET.PROC PP")
+  field(DLY3, "2.0")
+  field(LNK3, "$(P):SEQINIT.PROC PP")
+}
+
+record(bo, "$(P):RESET") {
+  field(DESC, "Reset device")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) reset() $(port) 0")
+  field(VAL, "1")
+}
+
+record(waveform, "$(P):READ") {
+  field(DESC, "Read currents from amplifier")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):PARSE")
+  field(INP, "@$(PROTO=I400.proto) readCurr() $(port) 0")
+  field(NELM, "100")
+  field(FTVL, "CHAR")
+  field(SDIS, "$(P):RUNNING")
+}
+
+record(bo, "$(P):RCL") {
+  field(DESC, "Recall settings")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) recall() $(port) 0")
+  field(VAL, "1")
+}
+
+record(bo, "$(P):RCLCALIB") {
+  field(DESC, "Recall calibration settings")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) recallCalib() $(port) 0")
+  field(VAL, "1")
+}
+
+record(seq, "$(P):SEQINIT") {
+  field(DESC, "Initialise amplifier")
+  field(PINI, "YES")
+  field(DOL1, "1")
+  field(LNK1, "$(P):RUNNING PP")
+  field(DLY2, "0.5")
+  field(LNK2, "$(P):COMMS.PROC PP")
+  field(DLY3, "0.2")
+  field(LNK3, "$(P):RCL.PROC PP")
+  field(DLY4, "0.1")
+  field(LNK4, "$(P):RCLCALIB.PROC PP")
+  field(DLY5, "0.1")
+  field(DOL5, "0")
+  field(LNK5, "$(P):ADMIN PP")
+  field(DLY6, "0.1")
+  field(LNK6, "$(P):INITRANGE.PROC PP")
+  field(DLY7, "0.1")
+  field(LNK7, "$(P):INITTIME.PROC PP")
+  field(DLY8, "0.1")
+  field(LNK8, "$(P):INITEMH.PROC PP")
+  field(DLY9, "0.1")
+  field(LNK9, "$(P):INITSMH.PROC PP")
+  field(FLNK, "$(P):SEQINIT2")
+}
+
+record(seq, "$(P):SEQINIT2") {
+  field(DESC, "Initialise amplifier")
+  field(LNK1, "$(P):INITEXTHV.PROC PP")
+  field(DLY2, "0.1")
+  field(LNK2, "$(P):INITSIGHV.PROC PP")
+  field(DLY3, "0.1")
+  field(LNK3, "$(P):INITCAP.PROC PP")
+  field(DLY5, "0.1")
+  field(LNK5, "$(P):INIT.PROC PP")
+  field(DLYA, "0.1")
+  field(DOLA, "0")
+  field(LNKA, "$(P):RUNNING PP")
+}
+
+record(bo, "$(P):INIT") {
+  field(DESC, "Initialise device")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) init() $(port) 0")
+  field(VAL, "1")
+}
+
+record(ai, "$(P):INITRANGE") {
+  field(DESC, "Initialise current range")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):INITRANGE2")
+  field(INP, "@$(PROTO=I400.proto) getRang() $(port) 0")
+}
+
+record(ao, "$(P):INITRANGE2") {
+  field(DESC, "Set setpoint on startup")
+  field(OUT, "$(P):SETRANGE.VAL PP")
+  field(DOL, "$(P):INITRANGE.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(ao, "$(P):SETRANGE") {
+  field(DESC, "Set current range")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) setRang() $(port) 0")
+  field(EGU, "A")
+}
+
+record(ai, "$(P):GETRANGE") {
+  field(DESC, "Get current range")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@$(PROTO=I400.proto) getRang() $(port) 0")
+  field(SDIS, "$(P):RUNNING")
+  field(FLNK, "$(P):HIGHLIM")
+  field(EGU, "A")
+  field(PREC, "2")
+}
+
+record(ai, "$(P):INITTIME") {
+  field(DESC, "Initialise integration time")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):CGETSUB")
+  field(INP, "@$(PROTO=I400.proto) getTime($(P):CGETSUB) $(port) 0")
+}
+
+record(calcout, "$(P):CINITTIME") {
+  field(DESC, "calc time got")
+  field(INPA, "$(P):INITTIME")
+  field(CALC, "A=0?4:-LOG(A)")
+  field(OUT, "$(P):MINITTIME.RVAL PP")
+}
+
+record(mbbi, "$(P):MINITTIME") {
+  field(DESC, "Menu of times")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "4")
+  field(ONVL, "3")
+  field(TWVL, "2")
+  field(THVL, "1")
+  field(FRVL, "0")
+  field(ZRST, "0.1 mS")
+  field(ONST, "1 mS")
+  field(TWST, "10 mS")
+  field(THST, "100 mS")
+  field(FRST, "1 S")
+}
+
+record(longout, "$(P):MINITTIME2") {
+  field(DESC, "Initialise times")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(P):MINITTIME")
+  field(OUT, "$(P):MSETTIME PP")
+}
+
+#% gdatag,mbbinary,rw,$(gda_name=),RANGE, Range Selection
+#% autosave 2 VAL
+record(mbbo, "$(P):MSETTIME") {
+  field(DESC, "Menu of times")
+  field(DTYP, "Raw Soft Channel")
+  field(OUT, "$(P):CSETTIME.A PP")
+  field(ZRVL, "4")
+  field(ONVL, "3")
+  field(TWVL, "2")
+  field(THVL, "1")
+  field(FRVL, "0")
+  field(ZRST, "0.1 mS")
+  field(ONST, "1 mS")
+  field(TWST, "10 mS")
+  field(THST, "100 mS")
+  field(FRST, "1 S")
+}
+
+#% autosave 2 VAL
+record(mbbo, "$(P):MSETSUB") {
+  field(DESC, "Menu of subsamples")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(ZRST, "1")
+  field(ONST, "2")
+  field(FLNK, "$(P):MSETTIME")
+}
+
+record(calcout, "$(P):CSETTIME") {
+  field(DESC, "calc time to set")
+  field(CALC, "10^-A")
+  field(OUT, "$(P):SETTIME PP")
+}
+
+record(ao, "$(P):SETTIME") {
+  field(DESC, "Set integration time")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) setTime($(P):MSETSUB.RVAL) $(port) 0")
+  #field(OUT, "@$(PROTO=I400.proto) setTime() $(port) 0")
+  field(EGU, "S")
+  field(PREC, "2")
+}
+
+record(ai, "$(P):GETTIME") {
+  field(DESC, "Get integration time")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@$(PROTO=I400.proto) getTime($(P):CGETSUB.A) $(port) 0")
+  field(SDIS, "$(P):RUNNING")
+  field(EGU, "S")
+  field(PREC, "2")
+  field(FLNK, "$(P):CGETSUB")
+}
+
+record(calcout, "$(P):CGETSUB") {
+  field(DESC, "calc time got")
+  field(CALC, "A=0?1:A")
+  field(OUT, "$(P):MGETSUB.RVAL PP")
+  field(FLNK, "$(P):CGETTIME")
+}
+
+record(mbbi, "$(P):MGETSUB") {
+  field(DESC, "Menu of Subsamples")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(ZRST, "1")
+  field(ONST, "2")
+}
+
+record(calcout, "$(P):CGETTIME") {
+  field(DESC, "calc time got")
+  field(INPA, "$(P):GETTIME")
+  field(CALC, "A=0?4:-LOG(A)")
+  field(OUT, "$(P):MGETTIME.RVAL PP")
+}
+
+record(mbbi, "$(P):MGETTIME") {
+  field(DESC, "Menu of times")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "4")
+  field(ONVL, "3")
+  field(TWVL, "2")
+  field(THVL, "1")
+  field(FRVL, "0")
+  field(ZRST, "0.1 mS")
+  field(ONST, "1 mS")
+  field(TWST, "10 mS")
+  field(THST, "100 mS")
+  field(FRST, "1 S")
+}
+
+record(longin, "$(P):INITEXTHV") {
+  field(DESC, "Initialise external HV")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):INITEXTHV2")
+  field(INP, "@$(PROTO=I400.proto) getExtHV() $(port) 0")
+}
+
+record(longout, "$(P):INITEXTHV2") {
+  field(DESC, "Set setpoint on startup")
+  field(OUT, "$(P):SETEXTHV.VAL PP")
+  field(DOL, "$(P):INITEXTHV.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(longout, "$(P):SETEXTHV") {
+  field(DESC, "Set external HV")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) setExtHV() $(port) 0")
+  field(EGU, "V")
+}
+
+record(longin, "$(P):GETEXTHV") {
+  field(DESC, "Get external HV")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@$(PROTO=I400.proto) getExtHV() $(port) 0")
+  field(SDIS, "$(P):RUNNING")
+  field(EGU, "V")
+}
+
+record(longin, "$(P):INITSIGHV") {
+  field(DESC, "Initialise signal HV")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):INITSIGHV2")
+  field(INP, "@$(PROTO=I400.proto) getSigHV() $(port) 0")
+}
+
+record(longout, "$(P):INITSIGHV2") {
+  field(DESC, "Set setpoint on startup")
+  field(OUT, "$(P):SETSIGHV.VAL PP")
+  field(DOL, "$(P):INITSIGHV.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(longout, "$(P):SETSIGHV") {
+  field(DESC, "Set signal HV")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) setSigHV() $(port) 0")
+  field(EGU, "V")
+}
+
+record(longin, "$(P):GETSIGHV") {
+  field(DESC, "Get signal HV")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@$(PROTO=I400.proto) getSigHV() $(port) 0")
+  field(SDIS, "$(P):RUNNING")
+  field(EGU, "V")
+}
+
+record(genSub, "$(P):PARSE") {
+  field(DESC, "Parse Input")
+  field(SNAM, "i400parse")
+  field(INPA, "$(P):READ")
+  field(FTA, "CHAR")
+  field(NOA, "100")
+  field(OUTA, "$(P):TIME PP")
+  field(OUTB, "$(P):CURR1 PP")
+  field(OUTC, "$(P):CURR2 PP")
+  field(OUTD, "$(P):CURR3 PP")
+  field(OUTE, "$(P):CURR4 PP")
+  field(OUTF, "$(P):STATUS1 PP")
+  field(OUTG, "$(P):STATUS2 PP")
+  field(OUTH, "$(P):STATUS3 PP")
+  field(OUTI, "$(P):STATUS4 PP")
+  field(FTVA, "DOUBLE")
+  field(FTVB, "DOUBLE")
+  field(FTVC, "DOUBLE")
+  field(FTVD, "DOUBLE")
+  field(FTVE, "DOUBLE")
+  field(FTVF, "LONG")
+  field(FTVG, "LONG")
+  field(FTVH, "LONG")
+  field(FTVI, "LONG")
+  field(FLNK, "$(P):CALC")
+}
+
+record(ao, "$(P):TIME") {
+  field(DESC, "Integration time")
+  field(DTYP, "Soft Channel")
+  field(EGU, "S")
+  field(PREC, "2")
+}
+
+#% gdatag,pv,ro,$(gda_curr_name),I1,Channel 1 Current
+#% archiver 1 Monitor
+record(ao, "$(P):CURR1") {
+  field(DESC, "Current 1")
+  field(DTYP, "Soft Channel")
+  field(EGU, "A")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(PREC, "4")
+  field(ADEL, "$(ADEL=0.001)")
+}
+
+#% gdatag,pv,ro,$(gda_curr_name),I2,Channel 2 Current
+#% archiver 1 Monitor
+record(ao, "$(P):CURR2") {
+  field(DESC, "Current 2")
+  field(DTYP, "Soft Channel")
+  field(EGU, "A")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(PREC, "4")
+  field(ADEL, "$(ADEL=0.001)")
+}
+
+#% gdatag,pv,ro,$(gda_curr_name),I3,Channel 3 Current
+#% archiver 1 Monitor
+record(ao, "$(P):CURR3") {
+  field(DESC, "Current 3")
+  field(DTYP, "Soft Channel")
+  field(EGU, "A")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(PREC, "4")
+  field(ADEL, "$(ADEL=0.001)")
+}
+
+#% gdatag,pv,ro,$(gda_curr_name),I4,Channel 4 Current
+#% archiver 1 Monitor
+record(ao, "$(P):CURR4") {
+  field(DESC, "Current 4")
+  field(DTYP, "Soft Channel")
+  field(EGU, "A")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(PREC, "4")
+  field(ADEL, "$(ADEL=0.001)")
+}
+
+record(longout, "$(P):STATUS1") {
+  field(DESC, "Status 1")
+  field(DTYP, "Soft Channel")
+}
+
+record(longout, "$(P):STATUS2") {
+  field(DESC, "Status 2")
+  field(DTYP, "Soft Channel")
+}
+
+record(longout, "$(P):STATUS3") {
+  field(DESC, "Status 3")
+  field(DTYP, "Soft Channel")
+}
+
+record(longout, "$(P):STATUS4") {
+  field(DESC, "Status 4")
+  field(DTYP, "Soft Channel")
+}
+
+record(bo, "$(P):RUNNING") {
+  field(DESC, "Gate for initialising")
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Running")
+  field(ONAM, "Disabled")
+}
+
+record(calcout, "$(P):HIGHLIM") {
+  field(DESC, "Calculate high limit")
+  field(FLNK, "$(P):LOWLIM")
+  field(CALC, "A*0.95")
+  field(INPA, "$(P):GETRANGE")
+  field(OUT, "$(P):HIGHFAN PP")
+}
+
+record(calcout, "$(P):LOWLIM") {
+  field(DESC, "Calculate low limit")
+  field(CALC, "A*-0.95")
+  field(INPA, "$(P):GETRANGE")
+  field(OUT, "$(P):LOWFAN PP")
+}
+
+record(ao, "$(P):YGAIN") {
+  field(DESC, "Y Gain coefficient")
+  field(PINI, "YES")
+  field(VAL, "$(YGAIN)")
+}
+                                                                                                                                                                                                                                                
+record(ao, "$(P):XGAIN") {
+  field(DESC, "X Gain coefficient")
+  field(PINI, "YES")
+  field(VAL, "$(XGAIN)")
+}
+                                                                                                                                                                                                                                                
+record(transform, "$(P):CALC") {
+  field(CMTA, "Blade Y+, Quad Y+")
+  field(INPA, "$(P):CURR1.VAL MS")
+  field(CMTB, "Blade Y-, Quad X-")
+  field(INPB, "$(P):CURR2.VAL MS")
+  field(CMTC, "Quad Y-")
+  field(INPC, "$(P):CURR3.VAL MS")
+  field(CMTD, "Quad X+")
+  field(INPD, "$(P):CURR4.VAL MS")
+  field(CMTE, "Y gain")
+  field(INPE, "$(P):YGAIN")
+  field(CMTF, "X gain")
+  field(INPF, "$(P):XGAIN")
+  field(CMTG, "Total Intensity")
+  field(CLCG, "A+B+C+D")
+  field(OUTG, "$(P):INTEN PP")
+  field(CMTH, "Blade position")
+  field(CLCH, "(A+B)=0?0:E*(A-B)/(A+B)")
+  field(CMTJ, "Quad Y position")
+  field(CLCJ, "(A+C)=0?0:E*(A-C)/(A+C)")
+  field(OUTJ, "$(P):YPOS PP")
+  field(CMTK, "Quad X position")
+  field(CLCK, "(D+B)=0?0:F*(D-B)/(D+B)")
+  field(OUTK, "$(P):XPOS PP")
+  field(PREC, "4")
+}
+
+# Records used by BPM screens
+#% gdatag,pv,ro,$(gda_bpm_name),INTENSITY,Summed intensity value
+#% archiver 1 Monitor
+record(ao, "$(P):INTEN") {
+  field(DESC, "Beam intensity")
+  field(ADEL, "$(ADEL=0.001)")
+}
+
+#% gdatag,pv,ro,$(gda_bpm_name),XPOS,X Position
+#% archiver 1 Monitor
+record(ao, "$(P):XPOS") {
+  field(DESC, "Beam X position")
+  field(ADEL, "$(ADEL=0.001)")
+}
+
+#% gdatag,pv,ro,$(gda_bpm_name),YPOS,Y Position
+#% archiver 1 Monitor
+record(ao, "$(P):YPOS") {
+  field(DESC, "Beam Y position")
+  field(ADEL, "$(ADEL=0.001)")
+}
+
+record(transform, "$(P):SETEHL") {
+  field(DESC, "Set limit on record")
+  field(INPA, "$(P):GETEMH")
+  field(CLCB, "A>0?A:0")
+  field(OUTB, "$(P):SETEXTHV.DRVH")
+  field(CLCC, "A<0?A:0")
+  field(OUTC, "$(P):SETEXTHV.DRVL")
+}
+                                                                                                                                                                        
+record(transform, "$(P):SETSHL") {
+  field(DESC, "Set limit on record")
+  field(INPA, "$(P):GETSMH")
+  field(CLCB, "A>0?A:0")
+  field(OUTB, "$(P):SETSIGHV.DRVH")
+  field(CLCC, "A<0?A:0")
+  field(OUTC, "$(P):SETSIGHV.DRVL")
+}
+
+record(dfanout, "$(P):HIGHFAN") {
+  field(DESC, "Fanout +ve limit")
+  field(OUTA, "$(P):CURR1.HIHI")
+  field(OUTB, "$(P):CURR2.HIHI")
+  field(OUTC, "$(P):CURR3.HIHI")
+  field(OUTD, "$(P):CURR4.HIHI")
+}
+
+record(dfanout, "$(P):LOWFAN") {
+  field(DESC, "Fanout -ve limit")
+  field(OUTA, "$(P):CURR1.LOLO")
+  field(OUTB, "$(P):CURR2.LOLO")
+  field(OUTC, "$(P):CURR3.LOLO")
+  field(OUTD, "$(P):CURR4.LOLO")
+}
+
+record(bi, "$(P):INITCAP") {
+  field(DESC, "Initialise Capacitor")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):INITCAP2")
+  field(INP, "@$(PROTO=I400.proto) getCap() $(port) 0")
+}
+
+record(bo, "$(P):INITCAP2") {
+  field(DESC, "Set setpoint on startup")
+  field(OUT, "$(P):SETCAP.VAL PP")
+  field(DOL, "$(P):INITCAP.VAL")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 2 VAL
+record(bo, "$(P):SETCAP") {
+  field(DESC, "Set Capacitor")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) setCap() $(port) 0")
+  field(ZNAM, "$(CAP0)")
+  field(ONAM, "$(CAP1)")
+}
+
+record(bi, "$(P):GETCAP") {
+  field(DESC, "Get Capacitor")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@$(PROTO=I400.proto) getCap() $(port) 0")
+  field(ZNAM, "$(CAP0)")
+  field(ONAM, "$(CAP1)")
+  field(SDIS, "$(P):RUNNING")
+  field(FLNK, "$(P):GETCAP2")
+}
+
+record(ai, "$(P):GETCAP2") {
+  field(DESC, "Get Capacitance value")
+  field(DTYP, "stream")
+  field(INP, "@$(PROTO=I400.proto) getCap2() $(port) 0")
+  field(SDIS, "$(P):RUNNING")
+  field(PREC, "2")
+  field(EGU, "F")
+}
+
+record(seq, "$(P):COMMS") {
+  field(DESC, "Init comms")
+  field(DLY1, "0.1")
+  field(DOL1, "12345")
+  field(LNK1, "$(P):ADMIN PP")
+  field(DLY2, "0.1")
+  field(LNK2, "$(P):TIMEOUT.PROC PP")
+  field(DLY3, "0.1")
+  field(LNK3, "$(P):CHECK.PROC PP")
+}
+
+record(longout, "$(P):TIMEOUT") {
+  field(DESC, "Disable timeout")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) timeout() $(port) 0")
+}
+
+record(longout, "$(P):CHECK") {
+  field(DESC, "Enable checksums")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) check() $(port) 0")
+}
+
+record(stringout, "$(P):TEST") {
+  field(DESC, "Test record")
+  field(DTYP, "stream")
+  field(OUT, "@$(PROTO=I400.proto) test() $(port) 0")
+}
+
+# Additional records for GDA interface:
+
+#% gdatag,pv,ro,$(gda_name=),VENDOR,Vendor String
+record(stringout, "$(P):VENDOR") {
+  field(VAL, "FMB Oxford")
+  field(PINI, "YES")
+}
+
+#% gdatag,pv,ro,$(gda_name=),MODEL,Model String
+record(stringout, "$(P):MODEL") {
+  field(VAL, "I400")
+  field(PINI, "YES")  
+}
+

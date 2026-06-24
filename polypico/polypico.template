@@ -1,0 +1,322 @@
+# % macro, P, Domain
+# % macro, PORT, Asyn port name for stream device
+
+#### Ping board #####
+
+record(calcout, "$(P):PING_OK")
+{
+  field(DESC, "Ping works ok")
+  field(INPA, "$(P):PING_BOARD.STAT CP")
+  field(B, "")
+  field(CALC, "A=B?1:0")
+}
+
+record(bo, "$(P):PING_BOARD") {
+  field(DESC, "Ping board")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(VAL,  "")
+  field(PINI, "YES")
+  field(OUT, "@polypico.proto ping_board($(P)) $(PORT) PP")
+}
+
+##### Frequency #####
+
+record(ai, "$(P):FREQ_RBV"){
+  field(DESC, "Read frequency")
+  field(VAL,  "")
+}
+
+record(ao, "$(P):FREQ") {
+  field(DESC, "Set frequency")
+  field(DTYP, "stream")
+  field(VAL,  "10") 
+  field(PINI, "YES")
+  field(OUT, "@polypico.proto set_frequency($(P)) $(PORT) PP")
+}
+
+##### Amplitude #####
+
+record(ai, "$(P):AMPLITUDE_RBV"){
+  field(DESC, "Store amplitude")
+  field(VAL,  "")
+}
+
+record(calc, "$(P):AMPLITUDE_PRCTG_RBV"){
+  field(DESC, "Calc rbv amplitude in percentage")
+  field(A, "10")
+  field(INPB, "$(P):AMPLITUDE_RBV CP")
+  field(CALC, "B/A")
+  field(PREC, "1")
+}
+
+record(ao, "$(P):AMPLITUDE_PRCTG"){
+  field(DESC, "Set amplitude in prercentage")
+  field(PINI, "YES")
+  field(VAL, "10") 
+  field(PREC, "1")
+}
+
+record(calcout, "$(P):AMPLITUDE_CALC"){
+  field(DESC, "Calculate amplitude")
+  field(A, "10")
+  field(DTYP, "stream")
+  field(INPB, "$(P):AMPLITUDE_PRCTG CP")
+  field(CALC, "(A*B)")
+  field(OUT, "@polypico.proto set_amplitude($(P)) $(PORT) PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+##### Pulse width #####
+
+record(ai, "$(P):PULSE_WIDTH_RBV"){
+  field(DESC, "Store pulse width")
+  field(VAL,  "")
+}
+
+record(calc, "$(P):PULSE_WIDTH_PRCTG_RBV"){
+  field(DESC, "Calc rbv pulse width in percentage")
+  field(A, "10")
+  field(INPB, "$(P):PULSE_WIDTH_RBV CP")
+  field(CALC, "B/A")
+  field(PREC, "1")
+}
+
+record(ao, "$(P):PULSE_WIDTH_PRCTG"){
+  field(DESC, "Set pulse width in prercentage")
+  field(VAL,  "50")
+  field(PREC, "1")
+  field(PINI, "YES")
+}
+
+record(calcout, "$(P):PULSE_WIDTH_CALC"){
+  field(DESC, "Calculate pulse width")
+  field(A, "10")
+  field(DTYP, "stream")
+  field(INPB, "$(P):PULSE_WIDTH_PRCTG CP")
+  field(CALC,"A*B")
+  field(OUT, "@polypico.proto set_pulse_width($(P)) $(PORT) PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+##### Strobe Brightness #####
+
+record(ai, "$(P):STROBE_BRIGHTNESS_RBV"){
+  field(DESC, "Store bright rbv")
+  field(VAL,  "")
+}
+
+record(calc, "$(P):STROBE_BRIGHTNESS_PRCTG_RBV"){
+  field(DESC, "Calc rbv strobe br in percentage")
+  field(A, "10")
+  field(INPB, "$(P):STROBE_BRIGHTNESS_RBV CP")
+  field(CALC, "B/A")
+  field(PREC, "1")
+}
+
+record(ao, "$(P):STROBE_BRIGHTNESS_PRCTG"){
+  field(DESC, "Set strobe br in prercentage")
+  field(VAL,  "50")
+  field(PREC, "1")
+  field(PINI, "YES")
+}
+
+record(calcout, "$(P):STROBE_BRIGHTNESS_CALC"){
+  field(DESC, "Calculate strobe br")
+  field(A, "10")
+  field(DTYP, "stream")
+  field(INPB, "$(P):STROBE_BRIGHTNESS_PRCTG CP")
+  field(CALC,"A*B")
+  field(OUT, "@polypico.proto set_strobe_brightness($(P)) $(PORT) PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+##### Packet Length #####
+
+record(ai, "$(P):PACKET_LENGTH_RBV"){
+  field(DESC, "Packet length rbv")
+  field(VAL,  "")
+}
+
+record(ao, "$(P):PACKET_LENGTH") {
+  field(DESC, "Set packet length")
+  field(DTYP, "stream")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(OUT, "@polypico.proto set_packet_length($(P)) $(PORT) PP")
+}
+
+##### Trigger mode #####
+
+record(bi, "$(P):TRIGGER_MODE_RBV"){
+  field(DESC, "Read trigger mode")
+  field(VAL,  "")
+}
+
+record(bo, "$(P):TRIGGER_MODE") {
+  field(DESC, "Set trigger mode")
+  field(DTYP, "stream")
+  field(ZNAM, "Internal")
+  field(ONAM, "External")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(OUT, "@polypico.proto set_trigger_mode($(P)) $(PORT) PP")
+}
+
+##### Dispensing #####
+
+record(stringin, "$(P):DISPENSING_RBV"){
+  field(DESC, "dispensing mode")
+  field(VAL,  "")
+}
+
+record(mbbo, "$(P):DISPENSING") {
+  field(DESC, "Set trigger mode")
+  field(DTYP, "stream")
+  field(ZRST, "S")
+  field(ONST, "D")
+  field(TWST, "P")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(OUT, "@polypico.proto set_dispensing($(P)) $(PORT) PP")
+}
+
+record(scalcout, "$(P):DISPENSING_ON")
+{
+  field(DESC, "Continued dispensing on")
+  field(INAA, "$(P):DISPENSING_RBV CP")
+  field(BB, "D")
+  field(CALC, "AA==BB?1:0")
+}
+
+##### Purge #####
+record(ai, "$(P):PURGE_RBV"){
+  field(DESC, "Purge readback")
+  field(VAL,  "")
+}
+
+
+record(ao, "$(P):PURGE") {
+  field(DESC, "Set purge")
+  field(DTYP, "stream")
+  field(VAL, "100")
+  field(OUT, "@polypico.proto set_purge($(P)) $(PORT) PP")
+}
+
+##### StrobeA enable #####
+
+record(stringin, "$(P):STROBE_A_ENABLE_RBV"){
+  field(DESC, "StrobeA")
+  field(VAL,  "")
+}
+
+record(bo, "$(P):STROBE_A_ENABLE") {
+  field(DESC, "Set strobeA")
+  field(DTYP, "stream")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+  field(VAL,  "1")
+  field(PINI, "YES")
+  field(OUT, "@polypico.proto set_strobeA($(P)) $(PORT)")
+}
+
+###### StrobeB enable ######
+
+record(bi, "$(P):STROBE_B_ENABLE_RBV"){
+  field(DESC, "StrobeB")
+  field(VAL,  "0")
+}
+
+record(bo, "$(P):STROBE_B_ENABLE") {
+  field(DESC, "Set strobeB")
+  field(DTYP, "stream")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(OUT, "@polypico.proto set_strobeB($(P)) $(PORT)")
+}
+##### StrobeA del ####
+
+record(ai, "$(P):STROBE_A_DEL_RBV"){
+  field(DESC, "Read strobe A del")
+  field(VAL,  "")
+}
+
+record(calc, "$(P):STROBE_A_DEL_UM_RBV"){
+  field(DESC, "Calc rbv strobe A del in um")
+  field(A, "16") # 16.0 MHz  clock of the strobe timer 
+  field(INPB, "$(P):STROBE_A_DEL_RBV CP")
+  field(CALC, "B/A")
+  field(PREC, "1")
+}
+
+record(ao, "$(P):STROBE_A_DEL_UM") {
+  field(DESC, "SET strob A del in um")
+  field(VAL,  "10")
+  field(PREC, "1") 
+  field(PINI, "YES")
+}
+
+record(calcout, "$(P):STROBE_A_DEL_CALC"){
+  field(DESC, "Calculate strobe A del")
+  field(A, "16")
+  field(DTYP, "stream")
+  field(INPB, "$(P):STROBE_A_DEL_UM CP")
+  field(CALC,"A*B")
+  field(OUT, "@polypico.proto set_strobeA_delay($(P)) $(PORT) PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+##### StrobeB del #####
+
+record(ai, "$(P):STROBE_B_DEL_RBV"){
+  field(DESC, "Read strobe B del")
+  field(VAL,  "")
+}
+
+record(calc, "$(P):STROBE_B_DEL_UM_RBV"){
+  field(DESC, "Calc rbv strobe B del in um")
+  field(A, "16") # 16.0 MHz  clock of the strobe timer 
+  field(INPB, "$(P):STROBE_B_DEL_RBV CP")
+  field(CALC, "B/A")
+  field(PREC, "1")
+}
+
+record(ao, "$(P):STROBE_B_DEL_UM") {
+  field(DESC, "SET strob B del in um")
+  field(VAL,  "10")
+  field(PINI, "YES")
+  field(PREC, "1")
+}
+
+record(calcout, "$(P):STROBE_B_DEL_CALC"){
+  field(DESC, "Calculate strobe B del")
+  field(A, "16")
+  field(DTYP, "stream")
+  field(INPB, "$(P):STROBE_B_DEL_UM CP")
+  field(CALC,"A*B")
+  field(OUT, "@polypico.proto set_strobeB_delay($(P)) $(PORT) PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+##### Strobe Duration #####
+
+record(ai, "$(P):STROBE_DURATION_RBV"){
+  field(DESC, "Read strobe duration")
+  field(VAL,  "")
+}
+
+record(ao,"$(P):STROBE_DURATION") {
+  field(DESC, "Set strobe dration")
+  field(DTYP, "stream")
+  field(VAL,  "10")
+  field(PINI, "YES")
+  field(OUT, "@polypico.proto set_strobe_duration($(P)) $(PORT) PP")
+}
+
+

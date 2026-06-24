@@ -1,0 +1,62 @@
+################################################################################################
+# Protocol file for:
+#
+# VICI UMH, UMD, UMT series modular universal actuator
+#
+# Protocol assumes no ID has been set for the controller (i.e. single controller on an RS232 line)
+# Default serial configuration: 9600 baud, no parity, 8 data bits, 1 stop bit.
+#
+################################################################################################
+
+# Terminator = CR LF;
+InTerminator = CR;
+OutTerminator = CR LF;
+
+LockTimeout = 3000;
+ReplyTimeout = 5000;
+ReadTimeout = 3000;
+ExtraInput = Ignore;
+
+##################
+# commands
+
+# # Move valve clockwise to position n(1..16)
+# Cmd: 'CW\r' Resp: none
+setPosCW { out "CW%{1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16}"; }
+
+# Move valve counter clockwise to position n(1..16)
+# Cmd: 'CC\r' Resp: none
+setPosCC { out "CC%{1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16}"; }
+
+# Move valve to position n(1..16)
+# Cmd: 'GOx\r' Resp: none
+# there is an optional "bad command" string when setting to current position
+setPos { out "GO%{1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16}"; }
+
+# Read valve move counter
+# Cmd: 'NP\r' Resp: 'NP = <int>\r'
+getNP { out "NP"; in "NP = %d"; }
+
+# Read valve position
+# Cmd: 'CP\r' Resp: 'Position is A|B\r'
+getPos { out "CP"; in "Position is  = %d";}
+
+# Read software status info
+# Cmd: 'VR\r' Resp: 'I-PD-EDF56RC.7\rAug  29 2022\r'  (NB \r in middle of response)
+getInfo { out "VR"; in "%[_ a-zA-Z0-9]"; in "%(\$1.VAL)[_ a-zA-Z0-9]"; }
+
+# Read valve move counter
+# Cmd: 'CNT\r' Resp: 'CNT<int>\r'
+getCnt { out "CNT"; in "CNT = %d"; }
+
+# Read current actuation mode
+# Cmd: 'AM\r' Resp: 'AM = <int>\r'
+getAM { out "AM"; in "AM = %d"; }
+
+# Sets actuation mode (Default: 3/Multiposition mode)
+# Cmd: 'AMx\r' Resp: 'AM = x\r'
+setAM { out "AM%{1|2|3}"; in "AM = %d"; }
+
+# Gets current motor setting for type of motor assembly to be used
+# Cmd: 'MA\r' Resp: 'MA = EMH\r | MA = EMD\r | MA = EMT\r'
+getMA { out "MA"; in "MA = %s"; }

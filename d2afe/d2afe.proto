@@ -1,0 +1,114 @@
+Terminator = CR LF;
+LockTimeout = 1000;
+ReplyTimeout = 1000;
+ReadTimeout = 1000;
+ExtraInput = Ignore;
+separator = "";
+
+
+mon{
+  out "fwd \$1 mon"; 
+  in "\$1 OK %*6c,%*6c,"
+  "%(\$2:CH1_TEMP)f,%(\$2:CH2_TEMP)f,%(\$2:CH3_TEMP)f,%(\$2:CH4_TEMP)f,"
+  "%(\$2:RF1_DBM)f,%(\$2:RF2_DBM)f,%(\$2:RF3_DBM)f,%(\$2:RF4_DBM)f,"
+  "%(\$2:RADSENSE)f,"
+  "%(\$2:12V_MON)f,"
+  "%(\$2:5V_MON)f,"
+  "%(\$2:I_MON)f,"
+  "%(\$2:UPTIME)d,"
+  "%(\$2:BUFF_PEAK)d,"
+  "%(\$2:CH1_IN_ATT_RAW_RBV)f,%(\$2:CH1_OUT_ATT_RAW_RBV)f,"
+  "%(\$2:CH2_IN_ATT_RAW_RBV)f,%(\$2:CH2_OUT_ATT_RAW_RBV)f,"
+  "%(\$2:CH3_IN_ATT_RAW_RBV)f,%(\$2:CH3_OUT_ATT_RAW_RBV)f,"
+  "%(\$2:CH4_IN_ATT_RAW_RBV)f,%(\$2:CH4_OUT_ATT_RAW_RBV)f,"
+  "%(\$2:PILOT_ATT_RAW_RBV)f,"
+  "%(\$2:CH1_IN_ATT_RBV)f,%(\$2:CH1_OUT_ATT_RBV)f,"
+  "%(\$2:CH2_IN_ATT_RBV)f,%(\$2:CH2_OUT_ATT_RBV)f,"
+  "%(\$2:CH3_IN_ATT_RBV)f,%(\$2:CH3_OUT_ATT_RBV)f,"
+  "%(\$2:CH4_IN_ATT_RBV)f,%(\$2:CH4_OUT_ATT_RBV)f,"
+  "%(\$2:PILOT_ATT_RBV)f %0<xor>";
+}
+
+calmon{
+  out "fwd \$1 calmon"; 
+  in "\$1 OK"
+  "%(\$2:CAL:CH1_TEMP_OFF_RBV)f,%(\$2:CAL:CH1_TEMP_SLO_RBV)f,"
+  "%(\$2:CAL:CH2_TEMP_OFF_RBV)f,%(\$2:CAL:CH2_TEMP_SLO_RBV)f,"
+  "%(\$2:CAL:CH3_TEMP_OFF_RBV)f,%(\$2:CAL:CH3_TEMP_SLO_RBV)f,"
+  "%(\$2:CAL:CH4_TEMP_OFF_RBV)f,%(\$2:CAL:CH4_TEMP_SLO_RBV)f,"
+  "%(\$2:CAL:CH1_RF_OFF_RBV)f,%(\$2:CAL:CH1_RF_SLO_RBV)f,"
+  "%(\$2:CAL:CH2_RF_OFF_RBV)f,%(\$2:CAL:CH2_RF_SLO_RBV)f,"
+  "%(\$2:CAL:CH3_RF_OFF_RBV)f,%(\$2:CAL:CH3_RF_SLO_RBV)f,"
+  "%(\$2:CAL:CH4_RF_OFF_RBV)f,%(\$2:CAL:CH4_RF_SLO_RBV)f,"
+  "%(\$2:CAL:RADS_OFF_RBV)f,%(\$2:CAL:RADS_SLO_RBV)f,"
+  "%(\$2:CAL:VCC12_OFF_RBV)f,%(\$2:CAL:VCC12_SLO_RBV)f,"
+  "%(\$2:CAL:VCC5_OFF_RBV)f,%(\$2:CAL:VCC5_SLO_RBV)f,"
+  "%(\$2:CAL:ICC_OFF_RBV)f,%(\$2:CAL:ICC_SLO_RBV)f,"
+  "%(\$2:CAL:MCU_TEMP_OFF_RBV)f,%(\$2:CAL:MCU_TEMP_SLO_RBV)f,"
+  "%(\$2:CAL:VCC3_OFF_RBV)f,%(\$2:CAL:VCC3_SLO_RBV)f,"
+  "%(\$2:CAL:CH1_IN_ATT_OFF_RBV)f,%(\$2:CAL:CH1_OUT_ATT_OFF_RBV)f,"
+  "%(\$2:CAL:CH2_IN_ATT_OFF_RBV)f,%(\$2:CAL:CH2_OUT_ATT_OFF_RBV)f,"
+  "%(\$2:CAL:CH3_IN_ATT_OFF_RBV)f,%(\$2:CAL:CH3_OUT_ATT_OFF_RBV)f,"
+  "%(\$2:CAL:CH4_IN_ATT_OFF_RBV)f,%(\$2:CAL:CH4_OUT_ATT_OFF_RBV)f,"
+  "%(\$2:CAL:PILOT_ATT_OFF_RBV)f %0<xor>"
+}
+
+att_set{
+  out "fwd \$1 attenc \$2 \$3 %f";
+  in "\$1 %(\$4)255c";
+}
+
+att_set_raw{
+  out "fwd \$1 atten \$2 \$3 %f";
+  in "\$1 %(\$4)255c";
+}
+
+att_offset_set{
+  out "fwd \$1 attoff \$2 \$3 %f";
+  in "\$1 %(\$4)255c";
+}
+
+out_att_set{
+  out "fwd \$1 atteno %f";
+  in "\$1 %(\$2)255c";
+}
+
+read_fw{
+  out "fwd \$1 ver";
+  in "\$1 %{ERR|OK} %(\$2:HARDWARE)s %(\$2:FW_VER)s %(\$2:MCU)s (%(\$2:BUILD_DATE)11c %(\$2:BUILD_TIME)8c)";
+}
+
+read_eid{
+  out "fwd \$1 eid";
+  in "\$1 OK %(\$2:EID)s";
+}
+
+read_calid{
+  out "fwd \$1 calid";
+  in "\$1 OK %(\$2:CALID)s";
+}
+
+save_cal{
+  out "fwd \$1 savecal";
+  in "\$1 %(\$2)255c";
+}
+
+load_cal{
+  out "fwd \$1 loadcal";
+  in "\$1 %(\$2)255c";
+}
+
+save_att{
+  out "fwd \$1 saveatt";
+  in "\$1 %(\$2)255c";
+}
+
+load_att{
+  out "fwd \$1 loadatt";
+  in "\$1 %(\$2)255c";
+}
+
+reset{
+  out "fwd \$1 reset";
+  in "\$1 %(\$2)255c";
+}

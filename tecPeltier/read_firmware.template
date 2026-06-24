@@ -1,0 +1,26 @@
+# Start of support/tecPeltier/tecPeltier/Db/read_firmware.template
+# Original Author: Lee Hudson 2018
+
+# Reads the firmware version of the specified controller
+
+#  P, Device P
+#  PORT, Asyn port for the TEC Controller
+#  ADDR, Address of the TEC controller
+#  SCAN, Scan
+# % gui, $(name), edm, tecStatus.edl, P=$(P)
+
+# Send query to the controller
+record(stringout, "$(P):FW_REQUEST") {
+  field(SCAN, "$(SCAN)")
+  field(DTYP, "stream")
+  field(OUT, "@tecPeltier.proto read_fw($(P)) $(PORT)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P):ADDR") {
+  field(VAL, "$(ADDR)")
+}
+
+record(stringin, "$(P):FIRMWARE"){
+}
+# End of support/tecPeltier/tecPeltier/Db/read_firmware.template

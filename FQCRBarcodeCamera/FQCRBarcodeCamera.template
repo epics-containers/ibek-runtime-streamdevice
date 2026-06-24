@@ -1,0 +1,192 @@
+
+
+# FQCR Barcoder camera
+# 
+# % macro, P, Device P
+# % macro, cam_port, Asyn port for omron camera 
+# % macro, plc_port, Asyn port for omron PLC
+record(stringin, "$(P):FQCR_CAM:INCOMING_DATA") {
+  field(SCAN, "I/O Intr")
+  field(DTYP, "stream")
+  field(INP, "@FQCRcam.proto read_barcode($(P):FQCR_CAM) $(cam_port)")
+  field(FLNK, "$(P):FQCR_CAM:JUDGEMENT_OK")
+}
+
+record(ai, "$(P):FQCR_CAM:BC_JUDGEMENT") {
+}
+
+record(ai, "$(P):FQCR_CAM:BC_LENGTH") {
+}
+
+record(ai, "$(P):FQCR_CAM:BC_CELL_RR") {
+}
+
+record(ai, "$(P):FQCR_CAM:BC_CONTRAST") {
+}
+
+record(ai, "$(P):FQCR_CAM:BC_FOCUS") {
+}
+
+#% autosave 1 VAL
+record(ai, "$(P):FQCR_CAM:ENABLE_DEBUG") {
+}
+
+record(stringin, "$(P):FQCR_CAM:LAST_BARCODE") {
+}
+
+record(calcout , "$(P):FQCR_CAM:JUDGEMENT_OK") {
+    field(INPA, "$(P):FQCR_CAM:BC_JUDGEMENT")
+    field(CALC, "A=0?1:0")
+    field(OOPT, "When Non-zero")
+    field(OUT, "$(P):FQCR_CAM:LAST_BARCODE_BI PP")
+}
+
+record(bo, "$(P):FQCR_CAM:LAST_BARCODE_BI"){
+  field(FLNK, "$(P):FQCR_CAM:CONVERT_BARCODE")
+
+}
+
+record(stringin, "$(P):FQCR_CAM:MANUAL_BARCODE") {
+  field(FLNK, "$(P):FQCR_CAM:CONVERT_BARCODE")
+}
+
+record(aSub, "$(P):FQCR_CAM:CONVERT_BARCODE") {
+  field(SNAM, "AscToDec")
+  field(INPA, "$(P):FQCR_CAM:LAST_BARCODE")
+  field(INPB, "$(P):FQCR_CAM:BC_JUDGEMENT")
+  field(INPC, "$(P):FQCR_CAM:BC_LENGTH")
+  field(INPD, "$(P):FQCR_CAM:BC_CELL_RR")
+  field(INPE, "$(P):FQCR_CAM:BC_CONTRAST")
+  field(INPF, "$(P):FQCR_CAM:BC_FOCUS")
+  field(INPG, "$(P):FQCR_CAM:ENABLE_DEBUG")
+  field(INPH, "$(P):FQCR_CAM:MANUAL_BARCODE")
+  field(FTA, "STRING")
+  field(FTB, "SHORT")
+  field(FTC, "USHORT")
+  field(FTD, "USHORT")
+  field(FTE, "USHORT")
+  field(FTF, "USHORT")
+  field(FTG, "USHORT")
+  field(FTH, "STRING")
+  field(FTVA, "USHORT")
+  field(FTVB, "USHORT")
+  field(FTVC, "USHORT")
+  field(FTVD, "USHORT")
+  field(FTVE, "USHORT")
+  field(FTVF, "USHORT")
+  field(FTVG, "USHORT")
+  field(FTVH, "USHORT")
+  field(FTVI, "USHORT")
+  field(FTVJ, "USHORT")
+  field(FTVK, "USHORT")
+  field(FTVL, "STRING")
+  field(FTVM, "STRING")
+  field(FTVN, "STRING")
+  field(OUTA, "$(P):FQCR_CAM:BARCODE:CHAR_0")
+  field(OUTB, "$(P):FQCR_CAM:BARCODE:CHAR_1")
+  field(OUTC, "$(P):FQCR_CAM:BARCODE:CHAR_2")
+  field(OUTD, "$(P):FQCR_CAM:BARCODE:CHAR_3")
+  field(OUTE, "$(P):FQCR_CAM:BARCODE:CHAR_4")
+  field(OUTF, "$(P):FQCR_CAM:BARCODE:CHAR_5")
+  field(OUTG, "$(P):FQCR_CAM:BARCODE:CHAR_6")
+  field(OUTH, "$(P):FQCR_CAM:BARCODE:CHAR_7")
+  field(OUTI, "$(P):FQCR_CAM:BARCODE:CHAR_8")
+  field(OUTJ, "$(P):FQCR_CAM:BARCODE:CHAR_9")
+  field(OUTK, "$(P):FQCR_CAM:BARCODE:DATA_VALID_WRITE")
+  field(OUTL, "$(P):FQCR_CAM:MANUAL_BARCODE")
+  field(OUTM, "$(P):FQCR_CAM:LAST_BARCODE")
+  field(OUTN, "$(P):FQCR_CAM:BARCODE_STORE PP")
+  field(SCAN, "Passive")
+  field(FLNK, "$(P):FQCR_CAM:CLEAR_DATA")
+}
+
+record(stringin, "$(P):FQCR_CAM:BARCODE_STORE") {
+}
+
+
+record(dfanout, "$(P):FQCR_CAM:CLEAR_DATA") {
+  field(SCAN, "Passive")
+  field(OUTA, "$(P):FQCR_CAM:BC_JUDGEMENT PP")
+  field(OUTB, "$(P):FQCR_CAM:BC_LENGTH PP")
+  field(OUTC, "$(P):FQCR_CAM:BC_CELL_RR PP")
+  field(OUTD, "$(P):FQCR_CAM:BC_CONTRAST PP")
+  field(OUTE, "$(P):FQCR_CAM:BC_FOCUS PP")
+  field(VAL, "0")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_0")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_0") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 200) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_1")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_1") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 201) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_2")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_2") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 202) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_3")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_3") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 203) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_4")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_4") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 204) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_5")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_5") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 205) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_6")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_6") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 206) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_7")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_7") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 207) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_8")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_8") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 208) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:CHAR_9")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:CHAR_9") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 209) FINS_DM_WRITE")
+  field(FLNK, "$(P):FQCR_CAM:BARCODE:DATA_VALID_WRITE")
+}
+
+record(ao, "$(P):FQCR_CAM:BARCODE:DATA_VALID_WRITE") {
+  field(SCAN, "Passive")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(plc_port), 220) FINS_DM_WRITE")
+}

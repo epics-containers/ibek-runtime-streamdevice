@@ -1,0 +1,274 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for Oxy Dan Bimorph PSU
+#
+#
+
+terminator   = LF;
+replytimeout = 1000;
+readtimeout  = 500;
+locktimeout = 60000;
+extrainput   = Ignore;
+separator = ",";
+
+# Slew get/set
+setslew{ out ":CONF:SLEW %d"; in "\6:CONF:SLEW";}
+getslew{ out ":CONF:SLEW?"; in "\6:CONF:SLEW %d";}
+
+# Voltage demand get/set per channel
+#setvd{ out ":CONF:DEMA\$1 %d"; in "\6:CONF:DEMA%*d %d"}
+setvd{ out ":CONF:DEMA\$1 %d"; 
+       readtimeout=45000; 
+       in "\6:CONF:DEMA%*d %d";
+       @mismatch { in "\6FAIL"; }
+}
+getvd{ out ":CONF:DEMA\$1?"; in "\6:CONF:DEMA%*d %d"}
+
+# Retreive all voltage demands for a format (0-7)
+#getvdformat{ out ":CONF:FORM%d?"; readtimeout=45000; in "\6:CONF:FORM%*d";}
+getvdformat{ out ":CONF:FORM%d?"; readtimeout=45000; in "\6:CONF:FORM";}
+getvdformat0{ readtimeout=45000; in "\6:CONF:FORM%*d %d";}
+getvdformat1{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%d";}
+getvdformat2{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%d";}
+getvdformat3{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%d";}
+getvdformat4{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%d";}
+getvdformat5{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat6{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat7{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat8{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat9{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat10{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat11{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat12{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat13{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat14{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat15{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat16{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat17{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+getvdformat18{ readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d";}
+
+# Need to split the following lines up as they are too long otherwise. Note there is also a limit of 20 format converters per line.
+
+getvdformat19{
+        readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+        ",%*d,%d";
+}
+getvdformat20{
+	readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%d";
+}
+getvdformat21{
+	readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%*d,%d";
+}
+getvdformat22{
+	readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%*d,%*d,%d";
+}
+getvdformat23{
+	readtimeout=45000; in "\6:CONF:FORM%*d %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%*d,%*d,%*d,%d";
+}
+
+getvdformatw{ out ":CONF:FORM\$1?"; in "\6:CONF:FORM%*d %d";}
+
+# Set a bank(0or1) of voltage demands for a format (0-7)
+setvdformat0{ outterminator = ""; out ":CONF:FORM%d ";}
+setvdformat1{ outterminator = ""; out "%d ";}
+setvdformat2{ outterminator = ""; out "%d,";}
+setvdformat3{ out "%d"; in "\6SUCCESS";
+  @mismatch { in "\6FAIL";}
+}
+# same as above, but with two dummy values added
+# because firmware RXM2PN/24/490 - Version 0.13b  06.06.20 (I02/Mx)
+# wants to round up to 24 from the 22 used channels
+# when setting bank 1
+setvdformat3d{ out "%d,0,0"; in "\6SUCCESS";
+  @mismatch { in "\6FAIL";}
+}
+
+
+# Set/get active format (0-7)
+# The time to change 2000 V at 10V/s is 200 seconds -> hence the large timeout
+setformat{out ":CONF:FORM%d"; 
+  readtimeout=200000; 
+  in "\6SUCCESS";
+  @mismatch { in "\6FAIL";}
+}
+getformat{out ":CONF:FORM?"; in "\6:CONF:FORM%d";}
+
+# Reset formats to factory defaults (outputs must be off)
+resetformat{out ":CONF:RST:FORM"; in "\6SUCCESS";}
+
+# Set current formats as the factory defaults
+setformatdefaults{out ":CONF:FACT"; in "\6SUCCESS";}
+ 
+# Set/get the increment/decrement voltage step
+setstep{ out ":CONF:STEP %d"; in "\6SUCCESS"; }
+getstep{ out ":CONF:STEP?"; in "\6:CONF:STEP %d"; }
+
+# Increment/decrement voltage demand per channel
+incv{ out ":CONF:DEMA\$1 UP"; readtimeout=45000; 
+      in "\6:CONF:DEMA\%d UP";
+      @mismatch { in "\6FAIL"; } 
+}
+decv{ out ":CONF:DEMA\$1 DOWN"; readtimeout=45000; in "\6:CONF:DEMA\%d DOWN"}
+
+# Increment/decrement voltage demand for a bank
+incvbank{ out ":CONF:DEMAALL\$1 UP"; readtimeout=45000; 
+          in "\6SUCCESS" ;
+      @mismatch { in "\6FAIL"; } 
+}
+decvbank{ out ":CONF:DEMAALL\$1 DOWN"; readtimeout=45000; in "\6SUCCESS"}
+
+# Get voltage reading per channel
+getv{ out ":READ:OUTP\$1?"; in "\6:READ:OUTP%*d %d"}
+
+# Get all voltage reading per channel
+getvall{ out ":READ:OUTPALL?"; readtimeout=45000; in "\6:READ:OUTPALL"}
+getvall0{ readtimeout=45000; in "\6:READ:OUTPALL %d"}
+getvall1{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%d"}
+getvall2{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%d"}
+getvall3{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%d"}
+getvall4{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%d"}
+getvall5{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%d"}
+getvall6{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall7{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall8{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall9{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall10{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall11{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall12{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall13{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall14{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall15{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall16{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall17{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+getvall18{ readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+
+# Need to split the following lines up as they are too long otherwise. Note there is also a limit of 20 format converters per line.
+
+getvall19{
+        readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+        ",%*d,%d"
+}
+getvall20{
+	readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%d"
+}
+getvall21{
+	readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%d"
+}
+getvall22{
+	readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%*d,%d"
+}
+getvall23{
+	readtimeout=45000; in "\6:READ:OUTPALL %*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d"
+	",%*d,%*d,%*d,%d"
+}
+
+# Turn output on or off
+outputon{ out "%{:CONF:OUTP OFF |:CONF:OUTP ON }"; 
+          readtimeout=200000; 
+          in "\6SUCCESS";
+          @mismatch { in "\6FAIL"; }
+}
+
+# Set/get min/max bank limits
+setmax{ out ":CONF:RANG:MAX\$1 %d"; in "\6SUCCESS";}
+getmax{ out ":CONF:RANG:MAX\$1?"; in "\6:CONF:RANG:MAX%*d %d";}
+setmin{ out ":CONF:RANG:MIN\$1 %d"; in "\6SUCCESS";}
+getmin{ out ":CONF:RANG:MIN\$1?"; in "\6:CONF:RANG:MIN%*d %d";}
+
+# Set unit autostart on or off
+autostarton{ out "%{:CONF:STAR:AUTO OFF |:CONF:STAR:AUTO ON}"; in "\6SUCCESS";}
+
+# Set/get correction function parameters for a bank (0 or 1)
+getfunctionw{ out ":CONF:FUNC\$1?"; in "\6:CONF:FUNC%*d %*d %f";}
+getfunctionitvl{ readtimeout=45000; in "\6:CONF:FUNC%*d %d";}
+setfunctionfirst{ outterminator = ""; out ":CONF:FUNC\$1 %d ";}
+setfunctionnext{ outterminator = ""; out "%f,";}
+setfunctionlast{ out "%f"; in "\6SUCCESS";}
+
+# Turn correction function on or off
+correctionon{ out "%{:CONF:STAR:FUNC OFF |:CONF:STAR:FUNC ON}"; in "\6SUCCESS";}
+
+# Set/get date
+#TODO
+
+# Set/get time
+#TODO
+
+# Get time since first power on (hours)
+getoperatingtime{ out ":CONF:OTFP?"; in "\6:CONF:OTFP %f";}
+
+# Get time since last reset (secs)
+getresettime{ out ":CONF:OTLR?"; in "\6:CONF:OTLR %f";}
+# Reset time since last reset count
+resettime{ out ":CONF:RST:TIME"; in "\6SUCCESS";}
+
+# Get unit setup
+#getsetup1{ out ":CONF:SETP?"; in "\6:CONF:SETP %d"}
+#getsetup2{ in "\6:CONF:SETP %*d,%f"}
+#getsetup3{ in "\6:CONF:SETP %*d,%*f,%d"}
+#getsetup4{ in "\6:CONF:SETP %*d,%*f,%*d,%d"}
+#getsetup5{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%d"}
+#getsetup6{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%d"}
+#getsetup7{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%d"}
+#getsetup8{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup9{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup10{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup11{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup12{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup13{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup14{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup15{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup16{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+#getsetup17{ in "\6:CONF:SETP %*d,%*f,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%*d,%d"}
+
+getsetupw{ out ":CONF:SETP?"; in "\6:CONF:SETP %f"}
+
+# Get unit status
+#getstatus1{ out ":CONF:STAT?"; in "\6:CONF:STAT %b";}
+#getstatus2{ in "\6:CONF:STAT %*b,%d";}
+#getstatus3{ in "\6:CONF:STAT %*b,%*d,%d";}
+#getstatus4{ in "\6:CONF:STAT %*b,%*d,%*d,%b";}
+#getstatus5{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%b";}
+#getstatus6{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%d";}
+#getstatus7{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%d";}
+#getstatus8{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%b";}
+#getstatus9{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%b";}
+#getstatus10{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%d";}
+#getstatus11{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*d,%d";}
+#getstatus12{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*d,%*d,%b";}
+#getstatus13{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%b";}
+#getstatus14{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%b";}
+#getstatus15{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*b,%b";}
+#getstatus16{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*b,%*b,%b";}
+#getstatus17{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*b,%*b,%*b,%b";}
+#getstatus18{ in "\6:CONF:STAT %*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*d,%*d,%*b,%*b,%*b,%*b,%*b,%*b,%d";}
+
+getstatusw{out ":CONF:STAT?"; in "\6:CONF:STAT %d"}
+
+# Set/get hysteresis point
+sethyst{ out ":CONF:HYST %d"; in "\6SUCCESS"; }
+gethyst{ out ":CONF:HYST?"; in "\6:CONF:HYST %d"; }
+
+#Turn hysteresis mode on or off
+hyston{ out "%{:CONF:STAR:HYST OFF |:CONF:STAR:HYST ON}"; in "\6SUCCESS";}
+
+# Secondary slew get/set
+setslew2{ out ":CONF:SLEW:SEC %d"; in "\6:CONF:SLEW:SEC";}
+getslew2{ out ":CONF:SLEW:SEC?"; in "\6:CONF:SLEW:SEC %d";}
+
+# Get error log
+# NB this only returns the first error at present
+geterr{ out ":CONF:ERR?"; interminator=""; readtimeout=1000; in "ERR %s" CR;}
+
+#################################################################################

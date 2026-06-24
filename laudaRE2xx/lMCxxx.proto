@@ -1,0 +1,88 @@
+##################################################
+#
+# Protocol file for Lauda devices
+# Microcool MC 250, MC 350, MC 600, MC 1200, MC 1200 W
+#
+##################################################
+
+
+##################################################
+# General Settings
+##################################################
+
+Terminator = "\r\n";
+ReplyTimeout = 1000;
+
+
+###################################################
+# Get functions
+###################################################
+
+# /// Read water bath temperature
+# /// using the IN_PV_00 command
+getTemp {
+   ExtraInput = Ignore;
+   out "IN_PV_00";
+   in "%f";
+}
+
+# /// Read error diagnosis response, using the "stat" command
+getStatus {
+   ExtraInput = Ignore;
+   Separator = "";
+   out "STAT";
+   in "%7d";
+}
+
+# /// ! Read water bath level status from STAT output, char 5 (1=low level)
+getLevel {
+   ExtraInput = Ignore;
+   out "STAT";
+   in "%*4d%1d%*2d";
+   # Parse error status
+   @mismatch{in "%(\$1:ERROR)s";}
+}
+
+# /// Read temperature setpoint 
+getTempReadback {
+    ExtraInput = Ignore;
+    out "IN_SP_00";
+    in "%f";
+}
+
+# /// Read power status from STAT output, char 2 (1=ON, undocumented!)
+getPowerStatus {
+    ExtraInput = Ignore;
+    out "STAT";
+    in "%*1d%1d%*5d";
+}
+
+###################################################
+# Set functions
+###################################################
+
+# /// Set the setpoint for water temperature (temperature must be specific format (up to 3 digits before decimal point and up to 2 digits after decimal point).
+setTemp {
+   out "OUT_SP_00_%.2f";
+}
+
+# /// Switch device on (from standby)
+start {
+   out "START";
+}
+
+# /// Switch device to standby (pump, heating and chiller off)
+stop {
+   out "STOP";
+}
+
+#############################################################
+# Generic protocol
+############################################################
+
+# /// Use this send any command and get back the response (max 39 chars).
+gen {
+    ExtraInput = Ignore;
+    out "%s";
+    in "%39c"
+}

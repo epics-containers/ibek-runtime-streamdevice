@@ -1,0 +1,121 @@
+################################################################################################
+# Protocol file for:
+#
+# MicroEpsilon capaNCDT 6500 capacitive sensor
+#
+# Default IP configuration: data port 10001
+#                           command port 23
+# Early versions of the firmware just use port 10001 for both commands and data
+#
+################################################################################################
+
+ExtraInput = Ignore;
+
+OutTerminator   = "\r";
+InTerminator   = "";
+
+LockTimeout = 5000;
+ReplyTimeout = 1000;
+ReadTimeout = 50;
+PollPeriod = 50;
+
+
+#############################################################################
+## Trigger mode
+##
+## read
+##   send: $TRG?\r
+##   reply: $TRG?nOK\r\n
+## write
+##   send: $TRGn\r
+##   reply: $TRGnOK\r\n
+#
+readTRG { out "$TRG?"; InTerminator = "\r\n"; in "$TRG?%dOK"; }
+writeTRG { out "$TRG%d"; InTerminator = "\r\n"; in "$TRG%dOK"; }
+
+#############################################################################
+## Averaging mode 
+##
+## n = 0:none, 1:moving av, 2:arithmetic av, 3:median
+## read
+##   send: $AVT?\r
+##   reply: $AVT?nOK\r\n
+## write
+##   send: $AVNn\r
+##   reply: $AVTnOK\r\n
+##
+readAVT { out "$AVT?"; InTerminator = "\r\n"; in "$AVT?%dOK"; }
+writeAVT { out "$AVT%d"; InTerminator = "\r\n"; in "$AVT%dOK" }; 
+
+## Averaging number [2..8]
+##
+readAVN { out "$AVN?"; InTerminator = "\r\n"; in "$AVN?%dOK"; }
+writeAVN { out "$AVN%d"; InTerminator = "\r\n"; in "$AVN%dOK" }; 
+
+#############################################################################
+## Save Settings to EEPROM 
+##
+writeSSU { out "$SSU"; InTerminator = "\r\n"; in "$SSUOK" }; 
+
+#############################################################################
+## Channels Transfer Enable
+##
+writeCHT1 { out "$CHT1,0,0,0,0,0,0,0"; InTerminator = "\r\n"; in "$CHT1,0,0,0,0,0,0,0OK" }; 
+writeCHT2 { out "$CHT1,1,0,0,0,0,0,0"; InTerminator = "\r\n"; in "$CHT1,1,0,0,0,0,0,0OK" }; 
+writeCHT3 { out "$CHT1,1,1,0,0,0,0,0"; InTerminator = "\r\n"; in "$CHT1,1,1,0,0,0,0,0OK" }; 
+writeCHT4 { out "$CHT1,1,1,1,0,0,0,0"; InTerminator = "\r\n"; in "$CHT1,1,1,1,0,0,0,0OK" }; 
+writeCHT5 { out "$CHT1,1,1,1,1,0,0,0"; InTerminator = "\r\n"; in "$CHT1,1,1,1,1,0,0,0OK" }; 
+writeCHT6 { out "$CHT1,1,1,1,1,1,0,0"; InTerminator = "\r\n"; in "$CHT1,1,1,1,1,1,0,0OK" }; 
+writeCHT7 { out "$CHT1,1,1,1,1,1,1,0"; InTerminator = "\r\n"; in "$CHT1,1,1,1,1,1,1,0OK" }; 
+writeCHT8 { out "$CHT1,1,1,1,1,1,1,1"; InTerminator = "\r\n"; in "$CHT1,1,1,1,1,1,1,1OK" }; 
+
+
+#############################################################################
+## Read position
+## send: $GMD\r
+## reply: $GMDOK\r\n   - followed by 4 bytes for each channel
+#
+# NB It is necessary to read in all response characters to the GMD command to avoid sending a 
+# new GMD command to the controller while its transmitting channel 2..8 readings.
+# Following protocol picks up channel 1 of the 1..8 actual channels fitted into the controller.
+read1GMD1chan { out "$GMD"; MaxInput = 12; in "$GMDOK\r\n%04r"; }
+read2GMD1chan { out "$GMD"; MaxInput = 16; in "$GMDOK\r\n%04r"; }
+read3GMD1chan { out "$GMD"; MaxInput = 20; in "$GMDOK\r\n%04r"; }
+read4GMD1chan { out "$GMD"; MaxInput = 24; in "$GMDOK\r\n%04r"; }
+read5GMD1chan { out "$GMD"; MaxInput = 28; in "$GMDOK\r\n%04r"; }
+read6GMD1chan { out "$GMD"; MaxInput = 32; in "$GMDOK\r\n%04r"; }
+read7GMD1chan { out "$GMD"; MaxInput = 36; in "$GMDOK\r\n%04r"; }
+read8GMD1chan { out "$GMD"; MaxInput = 40; in "$GMDOK\r\n%04r"; }
+# Following protocols can be used with I/O Intr records to pick up channels 2 and upwards.
+readGMD2chan {  MaxInput = 16; in "$GMDOK\r\n%*04r%04r"; }
+readGMD3chan {  MaxInput = 20; in "$GMDOK\r\n%*04r%*04r%04r"; }
+readGMD4chan {  MaxInput = 24; in "$GMDOK\r\n%*04r%*04r%*04r%04r"; }
+readGMD5chan {  MaxInput = 28; in "$GMDOK\r\n%*04r%*04r%*04r%*04r%04r"; }
+readGMD6chan {  MaxInput = 32; in "$GMDOK\r\n%*04r%*04r%*04r%*04r%*04r%04r"; }
+readGMD7chan {  MaxInput = 36; in "$GMDOK\r\n%*04r%*04r%*04r%*04r%*04r%*04r%04r"; }
+readGMD8chan {  MaxInput = 40; in "$GMDOK\r\n%*04r%*04r%*04r%*04r%*04r%*04r%*04r%04r"; }
+
+####################################################
+## These are for the version of the firmware which has seperate ports for commands and data
+##
+####################################################
+
+gmd { out "$GMD"; in "$GMDOK\r\n"; }
+
+read1chan { in "%04r"; }
+read2chan { in "%*04r%04r"; }
+read4chan { in "%*04r%*04r%*04r%04r"; }
+read5chan { in "%*04r%*04r%*04r%*04r%04r"; }
+read6chan { in "%*04r%*04r%*04r%*04r%*04r%04r"; }
+read7chan { in "%*04r%*04r%*04r%*04r%*04r%*04r%04r"; }
+read8chan { in "%*04r%*04r%*04r%*04r%*04r%*04r%*04r%04r"; }
+
+read3chan { in "%04r%(\$1)04r%(\$2)04r"; }
+
+linc1 { out "$LIN1:1"; in "$LIN1:1OK\r\n"; }
+linc2 { out "$LIN2:1"; in "$LIN2:1OK\r\n"; }
+linc3 { out "$LIN3:1"; in "$LIN3:1OK\r\n"; }
+
+slpc1 { out "$SLP1:1"; in "$SLP1:1OK\r\n"; }
+slpc2 { out "$SLP2:1"; in "$SLP2:1OK\r\n"; }
+slpc3 { out "$SLP3:1"; in "$SLP3:1OK\r\n"; }

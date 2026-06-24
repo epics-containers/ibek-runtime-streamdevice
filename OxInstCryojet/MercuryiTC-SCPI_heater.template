@@ -1,0 +1,90 @@
+##################
+# Heater commands
+##################
+
+record(stringin, "$(P)$(Q):READ_HTR_HVER") {
+  field(DESC, "$(UID=MB0.H1)")
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_HVER($(UID=MB0.H1)) $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_HTR_FVER") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_FVER($(UID=MB0.H1)) $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_HTR_SERL") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_SERL($(UID=MB0.H1)) $(PORT)")
+}
+
+record(stringout, "$(P)$(Q):SET_HTR_NICK") {
+  field(DTYP, "stream")
+  field(OUT, "@MercuryiTC-SCPI.proto SET_HTR_NICK($(UID=MB0.H1)) $(PORT)")
+  field(MPST, "Always")
+}
+
+record(stringin, "$(P)$(Q):READ_HTR_NICK") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_NICK($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SET_HTR_VLIM") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_HTR_VLIM($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_HTR_VLIM") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_VLIM($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SET_HTR_RES") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_HTR_RES($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_HTR_RES") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_RES($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_HTR_PMAX") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_PMAX($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SET_HTR_SIG_VOLT") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_HTR_SIG_VOLT($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_HTR_SIG_VOLT") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_SIG_VOLT($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_HTR_SIG_CURR") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_SIG_CURR($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SET_HTR_SIG_POWR") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_HTR_SIG_POWR($(UID=MB0.H1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_HTR_SIG_POWR") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HTR_SIG_POWR($(UID=MB0.H1)) $(PORT)")
+}

@@ -1,0 +1,280 @@
+# Streams protocol file for the CrateMonitor protocol
+# Initial version PH 03/2006
+# Polyrack extensions PH 11/2011
+# Polyrack PSU status & crate type PH 03/2013
+# Elma extensions for PSU status PH 08/2018
+
+# use "streamReload" to reload this file without restarting the IOC
+
+ExtraInput = Ignore;
+ReadTimeout = 1000;
+ReplyTimeout = 60000;
+
+Terminator = CR;
+term = ",%0<xor>";
+
+# Read the supply voltages
+
+supply
+{
+	Separator = ",";
+	out "V,7A";
+	in "v,%(A)x,%(B)x,%(C)x,%(D)x",$term;
+}
+
+# Read the fan speeds
+
+fans
+{
+	Separator = ",";
+	out "Y,75";
+	in "y,%(A)x,%(B)x,%(C)x,%(D)x,%(E)x,%(F)x,%(G)x,%(H)x",$term;
+}
+
+# Read the status bits
+
+status
+{
+	out "S,7F";
+	in "s,%x",$term;
+	
+	@mismatch
+	{
+		in "VME PF:%*d/%*d";
+	}
+}
+
+# Read the temperatures
+
+temps
+{
+	Separator = ",";
+	out "T,78";
+	in "t,%(A)x,%(B)x,%(C)x",$term;
+}
+
+# Perform a reset
+
+reset
+{
+	out "R,7E";
+	in "r",$term;
+}
+
+# Perform a shut down
+
+shutdown
+{
+	out "X,74";
+	in "x",$term;
+}
+
+# Change fan speed and temperature limits
+
+#	bits map of fans to test
+#	high speed fans
+#	high speed fans lower limit
+#	low speed fans lower limit
+#	max temp of any sensor
+#	max delta temp between any two sensors
+
+limits
+{
+	out "M,7F,70,2134,0DAC,20,05",$term;
+	in "m",$term;
+}
+
+# enable the eighth fan for PSU status
+
+elma_psu_limits
+{
+	out "M,FF,70,2134,0DAC,20,05",$term;
+	in "m",$term;
+}
+
+# Change voltage limits
+
+#supplylimits
+#{
+#	out "L,$1,<lower>,<upper>",$term;
+#	in "l",$term;
+#}
+
+# wake up
+
+wakeup
+{
+	out, "W,7B";
+	in "w",%term;
+}
+
+############################################################
+
+# battery info
+
+#battery
+#{
+#	out "B,6E";
+#	in "b,aa,bbb,ccc,ddd",$term;
+#}
+
+# voltage info
+
+#voltage
+#{
+#	out "A,6D";
+#	in "a,aaaa,bbbb,cccc,ddddc,ddddd,eeee,ffff",$term;
+#}
+
+# set voltage limits
+
+#setvoltagelimits
+#{
+#	out "L,a,bbbbb,ccccc",$term;
+#	in "l,40"
+#}
+
+# hardware and software versions
+
+version
+{
+	out "D,68";
+	in "d,%f,%f",$term;
+}
+
+# voltage limits
+
+#voltagelimits
+#{
+#	out, "C,6F";
+#	in "c,aaaa,bbbb,cccc,dddd,eeeee,fffff,ggggg,hhhhh,iiii,jjjj",$term;
+#}
+
+# temperature limits
+
+#temperaturelimits
+#{
+#	out "E,69";
+#	in "e,aa,bb",$term;
+#}
+
+# fan speed limits
+
+#fanspeedlimits
+#{
+#	out "F,6A";
+#	in "f,aaaa,bbbb,cccc,dddd,eeee,ffff,gggg,hhhh",$term;
+#}
+
+# toggle checksum
+
+#checksum
+#{
+#	out "P,7C";
+#	in "p,a"
+#}
+
+# set voltage calibration
+
+#setvoltagecalibration
+#{
+#	out "H,a,bbbbb",$term
+#	in "h,44"
+#}
+
+# get voltage calibration
+
+#getvoltagecalibration
+#{
+#	out "O,63";
+#	in "o,aaaa,bbbb,cccc,dddd,eeee,ffff",$term;
+#}
+
+# set if temperature to be monitored
+
+#settempmon
+#{
+#	out "K,bbb",$term
+#	in "k,47"
+#}
+
+# report if temps being monitored
+
+#gettempmon
+#{
+#	out "N,62";
+#	in "n,aaa",$term;
+#}
+
+# set if power fail to be monitored
+
+setpowermon
+{
+	out "Q,%2d",$term;
+	in "q,5D"
+}
+
+# report if power fail to be monitored
+
+getpowermon
+{
+	out "J,66";
+	in "j,%d",$term;
+}
+
+# board information
+
+#boardinfo
+#{
+#	out "I,65";
+#	in "i,186818,%(A)d,%(B)d",$term
+#}
+
+# set power supply type
+
+#setpsutype
+#{
+#	out "G,a",$term;
+#	in "g",$term;
+#}
+
+# enable/disable function to set a fan to a HS fan
+
+#setHSfan
+#{
+#	out "U,a",$term;
+#	in "u",$term;
+#}
+
+# New commands for SMC-2 controller
+
+getPSUstatus
+{
+	ReplyTimeout = 1000;
+
+	out, "Z,3",$term;
+	in "z,3,%d",$term;
+}
+
+setConfig
+{
+	ReplyTimeout = 1000;
+	
+	out, "Z,1,1,1,2",$term;
+	in "z,1",$term;
+}
+
+getConfig
+{
+	out, "I,65",$term;
+	in "i,186818,%(A)d,%(B)d,%(C)d,%(D)d",$term;
+	
+# old PolyRack firmware version
+
+	@mismatch
+	{
+		in "i,186818,%(A)d,%(B)d",$term;
+	}
+}
+
+# VME PF:x/y, VME_START

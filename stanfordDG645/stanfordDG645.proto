@@ -1,0 +1,17 @@
+# Protocol file for Stanford Digital Delay Generator DG645
+
+ReplyTimeout = 1000;
+Terminator = CR LF;
+
+getDelay {
+         out "DLAY?\$1";
+         in "%*u,%f";
+}
+
+setDelay {
+         out "DLAY \$1,\$2,%e";
+         out "*WAI";
+         out "LERR?";
+         in "0";
+}
+

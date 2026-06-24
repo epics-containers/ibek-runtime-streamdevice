@@ -1,0 +1,210 @@
+locktimeout  = 5000;
+replytimeout = 1500;
+readtimeout  = 1000;
+extrainput   = Ignore;
+terminator   = CR LF;
+extrainput   = ignore;
+
+#
+# Controller Protocols
+#
+
+close_command   { out "C:";
+                  in  "C:";
+                  @mismatch { in "x:100000000015284400"; }
+                }
+
+#open_command    { out "O:";
+#                  in  "O:";
+#                }
+
+#open_close_set  { out "%#{C=0|O=1}:";
+#                  in  "%{C=0|O=1}:";
+#                }
+
+hold_state      { out "H:";
+                  in  "H:";
+                }
+
+set_pos_limit   { out "a:101A%06d";
+                  in  "a:101A";
+                }
+
+# This command return an error on VAT valve device
+read_pos_limit  { out "a:101A";
+                  in  "a:101A%06d";
+                }
+
+get_position    { out "A:";
+                  in  "A:%06u";
+                }
+
+set_position    { out "R:%06d";
+                  in  "R:";
+                  @mismatch { in "x:101000000099774600"; }
+                }
+
+perc_open       { out "R:%06d";
+                  in  "";
+                  @mismatch {in "100200000000000000030000100080200000000";}
+                }
+
+get_pressure    { out "P:";
+                  in  "P:%*1[-0]%7d";
+                }
+
+set_raw_press   { out "S:%08d";
+                  in  "S:";
+                }
+
+set_access_mode { out "c:010%01d";
+                  in  "c:01";
+                  @mismatch { in "x:100000000014305700"; }
+                }
+
+Device_Sta      { out "i:30";
+                  in  "i:30%08s" "i:30%c%c%c%c%c%c%c%c%*s";
+                }
+DS_access_mode  { out "i:30"; in "i:30%01d%*1[C-E1-9]%*d";     }
+DS_ctrl_mode    { out "i:30"; in "i:30%*1d%#{1=1|2|3|4|5|6|7|8|9|C=10|D=11|E=12}%*d"; }
+DS_power_fail   { out "i:30"; in "i:30%*1d%*1[C-E1-9]%01d%*d"; }
+DS_warnings     { out "i:30"; in "i:30%*1d%*1[C-E1-9]%*1d%01d%*d"; }
+DS_simulation   { out "i:30"; in "i:30%*1d%*1[C-E1-9]%*5d%01d";    }
+
+
+get_firmwareno  { out "i:84";
+                  in  "i:84%";
+                }
+
+Warnings        { out "i:51";
+                  in  "i:51%*s";
+                }
+
+W_service_sta   { out "i:51";
+                  in  "i:51%01d%*d";
+                }
+
+W_powerfail_sta { out "i:51";
+                  in  "i:51%*2d%01d%*d";
+                }
+
+W_comp_air_sta  { out "i:51";
+                  in  "i:51%*3d%01d%*d";
+                }
+
+Vlve_speed_read { out "i:68";
+                  in  "i:680000%04d";
+                }
+
+Vlve_speed_write{ out "V:00%04d";
+                  in  "V:";
+                  @mismatch { in "x:101000000099774600"; }
+                  @mismatch { in "x:101000000099774700"; }
+                }
+
+
+sensor1_offset  { out "i:60";
+                  in  "i:60%08s";
+                }
+
+sensor1_reading { out "i:64";
+                  in  "i:64%c%08s";
+                }
+
+Scale_read      { out "i:05";
+                  in  "i:05%05d%*3d";
+                }
+
+Scale_write     { out "s:05%(\$1:SETSCALE.RVAL)d%(\$1:SIGN)d%(\$1:SETEXP)d%(\$1:SETUNIT)d";
+                  in  "s:05";
+                  @mismatch {in "x:100000000020977500"; }
+                }
+
+Sign_read       { out "i:05";
+                  in  "i:05%*5d%{0|1}%*d";
+                }
+
+Sign_write      { out "s:05%(\$1:SETSCALE.RVAL)d%01d%(\$1:SETEXP)d%(\$1:SETUNIT.RVAL)d";
+                  in  "s:05";
+                  @mismatch { in "x:101000000026628200"; }
+                }
+
+    Exp_read    { out "i:05";
+                  in  "i:05%*5d%*1d%{0|1|2|3|4}";
+                }
+
+    Exp_write   { out "s:05%(\$1:SETSCALE.RVAL)d%(\$1:SETSIGN)d%(\$1:SETEXP)d%(\$1:SETUNIT.RVAL)d";
+                  in  "s:05";
+                  @mismatch { in "x:100000000020974100"; }
+                }
+
+    Unit_read   { out "i:05";
+                  in  "i:05%*5d%*2d%01d";
+                }
+
+    Unit_write  { out "s:05%(\$1:SETSCALE.RVAL)d%(\$1:SETSIGN)d%(\$1:SETEXP)d%01d";
+                  in  "s:05";
+                }
+
+read_pr_ctlr    { out "i:02Z00";
+                  in  "i:02Z00%01d";
+                }
+
+# hard-coded command to set pressure controller top Fixed 2
+set_pr_ctlr_F2  { out "s:02Z002";
+                  in  "s:02";
+                  @mismatch { in "x:100000000018823600"; }
+                  @mismatch { in "x:100000000018956500"; }
+                }
+
+    pos_rng_wrt { out "s:21%01d%(\$1.VAL)d";
+                  in  "s:21";
+                  @mismatch { in "x:101000000026661600"; }
+                  @mismatch { in  "x:100000000019986300"; }
+                }
+
+    pos_rng_rd  { out "i:21";
+                  in  "i:21%01d%*d";
+                }
+
+    pr_rng_wrt  { out "s:21%(\$1.VAL)d%07d";
+                  in  "s:21";
+                }
+
+    pr_rng_rd   { out "i:21";
+                  in  "i:21%*1d%07d";
+                }
+
+reset_warnings  { out "c:820%01d";
+                  in  "c:82";
+                }
+
+
+
+# For these commands, F2 represents "Fixed 2 (PI) (downstream or upstream)" -
+# which maps to 'C' in these commands.
+
+set_F2_cdir_up  { out "s:02C03%01d";
+                  in  "s:02";
+                  @mismatch { in "x:100000000015283200"; }
+                }
+
+get_F2_cdir     { out "i:02C03";
+                  in  "i:02C03%01d";
+                }
+
+set_F2_pgain    { out "s:02C04%.3f";
+                  in  "s:02";
+                }
+
+read_F2_pgain   { out "i:02C04";
+                  in  "i:02C04%f";
+                }
+
+set_F2_igain    { out "s:02C05%.3f";
+                  in  "s:02";
+                }
+
+read_F2_igain   { out "i:02C05";
+                  in  "i:02C05%f";
+                }
