@@ -1,0 +1,51 @@
+# Stream Device Protocol for the MKS 937A Multi-Sensor System
+# This protocol uses features defined in Stream Device Version 1.5
+#
+# Pete Owens 22-1-02
+#
+# $1 = channel number: 1 - 5
+# $2 = setpoint:       RLY, PRO or CTL
+
+locktimeout = 5000;
+terminator   = CR;
+replytimeout = 1000;
+readtimeout  = 1000;
+extrainput   = Ignore;
+
+# Send an initial dummy command to clear out any garbage the mks has already received.
+# This makes it more likely that the first command sent is received OK.
+# NB we dont wait for a response to the dummy command because if it didnt arrive (e.g. rs232 unplugged) then
+# streams would issue a replyTimeout exception and stop the ioc.
+@init{out " ";}
+
+pressure { out "R\$1"; in "%?f"; }
+raw      { out "R\$1"; in "%s"; }
+status   { out "R\$1"; in "%{\?.|  \?E|HI|A|Lo|F|H|W|L|CON|P|NOG|M|NOT|Not|C}"; }
+ccenable { out "%{X|E}CC\$1"; in "OK"; }
+
+# Setpoints
+
+getsp   {
+        out "\$2\$1";
+        in "%f";
+        @mismatch { in "%(\$3:ERROR.VAL)s";}
+        }
+
+setsp   { out "\$2\$1=%0.1E";
+          in "OK";
+          @mismatch { in "%(\$3:ERROR.VAL)s";}
+          }
+
+dissp   { out "\$2\$1=0"; in "OK"; }
+
+# Controller parameters
+
+freq    { out "FREQ"; in "%d"; }
+unit    { out "UNIT"; in "%s"; }
+ctlv    { out "VER"; in "%4f,"; }
+comv    { out "VER"; in "\?\?\?\?,%f"; }
+#version     { out "VER"; in "%s"; }
+#gauges    { out "GAUGES"; in "%s"; }
+modcc   { out "GAUGES"; in "%{Hc|Cc|Pr|Cv|Tc|Cm|P1|C1|T1|M1|Nc|Wc}"; }
+moda    { out "GAUGES"; in "\?\?%{Hc|Cc|Pr|Cv|Tc|Cm|P1|C1|T1|M1|Nc|Wc}"; }
+modb    { out "GAUGES"; in "\?\?\?\?%{Hc|Cc|Pr|Cv|Tc|Cm|P1|C1|T1|M1|Nc|Wc}"; }

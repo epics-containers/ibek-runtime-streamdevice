@@ -1,0 +1,131 @@
+#
+# IC101 protocol file
+#
+# Whilst some commands are common between the I400 and IC101,
+# a number of them 
+#
+# Written based IC101 User manual and on the I400.proto file
+#
+# The reply will contain an echo followed by line feed (0x0a) and then an
+# acknowledgement character (0x06)
+#
+# Testing was done with checksums switched off (SYST:COMM:CHECK 0)
+#
+
+InTerminator = CR LF;
+OutTerminator = LF;
+replytimeout = 2000;
+readtimeout  = 2000;
+locktimeout = 60000;
+
+# IDENTIFICATION
+
+# Get device manufacturer
+manufacturer {
+    out "*IDN?";
+    in "*IDN?\n\x06%[-./a-zA-Z0-9],%*[-./a-zA-Z0-9],%*[-./a-zA-Z0-9],%*[-./a-zA-Z0-9]";
+}
+# Also read model
+model {
+    in "*IDN?\n\x06%*[-./a-zA-Z0-9],%[-./a-zA-Z0-9],%*[-./a-zA-Z0-9],%*[-./a-zA-Z0-9]";
+}
+# Also read serial
+serial {
+    in "*IDN?\n\x06%*[-./a-zA-Z0-9],%*[-./a-zA-Z0-9],%[-./a-zA-Z0-9],%*[-./a-zA-Z0-9]";
+}
+# Also read firmware version
+firmware {
+    in "*IDN?\n\x06%*[-./a-zA-Z0-9],%*[-./a-zA-Z0-9],%*[-./a-zA-Z0-9],%[-./a-zA-Z0-9]";
+}
+
+
+# SYSTEM
+
+# Enter administrative mode (reset to exit)
+admin { out "SYST:PASS %d"; in "SYST:PASS %d\n%(\$1)r"; InTerminator = ""; }
+
+# Turn off checksums (REQUIRES ADMIN)
+check { out "SYST:COMM:CHECK 0"; in "SYST:COMM:CHECK 0\n\x06"; InTerminator = ""; }
+
+# Turn off timeout (REQUIRES ADMIN)
+timeout { out "SYST:COMM:TIMEOUT 0"; in "SYST:COMM:TIMEOUT 0\n\x06"; InTerminator = ""; }
+
+# Device state commands
+# Save state
+save { out "*SAV"; in "*SAV\n\x06"; InTerminator = ""; }
+# Reset the device
+reset { out "*RST"; in "*RST\n\x06"; InTerminator = ""; }
+# Recall configuration of the device
+recall { out "*RCL"; in "*RCL\n\x06"; InTerminator = ""; }
+
+
+# CALIBRATION
+
+# Gains for each capacitor (need to wait for calibration as device is not yet ready)
+doCalib { out "CALIB:GAI"; in "CALIB:GAI\n\x06"; InTerminator = ""; wait 2000; }
+getFirstGain { out "CALIB:GAI?"; in "CALIB:GAI?\n\x061,%e,%*e"; }
+getSecondGain { in "CALIB:GAI?\n\x061,%*e,%e"; }
+
+# Save calibration
+saveCalib { out "CALIB:SAV"; in "CALIB:SAV\n\x06"; InTerminator = ""; }
+
+# Restore calibration
+recallCalib { out "CALIB:RCL"; in "CALIB:RCL\n\x06"; InTerminator = ""; }
+
+# Internal calibration source
+setSource { out "CALIB:SOUR %d"; in "CALIB:SOUR %d\n\x06"; InTerminator = ""; }
+getSource { out "CALIB:SOUR?"; in "CALIB:SOUR?\n\x06%d"; }
+
+
+# INITIALISATION
+
+# Initialise device (needs to be done after changes to setup
+# e.g. int time, range, capacitor)
+init { out "INIT"; in "INIT\n\x06"; InTerminator = "";}
+
+# Abort measurement
+abort { out "ABOR"; in "ABOR\n\x06"; InTerminator = ""; }
+
+
+# CONFIGURATION
+
+# Current range
+setCurrRange {out "CONF:RANG %e"; in "CONF:RANG %e\n\x06"; InTerminator = ""; }
+getCurrRange {out "CONF:RANG?"; in "CONF:RANG?\n\x06%e A"; }
+
+# Integration period
+setIntPeriod {out "CONF:PER %e";in "CONF:PER %e\n\x06"; InTerminator = ""; }
+getIntPeriod {out "CONF:PER?"; in "CONF:PER?\n\x06%e S"; }
+
+# Maximum external voltage
+setMaxExtHV { out "CONF:HIVO:MAX %d"; in "CONF:HIVO:MAX %d\n\x06"; InTerminator = ""; }
+getMaxExtHV { out "CONF:HIVO:MAX?"; in "CONF:HIVO:MAX?\n\x06%d"; }
+
+# External voltage
+setExtHV { out "CONF:HIVO:SET %d"; in "CONF:HIVO:SET %d\n\x06"; InTerminator = ""; }
+getExtHV { out "CONF:HIVO:SET?"; in "CONF:HIVO:SET?\n\x06%d"; }
+
+# Capacitor selection
+setCap { out "CONF:CAP %d"; in "CONF:CAP %*d\n\x06"; InTerminator = ""; }
+getCap { out "CONF:CAP?"; in "CONF:CAP?\n\x06%d,%*e F"; }
+# Also read in capacitance value
+getCapValue { in "CONF:CAP?\n\x06%*d,%e F"; }
+
+
+# MEASUREMENTS
+
+# Current
+readCurr { out "READ:CURR?"; in "READ:CURR?\n\x06%*e S,%e A,%*d"; }
+
+# Charge
+readChar { out "READ:CHA?"; in "READ:CHA?\n\x06%*e S,%e C,%*d"; }
+
+# Digitals
+readDigi { out "READ:DIG?"; in "READ:DIG?\n\x06%d"; }
+
+
+# MISCELLANEOUS
+
+# Manual message
+sendMessage { out "%s"; }
+readMessage { in "%s"; }

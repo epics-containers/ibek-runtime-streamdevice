@@ -1,0 +1,43 @@
+# Protocol file for the Gardasoft Vision RT series LED lighting controllers (tested on the RT460-20)
+# Version: 1.0
+# Date:    14-02-2011
+
+# Please refer to the Gardasoft Vision User Manual Revision 3
+# Comms settings: 115200,8,N,1
+
+OutTerminator = CR;
+InTerminator = LF CR ">";
+replytimeout = 100;
+readtimeout  = 2000;
+
+# Report the firmware version
+getVersion {
+	out "VR";
+	in "%s";
+}
+
+# Save settings to the controller's
+# non-volatile memory
+save {
+	out "AW";
+	in "AW";
+}
+
+# Clear errors.  The errors that were cleared
+# are saved as a String
+resetErrors {
+	out "GR";
+	in "%s";
+}
+
+# Set the max current rating for a light (mA)
+# $1 - output channel
+setRating {
+	out "VL\$1,0,%fma";
+}
+
+# Set continuous output (at a percentage of full brightness)
+# $1 - output channel
+setOutput {
+	out "RS\$1,%u"
+}

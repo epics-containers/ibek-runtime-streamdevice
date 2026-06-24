@@ -1,0 +1,19 @@
+# fwVersionCheck.template
+# Template to check the current firmware matches that of the redirector tag "d2afe-fw"
+# % macro, P, Device prefix
+
+record(aSub, "$(P,undefined):AFE:FW_CHECK"){
+    field(SNAM, "checkFW")
+    field(SCAN, "10 second")
+    field(INPA, "$(P,undefined):AFE:FW_VER")
+    field(FTA, "STRING")
+    field(OUTA, "$(P,undefined):AFE:FW_VER_CORRECT PP")
+    field(FTVA, "USHORT")
+}
+
+record(bi, "$(P,undefined):AFE:FW_VER_CORRECT") {
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(ZSV, "MAJOR")
+    field(OSV, "NO_ALARM")
+}

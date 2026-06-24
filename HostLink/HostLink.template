@@ -1,0 +1,521 @@
+
+record(seq, "$(device):UPDATE") {
+  field(DESC, "Update all passive PVs")
+  
+  field(DOL1, "1")
+  field(DLY1, "0.0")
+  field(LNK1, "$(device):CPUSTATUS.PROC")
+  
+  field(DOL2, "1")
+  field(DLY2, "1.0")
+  field(LNK2, "$(device):CYCLE.PROC")
+
+  field(DOL3, "1")
+  field(DLY3, "1.0")
+  field(LNK3, "$(device):MULTI1.PROC")
+
+  field(DOL4, "1")
+  field(DLY4, "1.0")
+  field(LNK4, "$(device):MULTI2.PROC")
+
+  field(DOL5, "1")
+  field(DLY5, "1.0")
+  field(LNK5, "$(device):CLOCK.PROC")
+}
+
+record(bi, "$(device):STA") {
+  field(INP, "$(device):CPUSTATUS MS")
+  field(SCAN, "10 second")
+}
+
+################################################################################
+
+record(calcout, "$(device):CPUSTATUS") {
+  field(DTYP, "stream")
+  field(OUT, "@HostlinkFINS.proto CPU_UNIT_STATUS_READ $(port)")
+  field(FLNK, "$(device):STATUSFAN")
+  field(CALC, "1")
+  field(SCAN, "10 second")
+   field(PINI, "YES")
+}
+
+record(fanout, "$(device):STATUSFAN") {
+  field(LNK1, "$(device):MODE")
+  field(LNK2, "$(device):FATAL")
+  field(LNK3, "$(device):NONFATAL")
+}
+
+# 00 Program, 02 Monitor, 04 Run
+
+record(mbbi, "$(device):MODE") {
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "0")
+  field(TWVL, "2")
+  field(FRVL, "4")
+  field(ZRST, "Program")
+  field(ZRSV, "MAJOR")
+  field(TWST, "Monitor")
+  field(TWSV, "NO_ALARM")
+  field(FRST, "Run")
+  field(FRSV, "MINOR")
+  field(NOBT, "3")
+  field(INP, "$(device):CPUSTATUS.A MS")
+}
+
+################################################################################
+
+record(bo, "$(device):STOP") {
+  field(DTYP, "stream")
+  field(OUT, "@HostlinkFINS.proto STOP $(port)")
+  field(FLNK, "$(device):CPUSTATUS")
+}
+
+record(bo, "$(device):RUN") {
+  field(DTYP, "stream")
+  field(OUT, "@HostlinkFINS.proto RUN $(port)")
+  field(FLNK, "$(device):CPUSTATUS")
+}
+
+record(bo, "$(device):MONITOR") {
+  field(DTYP, "stream")
+  field(OUT, "@HostlinkFINS.proto MONITOR $(port)")
+  field(FLNK, "$(device):CPUSTATUS")
+}
+
+################################################################################
+
+record(calcout, "$(device):CYCLE") {
+  field(DTYP, "stream")
+  field(CALC, "0")
+  field(OUT, "@HostlinkFINS.proto CYCLE_TIME_READ $(port)")
+  field(FLNK, "$(device):CYCLEFAN")
+}
+
+record(fanout, "$(device):CYCLEFAN") {
+  field(LNK1, "$(device):CYCLEMEAN")
+  field(LNK2, "$(device):CYCLEMAX")
+  field(LNK3, "$(device):CYCLEMIN")
+}
+ 
+record(calc, "$(device):CYCLEMEAN") {
+  field(INPA, "$(device):CYCLE.A MS")
+  field(CALC, "A * 0.1")
+  field(PREC, "1")
+  field(EGU, "ms")
+}
+
+record(calc, "$(device):CYCLEMAX") {
+  field(INPA, "$(device):CYCLE.B MS")
+  field(CALC, "A * 0.1")
+  field(PREC, "1")
+  field(EGU, "ms")
+}
+
+record(calc, "$(device):CYCLEMIN") {
+  field(INPA, "$(device):CYCLE.C MS")
+  field(CALC, "A * 0.1")
+  field(PREC, "1")
+  field(EGU, "ms")
+}
+
+record(bo, "$(device):CYCLERESET") {
+  field(DTYP, "stream")
+  field(OUT, "@HostlinkFINS.proto CYCLE_TIME_READ_RESET $(port)")
+  field(FLNK, "$(device):CYCLE")
+}
+
+################################################################################
+
+# record to request AR data
+
+record(calcout, "$(device):MULTI1") {
+  field(DTYP, "stream")
+  field(CALC, "0")
+  field(OUT, "@HostlinkFINS.proto MULTI_READ_1 $(port)")
+  field(FLNK, "$(device):MULTI1FAN1")
+}
+
+record(fanout, "$(device):MULTI1FAN1") {
+  field(LNK1, "$(device):AR336")
+  field(LNK2, "$(device):AR510H")
+  field(LNK3, "$(device):AR510L")
+  field(LNK4, "$(device):AR511H")
+  field(LNK5, "$(device):AR511L")
+}
+
+# I/O units present
+
+record(longin, "$(device):AR336") {
+  field(INP, "$(device):MULTI1.A MS")
+}
+
+# start mins
+
+record(longin, "$(device):AR510H") {
+  field(INP, "$(device):MULTI1.B MS")
+}
+
+# start secs
+
+record(longin, "$(device):AR510L") {
+  field(INP, "$(device):MULTI1.C MS")
+}
+
+# start day
+
+record(longin, "$(device):AR511H") {
+  field(INP, "$(device):MULTI1.D MS")
+}
+
+# start hours
+
+record(longin, "$(device):AR511L") {
+  field(INP, "$(device):MULTI1.E MS")
+}
+
+################################################################################
+
+# record to request AR data
+record(calcout, "$(device):MULTI2") {
+  field(DTYP, "stream")
+  field(CALC, "0")
+  field(OUT, "@HostlinkFINS.proto MULTI_READ_2 $(port)")
+  field(FLNK, "$(device):MULTIFAN2")
+}
+
+record(fanout, "$(device):MULTIFAN2") {
+  field(LNK1, "$(device):AR514")
+  field(LNK2, "$(device):AR523")
+  field(LNK3, "$(device):DM000")
+  field(LNK4, "$(device):DM001")
+}
+
+# power ints
+
+record(longin, "$(device):AR514") {
+  field(INP, "$(device):MULTI2.A MS")
+}
+
+# power on
+
+record(longin, "$(device):AR523") {
+  field(INP, "$(device):MULTI2.B MS")
+}
+
+# serial
+
+record(longin, "$(device):DM000") {
+  field(INP, "$(device):MULTI2.C MS")
+}
+
+# software
+
+record(longin, "$(device):DM001") {
+  field(INP, "$(device):MULTI2.D MS")
+}
+
+################################################################################
+
+record(fanout, "$(device):STARTFAN") {
+  field(LNK1, "$(device):START:SECS")
+  field(LNK2, "$(device):START:MINS")
+  field(LNK3, "$(device):START:HOUR")
+  field(LNK4, "$(device):START:DAYS")
+  field(SCAN, "1 second")
+}
+
+# % controldesk Start time second readback
+record(longin, "$(device):START:SECS") {
+  field(INP, "$(device):AR510L MS")
+}
+
+# % controldesk Start time minute readback
+record(longin, "$(device):START:MINS") {
+  field(INP, "$(device):AR510H MS")
+}
+
+# % controldesk start time hour readback
+record(longin, "$(device):START:HOUR") {
+  field(INP, "$(device):AR511L MS")
+}
+
+# % controldesk  Start day readback
+record(longin, "$(device):START:DAYS") {
+  field(INP, "$(device):AR511H MS")
+}
+
+
+# record to request clock data
+
+record(calcout, "$(device):CLOCK") {
+  field(DTYP, "stream")
+  field(CALC, "0")
+  field(OUT, "@HostlinkFINS.proto CLOCK_READ $(port)")
+  field(FLNK, "$(device):CLOCKFAN")
+}
+
+record(fanout, "$(device):CLOCKFAN") {
+  field(LNK1, "$(device):CLOCK:SECS")
+  field(LNK2, "$(device):CLOCK:MINS")
+  field(LNK3, "$(device):CLOCK:HOUR")
+  field(LNK4, "$(device):CLOCK:DAY")
+  field(LNK5, "$(device):CLOCK:MONTH")
+  field(LNK6, "$(device):CLOCK:YEAR")
+}
+
+# % controldesk Clock second readback
+record(longin, "$(device):CLOCK:SECS") {
+  field(INP, "$(device):CLOCK.F MS")
+}
+
+# % controldesk Clock minute readback
+record(longin, "$(device):CLOCK:MINS") {
+  field(INP, "$(device):CLOCK.E MS")
+}
+
+# % controldesk Clock hour readback
+record(longin, "$(device):CLOCK:HOUR") {
+  field(INP, "$(device):CLOCK.D MS")
+}
+
+# % controldesk Clock day readback
+record(longin, "$(device):CLOCK:DAY") {
+  field(INP, "$(device):CLOCK.C MS")
+}
+
+# % controldesk Clock month readback
+record(longin, "$(device):CLOCK:MONTH") {
+  field(INP, "$(device):CLOCK.B MS")
+}
+
+# % controldesk Clock year readback
+record(calc, "$(device):CLOCK:YEAR") {
+  field(INPA, "$(device):CLOCK.A MS")
+  field(CALC, "2000 + A")
+}
+
+################################################################################
+
+# % controldesk I/O units readback
+
+record(longin, "$(device):ALLOCUNITS") {
+  field(INP, "$(device):AR336 MS")
+  field(PINI, "YES")
+  field(DESC, "I/O Units")
+  field(EGU, "Units")
+  field(HOPR, "10")
+  field(LOPR, "0")
+  field(LOLO, "0")
+  field(LLSV, "MAJOR")
+  field(SCAN, "1 second")
+}
+
+# % controldesk Power interrupts readback
+# % archiver 10 Monitor
+
+record(longin, "$(device):POWERINTS") {
+  field(INP, "$(device):AR514 MS")
+  field(SCAN, "1 second")
+  field(DESC, "Power Cycles")
+  field(HOPR, "1000")
+  field(LOPR, "0")
+}
+
+# % controldesk Uptime readback
+record(calc, "$(device):POWERON") {
+  field(INPA, "$(device):AR523 MS")
+  field(SCAN, "1 second")
+  field(EGU, "hours")
+  field(HOPR, "10000")
+  field(LOPR, "0")
+  field(CALC, "A * 10")
+}
+
+record(mbbiDirect, "$(device):FATAL") {
+  field(INP, "$(device):CPUSTATUS.B MS")
+  field(NOBT, "16")
+}
+
+record(bi, "$(device):ERROR:CYCLE") {
+  field(INP, "$(device):FATAL.B8 CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(device):ERROR:PROGRAM") {
+  field(INP, "$(device):FATAL.B9 CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(device):ERROR:IOSET") {
+  field(INP, "$(device):FATAL.BA CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(device):ERROR:IOPOINT") {
+  field(INP, "$(device):FATAL.BB CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(device):ERROR:BOARD") {
+  field(INP, "$(device):FATAL.BC CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(device):ERROR:DUP") {
+  field(INP, "$(device):FATAL.BD CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(device):ERROR:IOBUS") {
+  field(INP, "$(device):FATAL.BE CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(device):ERROR:MEMORY") {
+  field(INP, "$(device):FATAL.BF CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+}
+
+record(mbbiDirect, "$(device):NONFATAL") {
+  field(INP, "$(device):CPUSTATUS.C MS") 
+  field(NOBT, "16")
+}
+
+record(bi, "$(device):ERROR:IOSET") {
+  field(INP, "$(device):NONFATAL.B2 CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+record(bi, "$(device):ERROR:BATTERY") {
+  field(INP, "$(device):NONFATAL.B4 CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+record(bi, "$(device):ERROR:IOUNIT") {
+  field(INP, "$(device):NONFATAL.B6 CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+record(bi, "$(device):ERROR:CPUBUS") {
+  field(INP, "$(device):NONFATAL.B7 CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+record(bi, "$(device):ERROR:IOVERIFY") {
+  field(INP, "$(device):NONFATAL.B9 CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+record(bi, "$(device):ERROR:PCSETUP") {
+  field(INP, "$(device):NONFATAL.BA CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+record(bi, "$(device):ERROR:BASICIO") {
+  field(INP, "$(device):NONFATAL.BC CP MS")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MINOR")
+}
+
+################################################################################
+
+# % controldesk DLS serial number readback
+# % archiver 10 Monitor
+
+record(longin, "$(device):SERIALID") {
+  field(DESC, "DLS Serial number")
+  field(INP, "$(device):DM000 CP MS")
+}
+
+# % controldesk DLS software number readback
+# % archiver 10 Monitor
+
+record(longin, "$(device):SOFTWARE") {
+  field(DESC, "Software version")
+  field(INP, "$(device):DM001 CP MS")
+}
+
+record(calc, "$(device):SOFTMOD") {
+  field(INPA, "$(device):DM001 CP MS")
+  field(CALC, "FLOOR(A * 0.001)")
+}
+
+# % controldesk DLS PLC type readback
+# % archiver 10 Monitor
+
+record(mbbi, "$(device):PLCTYPE") {
+  field(DTYP, "Raw Soft Channel")
+  field(NOBT, "4")
+  field(INP, "$(device):SOFTMOD CP MS")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(ZRST, "Invalid")
+  field(ONST, "Linac")
+  field(TWST, "Machine Protect")
+  field(THST, "Gas Brem")
+  field(FRST, "Vac Four Valve")
+  field(FVST, "Undefined")
+  field(SXST, "Vac Six Valve")
+  field(SVST, "Vacuum Cart")
+  field(ZRSV, "MINOR")
+  field(ONSV, "NO_ALARM")
+  field(TWSV, "NO_ALARM")
+  field(THSV, "NO_ALARM")
+  field(FRSV, "NO_ALARM")
+  field(FVSV, "MINOR")
+  field(SXSV, "NO_ALARM")
+  field(UNSV, "MINOR")
+}
+
+################################################################################
+

@@ -1,0 +1,32 @@
+
+
+Terminator = CR;
+
+LockTimeout = 10000;
+ReplyTimeout = 1000;
+ReadTimeout = 1000;
+ExtraInput = Ignore;
+separator = "";
+
+
+#out #0<address>15AA?IF<crc>
+read_fw{
+  out "#0%(\$1:ADDR)s15AA?IF%0<ccitt16x>"; 
+  in "%*7c%(\$1:FIRMWARE)20c%0<ccitt16x>";
+}
+
+#out example #0115AB?VR03E801B97B
+read_param{
+  out "#0%(\$1:ADDR)d11AB?VR%(\$1:\$2_ID)s0\$3%0<ccitt16x>"; 
+  in "%*3c%(\$1:\$2\$3_SEQUENCE_NO)4c%(\$1:\$2\$3_RESPONSE)8c%0<ccitt16x>";
+}
+
+write_param{
+  out "#0%(\$1:ADDR)d11AEVS%(\$1:\$2_ID)s0\$3%s%0<ccitt16x>"; 
+  in "%*3c%(\$1:\$2\$3_WRITE_SEQUENCE_NO)4c%*4c";
+}
+
+reset{
+  out "#0%(\$1:ADDR)d11AERS%0<ccitt16x>";
+}
+

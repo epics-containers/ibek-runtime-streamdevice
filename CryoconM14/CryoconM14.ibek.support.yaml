@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: CryoconM14 Rx-y
+# Source: /dls_sw/prod/R3.14.12.7/support/CryoconM14/Rx-y
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/CryoconM14/ release.
+
+module: CryoconM14
+
+entity_models:
+  - name: M14_system
+    description: |-
+      System wide features of the Cryocon M14 Temperature Monitor
+    parameters:
+      tmon:
+        type: str
+        description: |-
+          EPICS device name for whole unit
+      port:
+        type: str
+        description: |-
+          Serial port identifier
+    databases:
+      - file: M14_system.template
+        args:
+          .*:
+  - name: M14_sensor
+    description: |-
+      Cryocon M14 Temperature Monitor individual sensor details. There are 4 channels.
+    parameters:
+      record:
+        type: str
+        description: |-
+          Record specifier part of PV name (e.g. T1)
+      tmon:
+        type: str
+        description: |-
+          EPICS device name for whole unit
+      sensor:
+        type: str
+        description: |-
+          Index of single sensor (A/B/C/D)
+      port:
+        type: str
+        description: |-
+          Serial port identifier
+      scan:
+        type: str
+        description: |-
+          Scan period
+      device:
+        type: str
+        description: |-
+          EPICS device name for single temperature reading
+      egu:
+        type: str
+        description: |-
+          EGU
+      adel:
+        type: str
+        description: |-
+          ADEL
+      hihi:
+        type: str
+        description: |-
+          HIHI
+      high:
+        type: str
+        description: |-
+          HIGH
+      low:
+        type: str
+        description: |-
+          LOW
+      lolo:
+        type: str
+        description: |-
+          LOLO
+      name:
+        type: id
+        description: |-
+          Object name, also used for gda_name if gda
+      desc:
+        type: str
+        description: |-
+          Object description, also used for gda_desc if gda
+    databases:
+      - file: M14_sensor.template
+        args:
+          .*:

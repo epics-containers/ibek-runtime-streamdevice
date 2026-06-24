@@ -1,0 +1,2592 @@
+
+
+# % gui, , edm, J15Robot.edl, P=$(P)
+
+#################### Program Control ###################
+
+record(ao, "$(P):SON")
+{
+  field(DESC, "Servo on")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto servoOn($(P)) $(STREAMS_PORT,undefined)")
+  field(MDEL, "-1")
+}
+
+record(ao, "$(P):SOFF")
+{
+  field(DESC, "Abort the Current Program")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto servoOff($(P)) $(STREAMS_PORT,undefined)")
+  field(MDEL, "-1")
+  field(FLNK, "$(P):ABORT_MSG")
+}
+
+record(stringout, "$(P):ABORT_MSG")
+{
+  field(DESC, "Abort Message")
+  field(VAL,  "Stop button pressed")
+  field(OUT,  "$(P):LOGGING.D PP")
+}
+
+#################### Programs #####################
+
+record(stringout, "$(P):RUN_PROGRAM")
+{
+  field(DESC, "Run Program")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto runProgram($(P)) $(STREAMS_PORT,undefined)")
+}
+
+record(stringout, "$(P):LOAD_PROGRAM")
+{
+  field(DESC, "Load Program")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto loadProgramToSlot($(P)) $(STREAMS_PORT,undefined)")
+}
+
+
+record(stringout, "$(P):RUN_ERROR_CODE")
+{
+  field(DESC, "runProgram error code")
+  field(VAL,  "")
+}
+
+################### Program Status ###################
+
+# All of the following records in this section
+# are populated as a result of the protocol file
+# response to the GET_STATE request below
+
+record(ai, "$(P):GET_STATE")
+{
+  field(DESC, "Robot Program Status")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto getState($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):STATUS_POLL.RVAL CP")
+}
+
+record(stringin, "$(P):PROGRAM_NAME")
+{
+  field(DESC, "Currently Running Program Name")
+}
+
+# Request the currently executed program line
+record(ao, "$(P):LINE_NUMBER")
+{
+  field(DESC, "Current Program Line Number")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto currentLine($(P)) $(STREAMS_PORT,undefined)")
+}
+
+# Display the returned error number
+
+# This record is populated as a result 
+# of the protocol file response to the 
+# above LINE_NUMBER request
+record(waveform, "$(P):LINE_CONTENTS")
+{
+  field(DESC, "Current Line Contents")
+  field(NELM, "255")
+  field(FTVL, "STRING")
+}
+
+record(ai, "$(P):EDIT_STATUS")
+{
+  field(DESC, "Edit Status")
+}
+
+record(ai, "$(P):STEP_NUMBER")
+{
+  field(DESC, "Execution Step Number")
+}
+
+record(ai, "$(P):MECH_INFO")
+{
+  field(DESC, "Mech Info")
+}
+
+record(stringin, "$(P):TASK_NAME")
+{
+  field(DESC, "Current Task Name")
+}
+
+record(mbbi, "$(P):TASK_MODE")
+{
+  field(DESC, "Operation Mode of Slot Table")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "REP")
+  field(ZRVL, "0")
+  field(ONST, "CYC")
+  field(ONVL, "1")
+}
+
+record(mbbi, "$(P):TASK_CONDITION")
+{
+  field(DESC, "Operation Mode of Slot Table")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "START")
+  field(ZRVL, "0")
+  field(ONST, "ALWAYS")
+  field(ONVL, "1")
+  field(TWST, "ERROR")
+  field(TWVL, "2")
+}
+
+record(ai, "$(P):TASK_PRIORITY")
+{
+  field(DESC, "Priority of Slot Table")
+}
+
+record(ai, "$(P):MECH_NUM_IN_USE")
+{
+  field(DESC, "Mech Number In Use")
+}
+
+################ Convenience Statuses ###################
+
+# These records are used to give nice PV names to 
+# individual status bits (rather than have nameless
+# B1, B4, PVs etc)  This is done for PVs which are
+# used by GDA or regularly by the user
+
+record(bi, "$(P):TEACH_MODE")
+{
+  field(DESC, "Teach Mode State")
+  field(INP,  "$(P):RUN_STATUS.B3 CP")
+  field(ZNAM, "Exec Mode")
+  field(ONAM, "Teach Mode")
+}
+
+record(bi, "$(P):SERVO_ON")
+{
+  field(DESC, "Servo State")
+  field(INP,  "$(P):RUN_STATUS.B5 CP")
+  field(ZNAM, "Servo Off")
+  field(ONAM, "Servo On")
+}
+
+record(bi, "$(P):PROGRAM_RUNNING")
+{
+  field(DESC, "Program Running State")
+  field(INP,  "$(P):RUN_STATUS.B6 CP")
+  field(ZNAM, "No Program Running")
+  field(ONAM, "Program Running")
+}
+
+record(bi, "$(P):CONTROL_STATE")
+{
+  field(DESC, "Control State")
+  field(INP,  "$(P):RUN_STATUS.B7 CP")
+  field(ZNAM, "Control Off")
+  field(ONAM, "Control On")
+}
+
+record(bi, "$(P):PROGRAM_SELECT")
+{
+  field(DESC, "Program Select State")
+  field(INP,  "$(P):STOP_STATUS.B4 CP")
+  field(ZNAM, "Program Select Disabled")
+  field(ONAM, "Program Select Enabled")
+}
+
+record(bi, "$(P):SPINNER_STATE")
+{
+  field(DESC, "Spinner State")
+  field(INP,  "$(P):ROBOT_OP_0_BITS.BB CP")
+  field(ZNAM, "Spinner Off")
+  field(ONAM, "Spinner On")
+}
+
+############### Visibility / Ready PVs #################
+
+# These records are used by the GUI or by SDIS
+# fields of other records to determine that certain
+# conditions are met before allowing something
+# to be controlled or to be visible on the GUI
+
+record(calcout, "$(P):PROGRAM_READY")
+{
+  field(DESC, "Program Ready State")
+  field(INPA, "$(P):PROGRAM_RUNNING CP")
+  field(INPB, "$(P):CONTROL_STATE CP")
+  field(CALC, "(A|!B)?1:0")
+}
+
+############################################################
+
+record(genSub, "$(P):LOGGING")
+{
+  field(SNAM, "Logging")
+  field(INPA, "$(P):RUN_PROGRAM.VAL CP")
+  field(FTA,  "STRING")
+  field(FTD,  "STRING")
+}
+
+######################## Resets ##############################
+
+# Pressing the reset button on the main GUI triggers
+# a chain of reset events:
+
+# 1) Reset of alarm state
+# 2) Enabling control
+# 3) Reset of program
+# 4) Reset of program error code to zero
+# 5) Reset of run error code to zero
+# 6) Reset of the top level program variable to zero
+######################## Resets ##############################
+
+# Pressing the reset button on the main GUI triggers
+# a chain of reset events:
+
+# 1) Reset of alarm state
+# 2) Enabling control
+# 3) Reset of program
+# 4) Reset of program error code to zero
+# 5) Reset of run error code to zero
+# 6) Reset of the top level program variable to zero
+
+# This is achieved through a mixture of forward links
+# and return statements from the protocol file
+
+record(ai, "$(P):RESET")
+{
+  field(DESC, "Reset Robot State")
+  field(DTYP, "stream")
+  field(INP,  "@J15robot.proto openComms($(P)) $(STREAMS_PORT,undefined)")
+  field(MDEL, "-1")
+  field(FLNK, "$(P):RESET_ALARM")
+}
+
+record(ai, "$(P):RESET_ALARM")
+{
+  field(DESC, "Reset Robot Alarm")
+  field(DTYP, "stream")
+  field(INP,  "@J15robot.proto resetAlarm($(P)) $(STREAMS_PORT,undefined)")
+  field(MDEL, "-1")
+  field(FLNK, "$(P):RESET_CONTROL_ON")
+}
+
+record(stringout, "$(P):RESET_MSG")
+{
+  field(DESC, "Reset Message")
+  field(VAL,  "Reset button pressed")
+  field(OUT,  "$(P):LOGGING.D PP")
+}
+
+record(ao, "$(P):RESET_CONTROL_ON")
+{
+  field(DESC, "Turn Control On")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto controlOn($(P)) $(STREAMS_PORT,undefined)")
+  field(FLNK, "$(P):RESET_PROGRAM")
+  field(PINI, "1")
+}
+
+record(ao, "$(P):RESET_PROGRAM")
+{
+  field(DESC, "Reset Program")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto resetProgram($(P)) $(STREAMS_PORT,undefined)")
+}
+
+# The reset value of 0 is actually sent to this record
+# by the protocol file during a reset procedure
+# This is to avoid the error code value being 
+# overwritten upon startup by the streamDevice init
+# command reading a previous error code in
+record(ao, "$(P):RESET_ERROR_CODE")
+{
+  field(DESC, "Reset Program Error Code")
+  field(VAL,  "0")
+  field(FLNK, "$(P):RESET_RUN_ERR")
+}
+
+record(ao, "$(P):RESET_RUN_ERR")
+{
+  field(DESC, "Reset Program")
+  field(VAL,  "0")
+  field(OUT,  "$(P):RUN_ERR_CODE PP")
+  field(FLNK, "$(P):TOPPRG_ZERO")
+}
+
+# Triggered whenever a run command is sent
+# Request the message associated with an error number
+record(ao, "$(P):RUN_ERR_CODE")
+{
+  field(DESC, "Run Command Error Code")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto runErrorMessage($(P)) $(STREAMS_PORT,undefined)")
+}
+
+# Display the returned error message
+record(waveform, "$(P):RUN_ERR_RET")
+{
+  field(DESC, "Returned Run Error Message")
+  field(NELM, "255")
+  field(FTVL, "STRING")
+}
+
+record(genSub, "$(P):RUN_ERR_LOOKUP")
+{
+  field(SNAM, "CmdErrorLookup")
+  field(INPA, "$(P):RUN_ERR_CODE NP")
+  field(INPB, "$(P):RUN_ERR_RET CP")
+  field(INPC, "$(P):RUN_ERR_MSG NP")
+  field(FTA,  "LONG")
+  field(FTB,  "STRING")
+  field(FTC,  "STRING")
+  field(FTVA, "CHAR")
+  field(NOVA, "255")
+  field(OUTA, "$(P):RUN_ERR_MSG PP")
+}
+
+record(waveform, "$(P):RUN_ERR_MSG")
+{
+  field(DESC, "Run Error Message")
+  field(NELM, "255")
+  field(FTVL, "CHAR")
+}
+
+record(ao, "$(P):CNTL_ERR_CODE")
+{
+  field(DESC, "Controller Error Code")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto errorMessage($(P)) $(STREAMS_PORT,undefined)")
+}
+
+record(waveform, "$(P):CNTL_ERR_RET")
+{
+  field(DESC, "Returned Controller Error Message")
+  field(NELM, "255")
+  field(FTVL, "STRING")
+}
+
+record(scalcout, "$(P):CNTL_MSG_CHECK")
+{
+  field(DESC, "Check for Non-Blank Error Message")
+  field(CALC, "(A>0)?AA:''")
+  field(INPA, "$(P):CNTL_ERR_CODE CP")
+  field(INAA, "$(P):CNTL_ERR_RET")
+  field(OUT,  "$(P):CNTL_ERR_MSG PP")
+}
+
+record(waveform, "$(P):CNTL_ERR_MSG")
+{
+  field(DESC, "Controller Error Message")
+  field(NELM, "255")
+  field(FTVL, "STRING")
+}
+
+record(genSub, "$(P):LOG_CNTL_ERROR")
+{
+  field(SNAM, "LogError")
+  field(INPA, "$(P):CNTL_ERR_MSG CP")
+  field(INPB, "$(P):CNTL_ERR_CODE PP")
+  field(FTA,  "STRING")
+  field(FTB,  "STRING")
+}
+
+record(ai, "$(P):GET_ERROR_2")
+{
+  field(DTYP, "stream")
+  field(INP,  "@J15robot.proto readErrors($(P)) $(STREAMS_PORT,undefined)")
+  field(SCAN, "I/O Intr")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(P):PRG_ERR_CODE")
+{
+  field(DESC, "Program Error Code")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto readVariable(M_Err) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+}
+
+
+record(ao, "$(P):PUCK:ACTION_SEL")
+{
+  field(DESC, "Set Action selection")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto writeVariable($(P),PUCK,MPLACE) $(STREAMS_PORT,undefined)")
+  field(DRVH, "1")
+  field(DRVL, "0")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(P):PUCK:ACTION_SEL_RBV")
+{
+  field(DESC, "Action selection")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto readVariable(MPLACE) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+}
+
+
+record(ao, "$(P):PUCK:PUCK_SEL")
+{
+  field(DESC, "Set Puck selection")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto writeVariable($(P),PUCK,MPUCK) $(STREAMS_PORT,undefined)")
+  field(DRVH, "20")
+  field(DRVL, "1")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(P):PUCK:PUCK_SEL_RBV")
+{
+  field(DESC, "Puck selection")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto readVariable(MPUCK) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+}
+
+
+record(ao, "$(P):PUCK:POS_SEL")
+{
+  field(DESC, "Set Position in puck")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto writeVariable($(P),PUCK,MPOSITION) $(STREAMS_PORT,undefined)")
+  field(DRVH, "22")
+  field(DRVL, "1")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(P):PUCK:POS_SEL_RBV")
+{
+  field(DESC, "Position in puck")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto readVariable(MPOSITION) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+}
+
+
+record(ao, "$(P):BEAM:ACTION_SEL")
+{
+  field(DESC, "Set Action selection")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto writeVariable($(P),BEAM,MPLACE) $(STREAMS_PORT,undefined)")
+  field(DRVH, "1")
+  field(DRVL, "0")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(P):BEAM:ACTION_SEL_RBV")
+{
+  field(DESC, "Action selection")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto readVariable(MPLACE) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+}
+
+
+record(ao, "$(P):MOTOR:ACTION_SEL")
+{
+  field(DESC, "Set Action selection")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto writeVariable($(P),MOTOR,MACTION) $(STREAMS_PORT,undefined)")
+  field(DRVH, "1")
+  field(DRVL, "0")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(P):MOTOR:ACTION_SEL_RBV")
+{
+  field(DESC, "Action selection")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto readVariable(MACTION) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+}
+
+
+record(stringout, "$(P):PUCK")
+{
+  field(DESC, "PUCK Program Trigger")
+  field(VAL,  "PUCK")
+  field(OUT, "$(P):RUN_PROGRAM PP")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+record(stringout, "$(P):PUCK:LOAD")
+{
+  field(DESC, "PUCK Program Loader")
+  field(VAL,  "PUCK")
+  field(OUT, "$(P):LOAD_PROGRAM PP")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+
+record(seq, "$(P):PUCK:ACTION0")
+{
+  field(DOL1, "0")
+  field(LNK1, "$(P):PUCK:ACTION_SEL PP")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P):PUCK.PROC PP")
+}
+
+record(seq, "$(P):PUCK:ACTION1")
+{
+  field(DOL1, "1")
+  field(LNK1, "$(P):PUCK:ACTION_SEL PP")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P):PUCK.PROC PP")
+}
+
+
+record(stringout, "$(P):BEAM")
+{
+  field(DESC, "BEAM Program Trigger")
+  field(VAL,  "BEAM")
+  field(OUT, "$(P):RUN_PROGRAM PP")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+record(stringout, "$(P):BEAM:LOAD")
+{
+  field(DESC, "BEAM Program Loader")
+  field(VAL,  "BEAM")
+  field(OUT, "$(P):LOAD_PROGRAM PP")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+
+record(seq, "$(P):BEAM:ACTION0")
+{
+  field(DOL1, "0")
+  field(LNK1, "$(P):BEAM:ACTION_SEL PP")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P):BEAM.PROC PP")
+}
+
+record(seq, "$(P):BEAM:ACTION1")
+{
+  field(DOL1, "1")
+  field(LNK1, "$(P):BEAM:ACTION_SEL PP")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P):BEAM.PROC PP")
+}
+
+
+record(stringout, "$(P):MOTOR")
+{
+  field(DESC, "MOTOR Program Trigger")
+  field(VAL,  "MOTOR")
+  field(OUT, "$(P):RUN_PROGRAM PP")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+record(stringout, "$(P):MOTOR:LOAD")
+{
+  field(DESC, "MOTOR Program Loader")
+  field(VAL,  "MOTOR")
+  field(OUT, "$(P):LOAD_PROGRAM PP")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+
+record(seq, "$(P):MOTOR:ACTION0")
+{
+  field(DOL1, "0")
+  field(LNK1, "$(P):MOTOR:ACTION_SEL PP")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P):MOTOR.PROC PP")
+}
+
+record(seq, "$(P):MOTOR:ACTION1")
+{
+  field(DOL1, "1")
+  field(LNK1, "$(P):MOTOR:ACTION_SEL PP")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P):MOTOR.PROC PP")
+}
+
+
+record(stringout, "$(P):Home")
+{
+  field(DESC, "Home Program Trigger")
+  field(VAL,  "Home")
+  field(OUT, "$(P):RUN_PROGRAM PP")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+record(stringout, "$(P):Home:LOAD")
+{
+  field(DESC, "Home Program Loader")
+  field(VAL,  "Home")
+  field(OUT, "$(P):LOAD_PROGRAM PP")
+  field(SDIS, "$(P):PROGRAM_READY")
+}
+
+
+record(seq, "$(P):Home:ACTION0")
+{
+  field(DOL1, "0")
+  field(LNK1, "$(P):Home:ACTION_SEL PP")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P):Home.PROC PP")
+}
+
+record(seq, "$(P):Home:ACTION1")
+{
+  field(DOL1, "1")
+  field(LNK1, "$(P):Home:ACTION_SEL PP")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P):Home.PROC PP")
+}
+
+
+# Corresponding edm screens: InputsOutputs.edl & UserGUI.edl
+
+############### Input & Output Requests #############
+
+record(ai, "$(P):PORT_0_REQ")
+{
+  field(DESC, "Port 0 Status")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto ioState0($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):IO_POLL.RVAL CP")
+}
+
+record(ai, "$(P):PORT_1_REQ")
+{
+  field(DESC, "Port 1 Status")
+  field(DTYP, "stream")
+  field(SCAN, ".1 second")
+  field(INP,  "@J15robot.proto ioState1($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):IO_POLL.RVAL CP")
+}
+
+################ Run & Stop Status ###################
+
+record(mbbiDirect, "$(P):RUN_STATUS")
+{
+  field(DESC, "Run State in Bits")
+  field(DTYP, "Soft Channel")
+  field(NOBT, "8")
+}
+
+record(mbbiDirect, "$(P):STOP_STATUS")
+{
+  field(DESC, "Stop State in Bits")
+  field(DTYP, "Soft Channel")
+  field(NOBT, "8")
+}
+
+############### Gripper Control ###################
+
+# Control of the gripper was previously handled via
+# robot programs which set the relevant output bits.
+# This worked fine but meant that it was not possible
+# to control the gripper when in an e-stop state for
+# example, as no programs can be run in this state.
+# To get around this the gripper is controlled by
+# directly calling the relevant output bits, outside
+# of any robot programs
+
+# XORs are used because outputs are written a bank at
+# a time and we don't want to change the state of 
+# any other I/O on the same bank.  Also, we want to
+# avoid the gripper state from being toggled - ie if
+# an open command is sent when it is already open, we
+# want it to remain open (ie ignore the open request)
+# and not for it to close 
+
+# Open gripper
+record(calcout, "$(P):COLO")
+{
+  field(DESC, "Open Gripper")
+  field(INPA, "$(P):ROBOT_OP_0_BITS")
+  field(INPB, "$(P):ROBOT_OP_0_BITS.B8")
+  field(CALC, "(A XOR (!B * 256))")
+  field(OUT,  "$(P):WRITE_OP PP")
+}
+
+# Open gripper wide
+record(calcout, "$(P):COLW")
+{
+  field(DESC, "Open Gripper Wide")
+  field(INPA, "$(P):ROBOT_OP_0_BITS")
+  field(INPB, "$(P):ROBOT_OP_0_BITS.B8")
+  field(INPC, "$(P):ROBOT_OP_0_BITS.B9")
+  field(CALC, "(A XOR ((!B * 256) + (!C * 512)))")
+  field(OUT,  "$(P):WRITE_OP PP")
+}
+
+# Close gripper
+record(calcout, "$(P):COLC")
+{
+  field(DESC, "Close Gripper")
+  field(INPA, "$(P):ROBOT_OP_0_BITS")
+  field(INPB, "$(P):ROBOT_OP_0_BITS.B8")
+  field(INPC, "$(P):ROBOT_OP_0_BITS.B9")
+  field(CALC, "(A XOR ((B * 256) + (C * 512)))")
+  field(OUT,  "$(P):WRITE_OP PP")
+}
+
+record(ao, "$(P):WRITE_OP")
+{
+  field(DESC, "Force Robot Output State")
+  field(DTYP, "stream")
+  field(VAL,  "0")
+  field(OUT,  "@J15robot.proto writeOutput($(P)) $(STREAMS_PORT,undefined)")
+}
+
+########################################################
+
+################ Robot Inputs & Outputs ################
+
+record(mbbi, "$(P):ROBOT_IP_0")
+{
+  field(DESC, "Robot Inputs 0-15")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(NIVL, "9")
+  field(TEVL, "10")
+  field(ELVL, "11")
+  field(TVVL, "12")
+  field(TTVL, "13")
+  field(FTVL, "14")
+  field(FFVL, "15")
+  field(ZRST, "?Stop (All Slots)")
+  field(ONST, "?Servo Off")
+  field(TWST, "?Error Reset")
+  field(THST, "?Start")
+  field(FRST, "?Servo On")
+  field(FVST, "?Operation Rights")
+  field(SXST, "")
+  field(SVST, "")
+  field(EIST, "")
+  field(NIST, "?Light Gate Interrupted")
+  field(TEST, "")
+  field(ELST, "?")
+  field(TVST, "")
+  field(TTST, "")
+  field(FTST, "")
+  field(FFST, "?")
+}
+
+record(mbbiDirect, "$(P):ROBOT_IP_0_BITS")
+{
+  field(DESC, "Robot Inputs 0-15 in Bits")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(P):ROBOT_IP_0 CP")
+  field(NOBT, "16")
+}
+
+
+
+################ Robot Inputs & Outputs ################
+
+record(mbbi, "$(P):ROBOT_IP_16")
+{
+  field(DESC, "Robot Inputs 16-31")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(NIVL, "9")
+  field(TEVL, "10")
+  field(ELVL, "11")
+  field(TVVL, "12")
+  field(TTVL, "13")
+  field(FTVL, "14")
+  field(FFVL, "15")
+  field(ZRST, "")
+  field(ONST, "")
+  field(TWST, "")
+  field(THST, "")
+  field(FRST, "")
+  field(FVST, "")
+  field(SXST, "")
+  field(SVST, "")
+  field(EIST, "")
+  field(NIST, "")
+  field(TEST, "")
+  field(ELST, "")
+  field(TVST, "")
+  field(TTST, "")
+  field(FTST, "")
+  field(FFST, "")
+}
+
+record(mbbiDirect, "$(P):ROBOT_IP_16_BITS")
+{
+  field(DESC, "Robot Inputs 16-31 in Bits")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(P):ROBOT_IP_16 CP")
+  field(NOBT, "16")
+}
+
+
+
+################ Robot Inputs & Outputs ################
+
+record(mbbi, "$(P):ROBOT_OP_0")
+{
+  field(DESC, "Robot Outputs 0-15")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(NIVL, "9")
+  field(TEVL, "10")
+  field(ELVL, "11")
+  field(TVVL, "12")
+  field(TTVL, "13")
+  field(FTVL, "14")
+  field(FFVL, "15")
+  field(ZRST, "Running")
+  field(ONST, "Servo On")
+  field(TWST, "?Emergency Stop")
+  field(THST, "?Operation Rights")
+  field(FRST, "")
+  field(FVST, "")
+  field(SXST, "")
+  field(SVST, "")
+  field(EIST, "")
+  field(NIST, "")
+  field(TEST, "")
+  field(ELST, "Spinner")
+  field(TVST, "")
+  field(TTST, "")
+  field(FTST, "")
+  field(FFST, "")
+}
+
+record(mbbiDirect, "$(P):ROBOT_OP_0_BITS")
+{
+  field(DESC, "Robot Outputs 0-15 in Bits")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(P):ROBOT_OP_0 CP")
+  field(NOBT, "16")
+}
+
+
+
+################ Robot Inputs & Outputs ################
+
+record(mbbi, "$(P):ROBOT_OP_16")
+{
+  field(DESC, "Robot Outputs 16-31")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(NIVL, "9")
+  field(TEVL, "10")
+  field(ELVL, "11")
+  field(TVVL, "12")
+  field(TTVL, "13")
+  field(FTVL, "14")
+  field(FFVL, "15")
+  field(ZRST, "")
+  field(ONST, "")
+  field(TWST, "")
+  field(THST, "")
+  field(FRST, "")
+  field(FVST, "")
+  field(SXST, "")
+  field(SVST, "")
+  field(EIST, "")
+  field(NIST, "")
+  field(TEST, "")
+  field(ELST, "")
+  field(TVST, "")
+  field(TTST, "")
+  field(FTST, "")
+  field(FFST, "")
+}
+
+record(mbbiDirect, "$(P):ROBOT_OP_16_BITS")
+{
+  field(DESC, "Robot Outputs 16-31 in Bits")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(P):ROBOT_OP_16 CP")
+  field(NOBT, "16")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_1_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_1")
+{
+  field(DESC, "Variable 1 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_1_RBV")
+{
+  field(DESC, "Variable 1 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_1_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_1 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),1) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_1_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_1 CP")
+  field(INPA, "$(P):VAR_1_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_1_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_1_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_1 CP")
+  field(INPA, "$(P):VAR_1_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_1_CLR")
+{
+  field(DESC, "Clear Variable 1")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_1 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_1_RBV_CLR")
+{
+  field(DESC, "Clear Variable 1 Readback")
+  field(INAA, "$(P):VAR_1 CP")
+  field(INBB, "$(P):VAR_1_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_1_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_2_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_2")
+{
+  field(DESC, "Variable 2 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_2_RBV")
+{
+  field(DESC, "Variable 2 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_2_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_2 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),2) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_2_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_2 CP")
+  field(INPA, "$(P):VAR_2_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_2_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_2_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_2 CP")
+  field(INPA, "$(P):VAR_2_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_2_CLR")
+{
+  field(DESC, "Clear Variable 2")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_2 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_2_RBV_CLR")
+{
+  field(DESC, "Clear Variable 2 Readback")
+  field(INAA, "$(P):VAR_2 CP")
+  field(INBB, "$(P):VAR_2_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_2_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_3_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_3")
+{
+  field(DESC, "Variable 3 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_3_RBV")
+{
+  field(DESC, "Variable 3 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_3_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_3 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),3) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_3_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_3 CP")
+  field(INPA, "$(P):VAR_3_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_3_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_3_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_3 CP")
+  field(INPA, "$(P):VAR_3_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_3_CLR")
+{
+  field(DESC, "Clear Variable 3")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_3 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_3_RBV_CLR")
+{
+  field(DESC, "Clear Variable 3 Readback")
+  field(INAA, "$(P):VAR_3 CP")
+  field(INBB, "$(P):VAR_3_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_3_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_4_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_4")
+{
+  field(DESC, "Variable 4 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_4_RBV")
+{
+  field(DESC, "Variable 4 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_4_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_4 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),4) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_4_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_4 CP")
+  field(INPA, "$(P):VAR_4_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_4_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_4_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_4 CP")
+  field(INPA, "$(P):VAR_4_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_4_CLR")
+{
+  field(DESC, "Clear Variable 4")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_4 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_4_RBV_CLR")
+{
+  field(DESC, "Clear Variable 4 Readback")
+  field(INAA, "$(P):VAR_4 CP")
+  field(INBB, "$(P):VAR_4_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_4_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_5_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_5")
+{
+  field(DESC, "Variable 5 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_5_RBV")
+{
+  field(DESC, "Variable 5 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_5_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_5 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),5) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_5_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_5 CP")
+  field(INPA, "$(P):VAR_5_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_5_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_5_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_5 CP")
+  field(INPA, "$(P):VAR_5_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_5_CLR")
+{
+  field(DESC, "Clear Variable 5")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_5 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_5_RBV_CLR")
+{
+  field(DESC, "Clear Variable 5 Readback")
+  field(INAA, "$(P):VAR_5 CP")
+  field(INBB, "$(P):VAR_5_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_5_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_6_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_6")
+{
+  field(DESC, "Variable 6 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_6_RBV")
+{
+  field(DESC, "Variable 6 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_6_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_6 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),6) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_6_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_6 CP")
+  field(INPA, "$(P):VAR_6_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_6_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_6_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_6 CP")
+  field(INPA, "$(P):VAR_6_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_6_CLR")
+{
+  field(DESC, "Clear Variable 6")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_6 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_6_RBV_CLR")
+{
+  field(DESC, "Clear Variable 6 Readback")
+  field(INAA, "$(P):VAR_6 CP")
+  field(INBB, "$(P):VAR_6_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_6_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_7_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_7")
+{
+  field(DESC, "Variable 7 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_7_RBV")
+{
+  field(DESC, "Variable 7 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_7_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_7 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),7) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_7_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_7 CP")
+  field(INPA, "$(P):VAR_7_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_7_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_7_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_7 CP")
+  field(INPA, "$(P):VAR_7_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_7_CLR")
+{
+  field(DESC, "Clear Variable 7")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_7 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_7_RBV_CLR")
+{
+  field(DESC, "Clear Variable 7 Readback")
+  field(INAA, "$(P):VAR_7 CP")
+  field(INBB, "$(P):VAR_7_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_7_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_8_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_8")
+{
+  field(DESC, "Variable 8 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_8_RBV")
+{
+  field(DESC, "Variable 8 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_8_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_8 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),8) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_8_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_8 CP")
+  field(INPA, "$(P):VAR_8_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_8_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_8_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_8 CP")
+  field(INPA, "$(P):VAR_8_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_8_CLR")
+{
+  field(DESC, "Clear Variable 8")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_8 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_8_RBV_CLR")
+{
+  field(DESC, "Clear Variable 8 Readback")
+  field(INAA, "$(P):VAR_8 CP")
+  field(INBB, "$(P):VAR_8_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_8_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_9_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_9")
+{
+  field(DESC, "Variable 9 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_9_RBV")
+{
+  field(DESC, "Variable 9 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_9_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_9 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),9) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_9_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_9 CP")
+  field(INPA, "$(P):VAR_9_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_9_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_9_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_9 CP")
+  field(INPA, "$(P):VAR_9_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_9_CLR")
+{
+  field(DESC, "Clear Variable 9")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_9 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_9_RBV_CLR")
+{
+  field(DESC, "Clear Variable 9 Readback")
+  field(INAA, "$(P):VAR_9 CP")
+  field(INBB, "$(P):VAR_9_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_9_RBV PP")
+}
+
+
+
+# Corresponding edm screen: WatchWindow.edl
+
+###################################################
+
+# Record to hold name of PV to be watched
+# Used by VAR_10_REQ to request the
+# named variable
+
+record(stringout, "$(P):VAR_10")
+{
+  field(DESC, "Variable 10 Name")
+}
+
+# Value of the specified watched PV
+# This record is populated from the reply
+# to a command in the protocol file
+
+record(stringin, "$(P):VAR_10_RBV")
+{
+  field(DESC, "Variable 10 Readback")
+}
+
+# Record to request named variable.
+# Scan rate is Passive upon boot
+# but is changed to 0.2 scan rate by
+# record below if a valid variable is
+# entered
+
+record(stringout, "$(P):VAR_10_REQ")
+{
+  field(DESC, "Watch Variable")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(P):VAR_10 PP")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto watchVariable($(P),10) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):VARS_POLL.RVAL CP")
+  field(SCAN, "Passive")
+}
+
+# If no variable is entered or the variable
+# is invalid, don't watch (ie scan Passive), otherwise
+# watch at 0.2 second scan rate
+
+record(scalcout, "$(P):VAR_10_CALC")
+{
+  field(DESC, "Only Scan Valid Variables")
+  field(INAA, "$(P):VAR_10 CP")
+  field(INPA, "$(P):VAR_10_REQ.SEVR CP")
+  field(INPB, "$(P):RESET CP")
+  field(CALC, "(AA=='' || A==3)?'Passive':'.2 second'")
+  field(OUT,  "$(P):VAR_10_REQ.SCAN PP")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):VAR_10_INVALID")
+{
+  field(DESC, "Check for Invalid Variable Name")
+  field(INAA, "$(P):VAR_10 CP")
+  field(INPA, "$(P):VAR_10_REQ.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+# Clear a variable name
+
+record(stringout, "$(P):VAR_10_CLR")
+{
+  field(DESC, "Clear Variable 10")
+  field(VAL,  "")
+  field(OUT,  "$(P):VAR_10 PP")
+}
+
+# Clear a variable's readback
+# when the variable name is cleared
+# The second condition is to capture the
+# situation where the variable name is cleared
+# but the readback arrives a split second later
+# and so wouldn't be cleared by the first condition
+
+record(scalcout, "$(P):VAR_10_RBV_CLR")
+{
+  field(DESC, "Clear Variable 10 Readback")
+  field(INAA, "$(P):VAR_10 CP")
+  field(INBB, "$(P):VAR_10_RBV CP")
+  field(CALC, "(AA==''||(AA==''&&BB!=''))?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "''")
+  field(OUT,  "$(P):VAR_10_RBV PP")
+}
+
+
+
+# Corresponding edm screen: Advanced.edl
+
+####################### Control ########################
+
+record(stringout, "$(P):FREE_CMD")
+{
+  field(DESC, "Free Command Line")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto freeCommand($(P)) $(STREAMS_PORT,undefined)")
+}
+
+record(waveform, "$(P):CMD_RESPONSE")
+{
+  field(DESC, "Response from Free Command")
+  field(NELM, "1")
+  field(FTVL, "STRING")
+}
+
+record(ao, "$(P):OVERRIDE")
+{
+  field(DESC, "Override Speed")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto writeOverride($(P)) $(STREAMS_PORT,undefined)")
+  field(DRVH, "100")
+  field(DRVL, "0")
+}
+
+# No scanning on this record as values are
+# pushed in from the result of a (polled)
+# GET_STATE command in ControllerState.template
+
+record(ai, "$(P):OVERRIDE_RBV")
+{
+  field(DESC, "Present Override Value")
+  field(EGU,  "%")
+}
+
+record(ao, "$(P):CONTROL_ON")
+{ 
+  field(DESC, "Turn Control On")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto controlOn($(P)) $(STREAMS_PORT,undefined)")
+}
+
+record(ao, "$(P):OPEN_GRIPPER")
+{ 
+  field(DESC, "Open Gripper")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto openGripper($(P)) $(STREAMS_PORT,undefined)")
+}
+
+record(ao, "$(P):CLOSE_GRIPPER")
+{ 
+  field(DESC, "Close Gripper")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto closeGripper($(P)) $(STREAMS_PORT,undefined)")
+}
+
+record(ai, "$(P):REBOOT")
+{
+  field(DESC, "Reboot the Robot Controller")
+  field(DTYP, "stream")
+  field(INP,  "@J15robot.proto rebootController($(P)) $(STREAMS_PORT,undefined)")
+  field(MDEL, "-1")
+  field(FLNK, "$(P):REBOOT_MSG")
+}
+
+record(stringout, "$(P):REBOOT_MSG")
+{
+  field(DESC, "Reboot Message")
+  field(VAL,  "System Rebooted")
+  field(OUT,  "$(P):LOGGING.D PP")
+} 
+
+#################### Polling ###################
+
+record(bo, "$(P):STATUS_POLL")
+{
+  field(DESC, "Control Status Polling")
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+record(bo, "$(P):IO_POLL")
+{
+  field(DESC, "Control I/O Polling")
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+record(bo, "$(P):VARS_POLL")
+{
+  field(DESC, "Control Variable Polling")
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+############## Power Status ###################
+
+record(ai, "$(P):GET_POWER_STATE")
+{
+  field(DESC, "Get Power Status")
+  field(DTYP, "stream")
+  field(SCAN, "10 second")
+  field(INP,  "@J15robot.proto powerTime($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):STATUS_POLL.RVAL CP")
+}
+
+record(ai, "$(P):POWER_ON_TIME")
+{
+  field(DESC, "Power On Time")
+}
+
+record(ai, "$(P):BATT_REMAIN_TIME")
+{
+  field(DESC, "Battery Time Remaining")
+}
+
+############### Watch Window Clear ####################
+
+# These records are not under the watch window
+# template as they are only needed once
+# whereas the watch window template is used
+# multiple times
+
+record(fanout, "$(P):VAR_ALL_CLR")
+{
+  field(DESC, "Call Clear on First Six Variables")
+  field(SELM, "All")
+  field(LNK1, "$(P):VAR_1_CLR")
+  field(LNK2, "$(P):VAR_2_CLR")
+  field(LNK3, "$(P):VAR_3_CLR")
+  field(LNK4, "$(P):VAR_4_CLR")
+  field(LNK5, "$(P):VAR_5_CLR")
+  field(LNK6, "$(P):VAR_6_CLR")
+  field(FLNK, "$(P):VAR_ALL_CLR_2 PP")
+}
+
+record(fanout, "$(P):VAR_ALL_CLR_2")
+{
+  field(DESC, "Call Clear on Last Four Variables")
+  field(SELM, "All")
+  field(LNK1, "$(P):VAR_7_CLR")
+  field(LNK2, "$(P):VAR_8_CLR")
+  field(LNK3, "$(P):VAR_9_CLR")
+  field(LNK4, "$(P):VAR_10_CLR")
+}
+
+################# Fetch Positions #######################
+
+record(stringout, "$(P):FETCH_POSITION")
+{
+  field(DESC, "Get the Position")
+  field(OMSL, "closed_loop")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto fetchPosition($(P)) $(STREAMS_PORT,undefined)")
+  field(SCAN, "Passive")
+}
+
+# If a variable name returns mismatch (ie it's invalid)
+# then set this record high (to be used by GUI)
+# If the mismatch is for a blank variable name
+# (can happen for a second) when a name is cleared)
+# then don't mark as invalid
+
+record(scalcout, "$(P):FETCH_POSITION_INVALID")
+{
+  field(DESC, "Check for Invalid Position Name")
+  field(INAA, "$(P):FETCH_POSITION CP")
+  field(INPA, "$(P):FETCH_POSITION.SEVR CP")
+  field(CALC, "(AA=='' && A == 3)?0:A")
+}
+
+#########################################################
+
+
+# Corresponding edm screen: TeachMode.edl
+
+######################### Program Control #######################
+
+# Open up the positions program for editing
+
+# GET_TEACH_POS is forward linked here so that this 
+# record processes when the positions program is 
+# loaded.  This is to ensure that any teach position 
+# variable left in the TP field is read immediately 
+# when the program is loaded
+record(ao, "$(P):LOAD_POSITIONS")
+{ 
+  field(DESC, "Load the Positions Program")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto loadProgram($(P)) $(STREAMS_PORT,undefined)")
+  field(FLNK, "$(P):GET_TEACH_POS")
+}
+
+record(ao, "$(P):SAVE_POSITIONS")
+{
+  field(DESC, "Save the Positions Program")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto saveProgram($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+record(ao, "$(P):UNDO_POSITIONS")
+{
+  field(DESC, "Undo Changes to the Positions Program")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto undoProgram($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+# Poll the edit status to retrieve the name
+# of a program being edited.
+# If a name is present, sets an edit mode bit high
+# This is used as an SDIS input to other records
+# in this template, and the GUI, to know that a
+# program is loaded into the edit slot
+
+record(ai, "$(P):GET_EDIT_STATE")
+{
+  field(DESC, "Program Edit Status")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(INP,  "@J15robot.proto getEditState($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):STATUS_POLL.RVAL CP")
+}
+
+record(stringin, "$(P):EDIT_NAME")
+{
+  field(DESC, "Program Currently Being Edited")
+}
+
+# Record is high when program being edit, low otherwise
+record(scalcout, "$(P):EDIT_MODE")
+{
+  field(DESC, "Check for Program Being Edited")
+  field(INAA, "$(P):EDIT_NAME CP")
+  field(CALC, "(AA='')?1:0")
+}
+
+##################### Direct Execution ############################
+
+# Allow raw MELFA BASIC commands to be sent to the robot directly
+# Can only happen when the positions program is open (ie in edit mode)
+# Servo On & Off provided as convenience buttons - could be sent
+# as commands instead
+
+record(stringout, "$(P):TURN_SERVO_ON")
+{
+  field(DESC, "Turn Servo On with EXEC")
+  field(DTYP, "stream")
+  field(VAL,  "SERVO ON")
+  field(OUT,  "@J15robot.proto directCommand($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+record(stringout, "$(P):TURN_SERVO_OFF")
+{
+  field(DESC, "Turn Servo Off with EXEC")
+  field(DTYP, "stream")
+  field(VAL,  "SERVO OFF")
+  field(OUT,  "@J15robot.proto directCommand($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+record(stringout, "$(P):DIRECT_CMD")
+{
+  field(DESC, "Direct Execution Command")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto directCommand($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+# When a direct command is entered, send it to a regular
+# expression genSub routine for the P variable to be extracted
+# and then send this P variable on to the position name box
+record(genSub, "$(P):DIRECT_CMD_REGEX")
+{
+  field(DESC, "Regex on the Direct Command")
+  field(SNAM, "Regex")
+  field(INPA, "$(P):DIRECT_CMD CP")
+  field(FTA,  "STRING")
+  field(FTVA, "STRING")
+  field(OUTA, "$(P):TP PP")
+}
+
+########################### Teaching ##############################
+
+# Teach positions are fetched by position name
+# This name is fetched from TP by GET_TEACH_POS
+# whenever TP is changed
+
+record(stringout, "$(P):TP")
+{
+  field(DESC, "Teach Position")
+  field(FLNK, "$(P):GET_TEACH_POS")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+record(ao, "$(P):GET_TEACH_POS")
+{
+  field(DESC, "Get the Teach Position")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto getPosition($(P),TP) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+record(ao, "$(P):GET_CURR_POS")
+{
+  field(DESC, "Get the Current Positions")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto getCurrentPosition($(P)) $(STREAMS_PORT,undefined)")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+# A 'set' triggers a 'get' to ensure the values
+# displayed on the GUI are the latest
+
+record(ao, "$(P):SET_TEACH_POS")
+{
+  field(DESC, "Set the Teach Position")
+  field(DTYP, "stream")
+  field(OUT,  "@J15robot.proto setPosition($(P),X,Y,Z,A,B,C,L1,F1) $(STREAMS_PORT,undefined)")
+  field(FLNK, "$(P):GET_TEACH_POS")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):X_RBV")
+{
+  field(DESC, "X Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):X_REFRESH")
+{
+  field(DESC, "Update X with Readback")
+  field(INPA, "$(P):X_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):X PP")
+}
+
+record(ai, "$(P):X")
+{
+  field(DESC, "X Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):Y_RBV")
+{
+  field(DESC, "Y Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):Y_REFRESH")
+{
+  field(DESC, "Update Y with Readback")
+  field(INPA, "$(P):Y_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):Y PP")
+}
+
+record(ai, "$(P):Y")
+{
+  field(DESC, "Y Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):Z_RBV")
+{
+  field(DESC, "Z Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):Z_REFRESH")
+{
+  field(DESC, "Update Z with Readback")
+  field(INPA, "$(P):Z_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):Z PP")
+}
+
+record(ai, "$(P):Z")
+{
+  field(DESC, "Z Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):A_RBV")
+{
+  field(DESC, "A Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):A_REFRESH")
+{
+  field(DESC, "Update A with Readback")
+  field(INPA, "$(P):A_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):A PP")
+}
+
+record(ai, "$(P):A")
+{
+  field(DESC, "A Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):B_RBV")
+{
+  field(DESC, "B Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):B_REFRESH")
+{
+  field(DESC, "Update B with Readback")
+  field(INPA, "$(P):B_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):B PP")
+}
+
+record(ai, "$(P):B")
+{
+  field(DESC, "B Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):C_RBV")
+{
+  field(DESC, "C Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):C_REFRESH")
+{
+  field(DESC, "Update C with Readback")
+  field(INPA, "$(P):C_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):C PP")
+}
+
+record(ai, "$(P):C")
+{
+  field(DESC, "C Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):L1_RBV")
+{
+  field(DESC, "L1 Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):L1_REFRESH")
+{
+  field(DESC, "Update L1 with Readback")
+  field(INPA, "$(P):L1_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):L1 PP")
+}
+
+record(ai, "$(P):L1")
+{
+  field(DESC, "L1 Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):L2_RBV")
+{
+  field(DESC, "L2 Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):L2_REFRESH")
+{
+  field(DESC, "Update L2 with Readback")
+  field(INPA, "$(P):L2_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):L2 PP")
+}
+
+record(ai, "$(P):L2")
+{
+  field(DESC, "L2 Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):F1_RBV")
+{
+  field(DESC, "F1 Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):F1_REFRESH")
+{
+  field(DESC, "Update F1 with Readback")
+  field(INPA, "$(P):F1_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):F1 PP")
+}
+
+record(ai, "$(P):F1")
+{
+  field(DESC, "F1 Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Position readback is pushed down from the robot
+
+record(ai, "$(P):F2_RBV")
+{
+  field(DESC, "F2 Position Readback")
+}
+
+# The position is updated when the readback is refreshed
+
+record(calcout, "$(P):F2_REFRESH")
+{
+  field(DESC, "Update F2 with Readback")
+  field(INPA, "$(P):F2_RBV CP")
+  field(CALC, "A")
+  field(OUT,  "$(P):F2 PP")
+}
+
+record(ai, "$(P):F2")
+{
+  field(DESC, "F2 Position")
+  field(VAL,  "0")
+  field(PINI, "YES")
+  field(SDIS, "$(P):EDIT_MODE")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_X")
+{
+  field(DESC, "Fetched X Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_Y")
+{
+  field(DESC, "Fetched Y Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_Z")
+{
+  field(DESC, "Fetched Z Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_A")
+{
+  field(DESC, "Fetched A Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_B")
+{
+  field(DESC, "Fetched B Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_C")
+{
+  field(DESC, "Fetched C Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_L1")
+{
+  field(DESC, "Fetched L1 Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_L2")
+{
+  field(DESC, "Fetched L2 Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_F1")
+{
+  field(DESC, "Fetched F1 Position")
+}
+
+
+# Fetched position readback is pushed down from the robot
+
+record(ai, "$(P):FETCHED_F2")
+{
+  field(DESC, "Fetched F2 Position")
+}
+

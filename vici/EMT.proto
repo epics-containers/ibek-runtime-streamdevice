@@ -1,0 +1,45 @@
+################################################################################################
+# Protocol file for:
+#
+# VICI EMH, EMT, ECMH, ECMT series 4 to 16 position valve actuator
+#
+# Protocol assumes no ID has been set for the controller (i.e. single controller on an RS232 line)
+# Default serial configuration: 9600 baud, no parity, 8 data bits, 1 stop bit.
+#
+################################################################################################
+
+Terminator = CR;
+
+LockTimeout = 5000;
+ReplyTimeout = 5000;
+ReadTimeout = 3000;
+ExtraInput = Ignore;
+
+
+##################
+# commands
+
+# Move valve clockwise to position n(1..16)
+# Cmd: 'CW\r' Resp: none
+setPosCW { out "CW%{1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16}"; }
+
+# Move valve counter clockwise to position n(1..16)
+# Cmd: 'CC\r' Resp: none
+setPosCC { out "CC%{1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16}"; }
+
+# Move valve to position n(1..16)
+# Cmd: 'GOx\r' Resp: none
+setPos { out "GO%{1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16}"; }
+
+# Read valve move counter
+# Cmd: 'NP\r' Resp: 'NP = <int>\r'
+getNP { out "NP"; in "NP = %u"; }
+
+# Read valve position
+# Cmd: 'CP\r' Resp: 'Position is A|B\r'
+getPos { out "CP"; in "Position is%*s %{1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16}"; }
+
+# Read software status info
+# Cmd: 'VR\r' Resp: 'I-PD-EDF56RC.7\r08/19/2010\r'  (NB \r in middle of response)
+getInfo { out "VR"; in "%s"; in "%(\$1.VAL)s"; }
+

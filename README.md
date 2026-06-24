@@ -54,8 +54,18 @@ lakeshore340/
 
 ## Pristine storage and the vendored header
 
-**Files in this repo are stored PRISTINE.** They contain exactly the StreamDevice /
-EPICS / ibek content, with **no provenance header**.
+**The extracted device files are stored PRISTINE.** The `.proto`/`.protocol` and
+`.template`/`.db` files are copied byte-for-byte from their DLS production support
+module and must stay identical to it (that is what lets us diff them against future DLS
+releases). They carry **no provenance header**.
+
+The repo-authored **`*.ibek.support.yaml`** is the one exception: because we generate it
+here (it is not extracted), it may begin with a short DLS-source provenance comment —
+the originating module, version and `/dls_sw/prod/...` path — recording where the
+pattern came from. That comment is static and deterministic, so it does not affect
+consumer-side hashing.
+
+Either way, **the consumer-side vendor header below must never be committed here.**
 
 When `ibek pattern` vendors a file into an IOC instance, it injects a deterministic
 provenance header as the first line **before hashing**:
@@ -69,9 +79,10 @@ content that is hashed into the instance's lock file, integrity checking on the
 consumer side is a trivial `sha256(file_as_written) == lock`. The header is
 deterministic (no timestamps or absolute paths) so it is reproducible.
 
-**Do not commit this header here.** It is a consumer-side artifact. Patterns in this
-repo must stay header-free and pristine; the header you see in a vendored copy belongs
-to the IOC instance, not to this library.
+**Do not commit this vendor header here.** It is a consumer-side artifact: it is added
+at vendor time and the header you see in a vendored copy belongs to the IOC instance,
+not to this library (distinct from the static DLS-source comment described above, which
+the `support.yaml` may carry).
 
 ## Versioning
 
@@ -195,6 +206,11 @@ diverge:
 When you change `lakeshore340` device support (protocol, records, or parameters), apply
 the equivalent change to **both** repos, or explicitly document why they differ.
 Treat them as two views of one device and keep them in step.
+
+Not every DLS StreamDevice module can take the runtime path: some need a module-specific
+**compiled** library, `.dbd`, or SNL sequencer program that the generic
+`ioc-streamdevice` image does not ship, so they are build-time-only. Those modules — and
+the test used to tell them apart — are listed in [BUILD-TIME-ONLY.md](BUILD-TIME-ONLY.md).
 
 ## Adding a new pattern
 

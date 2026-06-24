@@ -1,0 +1,69 @@
+# % macro, P, Device Prefix
+# % macro, STREAMS_PORT, Asyn Port
+# % macro, VAR, P Variable to read/write
+# % macro, SCAN, Scan rate or readback
+
+record(ai, "$(P):P$(VAR):X") {
+  field(EGU, "mm")
+  field(PREC, "3")
+  field(FLNK, "$(P):P$(VAR):WRITE")
+}
+
+record(ai, "$(P):P$(VAR):Y") {
+  field(EGU, "mm")
+  field(PREC, "3")  
+  field(FLNK, "$(P):P$(VAR):WRITE")
+}
+
+record(ai, "$(P):P$(VAR):Z") {
+  field(EGU, "mm")
+  field(PREC, "3")
+  field(FLNK, "$(P):P$(VAR):WRITE")  
+}
+
+record(ai, "$(P):P$(VAR):TX") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(FLNK, "$(P):P$(VAR):WRITE")  
+}
+
+record(ai, "$(P):P$(VAR):TY") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(FLNK, "$(P):P$(VAR):WRITE")
+}
+
+record(ai, "$(P):P$(VAR):TZ") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(FLNK, "$(P):P$(VAR):WRITE")
+}
+
+record(longin, "$(P):P$(VAR):TYPE") {
+  field(FLNK, "$(P):P$(VAR):WRITE")
+}
+
+record(longin, "$(P):P$(VAR):TOOL") {
+  field(FLNK, "$(P):P$(VAR):WRITE")
+}
+
+record(stringin, "$(P):P$(VAR):READ") {
+  field(DTYP, "stream")
+  field(INP, "@yaskawa.proto readp($(P),$(VAR)) $(STREAMS_PORT)")
+}
+
+record(calcout, "$(P):P$(VAR):INITREAD")
+{
+  field(INPA, "$(P):P$(VAR):TOOL.SEVR")
+  field(CALC, "(A>0)?1:0")
+  field(SCAN, "$(SCAN)")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(SDIS, "$(P):P$(VAR):INITREAD")
+  field(OUT, "$(P):P$(VAR):READ PP NMS")
+}
+
+record(stringin, "$(P):P$(VAR):WRITE") {
+  field(DTYP, "stream")
+  field(INP, "@yaskawa.proto writep($(P),$(VAR)) $(STREAMS_PORT)")
+}

@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: belektronig_btc 2-2
+# Source: /dls_sw/prod/R3.14.12.7/support/belektronig_btc/2-2
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/belektronig_btc/ release.
+
+module: belektronig_btc
+
+entity_models:
+  - name: belektronig_btc
+    description: |-
+      Belektronig BTC M10 temperature controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      R:
+        type: str
+        description: |-
+          Heater name
+      DESC:
+        type: str
+        description: |-
+          Description
+      PORT:
+        type: str
+        description: |-
+          Device asyn port
+      name:
+        type: id
+        description: |-
+          Device object name
+    databases:
+      - file: m10.template
+        args:
+          .*:

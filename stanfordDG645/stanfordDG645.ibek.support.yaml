@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: stanfordDG645 1-3
+# Source: /dls_sw/prod/R3.14.12.7/support/stanfordDG645/1-3
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/stanfordDG645/ release.
+
+module: stanfordDG645
+
+entity_models:
+  - name: stanfordDG645
+    description: |-
+      Support for Stanford DG645 digital delay generator
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+    databases:
+      - file: stanfordDG645.template
+        args:
+          .*:

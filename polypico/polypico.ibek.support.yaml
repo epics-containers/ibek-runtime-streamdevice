@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: polypico 1.0
+# Source: /dls_sw/prod/R3.14.12.7/support/polypico/1.0
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/polypico/ release.
+
+module: polypico
+
+entity_models:
+  - name: polypico
+    description: |-
+      Polypico piezo dispenser StreamDevice control
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name for stream device
+    databases:
+      - file: polypico.template
+        args:
+          .*:

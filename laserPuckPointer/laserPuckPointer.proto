@@ -1,0 +1,75 @@
+#######################################################################
+#
+# Stream device protocol for Arduino based Pan Tilt stage
+#
+#######################################################################
+
+Terminator = CR LF;
+
+LockTimeout = 1000;
+ReplyTimeout = 1000;
+ReadTimeout = 1000;
+ExtraInput = Ignore;
+separator = "";
+
+
+####################################################################### 
+#Controller Status 
+
+
+# requests position of pan axis
+get_pan_position{
+  out "P?"; 
+  in "%d";
+}
+
+# requests position of tilt axis
+get_tilt_position{
+  out "T?"; 
+  in "%d";
+}
+
+# requests current operation mode, local or remote
+get_mode{
+  out "M?";
+  in "%{L|R}";
+}
+
+get_laser_status{
+  out "L?";
+  in "%{0|1}";
+}
+
+# sets pan position
+set_pan_position{
+  out "P%d";
+  @init { get_pan_position; }
+}
+
+# sets pan position
+set_pan_position_no_read{
+  out "P%d";
+}
+
+# sets tilt position
+set_tilt_position{
+  out "T%d";
+  @init { get_tilt_position; }
+}
+
+# sets tilt position
+set_tilt_position_no_read{
+  out "T%d";
+}
+
+# sets operation mode, local or remote
+set_mode{
+  out "M%{L|R}";
+  @init { get_mode; }
+}
+
+set_laser_status{
+  out "L%{0|1}";
+  @init { get_laser_status; }
+}
+

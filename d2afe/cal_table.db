@@ -1,0 +1,95 @@
+# cal_table.template
+# Records to trigger calmon command and split the response over the relevant PVs
+# Also takes care of firmware, calid and eid reading
+# % macro, P, Device prefix
+# % macro, ADDR, D2AFE RS485 address
+# % macro, STREAMS_PORT, PTG streams port
+# % macro, NEXT, PV of CAL:MON for next D2AFE.
+
+record(ao, "$(P,undefined):AFE:CAL:MON")
+{
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(PINI, "NO")
+  field(OUT,  "@d2afe.proto calmon($(ADDR,undefined),$(P,undefined):AFE) $(STREAMS_PORT,undefined)")
+  field(FLNK, "$(P,undefined):AFE:FW_REQUEST")
+}
+
+record(ai, "$(P,undefined):AFE:CAL:CH1_TEMP_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH1_TEMP_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH2_TEMP_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH2_TEMP_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH3_TEMP_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH3_TEMP_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH4_TEMP_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH4_TEMP_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH1_RF_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH1_RF_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH2_RF_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH2_RF_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH3_RF_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH3_RF_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH4_RF_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH4_RF_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:RADS_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:RADS_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:VCC12_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:VCC12_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:VCC5_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:VCC5_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:ICC_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:ICC_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:MCU_TEMP_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:MCU_TEMP_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:VCC3_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:VCC3_SLO_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH1_IN_ATT_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH1_OUT_ATT_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH2_IN_ATT_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH2_OUT_ATT_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH3_IN_ATT_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH3_OUT_ATT_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH4_IN_ATT_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:CH4_OUT_ATT_OFF_RBV"){}
+record(ai, "$(P,undefined):AFE:CAL:PILOT_ATT_OFF_RBV"){}
+
+######################
+# Request firmware details
+
+record(bi, "$(P,undefined):AFE:FW_REQUEST") {
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "stream")
+  field(INP, "@d2afe.proto read_fw($(ADDR,undefined),$(P,undefined):AFE) $(STREAMS_PORT,undefined)")
+  field(ZNAM, "Error")
+  field(ONAM, "OK")
+  field(FLNK, "$(P,undefined):AFE:EID_REQUEST")
+}
+record(stringin, "$(P,undefined):AFE:HARDWARE"){}
+record(stringin, "$(P,undefined):AFE:MCU"){}
+record(stringin, "$(P,undefined):AFE:FW_VER"){}
+record(stringin, "$(P,undefined):AFE:BUILD_DATE"){}
+record(stringin, "$(P,undefined):AFE:BUILD_TIME"){}
+######################
+
+
+record(stringout, "$(P,undefined):AFE:EID_REQUEST") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@d2afe.proto read_eid($(ADDR,undefined),$(P,undefined):AFE) $(STREAMS_PORT,undefined)")
+  field(FLNK, "$(P,undefined):AFE:CALID_REQUEST")
+}
+record(stringin, "$(P,undefined):AFE:EID"){}
+
+
+record(stringout, "$(P,undefined):AFE:CALID_REQUEST") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@d2afe.proto read_calid($(ADDR,undefined),$(P,undefined):AFE) $(STREAMS_PORT,undefined)")
+  field(FLNK, "$(NEXT,undefined)")
+}
+record(stringin, "$(P,undefined):AFE:CALID"){}
+
+record(stringin, "$(P,undefined):AFE:EMPTY") {
+  field(DISP, "1")
+}

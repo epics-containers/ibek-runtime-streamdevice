@@ -1,0 +1,44 @@
+# Start of support/tecPeltier/tecPeltier/Db/read_parameter.template
+# Original Author: Lee Hudson 2018
+
+# Reads the parameter specified in $(P):$(PARAM)_ID, converts it into the desired format / data type
+# and presents it in an _RBV PV
+
+#  P, Device P
+#  PORT, Asyn port for the TEC Controller
+#  PARAM, Name for the paramter, must be the same as the $(PARAM) for the parameters.template
+#  EGU, Units
+#  PREC, Precision
+#  CONVERT, Name of the method used by the aSub to convert the response into the desired format / data type
+#  FORMAT, Data type of the resonse
+#  CHAN, Channel of the TEC controller (1 or 2)
+#  SCAN, Scan
+
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)$(CHAN)_READ") {
+  field(SCAN, "$(SCAN)")
+  field(DTYP, "stream")
+  field(OUT, "@tecPeltier.proto read_param($(P),$(PARAM),$(CHAN)) $(PORT)")
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):$(PARAM)$(CHAN)_RESPONSE"){
+}
+
+record(stringin, "$(P):$(PARAM)$(CHAN)_SEQUENCE_NO"){
+}
+
+record(aSub, "$(P):$(PARAM)$(CHAN)_READ_CONVERT"){
+    field(INPA, "$(P):$(PARAM)$(CHAN)_RESPONSE CP")
+    field(FTA, "STRING")
+    field(SNAM, "$(CONVERT)")
+    field(OUTA, "$(P):$(PARAM)$(CHAN)_RBV PP")
+    field(FTVA, "$(FORMAT)")
+}
+
+record(ao, $(P):$(PARAM)$(CHAN)_RBV){
+    field(PREC, "$(PREC)")
+    field(EGU, "$(EGU)")
+}
+# End of support/tecPeltier/tecPeltier/Db/read_parameter.template

@@ -1,0 +1,54 @@
+################################################################################################
+# Protocol file for:
+#
+# VICI EUTA series multiposition valve actuator
+#
+# Protocol assumes no ID has been set for the controller (i.e. single controller on an RS232 line)
+# Default serial configuration: 9600 baud, no parity, 8 data bits, 1 stop bit.
+#
+################################################################################################
+
+Terminator = CR;
+
+LockTimeout = 3000;
+ReplyTimeout = 3000;
+ReadTimeout = 1000;
+ExtraInput = Ignore;
+
+
+##################
+# commands
+
+# Increment position
+# Cmd: 'CW\r' Resp: none
+setPosA { out "CW"; }
+
+# Decrement position
+# Cmd: 'CC\r' Resp: none
+setPosB { out "CC"; }
+
+# Move valve to position n
+# Cmd: 'GOx\r' Resp: none
+setPos { out "GO%u"; }
+
+# Move valve to reference position
+# Cmd: 'AL\r' Resp: none
+setRef { out "AL"; }
+
+# Read number of valve positions
+# Cmd: 'NP\r' Resp: 'NP%u"
+getNumP { out "NP"; in "NP%u";}
+
+# Read valve move counter
+# Cmd: 'CNT\r' Resp: 'CNT<int>\r'
+getCnt { out "CNT"; in "CNT%u"; }
+
+# Read valve position
+# Cmd: 'CP\r' Resp: 'Position is A|B\r' or  'Position is "A|B"\r' (with quotes)
+#getPos { out "CP"; in "Position is %d"; }
+getPos { out "CP"; in "CP%2d"; }
+
+# Read software status info
+# Cmd: 'VR\r' Resp: '<date>\r<time>\r<version>'  (NB \r in middle of response)
+getInfo { out "VR"; in "%s"; in "%*s"; in "%(\$1.VAL)s"; }
+

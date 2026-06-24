@@ -1,0 +1,97 @@
+# This file contains the stream device protocols for the I400
+# current amplifier from Oxford Danfysik.
+# For now ignore checksums, can be used in Streams 2.
+#
+# Modification History
+#   V1.R1.M0    2006-11-03  M. Walters (Tessella/Diamond Light Source)
+# Written based I400 User manual (I400_UM_060705)
+#
+# Updated by Andy Foster on 9/12/08 to coincide with firmware upgrade
+# carried out on 2 of the MX I400's, by John Gordan from Pyramid Consultants.
+# This makes the firmware the same on all 3 MX I400's. Previously
+# had two with very old versions of the firmware, which the first version
+# of this protocol file understood. There is no "echo off" command in the
+# latest firmware and this means we always get a new line in the responses
+# to other commands. The new line in streams protocol is represented by "\n".
+# Note that the I400 must not be in "terminal" mode where it responds to commands
+# which don't otherwise have a response, with "OK".
+#
+# The new firmware versions are:
+#       Device version    3.1
+#       FPGA version      1.2.1
+#       Hardware version  Rev 2
+#
+
+InTerminator = "";
+OutTerminator = LF;
+replytimeout = 1000;
+readtimeout  = 1000;
+locktimeout = 60000;
+
+# Enter administrative mode (reset to exit)
+admin { out "SYST:PASS %d"; in "SYST:PASS %d\nOK\r\n";}
+
+# Turn on checksums and disabl timeout (can only be done as administrator)
+check { out "SYST:COMM:CHECK 1"; in "SYST:COMM:CHECK 1\nOK\r\n";}
+timeout { out "SYST:COMM:TIMEOUT 0"; in "SYST:COMM:TIMEOUT 0\nOK\r\n";}
+
+# Device state commands
+# Save state
+save { out "*SAV"; in "*SAV\nOK\r\n";}
+# Reset the device
+reset { out "*RST"; in "*RST\nOK\r\n";}
+# Recall configuration of the device
+recall { out "*RCL"; in "*RCL\nOK\r\n";}
+
+# Calibration of device.
+# Carry out calibration
+doCalib { out "CALIB:GAI"; in "CALIB:GAI\nOK\r\n";}
+# Save calibration
+saveCalib { out "CALIB:SAV"; in "CALIB:SAV\nOK\r\n";}
+# Recall calibration (needed after reset)
+recallCalib { out "CALIB:RCL"; in "CALIB:RCL\nOK\r\n";}
+
+# initialise device (needs to be done after changes to setup
+# e.g. int time, range, capacitor)
+init { out "INIT"; in "INIT\nOK\r\n";}
+
+# Read as a waveform of bytes, this contains 6 numbers,
+# integration time, curr1, curr2, curr3, curr4, status
+readCurr { out "FETCH:CURR?"; in "FETCH:CURR?\n%r"; InTerminator = CR LF; }
+
+# Get/set range and period
+# Get range
+getRang {out "CONF:GAT:INT:RANG?"; in "CONF:GAT:INT:RANG?\n%e A,%*d\{%*d\}"; InTerminator = CR LF; }
+# Set range
+setRang {out "CONF:GAT:INT:RANG %e"; in "CONF:GAT:INT:RANG %e\nOK\r\n"; }
+# Get integration time
+getTime {out "PER?"; in "PER?\n%e S,%*d\{%*d\}"; InTerminator = CR LF; }
+# Set integration time
+setTime {out "PER %e"; in "PER %e\nOK\r\n"; }
+
+# Reading and setting the high voltage parameters
+# Set maximum external voltage (must be in administrator mode)
+setMaxExtHV { out "CONF:HIVO:EXT:MAX %d"; in "CONF:HIVO:EXT:MAX %d\nOK\r\n"; }
+# Get maximum external voltage
+getMaxExtHV { out "CONF:HIVO:EXT:MAX?"; in "CONF:HIVO:EXT:MAX?\n%d\{%*d\}"; InTerminator = CR LF; }
+# Set external voltage
+setExtHV { out "CONF:HIVO:EXT:VOLT %d"; in "CONF:HIVO:EXT:VOLT %d\nOK\r\n"; }
+# Get external voltage
+getExtHV { out "CONF:HIVO:EXT:VOLT?"; in "CONF:HIVO:EXT:VOLT?\n%d\{%*d\}"; InTerminator = CR LF; }
+# Set maximum signal voltage (must be in administrator mode)
+setMaxSigHV { out "CONF:HIVO:SIG:MAX %d"; in "CONF:HIVO:SIG:MAX %d\nOK\r\n"; }
+# Get maximum signal voltage
+getMaxSigHV { out "CONF:HIVO:SIG:MAX?"; in "CONF:HIVO:SIG:MAX?\n%d\{%*d\}"; InTerminator = CR LF; }
+# Set signal voltage
+setSigHV { out "CONF:HIVO:SIG:VOLT %d"; in "CONF:HIVO:SIG:VOLT %d\nOK\r\n"; }
+# Get signal voltage
+getSigHV { out "CONF:HIVO:SIG:VOLT?"; in "CONF:HIVO:SIG:VOLT?\n%d\{%*d\}"; InTerminator = CR LF; }
+
+# Get capacitor used, and its capacitance
+getCap { out "CAP?"; in "CAP?\n%d,%*e F\{%*d\}"; InTerminator = CR LF; }
+getCap2 { out "CAP?"; in "CAP?\n%*d,%e F\{%*d\}"; InTerminator = CR LF; }
+# Set capitor used
+setCap { out "CAP %d"; in "CAP %d\nOK\r\n"; }
+
+# Test string.
+test { out "%s"; in "%s";}

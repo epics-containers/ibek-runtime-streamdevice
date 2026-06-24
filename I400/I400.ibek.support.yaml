@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: I400 3-6-2
+# Source: /dls_sw/prod/R3.14.12.7/support/I400/3-6-2
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/I400/ release.
+
+module: I400
+
+entity_models:
+  - name: I400
+    description: |-
+      FMB Oxford I400 four channel picoammeter / BPM
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PROTO:
+        type: str
+        description: |-
+          Protocol file
+        default: I400.proto
+      MAXSIG:
+        type: int
+        description: |-
+          Max signal voltage
+      MAXEXT:
+        type: int
+        description: |-
+          Max external voltage
+      port:
+        type: str
+        description: |-
+          Asyn port to connect to
+      YGAIN:
+        type: int
+        description: |-
+          Y Gain
+      XGAIN:
+        type: int
+        description: |-
+          X Gain
+      CAP0:
+        type: str
+        description: |-
+          Friendly capacitor 0 label
+      CAP1:
+        type: str
+        description: |-
+          Friendly capacitor 1 label
+    databases:
+      - file: I400.template
+        args:
+          .*:
+  - name: IC101
+    description: |-
+      FMB Oxford IC101 single channel amplifier
+    parameters:
+      name:
+        type: id
+        description: |-
+          GUI object name
+      P:
+        type: str
+        description: |-
+          Device prefix
+      port:
+        type: str
+        description: |-
+          Asyn port to connect to
+      MAXEXT:
+        type: int
+        description: |-
+          Max external voltage
+      CAP0:
+        type: str
+        description: |-
+          Friendly capacitor 0 label
+      CAP1:
+        type: str
+        description: |-
+          Friendly capacitor 1 label
+    databases:
+      - file: IC101.template
+        args:
+          .*:

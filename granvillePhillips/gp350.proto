@@ -1,0 +1,58 @@
+################################################################################################
+# Protocol file for:
+#
+# Granville-Phillipts 350 Gauge ccontroller
+#
+# Default serial configuration: 9600 baud, no parity, 8 data bits, 1 stop bit.
+#
+################################################################################################
+
+Terminator = CR;
+
+LockTimeout = 5000;
+ReplyTimeout = 1000;
+ReadTimeout = 100;
+ExtraInput = Ignore;
+
+# NB All responses from GP350 will be 11 characters including the trailing CR character
+
+##################
+# Set Commands
+
+# set Degas on or off
+# Cmd: '#DG <0|1>' Resp: '* <0|1>DG <ON  |OFF >'
+setDG { out "#DG %{0|1}"; in "\* %*{0|1}DG%*s"; }
+
+# Set Gauge filament on or off
+# Cmd: '#F<1|2> <0|1>' Resp: '* <0|1>IG<1|2> <ON | ON|OFF>'
+setF12 { out "#F\$1 %{0|1}"; in "\* %*{0|1}IG%*{1|2}%*s";  }
+
+##################
+# Get Commands
+
+# Get Gauge filament on/off state 
+# Cmd: '#IGS' Resp: '* <01|10|00>     '
+#getIGS { out "#IGS"; in "\* %{00|01|10}      "; }
+getIGS { out "#IGS"; in "\052 %{00|01|10}      "; }
+
+# Get IG (Hot cathode) Pressure reading 
+# Cmd: '#RD' Resp: '9.90e+09'
+getRD { out "#RD"; in "\* %f"; }
+
+# Get RDA or RDB (Pirani) Pressure reading 
+# Cmd: '#RD<A|B>' Resp: '* 9.90e+09'
+getRDAB { out "#RD\$1"; in "\* %f"; }
+
+# Get Degas status
+# Cmd: '#DGS' Resp: '* <0|1>DG <ON  |OFF >'
+getDGS { out "#DGS"; in "\* %{0|1}DG %*{OFF |ON  }"; }
+
+# Get process control channel status
+# NB Poll getPCS1 and use 'I/O Intr' on getPCS2..4
+# Cmd: '#PCS' Resp: '* <0|1><0|1><0|1><0|1>'
+getPCS1 { out "#PCS"; in "\* %{0|1}%*{0|1}%*{0|1}%*{0|1}"; }
+getPCS2 { in "\* %*{0|1}%{0|1}%*{0|1}%*{0|1}"; }
+getPCS3 { in "\* %*{0|1}%*{0|1}%{0|1}%*{0|1}"; }
+getPCS4 { in "\* %*{0|1}%*{0|1}%*{0|1}%{0|1}"; }
+
+getPCS { out "#PCS"; in "\* %b"; }

@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: digitelSpc 1-13
+# Source: /dls_sw/prod/R3.14.12.7/support/digitelSpc/1-13
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/digitelSpc/ release.
+
+module: digitelSpc
+
+entity_models:
+  - name: digitelSpc
+    description: |-
+      Template database for digitel SPC - Controller
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial
+        default: "01"
+    databases:
+      - file: digitelSpc.template
+        args:
+          .*:

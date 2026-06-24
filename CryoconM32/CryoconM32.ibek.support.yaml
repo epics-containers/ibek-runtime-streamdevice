@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: CryoconM32 1-7
+# Source: /dls_sw/prod/R3.14.12.7/support/CryoconM32/1-7
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/CryoconM32/ release.
+
+module: CryoconM32
+
+entity_models:
+  - name: CryoconM32
+    description: |-
+      CryoconM32 temperature controller device class (includes sensors and control loops configured with other classes).
+    parameters:
+      tctrlr:
+        type: str
+        description: |-
+          The PV prefix for the temperature controller
+      port:
+        type: str
+        description: |-
+          Asyn Port
+      egu:
+        type: str
+        description: |-
+          Engineering units for sink temperature
+        default: K
+    databases:
+      - file: M32_system.template
+        args:
+          .*:

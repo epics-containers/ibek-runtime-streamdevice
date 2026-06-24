@@ -1,0 +1,96 @@
+#######################################################################
+#
+# Stream device protocol for polypico Command Interface
+#
+#
+# Device is supplied set to 115000 bps baud.
+# Commands are sent one at a time, and the next command should not be
+# sent before an acknowledgment is received from the previous command;
+# the ‘Break’ command is the only allowed exceptions to this rule.
+# The standard acknowledgement to any command is to return
+# (echo) the exact same command to the desktop PC.
+#
+# Each packet is made up of the following elements:
+# Header byte = 'P'
+# Command ID - ASCII character indicating the type of command
+#              e.g. A for amplitude, P for pressure
+# Command Data - data bytes, defined by the command type
+# Termination - 'CR' byte
+#######################################################################
+
+Terminator = CR;
+ExtraInput = Ignore;
+######################################################################
+
+
+set_frequency{
+     out "PF%f";
+     in "PF%(\$1:FREQ_RBV)f";
+}
+
+set_amplitude{
+     out "PA1%f";
+     in "PA1%(\$1:AMPLITUDE_RBV)f";
+}
+
+set_pulse_width{
+     out "PW1%f";
+     in "PW1%(\$1:PULSE_WIDTH_RBV)f";
+}
+
+set_trigger_mode {
+    out "PX%b";
+    in "PX%(\$1:TRIGGER_MODE_RBV)b"; 
+}
+
+set_purge{
+     out "PC%f";
+     in "PC%(\$1:PURGE_RBV)f";
+}
+
+set_packet_length{
+     out "PN1%f";
+     in "PN1%(\$1:PACKET_LENGTH_RBV)f";
+}
+
+set_dispensing {
+    out "PG%s";
+    in "PG%(\$1:DISPENSING_RBV)s";
+}
+
+set_strobe_brightness {
+    out "PS4%f";
+    in "PS4%(\$1:STROBE_BRIGHTNESS_RBV)f";
+}
+
+set_strobeA_delay{
+   out "PS1%f";
+   in "PS1%(\$1:STROBE_A_DEL_RBV)f";
+}
+
+set_strobeB_delay{
+   out "PS2%f";
+   in "PS2%(\$1:STROBE_B_DEL_RBV)f";
+}
+
+set_strobe_duration{
+   out "PS3%f";
+   in "PS3%(\$1:STROBE_DURATION_RBV)f";
+}
+
+set_strobeA{
+    out "PS5%b";
+    in "PS5%(\$1:STROBE_A_ENABLE_RBV)b";
+}
+
+set_strobeB{
+    out "PS6%b";
+    in "PS6%(\$1:STROBE_B_ENABLE_RBV)s";
+}
+
+ping_board{
+   out "P?ERR";
+   in "P?ERR";
+}
+
+

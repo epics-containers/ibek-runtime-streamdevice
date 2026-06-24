@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: laserPuckPointer 2-16
+# Source: /dls_sw/prod/R3.14.12.7/support/laserPuckPointer/2-16
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/laserPuckPointer/ release.
+
+module: laserPuckPointer
+
+entity_models:
+  - name: laserPuckPointer
+    description: |-
+      Laser puck pointer - writes the selected puck into or out of the ISpyB
+      database via a python script driven by the robot puck position.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port
+      DEMAND_IN:
+        type: str
+        description: |-
+          Demand position from PLC
+      SCAN:
+        type: str
+        description: |-
+          Scan time (one of: .1 second, .2 second, .5 second, 1 second,
+          2 second, 5 second, 10 second, I/O Intr, Event, Passive)
+      ROBOT:
+        type: str
+        description: |-
+          Robot prefix
+      BL:
+        type: str
+        description: |-
+          Beamline prefix to run iSpyB write script
+      VERS:
+        type: str
+        description: |-
+          Version of this support module used
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: laserPuckPointer.db
+        args:
+          .*:

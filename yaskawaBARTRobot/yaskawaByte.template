@@ -1,0 +1,43 @@
+#% archiver 1 Monitor
+# % macro, P, Device Prefix
+# % macro, STREAMS_PORT, Asyn Port
+# % macro, VAR, B Variable (Byte) to read/write (e.g. B001)
+# % macro, SCAN, Scan rate
+# % macro, DRVL, Low limit
+# % macro, DRVH, High limit
+# % macro, DESC, Variable's description
+
+record(ao, "$(P):B$(VAR)") {
+    field(DESC, "$(DESC=)")
+    field(OUT, "$(P):B$(VAR):WRITE PP")
+}
+
+record(ao, "$(P):B$(VAR):WRITE") {
+    field(DESC, "$(DESC=)")
+    field(SDIS, "$(P):B$(VAR):SYNC.PACT")
+    field(DISV, "1")
+    field(DTYP, "stream")
+    field(OUT, "@yaskawa.proto writeb($(P),$(VAR)) $(STREAMS_PORT)")
+    field(PREC, "0")
+    field(DRVL, "$(DRVL)")
+    field(DRVH, "$(DRVH)")
+}
+
+#% archiver 10 Monitor
+record(ai, "$(P):B$(VAR)_RBV") {
+    field(DESC, "$(DESC=)")
+    field(DISP, "1")
+    field(DTYP, "stream")
+    field(INP, "@yaskawa.proto readb($(P),$(VAR)) $(STREAMS_PORT)")
+    field(PREC, "0")
+    field(SCAN, "$(SCAN)")
+    field(FLNK, "$(P):B$(VAR):SYNC")
+}
+
+record(ao, "$(P):B$(VAR):SYNC")
+{
+    field(DESC, "$(DESC=)")
+    field(DOL, "$(P):B$(VAR)_RBV NPP")
+    field(OMSL, "closed_loop")
+    field(OUT, "$(P):B$(VAR) PP")
+}

@@ -1,0 +1,14 @@
+
+Terminator = CR;
+
+LockTimeout = 1000;
+ReplyTimeout = 1000;
+ReadTimeout = 1000;
+ExtraInput = Ignore;
+separator = "";
+
+read_barcode{
+  in "%(\$1:BC_JUDGEMENT)f%(\$1:BC_LENGTH)f%(\$1:BC_CELL_RR)f%(\$1:BC_CONTRAST)f%(\$1:BC_FOCUS)?d%(\$1:LAST_BARCODE)20c";
+}
+
+
