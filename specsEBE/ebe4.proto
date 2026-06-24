@@ -1,0 +1,130 @@
+##################################################
+# Protocol file for Specs EBE-4
+# Diamond Light Source, April 2018
+##################################################
+
+##################################################
+# General Settings
+##################################################
+
+Terminator = "\n";
+ReplyTimeout = 3000;
+
+RequestTag = ?1234;
+ResponseTag = !1234;
+
+###################################################
+# Get functions
+###################################################
+
+# /// Get the device name
+getDeviceName {
+   out "\$RequestTag GetDeviceName";
+   in "\$ResponseTag GetDeviceName OK: %39c";
+   @mismatch {
+      in "\$ResponseTag GetDeviceName ERROR: %39c"
+   }
+}
+
+# /// Get uptime
+getUptime {
+   out "\$RequestTag GetUptime";
+   in "\$ResponseTag GetUptime OK: %u";
+   @mismatch {
+      in "\$ResponseTag GetUptime ERROR: %39c"
+   }
+}
+
+# /// Get parameter limits
+# Argument 1: Parameter Number
+
+# /// Get parameter value
+# Argument 1: Parameter Number
+getInt {
+   out "\$RequestTag GetParaValue \$1";
+   in "\$ResponseTag GetParaValue OK: %d";
+   @mismatch {
+      in "\$ResponseTag GetParaValue ERROR: %39c"
+   }
+}
+getDouble {
+   out "\$RequestTag GetParaValue \$1";
+   in "\$ResponseTag GetParaValue OK: %f";
+   @mismatch {
+      in "\$ResponseTag GetParaValue ERROR: %39c"
+   }
+}
+getString {
+   out "\$RequestTag GetParaValue \$1";
+   in "\$ResponseTag GetParaValue OK: %39c";
+   @mismatch {
+      in "\$ResponseTag GetParaValue ERROR: %39c"
+   }
+}
+
+#######################################################
+# Set functions
+#######################################################
+
+# /// Set parameter value
+# Argument 1: Parameter Number
+setInt {
+   out "\$RequestTag SetParaValue \$1 %d";
+   in "\$ResponseTag SetParaValue OK";
+   @mismatch {
+      in "\$ResponseTag SetParaValue ERROR: %(\$2)39c";
+   }
+}
+setDouble {
+   out "\$RequestTag SetParaValue \$1 %.12f";
+   in "\$ResponseTag SetParaValue OK";
+   @mismatch {
+      in "\$ResponseTag SetParaValue ERROR: %(\$2)39c";
+   }
+}
+setString {
+   out "\$RequestTag SetParaValue \$1 %s";
+   in "\$ResponseTag SetParaValue OK";
+   @mismatch {
+      in "\$ResponseTag SetParaValue ERROR: %(\$2)39c";
+   }
+}
+
+# /// Set remote mode
+# 0 - Off, 1 - On
+setRemoteMode {
+   out "\$RequestTag SetRemoteMode %u";
+   in "\$ResponseTag SetRemoteMode OK";
+   @mismatch {
+      in "\$ResponseTag SetRemoteMode ERROR: %(\$1)39c";
+   }
+}
+
+# /// Clear error status
+setClearError {
+   out "\$RequestTag SetClearError";
+   in "\$ResponseTag SetClearError OK";
+   @mismatch {
+      in "\$ResponseTag SetClearError ERROR: %(\$1)39c";
+   }
+}
+
+# /// Reset error flags
+# Specs suggested using this instead of SetClearError, but this is not in the manual
+resetErrorFlags {
+   out "\$RequestTag ResetErrorFlags";
+   in "\$ResponseTag ResetErrorFlags OK";
+   @mismatch {
+      in "\$ResponseTag ResetErrorFlags ERROR: %(\$1)39c";
+   }
+}
+
+#############################################################
+# Generic protocol
+############################################################
+
+# /// Use this to send any command and get back the response (max 39 chars).
+gen {
+   out "\$RequestTag %s";
+   in "\$ResponseTag %(\$1)39c"
+}

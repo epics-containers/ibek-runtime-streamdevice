@@ -1,0 +1,19 @@
+Terminator = CR;
+#Terminator = "";
+ReadTimeout = 1000;
+#PollPeriod = 100;
+#ReplyTimeout = 2000;
+#MaxInput = 88;
+
+
+
+#arr_read { 
+#    separator=" "; 
+#    in "%*02i+%03f";
+#    @mismatch { in "%(\$1)39c"; };
+#}
+
+read {
+    in "%*02i+%f %*02i+%(\$1:01.VAL)f %*02i+%(\$1:02.VAL)f %*02i+%(\$1:03.VAL)f %*02i+%(\$1:04.VAL)f %*02i+%(\$1:05.VAL)f %*02i+%(\$1:06.VAL)f";
+    in "%*02i+%(\$1:07.VAL)f";
+}

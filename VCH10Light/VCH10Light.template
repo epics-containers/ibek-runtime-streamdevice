@@ -1,0 +1,52 @@
+# File VCH10Light.template.
+#
+# % macro, __doc__, Template database for a VCH-10 Light Controller.  Typically used on End Stations to illuminate one or more vacuum chambers.  All the lights are turned on/off together.
+#
+# % macro, P,           Mandatory.  Device prefix
+# % macro, port,        Mandatory.  Asyn serial port
+#
+# % macro, description, Optional.   Defaults to ES Chamber Lights.  Description of the controller for use on GUI - e.g. chambers illuminated.
+# % macro, shortdesc,   Optional.   Defaults to Lights.             Short description to appear in GUI text.
+#
+# % macro, name,        Optional.   Defaults to VCH-10.             Object name and associated gui name.
+
+# % gui, $(name=VCH-10), edm, VCH10Light.edl, P=$(P)
+# % gui, $(name=VCH-10), edmembed, VCH10Light-embed.edl, P=$(P), shortdesc=$(shortdesc=Lights)
+
+################################################################################
+record(stringin, "$(P):MESSAGE") {
+
+}
+
+# Read VCH-10 Light Status
+#
+record(bi, "$(P):LightStatus_RBV") {
+  field(DESC, "Light Status")
+  #field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@VCH10Light.proto readVCH10LightStatus($(P)) $(port)")
+  field(ZNAM, "ON")
+  field(ONAM, "OFF")
+}
+
+# Set VCH-10 Light Status
+#
+record(bo, "$(P):LightStatus") {
+  field(DESC, "Set Light Status")
+  field(DTYP, "stream")
+  field(OUT, "@VCH10Light.proto writeVCH10LightStatus $(port)")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+}
+
+#
+# Description of the VCH10, which is most meaningfully a
+# description of the lights controlled by the controller.
+# This will be used for GUI display, but there is not
+# much space on the screen, so it needs to be brief.
+#
+record(stringout, "$(P):DESCRIPTION") {
+  field(DESC, "Description of VCH10 Lights")
+  field(PINI, "YES")
+  field(VAL, "$(description=ES Chamber Lights)")
+}

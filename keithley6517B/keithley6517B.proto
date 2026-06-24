@@ -1,0 +1,176 @@
+@writetimeout { disconnect; }
+@replytimeout { disconnect; }
+@readtimeout  { disconnect; }
+@mismatch     { disconnect; }
+
+ReplyTimeout = 1200;
+InTerminator = "\r";
+OutTerminator = "\r";
+
+getIDN {
+    out "*IDN?";
+    in "%\$1[^\r\n]";
+    ExtraInput = Ignore;
+}
+cmd {
+    out "\$1";
+}
+
+setD {
+    out "\$1 %d";
+}
+getD {
+    out "\$1?";
+    in "%d";
+    ExtraInput = Ignore;
+}
+
+setF {
+    out "\$1 %f";
+}
+getF {
+    out "\$1?";
+    in "%f";
+    ExtraInput = Ignore;
+}
+
+# Voltage source
+setVSourceRange {
+   out "SOUR:VOLT:RANGE %{1.000000E+02|1.000000E+03}";
+   ExtraInput = Ignore;
+}
+getVSourceRange {
+   out "SOUR:VOLT:RANGE?";
+   in "%{1.000000E+02|1.000000E+03}";
+   ExtraInput = Ignore;
+}
+
+
+### Measurements ####
+setFunction {
+  out "SENS:FUNC \x22%{VOLT|CURR|RES|CHAR}\x22";
+}
+getFunction {
+  out "SENS:FUNC?";
+  in "\x22%{VOLT|CURR|RES|CHAR}";
+  ExtraInput = Ignore;
+}
+
+getRange {
+  out "SENS:%(\$1.VAL){VOLT|CURR|RES|CHAR}:RANG?";
+  in "%f";
+  ExtraInput = Ignore;
+}
+
+# Set integration
+setAper {
+  out "SENS:%(\$1.VAL){VOLT|CURR|RES|CHAR}:APER %f";
+}
+# Get integration
+getAper {
+  out "SENS:%(\$1.VAL){VOLT|CURR|RES|CHAR}:APER?";
+  in "%f";
+  ExtraInput = Ignore;
+}
+
+setArmContinuous {
+  out "INIT:CONT %d";
+}
+getArmContinuous {
+  out "INIT:CONT?";
+  in "%d";
+}
+
+####  Get a fresh measurement from device. 
+#  
+#  Response will have:
+#
+# <DATA><STATUS><UNIT>... timestamp etc (we ignore the rest)
+# For example:
+# -000.0012E-12NADC,+0018386.517851secs,+137618RDNG#
+#
+# Where DATA: is the value in exponential format.
+#
+# STATUS is:
+# N = Normal
+# Z = Zero Check Enabled
+# O = Overflow
+# U = Underflow
+# R = Reference (Rel)
+# L = Out of Limit
+# 
+# Units:
+# VDC = Volts
+# ADC = Amps
+# OHM = Ohms
+# OHMCM (Volume)
+# OHMSQ (Surface)
+# %/V (Voltage coefficient)
+# COUL = Coulombs
+freshMeasurement {
+  out "SENS:DATA:FRESH?";
+  in "%f%(\$1STAT.VAL){N|Z|O|U|R|L}%(\$1EGU.VAL){VDC|ADC|OHM|OHMCM|OHMSQ|\%/V|COUL},";
+  ExtraInput = Ignore;
+}
+
+############################################################
+#
+#      Manual device control
+#
+# Simple manual control of the device can be achieved
+# by two features of the device protocol: the ability
+# to simulate button presses and read out the display
+# panel string.
+#
+# Simulate Key Presses  
+#   Key codes:
+# 1:  Range Up Arrow
+# 2:  V-source Up Arrow
+# 3:  Left Arrow
+# 4:  MENU
+# 5:  Q
+# 6:  FILTER
+# 7:  LOCAL
+# 8:  PREV
+# 9:  AUTO
+# 10: Right Arrow
+# 11: EXIT
+# 12: CARD
+# 13: MATH
+# 14: STORE
+# 15: V
+# 16: NEXT
+# 17: Range Down Arrow
+# 18: ENTER
+# 19: OPER
+# 20: TRIG
+# 21: RECALL
+# 22: I
+# 23: Z-CHK
+# 26: V-source Down Arrow
+# 27: SEQ
+# 28: CONFIG
+# 29: R
+# 30: REL
+# 31: INFO
+
+keyPress {
+   out "SYST:KEY \$1";
+}
+
+# Read out the top line of the display
+getDisplayTop {
+    out "DISP:WIND1:DATA?";
+    in "\x22%20c\x22";
+    ExtraInput = Ignore;
+}
+
+# Read out the bottom line of the display
+getDisplayBottom {
+    out "DISP:WIND2:DATA?";
+    in "\x22%32c";
+    #in "\x22%32c\x22";
+    ExtraInput = Ignore;
+}
+
+

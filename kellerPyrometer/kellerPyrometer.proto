@@ -1,0 +1,40 @@
+##################################################
+# Protocol file for Keller M.S.R Pyrometer 
+# (Model No. PA 29 AF 2)
+# Diamond Light Source, April 2019
+##################################################
+
+##################################################
+# General Settings
+##################################################
+
+# Temperature Format
+#  Byte	      -ve	+ve	<rnge	>rnge
+#  1	      "-"	" "	" "	" "
+#  2	      1000s	1000s	"-"	"-"
+#  3	      100s	100s	"U"	"O"
+#  4	      10s	10s 	"N"	"V"
+#  5	      1s	1s	"D"	"E"
+#  6	      "."	"."	"E"	"R"
+#  7	      .1s	.1s	"R"	" "
+#  8	      " "	" "	" "	" "
+#  9	      "C"/"F"	"C"/"F"	"-"	"-"
+# 10	      " "	" "	" "	" "
+# 11	      "\r"	"\r"	"\r"	"\r"
+
+Terminator = CR;
+
+getTemperature {
+    out " ";
+    in "%f %*{C|F} ";
+    @mismatch {
+        in "%(\$1:MESSAGE)39c";	
+    }   
+}
+
+getTemperatureUnit {
+    in "%*f %s";
+    @mismatch {
+        in "%s";
+    }
+}

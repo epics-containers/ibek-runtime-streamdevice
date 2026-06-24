@@ -1,0 +1,442 @@
+# Main template file for Deben open frame rig
+# Andrew Wilson  November 2015
+
+# % macro, P, Device prefix
+# % macro, R, Device suffix
+# % macro, PORT, Asyn port name for comms
+# % gui, $(name=), edm, debenOF.edl, device=$(P)$(R)
+
+## \name Interface for Zebra
+## \{
+
+## (deprecated) Dummy soft motor for the purpose of telling Zebra what the resolution is
+record(motor, "$(P)$(R):DUMMYMOTOR") {
+    field(DESC, "Dummy motor to give zebra MRES")
+    field(DTYP, "Soft Channel")
+    field(MRES, "0.001")
+    field(ERES, "0.001")
+    field(EGU, "deg")
+    field(OFF, "0")
+}
+
+## Required for Zebra to read position from encoder
+record(stringout, "$(P)$(R):TOP:MOTOR:SCALE") {
+    field(PINI, "YES")
+    field(VAL, "1")
+}
+## Required for Zebra to read position from encoder
+record(stringout, "$(P)$(R):BOT:MOTOR:SCALE") {
+    field(PINI, "YES")
+    field(VAL, "1")
+}
+## Required for Zebra to read position from encoder
+record(stringout, "$(P)$(R):LIN:MOTOR:SCALE") {
+    field(PINI, "YES")
+    field(VAL, "1")
+}
+
+## \}
+
+## \name Global commands & readbacks
+## \{
+
+## \brief Full system reset
+## \details ! Power off servos first or you'll end up in a bad state and 
+## will have to power cycle the controller
+record(bo, "$(P)$(R):RESET") {
+	field(DESC, "Full system reset")
+	field(DTYP, "stream")
+ 	field(OUT, "@debenOF.proto reset $(PORT)")
+}
+## Power on all servos
+record(bo, "$(P)$(R):SERVOON") {
+	field(DESC, "Power on servos")
+	field(DTYP, "stream")
+ 	field(OUT, "@debenOF.proto servoOn $(PORT)")
+}
+## Power off all servos
+record(bo, "$(P)$(R):SERVOOFF") {
+	field(DESC, "Power off servos")
+	field(DTYP, "stream")
+ 	field(OUT, "@debenOF.proto servoOff $(PORT)")
+}
+## Read timestamp from streamed data
+record(longin, "$(P)$(R):TIMESTAMP") {
+	field(DESC, "Read timestamp")
+    field(EGU, "ms")
+}
+## Read tension force from streamed data
+# % archiver 10 Monitor
+record(ai, "$(P)$(R):TENSIONFORCE") {
+    field(DESC, "Read tension force")
+    field(EGU, "N")
+    field(SCAN, "Passive")
+    field(PREC, "4")
+}
+## Read torsion force from streamed data
+# % archiver 10 Monitor
+record(ai, "$(P)$(R):TORSIONFORCE") {
+    field(DESC, "Read torsion force")
+    field(EGU, "N")
+    field(PREC, "4")
+}
+
+## Parse global status
+record(longin, "$(P)$(R):STATUS") {
+    field(DESC, "Parse status")
+    field(DTYP, "stream")
+    field(SCAN, "I/O Intr")
+    field(INP, "@debenOF.proto wholeStatus($(P)$(R)) $(PORT)")
+    field(FLNK, "$(P)$(R):CALCSTAT")
+}
+## Extract Done Moving bits from global status
+record(seq, "$(P)$(R):CALCSTAT") {
+	field(DESC, "Calculate DMOVs")
+	field(LNK1, "$(P)$(R):TOP:DMOV.PROC")
+	field(SCAN, "Passive")
+	field(LNK2, "$(P)$(R):BOT:DMOV.PROC")
+	field(SCAN, "Passive")
+	field(LNK3, "$(P)$(R):LIN:DMOV.PROC")
+	field(SCAN, "Passive")
+}
+
+## Gloabl stop command
+record(bo, "$(P)$(R):STOP") {
+    field(DESC, "Stop all motion")
+    field(DTYP, "stream")
+    field(OUT, "@debenOF.proto stop $(PORT)")
+}
+## \}
+
+## \name Control of top rotation
+## \{
+
+## Read top position from streamed data
+record(ai, "$(P)$(R):TOP:RBV") {
+    field(DESC, "Read top position")
+    field(EGU, "deg")
+    field(PREC, "4")
+}
+## Set top rotation demand and start move
+record(ao, "$(P)$(R):TOP:SETPOS") {
+    field(DESC, "Top rotation")
+    field(DTYP, "stream")
+    field(EGU, "deg")
+    field(PREC, "4")
+    field(OUT, "@debenOF.proto moveTop $(PORT)")
+}
+
+## Soft motor for top rotation
+record(motor, "$(P)$(R):TOP:MOTOR") {
+	field(DESC, "Top rotation")
+	field(DTYP, "Soft Channel")
+	field(DINP, "$(P)$(R):TOP:DMOVA NPP")
+	field(OUT, "$(P)$(R):TOP:GO PP")
+	field(RDBL, "$(P)$(R):TOP:RBV.VAL") # Readback location
+	field(STOO, "$(P)$(R):STOP PP NMS") # STOP output link
+	field(URIP, "1") # Use readback from RDBL
+	field(DIR, "0") # Direction positive
+	field(VBAS, "0.1") # Minimum velocity
+	field(VMAX, "360")
+	field(VELO, "10") # Default velocity on startup
+	field(EGU, "deg")
+	field(PREC, "4")
+	field(MRES, "-0.001")
+	field(ERES, "0.001")
+	field(RRES, "1")
+# Soft limits
+	field(DHLM, "999999999") 
+	field(DLLM, "-999999999")
+	field(RTRY, "0")
+}
+
+## Write velocity and position demands 
+record(seq, "$(P)$(R):TOP:GO"){
+  field(DESC, "Top: write demands")
+# Write velocity
+  field(DOL1, "$(P)$(R):TOP:MOTOR.VELO NPP")
+  field(LNK1, "$(P)$(R):TOP:SETSPEED PP")
+# Write demand
+  field(DLY2, "0.1")
+  field(DOL2, "$(P)$(R):TOP:MOTOR.DVAL NPP")
+  field(LNK2, "$(P)$(R):TOP:SETPOS PP")
+}
+## Extract done moving bit for top rotation
+record(calcout, "$(P)$(R):TOP:DMOV") {
+	field(DESC, "Top done moving calc")
+	field(INPA, "$(P)$(R):STATUS NPP")
+	field(INPB, "8")
+	field(DTYP, "Soft Channel")
+	field(CALC, "(A&B)==8")
+	field(OOPT, "On Change")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):TOP:DMOVA PP")
+}
+## bi to hold result of :TOP:DMOV
+record(bi, "$(P)$(R):TOP:DMOVA") {
+	field(DESC, "Top done moving")
+	field(ZNAM, "Moving")
+	field(ONAM, "Done")
+}
+## Write speed for top
+record(ao, "$(P)$(R):TOP:SETSPEED") {
+    field(DESC, "Set top speed")
+    field(DTYP, "stream")
+    field(EGU, "deg/s")
+    field(PREC, "4")
+    field(OUT, "@debenOF.proto setSpeedTop $(PORT)")
+}
+## Zero top position
+record(bo, "$(P)$(R):TOP:SETORIGIN") {
+    field(DESC, "Set top origin")
+    field(DTYP, "stream")
+    field(OUT, "@debenOF.proto setOriginTop $(PORT)")
+}
+## \}
+
+## \name Control of bottom rotation
+## \{
+
+## Read bottom position from streamed data
+record(ai, "$(P)$(R):BOT:RBV") {
+    field(DESC, "Read bottom position")
+    field(EGU, "deg")
+    field(PREC, "4")
+}
+
+## Extract done moving bit for bottom rotation
+record(calcout, "$(P)$(R):BOT:DMOV") {
+	field(DESC, "Bot done moving calc")
+	field(INPA, "$(P)$(R):STATUS NPP")
+	field(INPB, "512")
+	field(DTYP, "Soft Channel")
+	field(CALC, "(A&B)==512")
+	field(OOPT, "On Change")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):BOT:DMOVA PP")
+}
+## bi to hold result of :BOT:DMOV
+record(bi, "$(P)$(R):BOT:DMOVA") {
+	field(DESC, "Bot done moving")
+	field(ZNAM, "Moving")
+	field(ONAM, "Done")
+}
+
+## Soft motor for bottom rotation
+record(motor, "$(P)$(R):BOT:MOTOR") {
+	field(DESC, "Bottom rotation")
+	field(DTYP, "Soft Channel")
+	field(DINP, "$(P)$(R):BOT:DMOVA NPP")
+	field(OUT, "$(P)$(R):BOT:GO PP")
+	field(RDBL, "$(P)$(R):BOT:RBV.VAL") # Readback location
+	field(STOO, "$(P)$(R):STOP PP NMS") # STOP output link
+	field(URIP, "1") # Use readback from RDBL
+	field(DIR, "0") # Direction positive
+	field(VBAS, "0.1") # Minimum velocity
+	field(VMAX, "360")
+	field(VELO, "10") # Default velocity on startup
+	field(EGU, "deg")
+	field(PREC, "4")
+	field(MRES, "-0.001")
+	field(ERES, "0.001")
+	field(RRES, "1")
+# Soft limits
+	field(DHLM, "999999999") 
+	field(DLLM, "-999999999")
+	field(RTRY, "0")
+}
+## Write velocity and position demands
+record(seq, "$(P)$(R):BOT:GO"){
+  field(DESC, "Bot: write demands")
+# Write velocity
+  field(DOL1, "$(P)$(R):BOT:MOTOR.VELO")
+  field(LNK1, "$(P)$(R):BOT:SETSPEED PP")
+# Write demand
+  field(DLY2, "0.1")
+  field(DOL2, "$(P)$(R):BOT:MOTOR.DVAL NPP")
+  field(LNK2, "$(P)$(R):BOT:SETPOS PP")
+}
+## Write bottom position demand
+record(ao, "$(P)$(R):BOT:SETPOS") {
+    field(DESC, "Bottom rotation")
+    field(DTYP, "stream")
+    field(EGU, "deg")
+    field(PREC, "4")
+    field(OUT, "@debenOF.proto moveBottom $(PORT)")
+}
+## Write speed for bottom
+record(ao, "$(P)$(R):BOT:SETSPEED") {
+    field(DESC, "Set bottom speed")
+    field(DTYP, "stream")
+    field(EGU, "deg/s")
+    field(PREC, "4")
+    field(OUT, "@debenOF.proto setSpeedBottom $(PORT)")
+}
+## \}
+
+## \name Control of linear motion
+## \{
+
+## Read linear position from streamed data
+record(ai, "$(P)$(R):LIN:RBV") {
+    field(DESC, "Read linear position")
+    field(EGU, "um")
+    field(PREC, "4")
+}
+
+## Extract done moving bit for linear motion
+record(calcout, "$(P)$(R):LIN:DMOV") {
+	field(DESC, "Lin done moving calc")
+	field(INPA, "$(P)$(R):STATUS NPP")
+	field(INPB, "32768")
+	field(DTYP, "Soft Channel")
+	field(CALC, "(A&B)==32768")
+	field(OOPT, "On Change")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):LIN:DMOVA PP")
+}
+## bi to hold result of :LIN:DMOV
+record(bi, "$(P)$(R):LIN:DMOVA") {
+	field(DESC, "Lin done moving")
+	field(ZNAM, "Moving")
+	field(ONAM, "Done")
+}
+## Soft motor for linear motion
+# % archiver 10 Monitor
+record(motor, "$(P)$(R):LIN:MOTOR") {
+	field(DESC, "Linear motion")
+	field(DTYP, "Soft Channel")
+	field(DINP, "$(P)$(R):LIN:DMOVA NPP")
+	field(OUT, "$(P)$(R):LIN:GO PP")
+	field(RDBL, "$(P)$(R):LIN:RBV.VAL") # Readback location
+	field(STOO, "$(P)$(R):STOP PP NMS") # STOP output link
+	field(URIP, "1") # Use readback from RDBL
+	field(DIR, "0") # Direction positive
+	field(VBAS, "0.1") # Minimum velocity
+	field(VMAX, "360")
+	field(VELO, "0.1") # Default velocity on startup
+	field(EGU, "mm")
+	field(PREC, "4")
+	field(MRES, "0.0001")
+	field(ERES, "0.0001")
+	field(RRES, "1")
+# Soft limits
+	field(DHLM, "999999999") 
+	field(DLLM, "-999999999")
+	field(RTRY, "0")
+}
+## Calibrate velocity demand
+record(calcout, "$(P)$(R):LIN:VELOC") {
+	field(DESC, "Calibrate velocity")
+	field(INPA, "$(P)$(R):LIN:MOTOR.VELO NPP")
+	field(INPB, "1000.0")
+	field(CALC, "A*B")
+	field(OOPT, "Every Time")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):LIN:SETSPEED PP")
+}
+## Write velocity and position demands for linear motion
+record(seq, "$(P)$(R):LIN:GO"){
+  field(DESC, "Lin: write demands")
+# Calibrate and write velocity
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):LIN:VELOC.PROC")
+# Write demand
+  field(DLY2, "0.1")
+  field(DOL2, "$(P)$(R):LIN:MOTOR.DVAL NPP")
+  field(LNK2, "$(P)$(R):LIN:SETPOS PP")
+}
+## Write linear position demand
+record(ao, "$(P)$(R):LIN:SETPOS") {
+    field(DESC, "Linear position")
+    field(DTYP, "stream")
+    field(EGU, "mm")
+    field(PREC, "4")
+    field(OUT, "@debenOF.proto moveLinear $(PORT)")
+}
+## Write linear speed demand
+record(ao, "$(P)$(R):LIN:SETSPEED") {
+    field(DESC, "Set linear speed")
+    field(DTYP, "stream")
+    field(EGU, "um/s")
+    field(PREC, "4")
+    field(OUT, "@debenOF.proto setSpeedLinear $(PORT)")
+}
+## \}
+
+## \name Force control
+## \{
+
+## Set hold force demand
+record(ao, "$(P)$(R):SETHOLDFORCE") {
+    field(DESC, "Set Hold Force")
+    field(DTYP, "stream")
+    field(EGU, "N")
+    field(OUT, "@debenOF.proto holdForce $(PORT)")
+}
+## \}
+
+## \name Rotation mode control
+## \{
+
+## Rotate top/bottom independently
+record(bo, "$(P)$(R):ROTIND") {
+    field(DESC, "Rotate top/bottom independently")
+    field(DTYP, "stream")
+    field(OUT, "@debenOF.proto rotationInd $(PORT)")
+}
+## Rotate top/bottom fixed
+record(bo, "$(P)$(R):ROTFIX") {
+    field(DESC, "Rotate top/bottom fixed ")
+    field(DTYP, "stream")
+    field(OUT, "@debenOF.proto rotationFixed $(PORT)")
+}
+
+## \}
+
+## Request top position
+record(bo, "$(P)$(R):QUERYTOPPOS") {
+    field(DESC, "Query top pos")
+    field(DTYP, "stream")
+    field(OUT, "@debenOF.proto queryTopPos $(PORT)")
+}
+record(stringin, "$(P)$(R):REPLY") {
+    field(DESC, "Test read a reply")
+}
+
+# Parse response to a register read.
+record(aSub, "$(P)$(R):PARSEREPLY") {
+	field(DESC, "Parse response")
+#	field(INPA, "$(P)$(R):REPLY.VAL NPP")
+	field(FTA, "UCHAR")
+	field(NOA, "256")
+	field(INAM, "mySubInit")
+	field(SNAM, "parseStatusString")
+	field(FTVA, "LONG")
+	field(FTVB, "FLOAT")
+	field(NOVA, "1")
+	field(NOVB, "1")
+	field(OUTA, "$(P)$(R):REGNUM PP")
+	field(OUTB, "$(P)$(R):REGVAL PP")
+#	field(TPRO, "1")
+}
+
+record(longout, "$(P)$(R):REGNUM") {
+    field(DESC, "Register number")
+}
+record(ao, "$(P)$(R):REGVAL") {
+    field(DESC, "Register value")
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

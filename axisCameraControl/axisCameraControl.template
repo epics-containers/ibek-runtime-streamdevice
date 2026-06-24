@@ -1,0 +1,416 @@
+# ptz.template
+# Control template for a Axis web cameras
+# Jonathan Thompson, December 2015
+#
+# substitutions:
+# % macro, P, PV prefix
+# % macro, PORT, Asyn http port
+# % macro, IPADDR, IP address of the camera
+# % macro, name, Object and gui association name
+################################################################################
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boydetail, axisCameraControlApp_opi/axisCameraControl_detail.opi, P=$(P),desc=Pan/Tilt/Zoom Control
+# % gui, $(name=), boyembed, axisCameraControlApp_opi/axisCameraControl_embed_box.opi, P=$(P),desc=Pan/Tilt/Zoom Control
+# % gui, $(name=), boyembed, axisCameraControlApp_opi/axisCameraControl_embed.opi, P=$(P),desc=Pan/Tilt/Zoom Control
+# These define what PVs the detail screen should contain
+# % gui, $(name=), demand, Pan,   $(P):PAN
+# % gui, $(name=), demand, Pan Tweak,   $(P):PANTWEAK
+# % gui, $(name=), command, Pan Down,   $(P):PANMINUS.PROC
+# % gui, $(name=), command, Pan Up,   $(P):PANPLUS.PROC
+# % gui, $(name=), command, Pan Tweak Double,   $(P):PANTWEAKMUL.PROC
+# % gui, $(name=), command, Pan Tweak Halve,   $(P):PANTWEAKDIV.PROC
+# % gui, $(name=), demand, Tilt,   $(P):TILT
+# % gui, $(name=), demand, Tilt Tweak,   $(P):TILTTWEAK
+# % gui, $(name=), command, Tilt Down,   $(P):TILTMINUS.PROC
+# % gui, $(name=), command, Tilt Up,   $(P):TILTPLUS.PROC
+# % gui, $(name=), command, Tilt Tweak Double,   $(P):TILTTWEAKMUL.PROC
+# % gui, $(name=), command, Tilt Tweak Halve,   $(P):TILTTWEAKDIV.PROC
+# % gui, $(name=), demand, Zoom,   $(P):ZOOM
+# % gui, $(name=), demand, Zoom Tweak,   $(P):ZOOMTWEAK
+# % gui, $(name=), command, Zoom Down,   $(P):ZOOMMINUS.PROC
+# % gui, $(name=), command, Zoom Up,   $(P):ZOOMPLUS.PROC
+# % gui, $(name=), command, Zoom Tweak Double,   $(P):ZOOMTWEAKMUL.PROC
+# % gui, $(name=), command, Zoom Tweak Halve,   $(P):ZOOMTWEAKDIV.PROC
+# % gui, $(name=), demand, Focus,   $(P):FOCUS
+# % gui, $(name=), demand, Focus Tweak,   $(P):FOCUSTWEAK
+# % gui, $(name=), command, Focus Down,   $(P):FOCUSMINUS.PROC
+# % gui, $(name=), command, Focus Up,   $(P):FOCUSPLUS.PROC
+# % gui, $(name=), command, Focus Tweak Double,   $(P):FOCUSTWEAKMUL.PROC
+# % gui, $(name=), command, Focus Tweak Halve,   $(P):FOCUSTWEAKDIV.PROC
+# % gui, $(name=), enum, Auto Focus,   $(P):AUTOFOCUS
+# % gui, $(name=), demand, Iris,   $(P):IRIS
+# % gui, $(name=), demand, Iris Tweak,   $(P):IRISTWEAK
+# % gui, $(name=), command, Iris Down,   $(P):IRISMINUS.PROC
+# % gui, $(name=), command, Iris Up,   $(P):IRISPLUS.PROC
+# % gui, $(name=), command, Iris Tweak Double,   $(P):IRISTWEAKMUL.PROC
+# % gui, $(name=), command, Iris Tweak Halve,   $(P):IRISTWEAKDIV.PROC
+# % gui, $(name=), enum, Auto Iris,   $(P):AUTOIRIS
+# % gui, $(name=), edmembed, ptz.edl, P=$(P)
+
+# Pan control
+record(ao, "$(P):PAN")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@ptz.proto pan() $(PORT) 0")
+    field(EGU, "deg")
+    field(DRVL, "-180")
+    field(DRVH, "180")
+    field(LOPR, "-180")
+    field(HOPR, "180")
+    field(PREC, "4")
+    field(VAL, "0")
+    field(SDIS, "$(P):DISABLE")
+}
+record(ao, "$(P):PANTWEAK")
+{
+    field(VAL, "10")
+    field(PREC, "4")
+    field(EGU, "deg")
+}
+record(calcout, "$(P):PANPLUS")
+{
+    field(INPA, "$(P):PANTWEAK")
+    field(INPB, "$(P):PAN")
+    field(CALC, "B+A")
+    field(OUT, "$(P):PAN PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):PANMINUS")
+{
+    field(INPA, "$(P):PANTWEAK")
+    field(INPB, "$(P):PAN")
+    field(CALC, "B-A")
+    field(OUT, "$(P):PAN PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):PANTWEAKMUL")
+{
+    field(INPA, "$(P):PANTWEAK")
+    field(CALC, "A*2")
+    field(OUT, "$(P):PANTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):PANTWEAKDIV")
+{
+    field(INPA, "$(P):PANTWEAK")
+    field(CALC, "A/2")
+    field(OUT, "$(P):PANTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+
+# Tilt control
+record(ao, "$(P):TILT")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@ptz.proto tilt() $(PORT) 0")
+    field(EGU, "deg")
+    field(DRVL, "-180")
+    field(DRVH, "180")
+    field(LOPR, "-180")
+    field(HOPR, "180")
+    field(PREC, "4")
+    field(VAL, "0")
+    field(SDIS, "$(P):DISABLE")
+}
+record(ao, "$(P):TILTTWEAK")
+{
+    field(VAL, "10")
+    field(PREC, "4")
+    field(EGU, "deg")
+}
+record(calcout, "$(P):TILTPLUS")
+{
+    field(INPA, "$(P):TILTTWEAK")
+    field(INPB, "$(P):TILT")
+    field(CALC, "B+A")
+    field(OUT, "$(P):TILT PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):TILTMINUS")
+{
+    field(INPA, "$(P):TILTTWEAK")
+    field(INPB, "$(P):TILT")
+    field(CALC, "B-A")
+    field(OUT, "$(P):TILT PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):TILTTWEAKMUL")
+{
+    field(INPA, "$(P):TILTTWEAK")
+    field(CALC, "A*2")
+    field(OUT, "$(P):TILTTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):TILTTWEAKDIV")
+{
+    field(INPA, "$(P):TILTTWEAK")
+    field(CALC, "A/2")
+    field(OUT, "$(P):TILTTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+
+# Zoom control
+record(longout, "$(P):ZOOM")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@ptz.proto zoom() $(PORT) 0")
+    field(DRVL, "1")
+    field(DRVH, "9999")
+    field(LOPR, "1")
+    field(HOPR, "9999")
+    field(VAL, "1")
+    field(SDIS, "$(P):DISABLE")
+}
+record(longout, "$(P):ZOOMTWEAK")
+{
+    field(VAL, "500")
+}
+record(calcout, "$(P):ZOOMPLUS")
+{
+    field(INPA, "$(P):ZOOMTWEAK")
+    field(INPB, "$(P):ZOOM")
+    field(CALC, "B+A")
+    field(OUT, "$(P):ZOOM PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):ZOOMMINUS")
+{
+    field(INPA, "$(P):ZOOMTWEAK")
+    field(INPB, "$(P):ZOOM")
+    field(CALC, "B-A")
+    field(OUT, "$(P):ZOOM PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):ZOOMTWEAKMUL")
+{
+    field(INPA, "$(P):ZOOMTWEAK")
+    field(CALC, "A*2")
+    field(OUT, "$(P):ZOOMTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):ZOOMTWEAKDIV")
+{
+    field(INPA, "$(P):ZOOMTWEAK")
+    field(CALC, "A/2")
+    field(OUT, "$(P):ZOOMTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+
+# Focus control
+record(longout, "$(P):FOCUS")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@ptz.proto focus() $(PORT) 0")
+    field(DRVL, "1")
+    field(DRVH, "9999")
+    field(LOPR, "1")
+    field(HOPR, "9999")
+    field(VAL, "1")
+    field(SDIS, "$(P):DISABLE")
+}
+record(longout, "$(P):FOCUSTWEAK")
+{
+    field(VAL, "500")
+}
+record(calcout, "$(P):FOCUSPLUS")
+{
+    field(INPA, "$(P):FOCUSTWEAK")
+    field(INPB, "$(P):FOCUS")
+    field(CALC, "B+A")
+    field(OUT, "$(P):FOCUS PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):FOCUSMINUS")
+{
+    field(INPA, "$(P):FOCUSTWEAK")
+    field(INPB, "$(P):FOCUS")
+    field(CALC, "B-A")
+    field(OUT, "$(P):FOCUS PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):FOCUSTWEAKMUL")
+{
+    field(INPA, "$(P):FOCUSTWEAK")
+    field(CALC, "A*2")
+    field(OUT, "$(P):FOCUSTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):FOCUSTWEAKDIV")
+{
+    field(INPA, "$(P):FOCUSTWEAK")
+    field(CALC, "A/2")
+    field(OUT, "$(P):FOCUSTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+
+# Iris control
+record(longout, "$(P):IRIS")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@ptz.proto iris() $(PORT) 0")
+    field(DRVL, "1")
+    field(DRVH, "9999")
+    field(LOPR, "1")
+    field(HOPR, "9999")
+    field(VAL, "1")
+    field(SDIS, "$(P):DISABLE")
+}
+record(longout, "$(P):IRISTWEAK")
+{
+    field(VAL, "500")
+}
+record(calcout, "$(P):IRISPLUS")
+{
+    field(INPA, "$(P):IRISTWEAK")
+    field(INPB, "$(P):IRIS")
+    field(CALC, "B+A")
+    field(OUT, "$(P):IRIS PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):IRISMINUS")
+{
+    field(INPA, "$(P):IRISTWEAK")
+    field(INPB, "$(P):IRIS")
+    field(CALC, "B-A")
+    field(OUT, "$(P):IRIS PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):IRISTWEAKMUL")
+{
+    field(INPA, "$(P):IRISTWEAK")
+    field(CALC, "A*2")
+    field(OUT, "$(P):IRISTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+record(calcout, "$(P):IRISTWEAKDIV")
+{
+    field(INPA, "$(P):IRISTWEAK")
+    field(CALC, "A/2")
+    field(OUT, "$(P):IRISTWEAK PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
+
+record(bo, "$(P):AUTOFOCUS")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@ptz.proto autofocus() $(PORT) 0")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(SDIS, "$(P):DISABLE")
+    field(FLNK, "$(P):GETFOCUS")
+}
+
+record(bo, "$(P):AUTOIRIS")
+{
+    field(DTYP, "stream")
+    field(OUT,  "@ptz.proto autoiris() $(PORT) 0")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(SDIS, "$(P):DISABLE")
+    field(FLNK, "$(P):GETIRIS")
+}
+
+record(seq, "$(P):INITIALISE")
+{
+    field(SCAN, "2 second")
+    field(SELM, "All")
+    field(DOL1, "1")
+    field(LNK1, "$(P):DISABLE PP")
+    field(DOL2, "1")
+    field(LNK2, "$(P):GETAUTOFOCUS PP")
+    field(DOL3, "1")
+    field(LNK3, "$(P):GETAUTOIRIS PP")
+    field(DLY4, "2")
+    field(DOL4, "1")
+    field(LNK4, "$(P):INITIALISE2.PROC")
+    field(DOL5, "1")
+    field(LNK5, "$(P):INITIALISE.DISA")
+}
+
+record(seq, "$(P):INITIALISE2")
+{
+    field(SELM, "All")
+    field(DOL1, "1")
+    field(LNK1, "$(P):GETPAN PP")
+    field(DOL2, "1")
+    field(LNK2, "$(P):GETTILT PP")
+    field(DOL3, "1")
+    field(LNK3, "$(P):GETZOOM PP")
+    field(DOL4, "1")
+    field(LNK4, "$(P):GETFOCUS PP")
+    field(DOL5, "1")
+    field(LNK5, "$(P):GETIRIS PP")
+    field(DLY6, "2")
+    field(DOL6, "0")
+    field(LNK6, "$(P):DISABLE PP")
+}
+
+record(longout, "$(P):DISABLE")
+{
+    field(VAL, "0")
+}
+
+record(ai, "$(P):GETAUTOFOCUS")
+{
+    field(DTYP, "stream")
+    field(INP,  "@ptz.proto getautofocus($(P):AUTOFOCUS) $(PORT) 0")
+}
+
+record(ai, "$(P):GETAUTOIRIS")
+{
+    field(DTYP, "stream")
+    field(INP,  "@ptz.proto getautoiris($(P):AUTOIRIS) $(PORT) 0")
+}
+
+record(ai, "$(P):GETPAN")
+{
+    field(DTYP, "stream")
+    field(INP,  "@ptz.proto getpan($(P):PAN) $(PORT) 0")
+}
+
+record(ai, "$(P):GETTILT")
+{
+    field(DTYP, "stream")
+    field(INP,  "@ptz.proto gettilt($(P):TILT) $(PORT) 0")
+}
+
+record(ai, "$(P):GETZOOM")
+{
+    field(DTYP, "stream")
+    field(INP,  "@ptz.proto getzoom($(P):ZOOM) $(PORT) 0")
+}
+
+record(ai, "$(P):GETFOCUS")
+{
+    field(DTYP, "stream")
+    field(INP,  "@ptz.proto getfocus($(P):FOCUS) $(PORT) 0")
+    field(SDIS, "$(P):AUTOFOCUS")
+}
+
+record(ai, "$(P):GETIRIS")
+{
+    field(DTYP, "stream")
+    field(INP,  "@ptz.proto getiris($(P):IRIS) $(PORT) 0")
+    field(SDIS, "$(P):AUTOIRIS")
+}

@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: opSens
+
+entity_models:
+  - name: opSens
+    description: |-
+      Controls opSens Optical Temperature sensor
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      tty:
+        type: str
+        description: |-
+          Terminal name
+    databases:
+      - file: opSens.template
+        args:
+          .*:

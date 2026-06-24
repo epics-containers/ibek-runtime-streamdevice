@@ -1,0 +1,231 @@
+##############################################################################
+#
+# Stream device protocol for Brecknell WS-300 SCALE 
+#
+#
+# Device has settings of
+#
+#   baud rate = 9600 bps (default)
+#
+#   RS232 format = 8N1 (8 data bits, no parity bit, 1 stop bit) (default)
+#
+#   resolution = 6000 (as in divisions) (default)
+#
+#   RS232 function = Bio-RS232 compatible to NCI-SP1 
+#                    (I don't know what this literally means, but this
+#                     setting allows sending commands over a network)
+#
+#   
+# There are plenty of other settings, refer to manual for more info.
+# All the settings can be changed using the scale's local control unit.
+#
+# Commands are preceded by their data formats as given in the manual, with
+# the following code:
+#
+#   LF        line feed
+#   CR        carriage return
+#   ETX       end of text
+#   SP        space
+#   P         polarity
+#   H#        3 status bytes
+#   W#        7 to 9 weight digits
+#   DP        decimal point
+#   U1, U2    units
+#
+# The 3 status bytes have the following bit meanings:
+#
+# bit   H1                      H2                      H3
+#                                                        
+#   0   0 = stable              0 = not under capacity  / 01 = normal mode
+#       1 = not stable          1 = under capacity      | 10 = hold mode
+#   1   0 = not at zero point   0 = not over capacity   | 00 = undefined
+#       1 = at zero point       1 = over capacity       \ 11 = undefined
+#                                                       
+#   2   always 0                always 0                0 = gross weight
+#                                                       1 = net weight
+#   3   0 = eeprom OK           always 0                always 0
+#       1 = eeprom error
+#   4   always 1                always 1                always 1
+#
+#   5   always 1                always 1                always 1
+#
+#   6   always 0                always 1                always 0
+#
+#   7   parity                  parity                  parity
+#
+#
+# Some special characters...
+#
+#   CR      0d      \r      carriage return
+#   LF      0a      \n      line feed (newline)
+#   ETX     03              end of text
+#
+##############################################################################
+
+
+##############################################################################
+# 
+# Scale expects commands in format of e.g. W<CR>, i.e. capital letter with a 
+# carriage return terminator. Manual specifies 1 second should be plenty as
+# a timeout limit.
+#
+
+#Terminator = CR;
+OutTerminator = CR;
+InTerminator = ETX;
+
+LockTimeout  = 1000;
+WriteTimeout = 1000;
+ReadTimeout  = 100;
+Separator    = "";
+ExtraInput   = IGNORE;
+
+
+##############################################################################
+#
+# 'Reading' commands
+
+
+# out:  W CR
+# in:   LF SP W1 W2 W3 W4 W5 W6 DP W7 U1 U2 CR LF H1 H2 H3 CR ETX
+# mismatch in:
+#       LF SP W1 W2 W3 W4 W5  l b  SP W6 W7  o z  CR LF H1 H2 H3 CR ETX
+
+
+measure {
+
+    out "W";
+
+    in  "\n%(\$1:WEIGHT:MAJOR.VAL)f"
+        "%(\$1:WEIGHT:MAJOR.EGU)2c"
+        "%(\$1:WEIGHT:MINOR.VAL)?f"
+        "%(\$1:WEIGHT:MINOR.EGU)?2c"
+        "\r\n%(\$1:STAT1.RVAL)r%(\$1:STAT2.RVAL)r%(\$1:STAT3.RVAL)r\r";
+
+    @mismatch {
+        in  "\n%(\$1:WEIGHT:MAJOR.VAL)f"
+            "%(\$1:WEIGHT:MAJOR.EGU)2c"
+            "\r\n%(\$1:STAT1.RVAL)r%(\$1:STAT2.RVAL)r%(\$1:STAT3.RVAL)r\r"
+            "%(\$1:WEIGHT:MINOR.VAL)?f"
+            "%(\$1:WEIGHT:MINOR.EGU)?2c";
+    }
+
+    # this input matches the 'lb & oz' format
+#    in  "\n%(\$1:WEIGHT:MAJOR.VAL).1/(?m)^[ ]*([0-9\.]+)/"
+#        "%(\$1:WEIGHT:MAJOR.EGU).1/(?mi)^[\040]*([a-z]{2})/"
+#        "%(\$1:WEIGHT:MINOR.VAL)?.1/(?m)^[\040]*([0-9]+)/"
+#        "%(\$1:WEIGHT:MINOR.EGU)?.1/(?im)(oz)/\r\n"
+#        "%(\$1:STAT1.RVAL)r"
+#        "%(\$1:STAT2.RVAL)r"
+#        "%(\$1:STAT3.RVAL)r\r";
+
+    # this input matches both the 'kg' and 'lb' format
+#    @mismatch {
+#        in  "\n%(\$1:WEIGHT:MAJOR.VAL).1/(?m)^[ ]*([0-9\.]+)/"
+#            "%(\$1:WEIGHT:MAJOR.EGU).1/(?mi)^[\040]*([a-z]{2})/"
+#            "%(\$1:WEIGHT:MINOR.VAL)?.1/(?m)^[\040]*([0-9]+)/"
+#            "%(\$1:WEIGHT:MINOR.EGU)?.1/(?im)(oz)/\r\n"
+#            "%(\$1:STAT1.RVAL)r"
+#            "%(\$1:STAT2.RVAL)r"
+#            "%(\$1:STAT3.RVAL)r\r"
+#            "%(\$1:WEIGHT:MINOR.VAL)?.1/(?m)^[\040]*([0-9]+)/"
+#            "%(\$1:WEIGHT:MINOR.EGU)?.1/(?im)(oz)/\r\n";
+#    }
+}
+
+
+# out:  S CR
+# in:   LF H1 H2 H3 CR ETX
+
+status{
+    out "S";
+    in  "\n%(\$1:STAT1.RVAL)r"
+        "%(\$1:STAT2.RVAL)r"
+        "%(\$1:STAT3.RVAL)r\r";
+}
+
+
+##############################################################################
+#
+# 'Setting' commands
+
+# out:  Z CR
+# in:   LF H1 H2 H3 CR ETX
+
+zero{
+    out "Z";
+    in  "\n%(\$1:STAT1.RVAL)r"
+        "%(\$1:STAT2.RVAL)r"
+        "%(\$1:STAT3.RVAL)r\r";
+}
+
+# out:  T CR
+# in:   LF H1 H2 H3 CR ETX
+
+tare{
+    out "T";
+    in  "\n%(\$1:STAT1.RVAL)r"
+        "%(\$1:STAT2.RVAL)r"
+        "%(\$1:STAT3.RVAL)r\r";
+}
+
+# out:  U CR
+# in:   LF U1 U2 CR LF H1 H2 H3 CR ETX
+
+units{
+
+    out "U";
+
+    # this input matches the 'lb & oz' format
+    in "\n%(\$1:WEIGHT:MAJOR.EGU)2c %(\$1:WEIGHT:MINOR.EGU)2c\r\n"
+        "%(\$1:STAT1.RVAL)r"
+        "%(\$1:STAT2.RVAL)r"
+        "%(\$1:STAT3.RVAL)r\r";
+
+    # this input matches the 'kg' and 'lb' formats
+    @mismatch{
+        in "\n%(\$1:WEIGHT:MAJOR.EGU)2c\r\n"
+            "%(\$1:STAT1.RVAL)r"
+            "%(\$1:STAT2.RVAL)r"
+            "%(\$1:STAT3.RVAL)r\r"
+            "%(\$1:WEIGHT:MINOR.EGU)?2c";
+    }
+}
+
+# out:  L CR
+# in:   LF H1 H2 H3 CR ETX
+
+hold{
+    out "L";
+    in  "\n%(\$1:STAT1.RVAL)r"
+        "%(\$1:STAT2.RVAL)r"
+        "%(\$1:STAT3.RVAL)r\r";
+}
+
+
+
+##############################################################################
+#
+# 'power off' commands
+
+# out:  X CR
+
+power_off{
+    out "X";
+}
+
+
+##############################################################################
+#
+# 'arbitrary' commands
+
+# out: #s CR
+# in:   LF ? CR ETX
+
+send_cmd{
+    out "%#s";
+    in "%s";
+}
+
+
+

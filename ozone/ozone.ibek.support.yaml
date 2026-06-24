@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: ozone
+
+entity_models:
+  - name: Ozone
+    description: |-
+      Ozone monitor support (Anseros ML9810B).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      port:
+        type: str
+        description: |-
+          Asyn serial port name for the device
+      C:
+        type: int
+        description: |-
+          Hy8001 card number
+      S1:
+        type: int
+        description: |-
+          Hy8001 signal number for output B
+      S2:
+        type: int
+        description: |-
+          Hy8001 signal number for output C
+      S3:
+        type: int
+        description: |-
+          Hy8001 signal number for output D
+      S4:
+        type: int
+        description: |-
+          Hy8001 signal number for output E
+    databases:
+      - file: ML9810B.db
+        args:
+          .*:

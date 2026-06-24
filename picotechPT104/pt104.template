@@ -1,0 +1,85 @@
+# Device support for picotech PT104.
+# % macro, P, Device prefix
+# % macro, R, Device suffix
+# % macro, CHAN1_NAME, Name for Chan1
+# % macro, CHAN1_T_HIGH, High limit for Chan1
+# % macro, CHAN1_T_LOW, Low limit for Chan1
+# % macro, CHAN1_T_LOPR, Low operating range Chan1
+# % macro, CHAN1_T_HOPR, High operating range Chan1
+# % macro, CHAN2_NAME, Name for Chan2
+# % macro, CHAN2_T_HIGH, High limit for Chan2
+# % macro, CHAN2_T_LOW, Low limit for Chan2
+# % macro, CHAN2_T_LOPR, Low operating range Chan2
+# % macro, CHAN2_T_HOPR, High operating range Chan2
+# % macro, CHAN3_NAME, Name for Chan3
+# % macro, CHAN3_T_HIGH, High limit for Chan3
+# % macro, CHAN3_T_LOW, Low limit for Chan3
+# % macro, CHAN3_T_LOPR, Low operating range Chan3
+# % macro, CHAN3_T_HOPR, High operating range Chan3
+# % macro, CHAN4_NAME, Name for Chan4
+# % macro, CHAN4_T_HIGH, High limit for Chan4
+# % macro, CHAN4_T_LOW, Low limit for Chan4
+# % macro, CHAN4_T_LOPR, Low operating range Chan4
+# % macro, CHAN4_T_HOPR, High operating range Chan4
+# % macro, PORT, Asyn port for connection with device
+# % macro, TIMEOUT, Timeout for temperature readout
+# % macro, name, Device and GUI name
+
+# This associates EDM & CSS/BOY screens with the template
+# % gui, $(name=), edm, pt104.edl, P=$(P), R=$(R), CHAN1NAME=$(CHAN1_NAME=Chan1), CHAN2NAME=$(CHAN2_NAME=Chan2), CHAN3NAME=$(CHAN3_NAME=Chan3), CHAN4NAME=$(CHAN4_NAME=Chan4)
+# % gui, $(name=), boyembed, pt104App_opi/pt104_embed.opi, P=$(P),R=$(R),CHAN1NAME=$(CHAN1_NAME=Chan1),CHAN2NAME=$(CHAN2_NAME=Chan2),CHAN3NAME=$(CHAN3_NAME=Chan3),CHAN4NAME=$(CHAN4_NAME=Chan4)
+# % gui, $(name=), boyembed, pt104App_opi/pt104_embed_box.opi, P=$(P),R=$(R),CHAN1NAME=$(CHAN1_NAME=Chan1),CHAN2NAME=$(CHAN2_NAME=Chan2),CHAN3NAME=$(CHAN3_NAME=Chan3),CHAN4NAME=$(CHAN4_NAME=Chan4)
+
+# This describes a severity PV (needed for CSS auto-geneerated screens to be OK)
+# % gui, $(name=), sevr, BL14I-DI-IOC-08:SCANMON_SEVR
+
+record (ao, "$(P)$(R):Lock") {
+    field(DESC, "Lock the device to this process")
+    field(PINI, "1")
+    field(SCAN, "10 second")
+    field(FLNK, "$(P)$(R):Configure")
+    field(DTYP, "stream")
+    field(OUT,  "@pt104.proto lock $(PORT)")
+    field(OMSL, "supervisory")
+}
+
+record (calcout, "$(P)$(R):Configure") {
+    field(DESC, "Configure enabled channels")
+    field(FLNK, "$(P)$(R):Eeprom")
+    field(DTYP, "stream")
+    field(INPA, "$(P)$(R):$(CHAN1_NAME=Chan1):Enable")
+    field(INPB, "$(P)$(R):$(CHAN2_NAME=Chan2):Enable")
+    field(INPC, "$(P)$(R):$(CHAN3_NAME=Chan3):Enable")
+    field(INPD, "$(P)$(R):$(CHAN4_NAME=Chan4):Enable")
+    field(CALC, "A*17+B*34+C*68+D*136")
+    field(OUT,  "@pt104.proto configure $(PORT)")
+}
+
+record (waveform, "$(P)$(R):Eeprom") {
+    field(DESC, "Device EEPROM")
+    field(SCAN, "Passive")
+    field(DTYP, "stream")
+    field(INP,  "@pt104.proto eeprom $(PORT)")
+    field(NELM, "128")
+    field(FTVL, "UCHAR")
+}
+
+record (ao, "$(P)$(R):ConnHeartbeat") {
+    field(DESC, "Keeps the connection alive")
+    field(PINI, "1")
+    field(SCAN, ".2 second")
+    field(DTYP, "stream")
+    field(OUT,  "@pt104.proto alive $(PORT)")
+    field(OMSL, "supervisory")
+}
+
+# Load the records for particular channels
+substitute "DELAY=$(TIMEOUT)"
+substitute "N=1,EEPR_IND=37,T_HIGH=$(CHAN1_T_HIGH=200),T_LOW=$(CHAN1_T_LOW=-200),T_LOPR=$(CHAN1_T_LOPR=-200),T_HOPR=$(CHAN1_T_HOPR=200),CHNAME=$(CHAN1_NAME=Chan1)"
+include "pt104Chan.template"
+substitute "N=2,EEPR_IND=41,T_HIGH=$(CHAN2_T_HIGH=200),T_LOW=$(CHAN2_T_LOW=-200),T_LOPR=$(CHAN2_T_LOPR=-200),T_HOPR=$(CHAN2_T_HOPR=200),CHNAME=$(CHAN2_NAME=Chan2)"
+include "pt104Chan.template"
+substitute "N=3,EEPR_IND=45,T_HIGH=$(CHAN3_T_HIGH=200),T_LOW=$(CHAN3_T_LOW=-200),T_LOPR=$(CHAN3_T_LOPR=-200),T_HOPR=$(CHAN3_T_HOPR=200),CHNAME=$(CHAN3_NAME=Chan3)"
+include "pt104Chan.template"
+substitute "N=4,EEPR_IND=49,T_HIGH=$(CHAN4_T_HIGH=200),T_LOW=$(CHAN4_T_LOW=-200),T_LOPR=$(CHAN4_T_LOPR=-200),T_HOPR=$(CHAN4_T_HOPR=200),CHNAME=$(CHAN4_NAME=Chan4)"
+include "pt104Chan.template"

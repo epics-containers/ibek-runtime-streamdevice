@@ -1,0 +1,53 @@
+# axisCameraControl.protocol
+# Stream Device Protocol for a Axis web cameras
+# Jonathan Thompson, December 2015
+#
+
+ReplyTimeout = 5000;
+ExtraInput   = Ignore;
+OutTerminator = CR LF;
+InTerminator = "";
+ReadTimeout = 1000;
+
+pan { out "GET /axis-cgi/com/ptz.cgi?pan=%.4f\r\n";
+           in "HTTP/1.0 204 No Content";}
+
+tilt { out "GET /axis-cgi/com/ptz.cgi?tilt=%.4f\r\n";
+           in "HTTP/1.0 204 No Content";}
+
+zoom { out "GET /axis-cgi/com/ptz.cgi?zoom=%d\r\n";
+           in "HTTP/1.0 204 No Content";}
+
+focus { out "GET /axis-cgi/com/ptz.cgi?focus=%d\r\n";
+           in "HTTP/1.0 204 No Content";}
+
+iris { out "GET /axis-cgi/com/ptz.cgi?iris=%d\r\n";
+           in "HTTP/1.0 204 No Content";}
+
+autofocus { out "GET /axis-cgi/com/ptz.cgi?autofocus=%{off|on}\r\n";
+           in "HTTP/1.0 204 No Content";}
+
+autoiris { out "GET /axis-cgi/com/ptz.cgi?autoiris=%{off|on}\r\n";
+           in "HTTP/1.0 204 No Content";}
+
+getpan { out "GET /axis-cgi/com/ptz.cgi?query=position\r\n";
+           in "%*/\r\npan=/%(\$1)f";}
+
+gettilt { out "GET /axis-cgi/com/ptz.cgi?query=position\r\n";
+           in "%*/\r\ntilt=/%(\$1)f";}
+
+getzoom { out "GET /axis-cgi/com/ptz.cgi?query=position\r\n";
+           in "%*/\r\nzoom=/%(\$1)d";}
+
+getfocus { out "GET /axis-cgi/com/ptz.cgi?query=position\r\n";
+           in "%*/\r\nfocus=/%(\$1)d";}
+
+getiris { out "GET /axis-cgi/com/ptz.cgi?query=position\r\n";
+           in "%*/\r\niris=/%(\$1)d";}
+
+getautofocus { out "GET /axis-cgi/com/ptz.cgi?query=position\r\n";
+           in "%*/\r\nautofocus=/%(\$1){off|on}";}
+
+getautoiris { out "GET /axis-cgi/com/ptz.cgi?query=position\r\n";
+           in "%*/\r\nautoiris=/%(\$1){off|on}";}
+

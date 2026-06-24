@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: keithley2600
+
+entity_models:
+  - name: keithley2600chan
+    description: |-
+      Controls a Keithley 2600 source meter channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      CHAN:
+        type: str
+        description: |-
+          Signal generator channel (A or B)
+      SMU:
+        type: str
+        description: |-
+          Signal generator channel (smua or smub)
+      TAG:
+        type: int
+        description: |-
+          Signal generator pulse tag (e.g. 1 if smua, 2 if smub)
+      NELM:
+        type: int
+        description: |-
+          Max number of Sweep Pulses (default 10000)
+        default: 10000
+      V_HLIMIT:
+        type: float
+        description: |-
+          Highest voltage value settable on the device
+        default: 20
+      I_HLIMIT:
+        type: float
+        description: |-
+          Highest current value settable on the device
+        default: 1.5
+      name:
+        type: id
+        description: |-
+          Name to export to gda as
+    databases:
+      - file: keithley2600chan.template
+        args:
+          .*:
+  - name: keithley2600
+    description: |-
+      Controls a Keithley 2600 source meter
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: keithley2600.template
+        args:
+          .*:

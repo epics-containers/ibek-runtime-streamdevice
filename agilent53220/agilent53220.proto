@@ -1,0 +1,45 @@
+# StreamDevice protocol file for Agilent 53220A
+
+InTerminator = '\n';
+OutTerminator = '\n';
+LockTimeout = 10000;
+ReplyTimeout = 9000;
+ReadTimeout = 100;
+
+read_float {
+    out "\$1?"; in "%f";
+}
+
+read_freq {
+	out "\$1? (@\$2)"; in "%f"
+}
+
+write_thresh {
+	out "CONF:FREQ (@\$1)";
+	wait 200;
+	out "INP\$1:LEV1 %f";
+	wait 200;
+}
+
+write_float {
+    out "\$1 %e";
+#    @init{ read_float; }
+}
+
+read_int {
+    out "\$1?"; in "%d";
+}
+
+write_int {
+    out "\$1 %d";
+#    @init{ read_int;}
+}
+
+read_string {
+    out "\$1?"; in "%#s";
+}
+
+write_string {
+    out "\$1 %s";
+#    @init{ read_string;}
+}

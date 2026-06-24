@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: keithley2400
+
+entity_models:
+  - name: Keithley2400
+    description: |-
+      Keithley 2400 SourceMeter
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      ADDR:
+        type: int
+        description: |-
+          Asyn addr (usually 0)
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters.
+      name:
+        type: id
+        description: |-
+          Name of device for gui - only appears in percent gui lines.
+      OMAX:
+        type: int
+        description: |-
+          Optional.  Defaults to 100.  Asyn record max output buffer for raw commands
+        default: 100
+      IMAX:
+        type: int
+        description: |-
+          Optional.  Defaults to 1000.  Asyn record max input buffer for raw commands
+        default: 1000
+      TMOT:
+        type: int
+        description: |-
+          Optional.  Defaults to 1.  Asyn record timeout in seconds
+        default: 1
+    databases:
+      - file: k2400.template
+        args:
+          .*:
+  - name: Keithley2461
+    description: |-
+      Keithley 2461 SourceMeter
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      ADDR:
+        type: int
+        description: |-
+          Asyn addr (usually 0)
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters.
+        default: 1
+      OMAX:
+        type: int
+        description: |-
+          Asyn record max output buffer for raw commands
+        default: 100
+      IMAX:
+        type: int
+        description: |-
+          Asyn record max input buffer for raw commands
+        default: 1000
+      TMOT:
+        type: int
+        description: |-
+          Asyn record timeout in seconds
+        default: 1
+    databases:
+      - file: k2461.template
+        args:
+          .*:

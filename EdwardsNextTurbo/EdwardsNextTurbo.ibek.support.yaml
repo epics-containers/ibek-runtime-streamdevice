@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: EdwardsNextTurbo
+
+entity_models:
+  - name: EdwardsNextTurbo
+    description: |-
+      Support for Edwards nEXT series turbo pump controllers, which control Edwards turbo pumps. NOTE: These are interlocked by a PLC, you need another template from a different module for that.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Mandatory. Device prefix for record names.
+      port:
+        type: str
+        description: |-
+          Mandatory. Name of the serial port controller device is on.
+      DISABLED:
+        type: int
+        description: |-
+          Optional. Whether to enable EPICS scanning the pump on boot. 0 Enabled, 1 Disabled. Defaults to zero, i.e. Enabled
+        default: 0
+      SVCLOWHR:
+        type: int
+        description: |-
+          Optional. Number of hours remaining to service before a warning should be given. Applied to all service records with units of hours. Defaults to 48.
+        default: 48
+      SVCLOLOHR:
+        type: int
+        description: |-
+          Optional. Number of hours remaining to service before it is considered an error. Applied to all service records with units of hours. Defaults to 0.
+        default: 0
+      SVCLOWCYCL:
+        type: int
+        description: |-
+          Optional. Number of cycles remaining to service before a warning should be given. Applied to all service records with units of cycles. Defaults to 20.
+        default: 20
+      SVCLOLOCYCL:
+        type: int
+        description: |-
+          Optional. Number of cycles remaining to service before it is considered an error. Applied to all service records with units of cycles. Defaults to 0.
+        default: 0
+      MTRTEMPLOW:
+        type: int
+        description: |-
+          Optional. Motor temperature low limit at which alarm should be raised in degrees Celsius. Defaults to 1 - don't suppose we want it to freeze.
+        default: 1
+      MTRTEMPHIGH:
+        type: int
+        description: |-
+          Optional. Motor temperature high limit at which alarm should be raised in degrees Celsius. Defaults to 90 - the range is given in the manual as 0-100.
+        default: 90
+      CTLRTEMPLOW:
+        type: int
+        description: |-
+          Optional. Internal temperature of the controller low limit at which alarm should be raised in degrees Celsius. Defaults to 1 - don't suppose we want it to freeze either.
+        default: 1
+      CTLRTEMPHIGH:
+        type: int
+        description: |-
+          Optional. Internal temperature of the controller high limit at which alarm should be raised in degrees Celsius. Defaults to 70 - the range is given in the manual as 0-100.
+        default: 70
+      VVENTENABLE:
+        type: int
+        description: |-
+          Optional. Whether the pump has a vent valve on it. Enables display of vent valve widgets on GUI. 0 - Disable, 1 - Enable. Defaults to 0, Disable
+        default: 0
+      name:
+        type: id
+        description: |-
+          Optional. Name for gui tag definitions. Defaults to empty string.
+    databases:
+      - file: EdwardsNextTurbo.template
+        args:
+          .*:

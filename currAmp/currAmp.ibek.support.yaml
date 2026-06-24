@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: currAmp
+
+entity_models:
+  - name: YMCS0012
+    description: |-
+      Oxford Danfysik YMCS0012 current amplifier / quad beam position monitor
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Name
+      addr:
+        type: int
+        description: |-
+          Amplifier Address
+      port:
+        type: str
+        description: |-
+          Serial Port
+      prec:
+        type: int
+        description: |-
+          Precision (Number of decimal places)
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+      SCAN:
+        type: str
+        description: |-
+          SCAN rate for the raw current readbacks
+        default: 1 second
+    databases:
+      - file: YMCS0012.template
+        args:
+          .*:
+  - name: YMCS0009
+    description: |-
+      Oxford Danfysik YMCS0009 current amplifier / quad beam position monitor
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Name
+      addr:
+        type: int
+        description: |-
+          Amplifier Address
+      port:
+        type: str
+        description: |-
+          Serial Port
+      prec:
+        type: int
+        description: |-
+          Precision (Number of decimal places)
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: YMCS0009.template
+        args:
+          .*:

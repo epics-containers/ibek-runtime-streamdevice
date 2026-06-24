@@ -1,0 +1,119 @@
+################################################################
+#
+# keysight LCR template file.
+#
+# Macros:
+# % macro,  P,    Prefix for PV name
+# % macro,  Q,    Suffix for PV name
+# % macro,  PORT, Bus/Port Address (eg. ASYN Port)
+# % macro,  ADDR, Address on the bus (optional)
+# % macro,  SCAN, SCAN rate for read parameters
+################################################################
+# % gui, keysightLCR, edm, keysightLCR.edl, P=$(P)$(Q)
+################################################################
+# Read records
+################################################################
+
+# % autosave 2 SCAN
+record(seq, "$(P)$(Q):UPDATE") {
+  field(DESC, "Update Params")
+  field(FLNK, "$(P)$(Q):UPDATEREC")
+  field(SCAN, "$(SCAN) second")
+  field(PINI, "YES")
+}
+
+record(fanout, "$(P)$(Q):UPDATEREC") {
+  field(DESC, "Update Params")
+  field(LNK1, "$(P)$(Q):MEAS_STR.PROC")
+  field(LNK2, "$(P)$(Q):MEAS.PROC")
+  field(LNK3, "$(P)$(Q):AMP:RBV.PROC")
+  #field(LNK4, "$(P)$(Q):AC:CURR:RBV.PROC")
+}
+
+# % gdatag,binary,rw,$(name=),DISABLE
+record(bo, "$(P)$(Q):DISABLE") {
+  field(DESC, "Disable comms")
+  field(VAL, "0")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+record(mbbo, "$(P)$(Q):MEAS_TYPE") {
+    field(DESC, "Measurement Type")
+    field(VAL,  "0")
+    field(ZRVL, "0")
+    field(ZRST, "Impedance")
+}
+
+# /// Take a measurement
+record(stringin, "$(P)$(Q):MEAS_STR") {
+  field(DTYP, "stream")
+  field(INP, "@keysightLCR.proto readMeasurementString($(P)$(Q)) $(PORT) $(ADDR)")
+}
+
+record(stringin, "$(P)$(Q):MEAS") {
+  field(DESC, "Read measurement")
+  field(DTYP, "stream")
+  field(INP,  "@keysightLCR.proto readMeasurement($(P)$(Q)) $(PORT) $(ADDR)")
+}
+
+# /// DATA A
+record(ao, "$(P)$(Q):MEAS:A") {
+  field(DESC, "Data A measurement")
+}
+
+# /// DATA B
+record(ao, "$(P)$(Q):MEAS:B") {
+  field(DESC, "Data B measurement")
+}
+
+# /// STATUS
+record(ao, "$(P)$(Q):MEAS:STATUS") {
+  field(DESC, "Measurement status")
+}
+
+#% gdatag,pv,rw,$(name=),AMP
+record(ao, "$(P)$(Q):AMP") {
+  field(DESC, "Amplitude")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):AMP:RBV")
+  field(OUT, "@keysightLCR.proto write_float(:VOLT) $(PORT) $(ADDR)")
+  field(VAL, "1")
+  field(PREC, "3")
+  field(EGU, "V")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# % gdatag,pv,ro,$(name=),AMPRBV
+# % archiver 10 Monitor
+record(ai, "$(P)$(Q):AMP:RBV") {
+  field(DESC, "Amplitude Readback")
+  field(DTYP, "stream")
+  field(INP, "@keysightLCR.proto read_float(:VOLT) $(PORT) $(ADDR)")
+  field(PREC, "3")
+  field(EGU, "V")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# #% gdatag,pv,rw,$(name=),AMP
+# record(ao, "$(P)$(Q):AC:CURR") {
+#   field(DESC, "AC Current")
+#   field(DTYP, "stream")
+#   field(FLNK, "$(P)$(Q):AC:CURR:RBV")
+#   field(OUT, "@keysightLCR.proto write_float(FETC:SMON:IAC) $(PORT)")
+#   field(PREC, "3")
+#   field(EGU, "V")
+#   field(SDIS, "$(P)$(Q):DISABLE")
+#}
+
+# % gdatag,pv,ro,$(name=),AMPRBV
+# % archiver 10 Monitor
+# record(ai, "$(P)$(Q):AC:CURR:RBV") {
+#   field(DESC, "Amplitude Readback")
+#   field(DTYP, "stream")
+#   field(INP, "@keysightLCR.proto read_float(:FETC:SMON:IAC) $(PORT) $(ADDR)")
+#   field(PREC, "3")
+#   field(EGU, "V")
+#   field(SDIS, "$(P)$(Q):DISABLE")
+# }

@@ -1,0 +1,40 @@
+#######################################################################
+## \file azuraV2-1S.proto
+## \brief Stream device protocol for Knauer Azura V 2.1S valve drive
+## with a 6-way valve
+##
+## \details Communication via TCP/IP or RS232
+##
+#######################################################################
+
+Terminator   = CR;
+
+LockTimeout  = 1000;
+ReplyTimeout = 1000;
+ReadTimeout  = 1000;
+ExtraInput   = Ignore;
+separator    = "/";
+
+## \brief As a ping, issue IDENTIFY? command
+identify{
+     out "IDENTIFY?"; 
+     in "IDENTIFY:%*i,%*[^,],%(\$1:VALVETYPE)[^,],%(\$1:SERIALNUM)[^,],%(\$1:FWAREVHI)[^,],%(\$1:FWAREVLOW)[^,]";
+}
+
+## \brief Move to numbered position
+goTo{
+	out "%i";
+	in "OK";
+}
+
+## \brief Move to home position
+home{
+	out "H";
+	in "OK";
+}
+
+## \brief Query current position
+currentPosition{
+	out "P";
+	in "%i";
+}

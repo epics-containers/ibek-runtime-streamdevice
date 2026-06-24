@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: debenOF
+
+entity_models:
+  - name: debenOF
+    description: |-
+      Deben Open Frame tensile/torsion rig controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name for comms
+    databases:
+      - file: debenOF.template
+        args:
+          .*:

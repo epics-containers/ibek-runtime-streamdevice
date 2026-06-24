@@ -1,0 +1,143 @@
+# enzLoCuM4.protocol
+# Stream Device Protocol for an ENZ LoCuM-4 Low Current Monitor
+# Pete Owens 2-12-05
+# Ian Gillingham 12-04-06
+#
+# $Author$
+# $Date$
+# $Id$
+# $Name: $
+# $Revision$
+
+#terminator   = CR;
+terminator   = LF;
+buffersize   = 500;
+replytimeout = 5000;
+locktimeout  = 10000;
+readtimeout  = 7000;
+extrainput   = Ignore;
+
+#
+# Configuration
+# 
+setrange  { out '$\$1:CONF:CURR:DC %{1E-10|1E-09|1E-08|1E-07|1E-06|1E-05|1E-04|1E-03|DEF}';
+            @init {out '$\$1:CONF?';
+                   in  '\"S1_%#{100pA|1nA|10nA|100nA|1\xb5A|10\xb5A|100\xb5A|1mA|Auto|Err|1uA=4|10uA=5|100uA=6}';
+                  }
+          }
+setrange_noinit  { out '$\$1:CONF:CURR:DC %{1E-10|1E-09|1E-08|1E-07|1E-06|1E-05|1E-04|1E-03|DEF}';
+          }
+setbiasv  { out '$\$1:CONF:BIAS:SOURCE %{PLUS|MINUS|EXT|DEF}';
+            @init {out '$\$1:CONF?';
+                   in  '\"S1_%*#{100pA|1nA|10nA|100nA|1\xb5A|10\xb5A|100\xb5A|1mA|Auto|Err|1uA=4|10uA=5|100uA=6},'
+                       'S2_%{Plus|Minus|Ext|0Volt|Err}';
+                  }
+          }
+setbiasv_noinit  { out '$\$1:CONF:BIAS:SOURCE %{PLUS|MINUS|EXT|DEF}';
+          }
+conf      { out '$\$1:CONF?';
+            in  '\"S1_%(A)#{100pA|1nA|10nA|100nA|1\xb5A|10\xb5A|100\xb5A|1mA|Auto|Err|1uA=4|10uA=5|100uA=6},'
+                'S2_%(B){Plus|Minus|Ext|0Volt|Err},'
+                'HV_%(C){OFF|ON},' 
+                'Ext_%(D){OFF|ON},' 
+                'Bias\?_%(E){OFF|ON},' 
+                'Auto_%(F){OFF|ON}' ; 
+          }
+#
+# System-related Commands
+#
+error     { 
+            #Separator = '\"';
+            out '$\$1:SYST:ERR?';
+	    # Can't use %s here, as it is greedy and would swallow the final
+	    # quote, so use a character set match for "everything but a quote"
+            in  '\"%[^\"]\"';
+          }
+version   { out '$\$1:SYST:VERS?';
+            in  '\"SCPI_ENZ_%f\"';
+          }
+limit     { out '$\$1:SYST:COMP:\$3:\$2 %04d';
+            in  '"COMP_\$3_\$2"';
+          }
+limits    { out '$\$1:SYST:COMP?';
+            in  '\"ChD %(G)d,%(H)d\"';
+            in  '\"ChC %(E)d,%(F)d\"';
+            in  '\"ChB %(C)d,%(D)d\"';
+            in  '\"ChA %(A)d,%(B)d\"';
+          }
+setwindow { out '$\$1:SYST:INTL %{4|8|16|32|64}';
+            in  '"New INTL: %*d"';
+            @init { out '$\$1:SYST:INTL?';
+                    in  '\"MVSL: %{04|08|16|32|64}\"';
+                  }
+          }
+setwindow_noinit { out '$\$1:SYST:INTL %{4|8|16|32|64}';
+            in  '"New INTL: %*d"';
+          }
+window    { out '$\$1:SYST:INTL?'; 
+            in  '\"MVSL: %{04|08|16|32|64}\"';
+          }
+#
+# Status
+#
+# Note: The response from the *CLS command is wierd
+# in that it has an embedded CR after P3_P4_P0:
+# but no terminator at all at after the final digit of XXYYZZ
+# A dummy command with a short response is issued (SYS:ERR), the
+# response of which provides a LF terminator - it all seems to work!
+# Without the terminator, the protocol continually times out.
+#
+sta      { 
+            InTerminator = '';
+            out '$\$1*CLS'; 
+            in  'P3_P4_P0:\?%*s';
+          }
+sta1      { # FP
+            InTerminator = '';
+            readtimeout  = 50;
+            out '$\$1*CLS'; 
+            in  'P3_P4_P0:\?%(A)2r%(B)2r%(C)2r';
+            out '$\$1:SYST:ERR?';
+            in '%*s';
+          }
+
+test     { 
+            InTerminator = '';
+            readtimeout  = 50;
+            #out '$\$1:CONF?';
+            #out '$\$1*CLS'; 
+            in  '\?%6c';
+         }
+ 
+#
+# Identification
+#
+serial    { 
+            #InTerminator = CR LF;
+            out '$\$1*IDN?';
+            # Remove leading CR LF - these are apparent but not documented
+            in '\r';
+            # NB: Documentation does not mention an 'n' after LoCuM4 but is observed
+            # For LoCuM4 installed in I15, OH1, downstream, the LoCuM4 suffix is a "p",
+            #    possibly refering to a positive or negative bias?
+            in  '\"LoCuM4\?,Version \?.\?\?,Address \?\?,\#%d\"\r';
+          }
+idn       { out '$\$1*IDN?';
+            # Remove leading CR LF - these are apparent but not documented
+            in  '%*s\r';
+            in  '%s\r';
+          }
+#
+# Reset
+#
+reset     { out '$\$1*RST';
+            in  '"Reset"';
+          }
+#
+# Rectified channel peak value
+#
+peak      { out '$\$1:MEAS:\$2';
+            in  '\"\$2 %d\"';
+          }
+
+#################################################################################

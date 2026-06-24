@@ -1,0 +1,26 @@
+OutTerminator = CR;
+InTerminator = LF;
+ReadTimeout = 5000;
+ReplyTimeout = 1000;
+ExtraInput = Ignore;
+
+init {
+    out "MEAS:STAR INFINITE";
+}
+
+scan {
+    in "%(\$1:TEMP1.VAL)f\9"
+       "%(\$1:TEMP2.VAL)f\9"
+       "%(\$1:TEMP3.VAL)f\9"
+       "%(\$1:TEMP4.VAL)f";
+}
+
+getChanCount {out "CH:COUN?"; in "%d";}
+
+getOff1 {out "CH:ANALOG:OFFS?"; in "%f";}
+
+# Loop back check
+commCheck {out "9"; in "%u"; InTerminator = CR;}
+
+# For some reason this doesn't work even though it does at a directly connected terminal.
+stop {out "MEAS:STOP";}

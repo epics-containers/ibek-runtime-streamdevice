@@ -1,0 +1,130 @@
+##########################################################################
+#
+# Protocol file for Attocube IDS3010 Interferometer
+#
+# The interferometer responds to JSON formatted commands on TCP port 9090
+#
+##########################################################################
+#
+# Example of getAbsolutePositions
+#  command:  {"jsonrpc": "2.0", "method": "com.attocube.ids.displacement.getAbsolutePositions", "id": 1}
+#  response: {"jsonrpc":"2.0","result":[1,0,100655314650,111730909560],"id":1}
+#
+# Example of getAxesDisplacement
+#  command:  {"jsonrpc":"2.0","method":"com.attocube.ids.displacement.getAxesDisplacement","id":1}
+#  response: {"jsonrpc":"2.0","result":[1,0,-14673553,3317430],"id":1}
+#
+# Example of getAbsolutePosition on second axis (NB the three axes are numbered 0..2 hence params = 1)
+#  command:  {"jsonrpc": "2.0","method":"com.attocube.ids.displacement.getAbsolutePosition","params":[1],"id":1}
+#  response: {"jsonrpc":"2.0","result":[0,100655314650],"id":1}
+#
+# Example of getCurrentMode
+#  command:  {"jsonrpc":"2.0","method":"com.attocube.ids.system.getCurrentMode","id":1}
+#  response: {"jsonrpc":"2.0","result":["measurement running"],"id":1}
+#
+# Example of stopMeasure
+#  command:  {"jsonrpc": "2.0", "method": "com.attocube.ids.system.stopMeasurement", "id": 1}
+#  response: {"jsonrpc":"2.0","result":[0],"id":1}
+#
+# Example of startMeasure
+#  command:  {"jsonrpc": "2.0", "method": "com.attocube.ids.system.startMeasurement", "id": 1}
+#  response: {"jsonrpc":"2.0","result":[0],"id":1}
+#
+# Badly formatted commands result in an error response
+#  response: {"id":1,"jsonrpc":"2.0","error":{"code":-32099,"message":"org.freedesktop.DBus.Error.UnknownMethod"}}
+#
+
+Terminator = "}";
+Separator =",";
+
+LockTimeout = 3000;
+ReplyTimeout = 2000;
+ReadTimeout = 100;
+ExtraInput = Ignore;
+
+# Command definitions
+CMDDISP = '{"jsonrpc":"2.0","method":"com.attocube.ids.displacement.';
+CMDSYS  = '{"jsonrpc":"2.0","method":"com.attocube.ids.system.';
+CMDECU  = '{"jsonrpc":"2.0","method":"com.attocube.ecu.';
+CMDTAIL = '","id":1';
+
+# Response definitions
+# NB order if json elements may change in particular the 'id' element moves so if doing explicit checking 
+# of all characters returned then its necessary to define some either/or type strings
+# Following is either: {"id":1,"jsonrpc":"2.0,"result":[" OR {"jsonrpc":"2.0,"result":["
+RESPHEAD = '%*{{"id":1,"jsonrpc":"2.0"|{"jsonrpc":"2.0"},"result":[';
+# ,Following is either: ],"id":1} OR ]}
+RESPTAIL = '%*{],"id":1|]}';
+
+
+
+getDisp_f 
+{ 
+    out $CMDDISP '\$1' $CMDTAIL;
+    in '%*/"result":/' '[%f]' 
+}
+
+getSys_s 
+{ 
+    out $CMDSYS '\$1' $CMDTAIL;
+    in '%*/"result":/["%[a-z A-Z]"]' 
+}
+
+getSys_d 
+{ 
+    out $CMDSYS '\$1' $CMDTAIL;
+    in '%*/"result":/' '[%d]' 
+}
+
+getEcu_b
+{
+    out $CMDECU '\$1' $CMDTAIL;
+    in '%*/"result":/' '[%*d,%{false|true}]' 
+}
+
+getEcu_f
+{
+    out $CMDECU '\$1' $CMDTAIL;
+    in '%*/"result":/' '[%f]' 
+}
+
+setEcu
+{
+    out $CMDECU '%{disable|enable}' $CMDTAIL;
+    in  $RESPHEAD '0' $RESPTAIL;
+}
+
+getSysMode 
+{ 
+    out $CMDSYS 'getCurrentMode' $CMDTAIL;
+    in '%*/"result":/["%{system idle|measurement starting|measurement running|optics alignment starting|optics alignment running|pilot laser enabled}"]' 
+}
+
+setSysMeasure
+{
+    out $CMDSYS '%{stopMeasurement|startMeasurement}' $CMDTAIL;
+    in  $RESPHEAD '0' $RESPTAIL;
+}
+
+setSysCmd
+{
+    out $CMDSYS '\$1' $CMDTAIL;
+    in  $RESPHEAD '0' $RESPTAIL;
+}
+
+getAdjContrast 
+{ 
+    out '{"jsonrpc":"2.0","method":"com.attocube.ids.adjustment.getContrastInPermille","params":[\$1],"id":1';
+    in '%*/"result":/' '[%f%*{]|,}' 
+}
+
+# Use these with I/OIntr processing to pick up any error responses
+getErrorCode
+{
+    in '%*/"error":{"code":/' '%d,'
+}
+getErrorMsg
+{
+    in '%*/"error":{"code":/' '%*d,"message":"%39[^"]"'
+}
+

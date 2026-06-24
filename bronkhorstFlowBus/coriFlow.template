@@ -1,0 +1,465 @@
+# % macro, P, Device prefix
+# % macro, Q, Device suffix
+# % macro, PORT, Asyn port name
+# % macro, NODE, Node number, normally 80 (hex for 128, broadcast)
+# % macro, name, Object and gui association name
+# % gui, $(name=), edm, coriFlow.edl, device=$(P)$(Q),name=$(name)
+
+record(bo, "$(P)$(Q):DISABLE") {
+  field(DESC, "Disable comms")
+  field(PINI, "YES")
+  field(VAL, "1")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+# % autosave 2 SCAN
+record(seq, "$(P)$(Q):UPDATE") {
+  field(DESC, "Update Params")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(Q):SP:RBV.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(Q):MS:RBV.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(Q):FSP:DEV.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(Q):FMS:DEV.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(Q):FTEMP:DEV.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(Q):FLUIDNAME:HEX.PROC")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(Q):FLUIDNAME.PROC")
+  field(DOL8, "1")
+  field(LNK8, "$(P)$(Q):UNITS:HEX.PROC")
+  field(DOL9, "1")
+  field(LNK9, "$(P)$(Q):SENSORTYPE:RBV.PROC")
+  field(SCAN, "1 second")
+  field(PINI, "YES")
+}
+
+record(seq, "$(P)$(Q):UPDATESECURE") {
+  field(DESC, "Update Params")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(Q):CP100:DEV.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(Q):CP0:DEV.PROC")
+  field(SCAN, "1 second")
+  field(PINI, "YES")
+  field(SDIS, "$(P)$(Q):DISABLE")
+
+}
+
+record(ao, "$(P)$(Q):SP") {
+  field(DESC, "Setpoint")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):SP:RBV")
+  field(OUT, "@bronkhorstFlowBus.proto writeint($(NODE=80),01,21) $(PORT)")
+  field(LINR, "LINEAR")
+  field(PREC, "1")
+  field(EGU, "%")
+  field(DRVH, "100")
+  field(DRVL, "0")
+  field(ESLO, "0.003125")
+  field(PINI, "YES")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# % archiver 10 Monitor
+record(ai, "$(P)$(Q):SP:RBV") {
+  field(DESC, "Setpoint Readback")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readint($(NODE=80),01,21) $(PORT)")
+  field(LINR, "LINEAR")
+  field(PREC, "1")
+  field(EGU, "%")
+  field(ESLO, "0.003125")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# % archiver 10 Monitor
+record(ai, "$(P)$(Q):MS:RBV") {
+  field(DESC, "Measure Readback")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readint($(NODE=80),01,20) $(PORT)")
+  field(LINR, "LINEAR")
+  field(PREC, "1")
+  field(EGU, "%")
+  field(ESLO, "0.003125")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+#Records for selecting fluid
+record(ao, "$(P)$(Q):SELECTFLUID") {
+  field(DESC, "Set Gas Type")
+  field(DTYP, "stream")
+  field(OUT, "@bronkhorstFlowBus.proto writechar($(NODE=80),01,10) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ai, "$(P)$(Q):SELECTFLUID:RBV") {
+  field(DESC, "Gas Type")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readchar($(NODE=80),01,10) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+# Records for reading FluidName
+
+record(stringin, "$(P)$(Q):FLUIDNAME:HEX") {
+  field(DESC, "gas currently monitored")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readstring10($(NODE=80),01,71) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(aSub, "$(P)$(Q):FLUIDNAME") {
+  field(DESC, "String converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "asciiToString10")
+  field(INPA, "$(P)$(Q):FLUIDNAME:HEX CP")
+  field(FTA,  "STRING")
+  field(OUTA, "$(P)$(Q):FLUIDNAME:RBV PP")
+  field(FTVA, "STRING")
+}
+
+record(stringout, "$(P)$(Q):FLUIDNAME:RBV") {
+  field(DESC, "gas currently monitored")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+#Records for reading/Writing SETPOINT as FLOAT
+
+record(ao, "$(P)$(Q):FSP:SET:DEV") {
+  field(DESC, "F Setpoint")
+  field(DTYP, "stream")
+  field(OUT, "@bronkhorstFlowBus.proto writefloat($(NODE=80),21,43) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(aSub, "$(P)$(Q):FSP:SET"){
+  field(DESC, "Float SetPoint converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "floatToInt")
+  field(INPA, "$(P)$(Q):FSP:SET:UI CP")
+  field(FTA,  "FLOAT")
+  field(OUTA, "$(P)$(Q):FSP:SET:DEV PP")
+  field(FTVA, "ULONG")
+}
+
+record(ao, "$(P)$(Q):FSP:SET:UI") {
+  field(DESC, "F Setpoint")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PREC, 3)
+}
+
+# RECORDS for reading SETPOINT READBACK as Float
+
+# % archiver 10 Monitor
+record(ai, "$(P)$(Q):FSP:DEV") {
+  field(DESC, "Float Setpoint Readback")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readfloat($(NODE=80),21,43) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):FSP:RBV"){
+  field(DESC, "Controller Set Point Float")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PREC, 3)
+}
+
+record(aSub, "$(P)$(Q):FSP"){
+  field(DESC, "Float Setpoint converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "intToFloat")
+  field(INPA, "$(P)$(Q):FSP:DEV CP")
+  field(FTA,  "ULONG")
+  field(OUTA, "$(P)$(Q):FSP:RBV PP")
+  field(FTVA, "FLOAT")
+}
+
+
+#Records for reading Measure as Float
+record(ai, "$(P)$(Q):FMS:DEV"){
+  field(DESC, "Float Measure")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readfloat($(NODE=80),21,40) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):FMS:RBV"){
+  field(DESC, "Read Measure Float")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PREC, 3)
+}
+
+record(aSub, "$(P)$(Q):FMS"){
+  field(DESC, "Measure  converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "intToFloat")
+  field(INPA, "$(P)$(Q):FMS:DEV CP")
+  field(FTA,  "ULONG")
+  field(OUTA, "$(P)$(Q):FMS:RBV PP")
+  field(FTVA, "FLOAT")
+}
+
+# Records for Reading Temperature
+record(ai, "$(P)$(Q):FTEMP:DEV"){
+  field(DESC, "Read Controller Temperature")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readfloat($(NODE=80),21,47) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):FTEMP:RBV"){
+  field(DESC, "Read Controller Temperature")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PREC, 3)
+}
+
+record(aSub, "$(P)$(Q):FTEMP"){
+  field(DESC, "Temperature converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "intToFloat")
+  field(INPA, "$(P)$(Q):FTEMP:DEV CP")
+  field(FTA,  "ULONG")
+  field(OUTA, "$(P)$(Q):FTEMP:RBV PP")
+  field(FTVA, "FLOAT")
+}
+
+# Records for reading Capacity Units
+
+record(stringin, "$(P)$(Q):UNITS:HEX") {
+  field(DESC, "Capacity Units Hex")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readstring7($(NODE=80),01,7F) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(aSub, "$(P)$(Q):UNITS") {
+  field(DESC, "String converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "asciiToString10")
+  field(INPA, "$(P)$(Q):UNITS:HEX CP")
+  field(FTA,  "STRING")
+  field(OUTA, "$(P)$(Q):UNITS:RBV PP")
+  field(FTVA, "STRING")
+}
+
+record(stringout, "$(P)$(Q):UNITS:RBV") {
+  field(DESC, "Capacity Units")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(mbbo, "$(P)$(Q):UNITS:SET") {
+  field(DESC, "Sensor Type")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):WRITESECURE:RBV")
+  field(OUT, "@bronkhorstFlowBus.proto writechar($(NODE=80),01,0F) $(PORT)")
+  field(SDIS, "$(P)$(Q):WRITESECURE")
+  field(ZRVL, "0")
+  field(ZRST, "bar/lmin/kgh/lnmin")
+  field(ONVL, "1")
+  field(ONST, "mbar/mlh/kgmin/minh")
+  field(TWVL, "2")
+  field(TWST, "psi/mlmin/kgs/mLnmin")
+  field(THVL, "3")
+  field(THST, "kpa/lh/gh/lnh")
+  field(FRVL, "4")
+  field(FRST, "cmh20/mm3s/gmin/m3n/h")
+  field(FVVL, "5")
+  field(FVST, "cmhg/cm3min/gs/mlsmin")
+  field(SXVL, "6")
+  field(SXST, "atm/mgh/mlsh")
+  field(SVVL, "7")
+  field(SVST, "kfgcm2/mgmin/lsmin")
+  field(EIVL, "8")
+  field(EIST, "mgs/lsh")
+  field(NIVL, "9")
+  field(NIST, "m3sh")
+}
+
+# Record for reading Sensor Type
+record(mbbi, "$(P)$(Q):SENSORTYPE:RBV") {
+  field(DESC, "Sensor Type")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readchar($(NODE=80),01,0E) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(ZRVL, "0")
+  field(ZRST, "pressure")
+  field(ONVL, "1")
+  field(ONST, "liquid volume")
+  field(TWVL, "2")
+  field(TWST, "liquid/gas mass")
+  field(THVL, "3")
+  field(THST, "gas volume")
+  field(FRVL, "4")
+  field(FRST, "other sensor type")
+  field(FVVL, "128")
+  field(FVST, "pressure")
+  field(SXVL, "129")
+  field(SXST, "liquid volume")
+  field(SVVL, "130")
+  field(SVST, "liquid/gas mass")
+  field(EIVL, "131")
+  field(EIST, "gas volume")
+  field(NIVL, "132")
+  field(NIST, "other sensor type")
+}
+
+record(mbbo, "$(P)$(Q):SENSORTYPE") {
+  field(DESC, "Sensor Type")
+  field(DTYP, "stream")
+  field(OUT, "@bronkhorstFlowBus.proto writechar($(NODE=80),01,0E) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(ZRVL, "0")
+  field(ZRST, "pressure")
+  field(ONVL, "1")
+  field(ONST, "liquid volume")
+  field(TWVL, "2")
+  field(TWST, "liquid/gas mass")
+  field(THVL, "3")
+  field(THST, "gas volume")
+  field(FRVL, "4")
+  field(FRST, "other sensor type")
+  field(FVVL, "128")
+  field(FVST, "pressure")
+  field(SXVL, "129")
+  field(SXST, "liquid volume")
+  field(SVVL, "130")
+  field(SVST, "liquid/gas mass")
+  field(EIVL, "131")
+  field(EIST, "gas volume")
+  field(NIVL, "132")
+  field(NIST, "other sensor type")
+}
+
+# Record for enabling writing secure params
+record(mbbi, "$(P)$(Q):WRITESECURE:RBV") {
+  field(DESC, "Sensor Type")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readchar($(NODE=80),00,0A) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(ZRVL, "0")
+  field(ZRST, "Disable")
+  field(ONVL, "64")
+  field(ONST, "Enable")
+}
+
+record(mbbo, "$(P)$(Q):WRITESECURE") {
+  field(DESC, "Sensor Type")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):WRITESECURE:RBV")
+  field(OUT, "@bronkhorstFlowBus.proto writechar($(NODE=80),00,0A) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(ZRVL, "64")
+  field(ZRST, "Enable")
+  field(ONVL, "0")
+  field(ONST, "Disable")
+  field(ONVL, "82")
+  field(ONST, "Disable")
+}
+
+#Records for reading/Writing Capacity0
+
+record(ao, "$(P)$(Q):CP0:SET:DEV") {
+  field(DESC, "F Setpoint")
+  field(DTYP, "stream")
+  field(OUT, "@bronkhorstFlowBus.proto writefloat($(NODE=80),21,56) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(aSub, "$(P)$(Q):CP0:SET"){
+  field(DESC, "Float SetPoint converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "floatToInt")
+  field(INPA, "$(P)$(Q):CP0:SET:UI CP")
+  field(FTA,  "FLOAT")
+  field(OUTA, "$(P)$(Q):CP0:SET:DEV PP")
+  field(FTVA, "ULONG")
+}
+
+record(ao, "$(P)$(Q):CP0:SET:UI") {
+  field(DESC, "F Setpoint")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PREC, 3)
+}
+
+# RECORDS for reading SETPOINT READBACK as Float
+
+# % archiver 10 Monitor
+record(ai, "$(P)$(Q):CP0:DEV") {
+  field(DESC, "Float Setpoint Readback")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readfloat($(NODE=80),21,56) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):CP0:RBV"){
+  field(DESC, "Controller Set Point Float")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PREC, 3)
+}
+
+record(aSub, "$(P)$(Q):CP0"){
+  field(DESC, "Float Setpoint converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "intToFloat")
+  field(INPA, "$(P)$(Q):CP0:DEV CP")
+  field(FTA,  "ULONG")
+  field(OUTA, "$(P)$(Q):CP0:RBV PP")
+  field(FTVA, "FLOAT")
+}
+
+#Records for reading/Writing Capacity 100
+
+record(ao, "$(P)$(Q):CP100:SET:DEV") {
+  field(DESC, "F Setpoint")
+  field(DTYP, "stream")
+  field(OUT, "@bronkhorstFlowBus.proto writefloat($(NODE=80),01,4D) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(aSub, "$(P)$(Q):CP100:SET"){
+  field(DESC, "Float SetPoint converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "floatToInt")
+  field(INPA, "$(P)$(Q):CP100:SET:UI CP")
+  field(FTA,  "FLOAT")
+  field(OUTA, "$(P)$(Q):CP100:SET:DEV PP")
+  field(FTVA, "ULONG")
+}
+
+record(ao, "$(P)$(Q):CP100:SET:UI") {
+  field(DESC, "F Setpoint")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PREC, 3)
+}
+
+# RECORDS for reading SETPOINT Capacity 100
+
+# % archiver 10 Monitor
+record(ai, "$(P)$(Q):CP100:DEV") {
+  field(DESC, "Float Setpoint Readback")
+  field(DTYP, "stream")
+  field(INP, "@bronkhorstFlowBus.proto readfloat($(NODE=80),01,4D) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):CP100:RBV"){
+  field(DESC, "Controller Set Point Float")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PREC, 3)
+}
+
+record(aSub, "$(P)$(Q):CP100"){
+  field(DESC, "Float Setpoint converter")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SNAM, "intToFloat")
+  field(INPA, "$(P)$(Q):CP100:DEV CP")
+  field(FTA,  "ULONG")
+  field(OUTA, "$(P)$(Q):CP100:RBV PP")
+  field(FTVA, "FLOAT")
+}

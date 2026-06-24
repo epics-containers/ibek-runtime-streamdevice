@@ -1,0 +1,66 @@
+####################################################
+# Protocol file for keysight LCR 
+# Diamond Light Source, Nov 2019
+####################################################
+
+####################################################
+# General
+####################################################
+
+InTerminator = '\n';
+OutTerminator = '\n';
+
+ExtraInput = Ignore;
+ReplyTimeout = 5000;
+
+
+# /// return is ascii by default
+# /// <DATAA>,<DATAB>,<STATUS>
+# /// <DATA> are in format SN.NNNNNESNN
+# /// <STATUS> is in the format SN
+# /// <STATUS> takes one of {-1, +0, +1, +3, +4}
+# /// {No data (in the data buffer memory), Normal measurement data, Overload,
+# ///  Signal source overloaded, ALC (auto level control) unable to regulate}
+# /// SN.NNNNNESNN,SN.NNNNNESNN,SN
+
+readMeasurementString {
+  out "INIT;FETC?";
+  in "%#s";
+}
+
+readMeasurement {
+  out "INIT;FETC?";
+  in "%(\$1:MEAS:A.VAL)E,%(\$1:MEAS:B.VAL)E,%(\$1:MEAS:STATUS)d";
+}
+
+read_float {
+    out "INIT;\$1?";
+    in "%f";
+}
+
+write_float {
+    out "INIT;\$1 %e";
+#    @init{ read_float; }
+}
+
+read_int {
+    out "\$1?";
+    in "%d";
+}
+
+write_int {
+    out "\$1 %d";
+#    @init{ read_int;}
+}
+
+read_string {
+    out "INIT;\$1?";
+    in "%s";
+}
+
+write_string {
+    out "INIT;\$1 %s";
+#    @init{ read_string;}
+}
+
+#############################################

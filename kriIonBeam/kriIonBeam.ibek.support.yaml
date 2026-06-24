@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: kriIonBeam
+
+entity_models:
+  - name: Autocontroller
+    description: |-
+      Top-level template for the Kaufman & Robinson ion beam auto controller.
+      Assumed to be using streamDevice.
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS PV prefix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: autocontroller.template
+        args:
+          .*:
+
+  - name: KaufmanSourceController
+    description: |-
+      Top-level template for the Kaufman & Robinson ion beam KSC.
+      Assumed to be using streamDevice.
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS PV prefix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: kaufmanSourceController.template
+        args:
+          .*:
+
+  - name: ProgramParameters
+    description: |-
+      Program template for the Kaufman & Robinson ion beam auto controller.
+      Assumed to be using streamDevice.
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS PV prefix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      PROG:
+        type: int
+        description: |-
+          program number
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: programParameters.template
+        args:
+          .*:

@@ -1,0 +1,363 @@
+## 
+## \file blueShadow40P.template 
+## \brief Template to communicate with Knauer BlueShadow 40P pump
+## \details Requires an instance of connectionManagement.template to manage connection and polling
+##
+## \author Andrew Wilson
+##
+
+# % macro, P, Device prefix
+# % macro, R, Device suffix
+# % macro, PORT, Asyn Port for communication with device
+# % macro, name, object and gui association name
+# # gui, $(name=), edm, blueShadow40P.edl, device=$(P)$(R), valve=$(P):AZ21S
+
+####################################################
+## \name Interface for connectionManagement.template
+## \{
+####################################################
+record(seq, "$(P)$(R):POLL"){
+	field(DESC, "Records polled regularly")
+    field(DO1, "1")
+    field(LNK1, "$(P)$(R):QUERYSTATUS.PROC")
+}
+record(seq, "$(P)$(R):INIT"){
+	field(DESC, "Actions on connection startup")
+    field(DO1, "1")
+    field(LNK1, "$(P)$(R):REMOTEONC.PROC")
+}
+record(longout, "$(P)$(R):HEALTH"){
+	field(DESC, "Reflect health of connection")
+	field(DOL, "$(P)$(R):QUERYSTATUS.SEVR NPP")
+	field(OMSL, "closed_loop")
+}
+######
+
+####################################################
+## \}
+## \name Startup
+## \{
+
+## \brief Take remote control
+record(bo, "$(P)$(R):REMOTEON") {
+	field(DESC, "Take remote control")
+	field(DTYP, "stream")
+	field(OUT, "@blueShadow40P.proto remoteOn($(P)$(R)) $(PORT)")
+}
+
+## \brief Set remote if connected
+## \details If connection is good, set remote mode
+## Otherwise do nothing and return false (0)
+record(calcout, "$(P)$(R):REMOTEONC") {
+	field(DESC, "Set remote if connected")
+	field(INPA, "$(P)$(R):CONN:CHECKCONN NPP NMS")
+	field(INPB, "1")
+	field(CALC, "(A==B)?1:0")
+	field(OOPT, "When Non-zero")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):REMOTEON PP")
+}
+
+## \brief Release remote control
+record(bo, "$(P)$(R):REMOTEOFF") {
+	field(DESC, "Release remote control")
+	field(DTYP, "stream")
+	field(OUT, "@blueShadow40P.proto remoteOff($(P)$(R)) $(PORT)")
+}
+
+## \brief Query remote mode
+record(bi, "$(P)$(R):QUERYREMOTE") {
+	field(DESC, "Query remote mode")
+	field(DTYP, "stream")
+	field(INP, "@blueShadow40P.proto remoteOff($(P)$(R)) $(PORT)")
+	field(VAL, "0") # Initialise to false
+}
+## \brief Wake up from standby mode
+record(bo, "$(P)$(R):POWERUP"){
+	field(DESC, "Wake up from standby")
+	field(DTYP, "stream")
+	field(OUT, "@blueShadow40P.proto powerup($(P)$(R)) $(PORT)")
+}
+## \brief Go into standby
+record(bo, "$(P)$(R):SHUTDOWN"){
+	field(DESC, "Go into standby")
+	field(DTYP, "stream")
+	field(OUT, "@blueShadow40P.proto shutdown($(P)$(R)) $(PORT)")
+}
+
+####################################################
+## \}
+## \name Status
+## \{
+
+## \brief Query status
+record(longin, "$(P)$(R):QUERYSTATUS"){
+    field(DESC, "Query status")
+	field(DTYP, "stream")
+	field(INP, "@blueShadow40P.proto queryStatus($(P)$(R)) $(PORT)")
+    field(VAL, "0")
+    field(FLNK, "$(P)$(R):TIMESTAMP")
+}
+## \brief Display timestamp
+record(longin, "$(P)$(R):TIMESTAMP"){
+	field(DESC, "Timestamp")
+	field(VAL, "0")
+	field(EGU, "ms")
+	field(DTYP, "Soft Channel")
+	field(INP, "$(P)$(R):QUERYSTATUS NPP MS")
+	field(SCAN, "Passive")
+}
+## \brief Instrument state enum
+record(mbbi, "$(P)$(R):STATE"){
+	field(DESC, "Instrument state")
+	field(VAL, "15")
+	field(ZRVL, "0")
+	field(ZRST, "Initializing")
+	field(ONVL, "1")
+	field(ONST, "Off")
+	field(TWVL, "2")
+	field(TWST, "Idle")
+	field(THVL, "3")
+	field(THST, "Running")
+	field(FRVL, "4")
+	field(FRST, "Hold")
+	field(FVVL, "5")
+	field(FVST, "Purge")
+	field(SXVL, "6")
+	field(SXST, "Standby")
+	field(SVVL, "7")
+	field(SVST, "Failed")
+	field(EIVL, "8")
+	field(EIST, "Run at end")
+	field(FFVL, "15")
+	field(FFST, "( Unknown )")
+	field(FLNK, "$(P)$(R):RUNNING")
+	field(DTYP, "Soft Channel")
+}
+## \brief Error code from status
+record(longin, "$(P)$(R):STATUSERR"){
+    field(DESC, "Error code from status")
+    field(VAL, "0")
+}
+## \brief Time since current program started
+record(longin, "$(P)$(R):PRGRUNT"){
+    field(DESC, "Current prog. run time")
+    field(VAL, "0")
+    field(EGU, "ms")
+}
+## \brief Curent flow rate readback
+record(longin, "$(P)$(R):FLOW:RBV"){
+    field(DESC, "Current flow rate")
+    field(VAL, "0")
+	field(EGU, "uL/min")
+}
+## \brief Current percentage input A
+record(longin, "$(P)$(R):A:RBV"){
+    field(DESC, "% input A")
+    field(VAL, "0")
+	field(EGU, "%")
+}
+## \brief Current percentage input B
+record(longin, "$(P)$(R):B:RBV"){
+    field(DESC, "% input B")
+    field(VAL, "0")
+	field(EGU, "%")
+}
+## \brief Current percentage input C
+record(longin, "$(P)$(R):C:RBV"){
+    field(DESC, "% input C")
+    field(VAL, "0")
+	field(EGU, "%")
+}
+## \brief Current percentage input D
+record(longin, "$(P)$(R):D:RBV"){
+    field(DESC, "% input D")
+    field(VAL, "0")
+	field(EGU, "%")
+}
+## \brief Pressure readback /kPa
+record(longin, "$(P)$(R):PRESSURE"){
+	field(DESC, "Pressure")
+	field(VAL, "0")
+	field(EGU, "kPa")
+}
+## \brief 1 when pump state is "running"
+record(calc, "$(P)$(R):RUNNING") {
+	field(DESC, "Running a program?")
+	field(INPA, "$(P)$(R):STATE.VAL")
+	field(INPB, "3")
+	field(CALC, "(A==B)?1:0")
+}
+####################################################
+## \}
+## \name Input stream selection
+## \{
+
+## \brief Desired percentage input A
+record(longout, "$(P)$(R):A"){
+	field(DESC, "% A")
+	field(VAL, "100")
+	field(EGU, "%")
+}
+## \brief Desired percentage input B
+record(longout, "$(P)$(R):B"){
+	field(DESC, "% B")
+	field(VAL, "0")
+	field(EGU, "%")
+}
+## \brief Desired percentage input C
+record(longout, "$(P)$(R):C"){
+	field(DESC, "% C")
+	field(VAL, "0")
+	field(EGU, "%")
+}
+## \brief Desired percentage input D
+record(longout, "$(P)$(R):D"){
+	field(DESC, "% D")
+	field(VAL, "0")
+	field(EGU, "%")
+}
+## \brief Select an input stream
+## \details Sets that stream to 100%, and others to 0%
+record(mbbo, "$(P)$(R):STREAM"){
+	field(DESC, "Select an input stream")
+	field(VAL, "0")
+	field(ZRVL, "0")
+	field(ZRST, "A")
+	field(ONVL, "1")
+	field(ONST, "B")
+	field(TWVL, "2")
+	field(TWST, "C")
+	field(THVL, "3")
+	field(THST, "D")
+	field(FRVL, "4")
+	field(FLNK, "$(P)$(R):SETSTREAM")
+}
+## \brief Apply input stream selection
+## \details Set selected input to 100% and others to 0%
+record(fanout, "$(P)$(R):SETSTREAM") {
+	field(LNK1, "$(P)$(R):ACALC.PROC")
+	field(LNK2, "$(P)$(R):BCALC.PROC")
+	field(LNK3, "$(P)$(R):CCALC.PROC")
+	field(LNK4, "$(P)$(R):DCALC.PROC")
+}
+## \brief Force A to be 100% or 0%
+record(calcout, "$(P)$(R):ACALC"){
+	field(DESC, "Force A to sel. stream")
+	field(INPA, "$(P)$(R):STREAM")
+	field(INPB, "0")
+	field(CALC, "(A==B)?100:0")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):A PP")
+	field(OOPT, "Every Time")
+}
+## \brief Force B to be 100% or 0%
+record(calcout, "$(P)$(R):BCALC"){
+	field(DESC, "Force B to sel. stream")
+	field(INPA, "$(P)$(R):STREAM")
+	field(INPB, "1")
+	field(CALC, "(A==B)?100:0")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):B PP")
+	field(OOPT, "Every Time")
+}
+## \brief Force C to be 100% or 0%
+record(calcout, "$(P)$(R):CCALC"){
+	field(DESC, "Force C to sel. stream")
+	field(INPA, "$(P)$(R):STREAM")
+	field(INPB, "2")
+	field(CALC, "(A==B)?100:0")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):C PP")
+	field(OOPT, "Every Time")
+}
+## \brief Force D to be 100% or 0%
+record(calcout, "$(P)$(R):DCALC"){
+	field(DESC, "Force D to sel. stream")
+	field(INPA, "$(P)$(R):STREAM")
+	field(INPB, "3")
+	field(CALC, "(A==B)?100:0")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):D PP")
+	field(OOPT, "Every Time")
+}
+###########################################
+## \}
+## \name Flow parameters
+## \{
+
+## \brief Desired flow rate
+record(longout, "$(P)$(R):FLOW") {
+	field(DESC, "Desired flow rate")
+	field(DRVH, "10000")
+	field(DRVL, "0")
+	field(VAL, "1000")
+	field(EGU, "uL/min")
+}
+## \brief Flow speedup time /ms
+## \details Pump will take this amount of time to reach commanded flow rate and inputs
+record(longout, "$(P)$(R):RAMPTIME") {
+	field(DESC, "Flow speedup time")
+	field(DTYP, "Soft Channel")
+	field(DRVH, "999999999")
+	field(DRVL, "0")
+	field(EGU, "ms")
+	field(VAL, "1000") # Default value
+}
+###########################################
+## \}
+## \name Start flow
+## \{
+
+## \brief Processed to check parameters then start flow
+record(seq, "$(P)$(R):FLOW:GO") {
+	field(DESC, "Start flow")
+	field(DO1, "1")
+	field(LNK1, "$(P)$(R):COMPVALID.PROC")
+}
+## \brief Check flow parameters are valid
+record(calcout, "$(P)$(R):COMPVALID") {
+	field(DESC, "Check composition is valid")
+	field(INPA, "$(P)$(R):A")
+	field(INPB, "$(P)$(R):B")
+	field(INPC, "$(P)$(R):C")
+	field(INPD, "$(P)$(R):D")
+	field(CALC, "((A+B+C+D)==100)?1:0")
+	field(OOPT, "When Non-zero")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):STARTRAMP.PROC PP")
+	field(VAL, "1")
+}
+## \brief Start a flow ramp with the entered parameters
+record(bo, "$(P)$(R):STARTRAMP") {
+	field(DESC, "Start ramp")
+	field(DTYP, "stream")
+	field(OUT, "@blueShadow40P.proto ramp($(P)$(R)) $(PORT)")
+	field(VAL, "0")
+}
+## \brief Stop the pump
+record(bo, "$(P)$(R):STOP") {
+	field(DESC, "Stop the pump")
+	field(DTYP, "stream")
+	field(OUT, "@blueShadow40P.proto stop($(P)$(R)) $(PORT)")
+    field(VAL, "0")
+}
+####################################################
+## \}
+## \name Errors
+## \{
+
+## \brief Error code if an error response is received
+record(longin, "$(P)$(R):ERRORCODE"){
+    field(DESC, "Error code")
+	field(DTYP, "stream")
+	field(INP, "@blueShadow40P.proto errorCode($(P)$(R)) $(PORT)")
+    field(SCAN, "I/O Intr")
+}
+## \brief Error description if an error response is received
+record(stringin, "$(P)$(R):ERRORSTR"){
+    field(SCAN, "Passive")
+}
+
+####################################################
+## \}

@@ -1,0 +1,151 @@
+# substitutions:
+# % macro, P,           Device prefix
+# % macro, PORT, asyn serial port number
+
+# % gui, SyconSTM100, edm, SyconSTM100.edl, P=$(P)
+
+###################################################
+
+record(mbbi, "$(P):Film_RBV") {
+  field(DTYP, "stream")
+  field(INP, "@SyconSTM100.proto getFilm $(PORT) 0")
+  field(SCAN, ".1 second")
+  field(ZRVL, "1")
+  field(ZRST, "1")
+  field(ONVL, "2")
+  field(ONST, "2")
+  field(TWVL, "3")
+  field(TWST, "3")
+  field(THVL, "4")
+  field(THST, "4")
+  field(FRVL, "5")
+  field(FRST, "5")
+  field(FVVL, "6")
+  field(FVST, "6")
+  field(SXVL, "7")
+  field(SXST, "7")
+  field(SVVL ,"8")
+  field(SVST, "8")
+  field(EIVL, "9")
+  field(EIST, "9")
+}
+
+record(mbbo, "$(P):Film") {
+  field(DTYP, "stream")
+  field(OUT, "@SyconSTM100.proto setFilm $(PORT) 0")
+  field(ZRVL, "1")
+  field(ZRST, "1")
+  field(ONVL, "2")
+  field(ONST, "2")
+  field(TWVL, "3")
+  field(TWST, "3")
+  field(THVL, "4")
+  field(THST, "4")
+  field(FRVL, "5")
+  field(FRST, "5")
+  field(FVVL, "6")
+  field(FVST, "6")
+  field(SXVL, "7")
+  field(SXST, "7")
+  field(SVVL ,"8")
+  field(SVST, "8")
+  field(EIVL, "9")
+  field(EIST, "9")
+}
+
+record(ai, "$(P):Thickness_RBV") {
+  field(DTYP, "stream")
+  field(INP, "@SyconSTM100.proto getThickness $(PORT) 0")
+  field(SCAN, ".1 second")
+  field(PREC, "3")
+  field(EGU, "Angstroms")
+}
+
+record(ai, "$(P):ThicknessRate_RBV") {
+  field(DTYP, "stream")
+  field(INP, "@SyconSTM100.proto getThicknessRate $(PORT) 0")
+  field(SCAN, ".1 second")
+  field(PREC, "3")
+  field(EGU, "Angstroms/s")
+}
+
+record(ai, "$(P):Density_RBV") {
+  field(DTYP, "stream")
+  field(INP, "@SyconSTM100.proto getDensity $(PORT) 0")
+  field(SCAN, ".1 second")
+  field(PREC, "3")
+  field(EGU, "gm/cc")
+}
+
+record(ao, "$(P):Density") {
+  field(DTYP, "stream")
+  field(DRVH, 99.99)
+  field(DRVL, 0.500)
+  field(PREC, "3")
+  field(OUT, "@SyconSTM100.proto setDensity $(PORT) 0")
+  field(EGU, "gm/cc")
+}
+
+record(ai, "$(P):ZFactor_RBV") {
+  field(DTYP, "stream")
+  field(INP, "@SyconSTM100.proto getZFactor $(PORT) 0")
+  field(SCAN, ".1 second")
+  field(PREC, "3")
+}
+
+record(ao, "$(P):ZFactor") {
+  field(DTYP, "stream")
+  field(DRVH, 9.999)
+  field(DRVL, 0.100)
+  field(PREC, "3")
+  field(OUT, "@SyconSTM100.proto setZFactor $(PORT) 0")
+}
+
+record(ai, "$(P):EndThickness_RBV") {
+  field(DTYP, "stream")
+  field(INP, "@SyconSTM100.proto getEndThickness $(PORT) 0")
+  field(SCAN, ".1 second")
+  field(PREC, "3")
+}
+
+record(ao, "$(P):EndThickness") {
+  field(DTYP, "stream")
+  field(DRVH, 9999000)
+  field(DRVL, 0)
+  field(PREC, 0)
+  field(OUT, "@SyconSTM100.proto setEndThickness $(PORT) 0") 
+}
+
+record(ai, "$(P):ThicknessLimit_RBV") {
+  field(DTYP, "stream")
+  field(INP, "@SyconSTM100.proto getThicknessLimit $(PORT) 0")
+  field(SCAN, ".1 second")
+  field(PREC, "3")
+}
+
+record(ao, "$(P):ThicknessLimit") {
+  field(DTYP, "stream")
+  field(DRVH, 9999000)
+  field(DRVL, 0)
+  field(PREC, 0)
+  field(OUT, "@SyconSTM100.proto setThicknessLimit $(PORT) 0")
+}
+
+record(ai, "$(P):ToolingFactor_RBV") {
+  field(DTYP, "stream")
+  field(INP, "@SyconSTM100.proto getToolingFactor $(PORT) 0")
+  field(SCAN, ".1 second")
+  field(PREC, "3")
+}
+
+record(ao, "$(P):ToolingFactor") {
+  field(DTYP, "stream")
+  field(DRVH, 399)
+  field(DRVL, 10)
+  field(OUT, "@SyconSTM100.proto setToolingFactor $(PORT) 0")
+}
+
+record(bo, "$(P):Zero") {
+  field(DTYP, "stream")
+  field(OUT, "@SyconSTM100.proto setZero $(PORT) 0")
+}

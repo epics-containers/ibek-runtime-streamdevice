@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: huberChiller
+
+entity_models:
+  - name: huber
+    description: |-
+      Huber chiller control using streams
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      R:
+        type: str
+        description: |-
+          Device Suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn Port name
+      name:
+        type: id
+        description: |-
+          gui element name
+    databases:
+      - file: huberChiller.template
+        args:
+          .*:

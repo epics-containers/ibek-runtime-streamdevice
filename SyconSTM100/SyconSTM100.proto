@@ -1,0 +1,135 @@
+####################################################
+# Protocol file for Sycon STM-100 / MF 
+# Thickness / Rate Monitor
+# Diamond Light Source, July 2019
+####################################################
+
+####################################################
+# General
+####################################################
+
+# 4 BAUD Rates Supported (300, 1200, 2400, 9600)
+# 9 PIN "D" FEMALE connection
+# 8 data bits, no parity & 1 stop bit
+# Terminal Server RS232 w/crossover adapter
+
+# Sycon Protocol
+
+# STX (Data Length) (Data(Data..Data)) (Checksum)
+# STX: character (\x02) - message start
+# (Data Length): 'SOH' (1 decimal) to 'LF' (10 decimal) - number of data characters in message
+# (Checksum): sum (modulo 256) of data bytes
+
+# Stores film parameters for 9 films or processes
+
+# For the currently selected film:
+
+# E=[0.500 .. 99.99]|[?] - sets the density parameter / asks for current density value (gm/cc)
+# F=[0.100 .. 9.999]|[?] - sets the material Z-Factor / asks for the current Z-Factor
+# G=[0 .. 9999000]|[?] - sets the end thickness / asks for the end thickness (4 digit limit; Angstroms)
+# H=[0 .. 9999000]|[?] - setpoint relay thickness limit
+# I=[00:00 .. 99:59]|[?] - setpoint timer relay (Minutes:Seconds)
+# J=[10.0 .. 399]|[?] - tooling factor parameter (%)
+
+# Set the film
+
+# i=[1-9]|[?]
+
+# With film specifier:
+
+# j[1..9][0.500 .. 99.99]|[?] - sets the dentisty parameter for specified film e.g. j6=0.75
+# k[1..9][0.100 .. 9.999]|[?] - material factor
+# l[1..9][0 .. 9999000]|[?] - end thickness
+# m[1..9][0 .. 9999000]|[?] - setpoint relay thickness
+# n[1..9][00:00 .. 99:59]|[?] - setpoint timer relay
+# o[1..9][10.0 .. 399]|[?] - tooling factor parameter
+
+# Other:
+# S - returns thickness value, in Angstroms (7 digits, leading space or minus sign)
+# T - returns the rate value, A/s (leading space or minus followed by NNN.N)
+
+OutTerminator = "\n";
+ExtraInput = Ignore;
+
+#############################################
+# Get functions
+#############################################
+
+getFilm {
+  out "\x02\x02i?%+2<sum8>";
+  in "\x02\x02B%d%+2<sum8>";
+}
+
+getThickness {
+  out "\x02\x01S%+2<sum8>";
+  in "\x02\x09B% 08f%+2<sum8>"; # 7 digits; leading space or minus sign (leading zeros not supressed)
+}
+
+getThicknessRate {
+  out "\x02\x01T%+2<sum8>";
+  in "\x02\x07B% f%+2<sum8>"; # NNN.N; leading space or minus sign
+}
+
+getDensity {
+  out "\x02\x02E?%+2<sum8>";
+  in "\x02\x07B%f%+2<sum8>";
+}
+
+getZFactor {
+  out "\x02\x02F?%+2<sum8>";
+  in "\x02\x06B%f";
+}
+
+getEndThickness {
+  out "\x02\x02G?%+2<sum8>";
+  in "\x02\x08B%f%+2<sum8>";
+}
+
+getThicknessLimit {
+  out "\x02\x02H?%+2<sum8>";
+  in "\x02\x08B%f%+2<sum8>";
+}
+
+getToolingFactor {
+  out "\x02\x02J?%+2<sum8>";
+  in "\x02\x06B%f";
+}
+
+#############################################
+# Set functions
+#############################################
+
+setZero {
+  out "\x02\x01B%+2<sum8>";
+  in "\x02\x01BB";
+}
+
+setFilm {
+  out "\x02\x03i=%d%+2<sum8>";
+  in "\x02\x01BB";
+}
+
+setDensity {
+  out "\x02\x06E=%1.2f%+2<sum8>";
+  in "\x02\x01BB";
+}
+
+setZFactor {
+  out "\x02\x07F=%1.3f%+2<sum8>";
+  in "\x02\x01BB";
+}
+
+setEndThickness {
+  out "\x02\x09G=%07.0f%+2<sum8>";
+  in "\x02\x01BB";
+}
+
+setThicknessLimit {
+  out "\x02\x09H=%07.0f%+2<sum8>";
+  in "\x02\x01BB";
+}
+
+setToolingFactor {
+  out "\x02\x07J=%3.1f%+2<sum8>";
+  in "\x02\x01BB";
+}

@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: gssExplorIR
+
+entity_models:
+  - name: explorir
+    description: |-
+      GSS ExplorIR-M-100 CO2 Sensor
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters.
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: explorir.template
+        args:
+          .*:

@@ -1,0 +1,331 @@
+################################################################
+#
+# Lakeshore 336 Temperature Controller template file.
+#
+# Macros:
+# % macro, P, prefix for PV name
+# % macro, DESC, Lakeshore336 controller description
+# % macro, PORT, Bus/Port Address (eg. ASYN Port).
+# % macro,  ADDR,  Address on the bus (optional)
+# % macro,  TEMPSCAN, SCAN rate for the temperature/voltage readings
+# % macro,  SCAN, SCAN rate for non-temperature/voltage parameters.
+# % macro, name, name for the gui element
+# % macro, DISABLED, disabled by default?
+# % macro, lakeshore336Path, path for the documentation, e.g. /dls_sw/prod/R3.14.12.3/support/lakeshore336/2-4-3
+# % macro, Description, main use of this device (defaults to Temperature Controller)
+# % macro, CH0_label, what is channel 1 measuring? Defaults to Channel 0
+# % macro, CH1_label, what is channel 1 measuring? Defaults to Channel 1
+# % macro, CH2_label, what is channel 2 measuring? Defaults to Channel 2
+# % macro, CH3_label, what is channel 3 measuring? Defaults to Channel 3
+# % macro, OUT1_label, what is output channel 1 controlling? Defaults to Output 1 Control
+# % macro, OUT2_label, what is output channel 2 controlling? Defaults to Output 2 Control
+# % macro, OUT3_label, what is output channel 3 controlling? Defaults to Output 3 Control
+# % macro, OUT4_label, what is output channel 4 controlling? Defaults to Output 4 Control
+# % gui, $(name=LAKESHORE336), edm, lakeshore336.edl, lakeshore=$(P),lakeshore336Path=$(lakeshore336Path)
+# % gui, $(name=LAKESHORE336), boyembed, lakeshore336App_opi/lakeshore336_embed.opi, desc=$(DESC), lakeshore=$(P),lakeshore336Path=$(lakeshore336Path), name=$(name=LAKESHORE336)
+# % gui, $(name=LAKESHORE336), boyembed, lakeshore336App_opi/lakeshore336_embed_box.opi, desc=$(DESC), lakeshore=$(P),lakeshore336Path=$(lakeshore336Path), name=$(name=LAKESHORE336)
+#
+# Notes: The temperatures in Kelvin are archived once every 10 secs.
+#        The loop dependent PVs are in lakeshore336loop.template, 
+#        included from this file. For loops 3 and 4 lakeshoreAout.template
+#        is included later to overwrite the generated record
+#
+################################################################
+
+
+record(bo, "$(P):DISABLE") {
+  field(DESC, "Disable comms")
+  field(PINI, "YES")
+  field(VAL, "$(DISABLED=0)")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+################################################################
+# Read records
+################################################################
+
+## 
+## Read the ID string from the device.
+##
+record(stringin, "$(P):ID") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getID $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+}
+
+## 
+## Read the temperature on channel 0 in Kelvin.
+## This is archived every 10 seconds.
+##
+#% archiver 10 Monitor
+#% alh 
+record(ai, "$(P):KRDG0") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Channel 0 temperature")
+  field(INP, "@lakeshore336.proto getKRDG(A) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "K")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"-1")
+  field(LOLO,"-1")
+}
+
+## 
+## Read the temperature on channel 1 in Kelvin.
+## This is archived every 10 seconds.
+##
+#% archiver 10 Monitor
+#% alh 
+record(ai, "$(P):KRDG1") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Channel 1 temperature")
+  field(INP, "@lakeshore336.proto getKRDG(B) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "K")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"-1")
+  field(LOLO,"-1")
+}
+
+## 
+## Read the temperature on channel 2 in Kelvin.
+## This is archived every 10 seconds.
+##
+#% archiver 10 Monitor
+#% alh 
+record(ai, "$(P):KRDG2") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Channel 2 temperature")
+  field(INP, "@lakeshore336.proto getKRDG(C) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "K")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"-1")
+  field(LOLO,"-1")
+}
+
+## 
+## Read the temperature on channel 3 in Kelvin.
+## This is archived every 10 seconds.
+##
+#% archiver 10 Monitor
+#% alh 
+record(ai, "$(P):KRDG3") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Channel 3 temperature")
+  field(INP, "@lakeshore336.proto getKRDG(D) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "K")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"-1")
+  field(LOLO,"-1")
+}
+
+## 
+## Read the raw voltage on channel 0.
+##
+record(ai, "$(P):SRDG0") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getSRDG(A) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "V")
+}
+
+## 
+## Read the raw voltage on channel 1.
+##
+record(ai, "$(P):SRDG1") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getSRDG(B) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "V")
+}
+
+## 
+## Read the raw voltage on channel 2.
+##
+record(ai, "$(P):SRDG2") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getSRDG(C) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "V")
+}
+
+## 
+## Read the raw voltage on channel 3.
+##
+record(ai, "$(P):SRDG3") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getSRDG(D) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "V")
+}
+
+
+## 
+## Read the tuning status from the device.
+##
+record(stringin, "$(P):TUNEST") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getTUNEST $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+}
+
+## 
+## Read the tuning status success parameter
+##
+record(bi, "$(P):TUNESTSUCCESS") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getTUNESTSUCCESS $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(ZNAM, "No Error")
+  field(ONAM, "Error (see manual)")
+}
+
+
+
+################################################################
+# Write records
+################################################################
+
+
+################################################################
+# Descriptive and label records
+# PINI set to YES to the PVs are not considered invalid by gui's
+################################################################
+
+
+record(stringout, "$(P):DESCRIPTION") {
+    field(DESC, "main purpose of this device")
+    field(VAL,  "$(Description=Temperature Controller)")
+    field(PINI, "YES")
+}
+
+
+record(stringout, "$(P):KRDG0LABEL") {
+    field(DESC, "label for channel 0")
+    field(VAL,  "$(CH0_label=Channel 0)")
+    field(PINI, "YES")
+}
+
+record(stringout, "$(P):KRDG1LABEL") {
+    field(DESC, "label for channel 1")
+    field(VAL,  "$(CH1_label=Channel 1)")
+    field(PINI, "YES")
+}
+
+record(stringout, "$(P):KRDG2LABEL") {
+    field(DESC, "label for channel 2")
+    field(VAL,  "$(CH2_label=Channel 2)")
+    field(PINI, "YES")
+}
+
+record(stringout, "$(P):KRDG3LABEL") {
+    field(DESC, "label for channel 3")
+    field(VAL,  "$(CH3_label=Channel 3)")
+    field(PINI, "YES")
+}
+
+
+record(stringout, "$(P):OUT1LABEL") {
+    field(DESC, "label for output 1")
+    field(VAL,  "$(OUT1_label=Output 1 Control)")
+    field(PINI, "YES")
+}
+
+record(stringout, "$(P):OUT2LABEL") {
+    field(DESC, "label for output 2")
+    field(VAL,  "$(OUT2_label=Output 2 Control)")
+    field(PINI, "YES")
+}
+
+record(stringout, "$(P):OUT3LABEL") {
+    field(DESC, "label for output 3")
+    field(VAL,  "$(OUT3_label=Output 3 Control)")
+    field(PINI, "YES")
+}
+
+record(stringout, "$(P):OUT4LABEL") {
+    field(DESC, "label for output 4")
+    field(VAL,  "$(OUT4_label=Output 4 Control)")
+    field(PINI, "YES")
+}
+
+
+################################################################
+# Now include the loop dependant records, for PID loops 1 to 2.
+# for loops 3 and 4, overwrite the heater read record (aout template)
+################################################################
+
+substitute "LOOP=1"
+include "lakeshore336loop.template"
+
+substitute "LOOP=2"
+include "lakeshore336loop.template"
+
+substitute "LOOP=3"
+include "lakeshore336loop.template"
+include "lakeshoreAout.template"
+
+substitute "LOOP=4"
+include "lakeshore336loop.template"
+include "lakeshoreAout.template"
+
+include "lakeshore336-FirmwareVersion.template"
+
+##
+## Generic Asyn record for reading parameters.
+##
+record(asyn,"$(P):ASYN")
+{
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"$(ADDR)")
+    field(OMAX,"1024")
+    field(IMAX,"1024")
+}

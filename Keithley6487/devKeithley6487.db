@@ -1,0 +1,804 @@
+##########################################################################
+# Copyright (c) 2011 Lawrence Berkeley National Laboratory, Accelerator
+# Technology Group, Engineering Division
+# This code is distributed subject to a Software License Agreement found
+# in file LICENSE that is included with this distribution.
+##########################################################################
+
+# % macro, P, Device prefix
+# % macro, R, Device suffix
+# % macro, PORT, Asyn port name
+# % macro, A, Asyn port address
+# % macro, NELM, Size of trigger capture waveform (default 1000)
+# % macro, MSCAN, Measure scan rate, use Passive to disable if using trigger acq. (default 1 second)
+# % macro, MODEL, Set to 0 for 6487, 1 for 6485 (default 0)
+# % macro, DESCSHORT, Optional.  Short description of current signal for use on packed GUI screens (but only EPICS VAL default actually limits the length of the string).  Defaults to $(P)$(R).
+# % macro, DESCLONG, Optional.  Longer description of the current signal.  Defaults to $(P)$(R) current signal.  The EPICS string record VAL field length limit is the restriction on the length of the string (of 39 characters under EPICS R3.14.12.7).
+#
+# % macro, name, Optional.  Name to export to gda as
+#
+# % gui, $(name=), edm, Keithley6487.edl, P=$(P), R=$(R)
+#
+# Basic SCPI (IEEE488.2) commands
+#
+record(waveform, "$(P)$(R)IDN")
+{
+    field(DESC, "SCPI identification string")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getIDN(119) $(PORT) $(A)")
+    field(PINI, "YES")
+    field(FTVL, "CHAR")
+    field(NELM, "120")
+}
+record(bo, "$(P)$(R)RST")
+{
+    field(DESC, "SCPI Reset")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto cmd(*RST) $(PORT) $(A)")
+}
+record(bo, "$(P)$(R)CLS")
+{
+    field(DESC, "SCPI Clear status")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto cmd(*CLS) $(PORT) $(A)")
+}
+record(bo, "$(P)$(R)TRG")
+{
+    field(DESC, "SCPI trigger")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto cmd(*TRG) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetSTB")
+{
+    field(DESC, "SCPI get status byte")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(*STB) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetESR")
+{
+    field(DESC, "SCPI get event status")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(*ESR) $(PORT) $(A)")
+}
+record(longout, "$(P)$(R)SetESE")
+{
+    field(DESC, "SCPI enable event status")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(*ESE) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetESE")
+{
+    field(DESC, "SCPI enabled event status")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(*ESE) $(PORT) $(A)")
+}
+record(longout, "$(P)$(R)SetSRE")
+{
+    field(DESC, "SCPI enable service requests")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(*SRE) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetSRE")
+{
+    field(DESC, "Enabled service requests")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(*SRE) $(PORT) $(A)")
+}
+record(longin, "$(P)$(R)GetOPC")
+{
+    field(DESC, "Output completion status")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(*OPC) $(PORT) $(A)")
+}
+
+#
+# Unlock/Lock local controls
+#
+record(bo, "$(P)$(R)KLOCK")
+{
+    field(DESC, "Lock out all local controls")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(SYST:KLOCK) $(PORT) $(A)")
+    field(ZNAM, "Unlocked")
+    field(ONAM, "Locked")
+    field(FLNK, "$(P)$(R)KLOCKRBV")
+    field(SDIS, "$(P)$(R)Model")
+}
+record(bi, "$(P)$(R)KLOCKRBV")
+{
+    field(DESC, "All local controls locked?")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(SYST:KLOCK) $(PORT) $(A)")
+    field(ZNAM, "Unlocked")
+    field(ONAM, "Locked")
+    field(PINI, "YES")
+    field(SDIS, "$(P)$(R)Model")
+}
+
+#
+# Reading
+#
+record(ai, "$(P)$(R)Measure")
+{
+    field(DESC, "Measure current")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto measureCurrent $(PORT) $(A)")
+    field(EGU,  "A")
+    field(PREC, "5")
+    field(SCAN, "$(MSCAN=1 second)")
+}
+record(waveform, "$(P)$(R)FetchWF")
+{
+    field(DESC, "Fetch buffered data")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto fetchBuffered $(PORT) $(A)")
+    field(EGU,  "A")
+    field(PREC, "5")
+    field(FTVL, "FLOAT")
+    field(NELM, "$(NELM=1000)")
+}
+
+#
+# Zero-check
+#
+record(bo, "$(P)$(R)ZeroCheck")
+{
+    field(DESC, "Disable/Enable zero check (input clamp)")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(SYST:ZCH) $(PORT) $(A)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(FLNK, "$(P)$(R)ZeroCheckRBV")
+}
+record(bi, "$(P)$(R)ZeroCheckRBV")
+{
+    field(DESC, "Disable/Enable zero check (input clamp)")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(SYST:ZCH) $(PORT) $(A)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(PINI, "YES")
+}
+
+#
+# Range
+#
+record(bo, "$(P)$(R)AutoRange")
+{
+    field(DESC, "Disable/Enable auto-range")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(RANG:AUTO) $(PORT) $(A)")
+    field(ZNAM, "Manual")
+    field(ONAM, "Auto")
+    field(FLNK, "$(P)$(R)AutoRangeRBV")
+}
+record(bi, "$(P)$(R)AutoRangeRBV")
+{
+    field(DESC, "Disable/Enable auto-range")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(RANG:AUTO) $(PORT) $(A)")
+    field(ZNAM, "Manual")
+    field(ONAM, "Auto")
+    field(PINI, "YES")
+}
+record(mbbo, "$(P)$(R)Range")
+{
+    field(DESC, "Full-scale range")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setRange $(PORT) $(A)")
+    field(ZRVL, "9")
+    field(ZRST, "2 nA")
+    field(ONVL, "8")
+    field(ONST, "20 nA")
+    field(TWVL, "7")
+    field(TWST, "200 nA")
+    field(THVL, "6")
+    field(THST, "2 uA")
+    field(FRVL, "5")
+    field(FRST, "20 uA")
+    field(FVVL, "4")
+    field(FVST, "200 uA")
+    field(SXVL, "3")
+    field(SXST, "2 mA")
+    field(SVVL, "2")
+    field(SVST, "20 mA")
+    field(FLNK, "$(P)$(R)RangeRBV")
+}
+record(mbbi, "$(P)$(R)RangeRBV")
+{
+    field(DESC, "Full-scale range readback")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getRange $(PORT) $(A)")
+    field(ZRVL, "9")
+    field(ZRST, "2 nA")
+    field(ONVL, "8")
+    field(ONST, "20 nA")
+    field(TWVL, "7")
+    field(TWST, "200 nA")
+    field(THVL, "6")
+    field(THST, "2 uA")
+    field(FRVL, "5")
+    field(FRST, "20 uA")
+    field(FVVL, "4")
+    field(FVST, "200 uA")
+    field(SXVL, "3")
+    field(SXST, "2 mA")
+    field(SVVL, "2")
+    field(SVST, "20 mA")
+    field(PINI, "YES")
+}
+
+#
+# Filtering
+#
+record(ao, "$(P)$(R)IntegrationTime")
+{
+    field(DESC, "Reading integration time")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setF(NPLC) $(PORT) $(A)")
+    field(EGU,  "Cycles")
+    field(PREC, "2")
+    field(LOPR, "0")
+    field(HOPR, "50")
+    field(DRVL, "0.01")
+    field(DRVH, "50")
+    field(FLNK, "$(P)$(R)IntegrationTimeRBV")
+}
+record(ai, "$(P)$(R)IntegrationTimeRBV")
+{
+    field(DESC, "Reading integration time")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getF(NPLC) $(PORT) $(A)")
+    field(EGU,  "Cycles")
+    field(PREC, "2")
+    field(LOPR, "0")
+    field(HOPR, "60")
+    field(PINI, "YES")
+}
+record(longout, "$(P)$(R)FilterCount")
+{
+    field(DESC, "Number of samples in reading")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(AVER:COUN) $(PORT) $(A)")
+    field(EGU,  "Samples")
+    field(LOPR, "2")
+    field(HOPR, "100")
+    field(DRVL, "2")
+    field(DRVH, "100")
+    field(FLNK, "$(P)$(R)FilterCountRBV")
+}
+record(longin, "$(P)$(R)FilterCountRBV")
+{
+    field(DESC, "Number of samples in reading")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(AVER:COUN) $(PORT) $(A)")
+    field(EGU,  "Samples")
+    field(LOPR, "2")
+    field(HOPR, "100")
+    field(PINI, "YES")
+}
+record(bo, "$(P)$(R)FilterEnable")
+{
+    field(DESC, "Disable/Enable filter")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(AVER) $(PORT) $(A)")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
+    field(FLNK, "$(P)$(R)FilterEnableRBV")
+}
+record(bi, "$(P)$(R)FilterEnableRBV")
+{
+    field(DESC, "Disable/Enable filter")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(AVER) $(PORT) $(A)")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
+    field(PINI, "YES")
+}
+record(bo, "$(P)$(R)Damping")
+{
+    field(DESC, "Disable/Enable damping")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(DAMP) $(PORT) $(A)")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
+    field(FLNK, "$(P)$(R)DampingRBV")
+    field(SDIS, "$(P)$(R)Model")
+}
+record(bi, "$(P)$(R)DampingRBV")
+{
+    field(DESC, "Disable/Enable damping")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(DAMP) $(PORT) $(A)")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
+    field(PINI, "YES")
+    field(SDIS, "$(P)$(R)Model")
+}
+
+#
+# Triggering
+#
+record(mbbo, "$(P)$(R)ArmSource")
+{
+    field(DESC, "Arm source")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setArmSource $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "Immediate")
+    field(ONVL, "1")
+    field(ONST, "GPIB/Serial")
+    field(TWVL, "2")
+    field(TWST, "Timer")
+    field(THVL, "3")
+    field(THST, "Manual")
+    field(FRVL, "4")
+    field(FRST, "Trigger Link")
+    field(FVVL, "5")
+    field(FVST, "SOT falling")
+    field(SXVL, "6")
+    field(SXST, "SOT rising")
+    field(SVVL, "7")
+    field(SVST, "SOT transition")
+    field(FLNK, "$(P)$(R)ArmSourceRBV")
+}
+record(mbbi, "$(P)$(R)ArmSourceRBV")
+{
+    field(DESC, "Arm source readback")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getArmSource $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "Immediate")
+    field(ONVL, "1")
+    field(ONST, "GPIB/Serial")
+    field(TWVL, "2")
+    field(TWST, "Timer")
+    field(THVL, "3")
+    field(THST, "Manual")
+    field(FRVL, "4")
+    field(FRST, "Trigger Link")
+    field(FVVL, "5")
+    field(FVST, "SOT falling")
+    field(SXVL, "6")
+    field(SXST, "SOT rising")
+    field(SVVL, "7")
+    field(SVST, "SOT transition")
+    field(PINI, "YES")
+}
+record(mbbo, "$(P)$(R)ArmLine")
+{
+    field(DESC, "TLINK arm line")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(ARM:ILIN) $(PORT) $(A)")
+    field(ONVL, "1")
+    field(ONST, " TLink 1")
+    field(TWVL, "2")
+    field(TWST, " TLink 2")
+    field(THVL, "3")
+    field(THST, " TLink 3")
+    field(FRVL, "4")
+    field(FRST, " TLink 4")
+    field(FVVL, "5")
+    field(FVST, " TLink 5")
+    field(SXVL, "6")
+    field(SXST, " TLink 6")
+    field(FLNK, "$(P)$(R)ArmLineRBV")
+}
+record(mbbi, "$(P)$(R)ArmLineRBV")
+{
+    field(DESC, "TLINK arm line")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(ARM:ILIN) $(PORT) $(A)")
+    field(ONVL, "1")
+    field(ONST, " TLink 1")
+    field(TWVL, "2")
+    field(TWST, " TLink 2")
+    field(THVL, "3")
+    field(THST, " TLink 3")
+    field(FRVL, "4")
+    field(FRST, " TLink 4")
+    field(FVVL, "5")
+    field(FVST, " TLink 5")
+    field(SXVL, "6")
+    field(SXST, " TLink 6")
+    field(PINI, "YES")
+}
+record(ao, "$(P)$(R)ArmTimerInterval")
+{
+    field(DESC, "Arm timer interval")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setF(ARM:TIM) $(PORT) $(A)")
+    field(EGU,  "s")
+    field(PREC, "5")
+    field(LOPR, "0")
+    field(HOPR, "1e5")
+    field(DRVL, "0.001")
+    field(DRVH, "99999.999")
+    field(FLNK, "$(P)$(R)ArmTimerIntervalRBV")
+}
+record(ai, "$(P)$(R)ArmTimerIntervalRBV")
+{
+    field(DESC, "Arm timer interval")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getF(ARM:TIM) $(PORT) $(A)")
+    field(EGU,  "s")
+    field(PREC, "5")
+    field(LOPR, "0")
+    field(HOPR, "1e5")
+    field(PINI, "YES")
+}
+record(longout, "$(P)$(R)ArmCount")
+{
+    field(DESC, "Arm count")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(ARM:COUN) $(PORT) $(A)")
+    field(LOPR, "1")
+    field(HOPR, "2048")
+    field(DRVL, "1")
+    field(DRVH, "2048")
+    field(FLNK, "$(P)$(R)ArmCountRBV")
+}
+record(longin, "$(P)$(R)ArmCountRBV")
+{
+    field(DESC, "Arm count")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(ARM:COUN) $(PORT) $(A)")
+    field(LOPR, "1")
+    field(HOPR, "2048")
+    field(PINI, "YES")
+}
+record(mbbo, "$(P)$(R)TriggerSource")
+{
+    field(DESC, "Trigger source")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setTriggerSource $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "Immediate")
+    field(ONVL, "1")
+    field(ONST, "Trigger Link")
+    field(FLNK, "$(P)$(R)TriggerSourceRBV")
+}
+record(mbbi, "$(P)$(R)TriggerSourceRBV")
+{
+    field(DESC, "Trigger source readback")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getTriggerSource $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "Immediate")
+    field(ONVL, "1")
+    field(ONST, "Trigger Link")
+    field(PINI, "YES")
+}
+record(mbbo, "$(P)$(R)TriggerLine")
+{
+    field(DESC, "TLINK trigger line")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(TRIG:ILIN) $(PORT) $(A)")
+    field(ONVL, "1")
+    field(ONST, " TLink 1")
+    field(TWVL, "2")
+    field(TWST, " TLink 2")
+    field(THVL, "3")
+    field(THST, " TLink 3")
+    field(FRVL, "4")
+    field(FRST, " TLink 4")
+    field(FVVL, "5")
+    field(FVST, " TLink 5")
+    field(SXVL, "6")
+    field(SXST, " TLink 6")
+    field(FLNK, "$(P)$(R)TriggerLineRBV")
+}
+record(mbbi, "$(P)$(R)TriggerLineRBV")
+{
+    field(DESC, "TLINK trigger line")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(TRIG:ILIN) $(PORT) $(A)")
+    field(ONVL, "1")
+    field(ONST, " TLink 1")
+    field(TWVL, "2")
+    field(TWST, " TLink 2")
+    field(THVL, "3")
+    field(THST, " TLink 3")
+    field(FRVL, "4")
+    field(FRST, " TLink 4")
+    field(FVVL, "5")
+    field(FVST, " TLink 5")
+    field(SXVL, "6")
+    field(SXST, " TLink 6")
+    field(PINI, "YES")
+}
+record(ao, "$(P)$(R)TriggerDelay")
+{
+    field(DESC, "Trigger Delay")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setF(TRIG:DEL) $(PORT) $(A)")
+    field(EGU,  "s")
+    field(PREC, "5")
+    field(LOPR, "0")
+    field(HOPR, "1000")
+    field(DRVL, "0")
+    field(DRVH, "999.9998")
+    field(FLNK, "$(P)$(R)TriggerDelayRBV")
+}
+record(ai, "$(P)$(R)TriggerDelayRBV")
+{
+    field(DESC, "Trigger Delay")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getF(TRIG:DEL) $(PORT) $(A)")
+    field(EGU,  "s")
+    field(PREC, "5")
+    field(LOPR, "0")
+    field(HOPR, "1000")
+    field(PINI, "YES")
+}
+record(bo, "$(P)$(R)TriggerDelayAuto")
+{
+    field(DESC, "Disable/Enable trigger autodelay")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(TRIG:DEL:AUTO) $(PORT) $(A)")
+    field(ZNAM, "Fixed")
+    field(ONAM, "Auto")
+    field(FLNK, "$(P)$(R)TriggerDelayAutoRBV")
+}
+record(bi, "$(P)$(R)TriggerDelayAutoRBV")
+{
+    field(DESC, "Disable/Enable trigger autodelay")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(TRIG:DEL:AUTO) $(PORT) $(A)")
+    field(ZNAM, "Fixed")
+    field(ONAM, "Auto")
+    field(PINI, "YES")
+}
+record(longout, "$(P)$(R)TriggerCount")
+{
+    field(DESC, "Trigger count")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(TRIG:COUN) $(PORT) $(A)")
+    field(LOPR, "1")
+    field(HOPR, "2048")
+    field(DRVL, "1")
+    field(DRVH, "2048")
+    field(FLNK, "$(P)$(R)TriggerCountRBV")
+}
+record(longin, "$(P)$(R)TriggerCountRBV")
+{
+    field(DESC, "Trigger count")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(TRIG:COUN) $(PORT) $(A)")
+    field(LOPR, "1")
+    field(HOPR, "2048")
+    field(PINI, "YES")
+}
+record(bo, "$(P)$(R)Start")
+{
+    field(DESC, "SCPI Reset")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto cmd(INIT) $(PORT) $(A)")
+}
+record(bo, "$(P)$(R)Cancel")
+{
+    field(DESC, "Cancel trigger sequence")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto cancel $(PORT) $(A)")
+}
+
+#
+# The MEASure? command resets a bunch of trigger settings.
+# This sequence record will restore them.
+#
+record(seq, "$(P)$(R)RestoreTriggerSettings")
+{
+    field(DESC, "Restore trigger settings after MEASure?")
+    field(LNK1, "$(P)$(R)ArmSource.PROC")
+    field(LNK2, "$(P)$(R)ArmCount.PROC")
+    field(LNK3, "$(P)$(R)TriggerSource.PROC")
+    field(LNK6, "$(P)$(R)TriggerCount.PROC")
+    field(LNK5, "$(P)$(R)TriggerDelayAuto.PROC")
+    field(LNK4, "$(P)$(R)TriggerDelay.PROC")
+    field(DOL7, "0")
+    field(LNK7, "$(P)$(R)Measure.SCAN")
+}
+record(seq, "$(P)$(R)ReadTriggerSettings")
+{
+    field(DESC, "Read back trigger settings")
+    field(LNK1, "$(P)$(R)ArmSourceRBV.PROC")
+    field(LNK2, "$(P)$(R)ArmLineRBV.PROC")
+    field(LNK3, "$(P)$(R)ArmTimerIntervalRBV.PROC")
+    field(LNK4, "$(P)$(R)ArmCountRBV.PROC")
+    field(LNK5, "$(P)$(R)TriggerSourceRBV.PROC")
+    field(LNK6, "$(P)$(R)TriggerLineRBV.PROC")
+    field(LNK7, "$(P)$(R)TriggerDelayRBV.PROC")
+    field(LNK8, "$(P)$(R)TriggerDelayAutoRBV.PROC")
+    field(LNK9, "$(P)$(R)TriggerCountRBV.PROC")
+}
+record(seq, "$(P)$(R)RestoreMeasureSettings")
+{
+    field(DESC, "Restore settings before MEASure?")
+    field(LNK1, "$(P)$(R)Cancel.PROC")
+    field(DOL2, "1")
+    field(LNK2, "$(P)$(R)ArmCount PP")
+    field(DOL3, "1")
+    field(LNK3, "$(P)$(R)TriggerCount PP")
+    field(DOL4, "0")
+    field(LNK4, "$(P)$(R)TriggerSource PP")
+    field(DOL5, "0")
+    field(LNK5, "$(P)$(R)TriggerDelay PP")
+    field(DOL6, "6")
+    field(LNK6, "$(P)$(R)Measure.SCAN")
+    field(PINI, "YES")
+}
+
+#
+# Voltage source
+#
+record(bo, "$(P)$(R)SourceEnable")
+{
+    field(DESC, "Disable/Enable voltage source")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(SOUR:VOLT:STAT) $(PORT) $(A)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(FLNK, "$(P)$(R)SourceEnableRBV")
+}
+record(bi, "$(P)$(R)SourceEnableRBV")
+{
+    field(DESC, "Voltage source enabled?")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(SOUR:VOLT:STAT) $(PORT) $(A)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+record(bo, "$(P)$(R)SourceInterlock")
+{
+    field(DESC, "Disable/Enable interlock")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setD(SOUR:VOLT:INT) $(PORT) $(A)")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
+    field(FLNK, "$(P)$(R)SourceInterlockRBV")
+}
+record(bi, "$(P)$(R)SourceInterlockRBV")
+{
+    field(DESC, "Interlock status")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getD(SOUR:VOLT:INT) $(PORT) $(A)")
+    field(ONAM, "Good")
+    field(ZNAM, "Broken")
+}
+record(mbbo, "$(P)$(R)SourceRange")
+{
+    field(DESC, "Full-scale range")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setSourceRange $(PORT) $(A)")
+    field(ZRVL, "10")
+    field(ZRST, "10 V")
+    field(ONVL, "50")
+    field(ONST, "50 V")
+    field(TWVL, "500")
+    field(TWST, "500 V")
+    field(FLNK, "$(P)$(R)SourceReadSettings")
+}
+record(mbbi, "$(P)$(R)SourceRangeRBV")
+{
+    field(DESC, "Full-scale range readback")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getSourceRange $(PORT) $(A)")
+    field(ZRVL, "0")
+    field(ZRST, "10 V")
+    field(ONVL, "1")
+    field(ONST, "50 V")
+    field(TWVL, "2")
+    field(TWST, "500 V")
+}
+record(mbbo, "$(P)$(R)SourceIlimit")
+{
+    field(DESC, "Source current limit")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setIlimit $(PORT) $(A)")
+    field(ZRVL, "5")
+    field(ZRST, "25 uA")
+    field(ONVL, "4")
+    field(ONST, "250 uA")
+    field(TWVL, "3")
+    field(TWST, "2.5 mA")
+    field(THVL, "2")
+    field(THST, "25 mA")
+    field(FLNK, "$(P)$(R)SourceIlimitRBV")
+}
+record(mbbi, "$(P)$(R)SourceIlimitRBV")
+{
+    field(DESC, "Source current limit")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getIlimit $(PORT) $(A)")
+    field(ZRVL, "5")
+    field(ZRST, "25 uA")
+    field(ONVL, "4")
+    field(ONST, "250 uA")
+    field(TWVL, "3")
+    field(TWST, "2.5 mA")
+    field(THVL, "2")
+    field(THST, "25 mA")
+}
+record(ao, "$(P)$(R)SourceVoltage")
+{
+    field(DESC, "Source voltage setpoint")
+    field(DTYP, "stream")
+    field(OUT,  "@devKeithley6487.proto setF(SOUR:VOLT) $(PORT) $(A)")
+    field(EGU,  "V")
+    field(PREC, "5")
+    field(LOPR, "-505")
+    field(HOPR, "505")
+    field(DRVL, "-505")
+    field(DRVH, "505")
+    field(FLNK, "$(P)$(R)SourceVoltageRBV")
+}
+record(ai, "$(P)$(R)SourceVoltageRBV")
+{
+    field(DESC, "Source voltage readback")
+    field(DTYP, "stream")
+    field(INP,  "@devKeithley6487.proto getF(SOUR:VOLT) $(PORT) $(A)")
+    field(EGU,  "V")
+    field(PREC, "5")
+    field(LOPR, "-505")
+    field(HOPR, "505")
+}
+record(seq, "$(P)$(R)SourceReadSettings")
+{
+    field(DESC, "Read back source settings")
+    field(LNK1, "$(P)$(R)SourceVoltageRBV.PROC")
+    field(LNK2, "$(P)$(R)SourceEnableRBV.PROC")
+    field(LNK3, "$(P)$(R)SourceInterlockRBV.PROC")
+    field(LNK4, "$(P)$(R)SourceIlimitRBV.PROC")
+    field(LNK5, "$(P)$(R)SourceRangeRBV.PROC")
+    field(PINI, "YES")
+    field(SDIS, "$(P)$(R)Model")
+}
+record(bo, "$(P)$(R)Model")
+{
+    field(DESC, "1=6485, 0=6487 with V src")
+    field(ZNAM, "6487")
+    field(ONAM, "6485")
+    field(VAL, "$(MODEL=0)")
+    field(PINI, "YES")
+}
+
+# The name of the Vendor to help screens with signals from many
+# different types of current amplifier signal and other devices on them.
+#
+# Fixed value of Keithley.
+#
+record(stringout, "$(P)$(R)Vendor") {
+  field(DESC, "Name of current amp vendor")
+  field(SCAN, "Passive")
+  field(VAL, "Keithley")
+  field(PINI, "YES")
+}
+
+# Short description of the current amplifier or the signal on it
+# for use on screens with lots of signals on it.
+#
+# Suggest what it is used for or where it is physically.
+# Defaults to record prefix.
+#
+record(stringout, "$(P)$(R)ShortDescription") {
+  field(DESC, "Short descr of amp/current.")
+  field(SCAN, "Passive")
+  field(VAL, "$(DESCSHORT=$(P)$(R))")
+  field(PINI, "YES")
+}
+
+# Longer description of the current amplifier or the signal on it
+# for use on screens which have more space available.
+#
+# Defaults to record prefix followed by " current signal"
+#
+# Under EPICS R3.14.12.7, the DESC field is limited to 28 characters
+# and the VAL field to 39 characters, which is one less than the array size
+# given in each case because of the terminating null character on the string.
+#
+record(stringout, "$(P)$(R)LongDescription") {
+  field(DESC, "Long descr of amp/current.")
+  field(SCAN, "Passive")
+  field(VAL, "$(DESCLONG=$(P)$(R) current signal)")
+  field(PINI, "YES")
+}

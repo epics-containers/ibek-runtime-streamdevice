@@ -1,0 +1,564 @@
+# % macro, P, Device prefix
+# % macro, Q, Device suffix
+# % macro, desc, Device label for GUI
+# % macro, PORT, Asyn port name
+# % macro, DISABLE, Set to 0 to enable this at startup
+# % macro, name, object and gui association name
+
+# EDM GUI
+# % gui, $(name=), edmembed, harvardSyringe_embed.edl, device=$(P)$(Q)
+# % gui, $(name=), edm, harvardSyringe.edl, device=$(P)$(Q)
+
+# CSS GUI
+# % gui, $(name=), boydetail, harvardSyringeApp_opi/harvardSyringe_detail.opi, P=$(P),Q=$(Q),desc=$(desc=Harvard Syringe Pump)
+# % gui, $(name=), boyembed, harvardSyringeApp_opi/harvardSyringe_embed_box.opi, P=$(P),Q=$(Q),desc=$(desc=Harvard Syringe Pump)
+# % gui, $(name=), boyembed, harvardSyringeApp_opi/harvardSyringe_embed.opi, P=$(P),Q=$(Q),desc=$(desc=Harvard Syringe Pump)
+
+# Detail screen objects
+## Setup
+# % gui, $(name=), groupHeading,  Setup
+# % gui, $(name=), demand,        Target Time,            $(P)$(Q):TTIME
+# % gui, $(name=), readback,      Target Time,            $(P)$(Q):TTIME:RBV
+# % gui, $(name=), enum,          Infuse Rate Units,      $(P)$(Q):IRATEUNITS
+# % gui, $(name=), readback,      Infuse Rate Units,      $(P)$(Q):IRATEUNITS:RBV
+# % gui, $(name=), demand,        Infuse Rate,            $(P)$(Q):IRATE
+# % gui, $(name=), readback,      Infuse Rate,            $(P)$(Q):IRATE:RBV
+# % gui, $(name=), enum,          Withdraw Rate Units,    $(P)$(Q):WRATEUNITS
+# % gui, $(name=), readback,      Withdraw Rate Units,    $(P)$(Q):WRATEUNITS:RBV
+# % gui, $(name=), demand,        Withdraw Rate,          $(P)$(Q):WRATE
+# % gui, $(name=), readback,      Withdraw Rate,          $(P)$(Q):WRATE:RBV
+# % gui, $(name=), readback,      Infused Volume,         $(P)$(Q):IVOLUME:RBV
+# % gui, $(name=), readback,      Infused Volume Units,   $(P)$(Q):IVOLUMEUNITS:RBV
+# % gui, $(name=), command,       Infused Volume Clear,   $(P)$(Q):CLEARINFUSED
+# % gui, $(name=), readback,      Withdrawn Volume,       $(P)$(Q):WVOLUME:RBV
+# % gui, $(name=), readback,      Withdrawn Volume Units, $(P)$(Q):WVOLUMEUNITS:RBV
+# % gui, $(name=), command,       Withdrawn Volume Clear, $(P)$(Q):CLEARWITHDRAWN
+# % gui, $(name=), enum,          Target Volume Units,    $(P)$(Q):TVOLUMEUNITS
+# % gui, $(name=), readback,      Target Volume Units,    $(P)$(Q):TVOLUMEUNITS:RBV
+# % gui, $(name=), demand,        Target Volume,          $(P)$(Q):TVOLUME
+# % gui, $(name=), readback,      Target Volume,          $(P)$(Q):TVOLUME:RBV
+# % gui, $(name=), groupExit,     SetupExit
+## Operation
+# % gui, $(name=), groupHeading,  Operation
+# % gui, $(name=), command,       Infuse,                 $(P)$(Q):IRUN
+# % gui, $(name=), command,       Withdraw,               $(P)$(Q):WRUN
+# % gui, $(name=), command,       Stop,                   $(P)$(Q):STOP
+# % gui, $(name=), readback,      Status,                 $(P)$(Q):STATUS
+# % gui, $(name=), groupExit,     OperationExit
+## Config
+# % gui, $(name=), groupHeading,  Config
+# % gui, $(name=), demand,        Force,                  $(P)$(Q):FORCE
+# % gui, $(name=), readback,      Force,                  $(P)$(Q):FORCE:RBV
+# % gui, $(name=), demand,        Diameter,               $(P)$(Q):DIAMETER
+# % gui, $(name=), readback,      Diameter,               $(P)$(Q):DIAMETER:RBV
+# % gui, $(name=), groupExit,     ConfigExit
+## Comms
+# % gui, $(name=), groupHeading,  Comms
+# % gui, $(name=), enum,          Enable,                 $(P)$(Q):DISABLE
+# % gui, $(name=), enum,          Update,                 $(P)$(Q):UPDATE.SCAN
+# % gui, $(name=), groupExit,     CommsExit
+
+record(ao, "$(P)$(Q):POLLON") {
+  field(DESC, "Set Polling")
+  field(DTYP, "stream")
+  field(OUT, "@harvardSyringe.proto setPollOn($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PINI, "YES")
+}
+
+record(bo, "$(P)$(Q):DISABLE") {
+  field(DESC, "Disable comms")
+  field(PINI, "YES")
+  field(VAL, "$(DISABLE=1)")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+  field(FLNK, "$(P)$(Q):ENABLEFANOUT")  
+}
+
+record(fanout, "$(P)$(Q):ENABLEFANOUT") {
+  field(SELM, "All")
+  field(LNK0, "$(P)$(Q):POLLON")
+  field(LNK1, "$(P)$(Q):INFUSEDISABLE")
+  field(LNK2, "$(P)$(Q):WITHDRAWDISABLE")
+}
+
+record(seq, "$(P)$(Q):UPDATE") {
+  field(DESC, "Update Temp Params")
+  field(DOL1, "1")
+  field(DOL2, "1")
+  field(DOL3, "1")
+  field(DOL4, "1")
+  field(DOL5, "1")
+  field(DOL6, "1")
+  field(DOL7, "1")
+  field(DOL8, "1")
+  field(DOL9, "1")
+  field(LNK1, "$(P)$(Q):FORCE:RBV.PROC")
+  field(LNK2, "$(P)$(Q):TTIME:RBV.PROC")
+  field(LNK3, "$(P)$(Q):DIAMETER:RBV.PROC")
+  field(LNK4, "$(P)$(Q):IRATE:RBV.PROC")
+  field(LNK5, "$(P)$(Q):WRATE:RBV.PROC")
+  field(LNK6, "$(P)$(Q):IVOLUME:RBV.PROC")
+  field(LNK7, "$(P)$(Q):WVOLUME:RBV.PROC")
+  field(LNK8, "$(P)$(Q):TVOLUME:RBV.PROC")
+  field(LNK9, "$(P)$(Q):SYRINGE:RBV.PROC")
+  field(SCAN, "1 second")
+  field(PINI, "YES")
+}
+
+record(mbbi, "$(P)$(Q):STATUS") {
+  field(DESC, "Pump Status")
+  field(ZRVL, "0")
+  field(ZRST, "Idle")
+  field(ONVL, "1")
+  field(ONST, "Infusing")
+  field(TWVL, "2")
+  field(TWST, "Withdrawing")
+  field(THVL, "3")
+  field(THST, "Stalled")
+  field(FRVL, "4")
+  field(FRST, "Target Reached")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(stringin, "$(P)$(Q):ERROR") {
+  field(VAL, " ")
+}
+
+record(ao, "$(P)$(Q):FORCE") {
+  field(DESC, "Force")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):FORCE:RBV")
+  field(OUT, "@harvardSyringe.proto setForce($(P)$(Q)) $(PORT)")
+  field(PREC, "0")
+  field(EGU, "%")
+  field(DRVH, "100")
+  field(DRVL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ai, "$(P)$(Q):FORCE:RBV") {
+  field(DESC, "Force Readback")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto getForce($(P)$(Q)) $(PORT)")
+  field(PREC, "0")
+  field(EGU, "%")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):TTIME") {
+  field(DESC, "Target Time")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):TTIME:RBV")
+  field(OUT, "@harvardSyringe.proto setTargetTime($(P)$(Q)) $(PORT)")
+  field(EGU, "seconds")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(stringin, "$(P)$(Q):TTIME:RBV") {
+  field(DESC, "Target Time Readback")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto getTargetTime($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):DIAMETER") {
+  field(DESC, "Syringe Diameter")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):DIAMETER:RBV")
+  field(OUT, "@harvardSyringe.proto setDiameter($(P)$(Q)) $(PORT)")
+  field(PREC, "4")
+  field(EGU, "mm")
+  field(DRVH, "100")
+  field(DRVL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ai, "$(P)$(Q):DIAMETER:RBV") {
+  field(DESC, "Syringe Diameter Readback")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto getDiameter($(P)$(Q)) $(PORT)")
+  field(PREC, "4")
+  field(EGU, "mm")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):IRATE") {
+  field(DESC, "Infusion Rate")
+  field(FLNK, "$(P)$(Q):IRATE:CALC")
+  field(PREC, "4")
+  field(DRVH, "100000")
+  field(DRVL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(calcout, "$(P)$(Q):IRATE:CALC") {
+  field(DESC, "Multiplies infusion rate by cal value")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(Q):CALIBRATION.RVAL")
+  field(INPB, "$(P)$(Q):IRATE")
+  field(CALC, "B / A")
+  field(OUT, "$(P)$(Q):IRATE:SET PP")
+}
+
+record(ao, "$(P)$(Q):IRATE:SET") {
+  field(DESC, "Sets the infusion rate")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):IRATE:RBV")
+  field(OUT, "@harvardSyringe.proto setIRate($(P)$(Q)) $(PORT)")
+  field(PREC, "4")
+  field(DRVH, "100000")
+  field(DRVL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ai, "$(P)$(Q):IRATE:RBV") {
+  field(DESC, "Infusion Rate Readback")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto getIRate($(P)$(Q)) $(PORT)")
+  field(PREC, "4")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(FLNK, "$(P)$(Q):IRATEMATCHES")
+}
+
+record(mbbo, "$(P)$(Q):IRATEUNITS") {
+  field(ZRVL, "0")
+  field(ZRST, "pl/sec")
+  field(ONVL, "1")
+  field(ONST, "pl/min")
+  field(TWVL, "2")
+  field(TWST, "pl/hr")
+  field(THVL, "3")
+  field(THST, "nl/sec")
+  field(FRVL, "4")
+  field(FRST, "nl/min")
+  field(FVVL, "5")
+  field(FVST, "nl/hr")
+  field(SXVL, "6")
+  field(SXST, "ul/sec")
+  field(SVVL, "7")
+  field(SVST, "ul/min")
+  field(EIVL, "8")
+  field(EIST, "ul/hr")
+  field(NIVL, "9")
+  field(NIST, "ml/sec")
+  field(TEVL, "10")
+  field(TEST, "ml/min")
+  field(ELVL, "11")
+  field(ELST, "ml/hr")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(mbbi, "$(P)$(Q):IRATEUNITS:RBV") {
+  field(ZRVL, "0")
+  field(ZRST, "pl/sec")
+  field(ONVL, "1")
+  field(ONST, "pl/min")
+  field(TWVL, "2")
+  field(TWST, "pl/hr")
+  field(THVL, "3")
+  field(THST, "nl/sec")
+  field(FRVL, "4")
+  field(FRST, "nl/min")
+  field(FVVL, "5")
+  field(FVST, "nl/hr")
+  field(SXVL, "6")
+  field(SXST, "ul/sec")
+  field(SVVL, "7")
+  field(SVST, "ul/min")
+  field(EIVL, "8")
+  field(EIST, "ul/hr")
+  field(NIVL, "9")
+  field(NIST, "ml/sec")
+  field(TEVL, "10")
+  field(TEST, "ml/min")
+  field(ELVL, "11")
+  field(ELST, "ml/hr")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):WRATE") {
+  field(DESC, "Withdraw Rate")
+  field(FLNK, "$(P)$(Q):WRATE:CALC")
+  field(PREC, "4")
+  field(DRVH, "100000")
+  field(DRVL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(calcout, "$(P)$(Q):WRATE:CALC") {
+  field(DESC, "Multiplies withdrawal rate by cal value")
+  field(SCAN, "Passive")
+  field(INPA, "$(P)$(Q):WRATE")
+  field(INPB, "$(P)$(Q):CALIBRATION.RVAL")
+  field(CALC, "A / B")
+  field(OUT, "$(P)$(Q):WRATE:SET PP")
+}
+  
+record(ao, "$(P)$(Q):WRATE:SET") {
+  field(DESC, "Withdrawal rate")
+  field(DTYP, "stream")
+  field(OUT, "@harvardSyringe.proto setWRate($(P)$(Q)) $(PORT)")
+  field(FLNK, "$(P)$(Q):WRATE:RBV")
+  field(PREC, "4")
+  field(DRVH, "100000")
+  field(DRVL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+record(ai, "$(P)$(Q):WRATE:RBV") {
+  field(DESC, "Withdraw Rate Readback")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto getWRate($(P)$(Q)) $(PORT)")
+  field(PREC, "4")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(FLNK, "$(P)$(Q):WRATEMATCHES")
+}
+
+record(mbbo, "$(P)$(Q):WRATEUNITS") {
+  field(ZRVL, "0")
+  field(ZRST, "pl/sec")
+  field(ONVL, "1")
+  field(ONST, "pl/min")
+  field(TWVL, "2")
+  field(TWST, "pl/hr")
+  field(THVL, "3")
+  field(THST, "nl/sec")
+  field(FRVL, "4")
+  field(FRST, "nl/min")
+  field(FVVL, "5")
+  field(FVST, "nl/hr")
+  field(SXVL, "6")
+  field(SXST, "ul/sec")
+  field(SVVL, "7")
+  field(SVST, "ul/min")
+  field(EIVL, "8")
+  field(EIST, "ul/hr")
+  field(NIVL, "9")
+  field(NIST, "ml/sec")
+  field(TEVL, "10")
+  field(TEST, "ml/min")
+  field(ELVL, "11")
+  field(ELST, "ml/hr")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(mbbi, "$(P)$(Q):WRATEUNITS:RBV") {
+  field(ZRVL, "0")
+  field(ZRST, "pl/sec")
+  field(ONVL, "1")
+  field(ONST, "pl/min")
+  field(TWVL, "2")
+  field(TWST, "pl/hr")
+  field(THVL, "3")
+  field(THST, "nl/sec")
+  field(FRVL, "4")
+  field(FRST, "nl/min")
+  field(FVVL, "5")
+  field(FVST, "nl/hr")
+  field(SXVL, "6")
+  field(SXST, "ul/sec")
+  field(SVVL, "7")
+  field(SVST, "ul/min")
+  field(EIVL, "8")
+  field(EIST, "ul/hr")
+  field(NIVL, "9")
+  field(NIST, "ml/sec")
+  field(TEVL, "10")
+  field(TEST, "ml/min")
+  field(ELVL, "11")
+  field(ELST, "ml/hr")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ai, "$(P)$(Q):IVOLUME:RBV") {
+  field(DESC, "Infused Volume")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto ivolume($(P)$(Q)) $(PORT)")
+  field(PREC, "4")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(mbbi, "$(P)$(Q):IVOLUMEUNITS:RBV") {
+  field(ZRVL, "0")
+  field(ZRST, "pl")
+  field(ONVL, "1")
+  field(ONST, "nl")
+  field(TWVL, "2")
+  field(TWST, "ul")
+  field(THVL, "3")
+  field(THST, "ml")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(bo, "$(P)$(Q):CLEARINFUSED") {
+  field(DTYP, "stream")
+  field(OUT, "@harvardSyringe.proto clear_infused($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ai, "$(P)$(Q):WVOLUME:RBV") {
+  field(DESC, "Withdrawn Volume")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto wvolume($(P)$(Q)) $(PORT)")
+  field(PREC, "4")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(mbbi, "$(P)$(Q):WVOLUMEUNITS:RBV") {
+  field(ZRVL, "0")
+  field(ZRST, "pl")
+  field(ONVL, "1")
+  field(ONST, "nl")
+  field(TWVL, "2")
+  field(TWST, "ul")
+  field(THVL, "3")
+  field(THST, "ml")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(bo, "$(P)$(Q):CLEARWITHDRAWN") {
+  field(DTYP, "stream")
+  field(OUT, "@harvardSyringe.proto clear_withdrawn($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(ao, "$(P)$(Q):TVOLUME") {
+  field(DESC, "Target Volume")
+  field(OUT, "$(P)$(Q):TVOLUME_CALC")
+  field(FLNK, "$(P)$(Q):TVOLUME_CALC")
+  field(PREC, "4")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(PINI, "YES")
+}
+
+record(calcout, "$(P)$(Q):TVOLUME_CALC") {
+    field(DESC, "Calculate movement")
+    field(SCAN, "Passive")
+    field(CALC, "B / A")
+    field(INPA, "$(P)$(Q):CALIBRATION.RVAL")
+    field(INPB, "$(P)$(Q):TVOLUME")
+    field(OUT, "$(P)$(Q):TVOLUME:SET PP")
+    field(OOPT, "Every Time")
+}
+
+record(ao, "$(P)$(Q):TVOLUME:SET") {
+  field(DESC, "Set target volume")
+  field(DTYP, "stream")
+  field(FLNK, "$(P)$(Q):TVOLUME:RBV")
+  field(OUT, "@harvardSyringe.proto setTVolume($(P)$(Q)) $(PORT)")
+  field(PREC, "4")
+  field(DRVH, "1000000")
+  field(DRVL, "0")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(stringin, "$(P)$(Q):TVOLUME:RBV") {
+  field(DESC, "Target Volume Readback")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto getTVolume($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(stringin, "$(P)$(Q):SYRINGE:RBV") {
+  field(DESC, "Current syringe information")
+  field(DTYP, "stream")
+  field(INP, "@harvardSyringe.proto getSyringe($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(mbbo, "$(P)$(Q):TVOLUMEUNITS") {
+  field(ZRVL, "0")
+  field(ZRST, "pl")
+  field(ONVL, "1")
+  field(ONST, "nl")
+  field(TWVL, "2")
+  field(TWST, "ul")
+  field(THVL, "3")
+  field(THST, "ml")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(mbbi, "$(P)$(Q):TVOLUMEUNITS:RBV") {
+  field(ZRVL, "0")
+  field(ZRST, "pl")
+  field(ONVL, "1")
+  field(ONST, "nl")
+  field(TWVL, "2")
+  field(TWST, "ul")
+  field(THVL, "3")
+  field(THST, "ml")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(bo, "$(P)$(Q):IRUN") {
+  field(DESC, "Infuse")
+  field(DTYP, "stream")
+  field(OUT, "@harvardSyringe.proto infuse($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):INFUSEDISABLE")
+}
+
+record(bo, "$(P)$(Q):WRUN") {
+  field(DESC, "Withdraw")
+  field(DTYP, "stream")
+  field(OUT, "@harvardSyringe.proto withdraw($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):WITHDRAWDISABLE")
+}
+
+record(bo, "$(P)$(Q):STOP") {
+  field(DESC, "Stop")
+  field(DTYP, "stream")
+  field(OUT, "@harvardSyringe.proto stop($(P)$(Q)) $(PORT)")
+  field(SDIS, "$(P)$(Q):DISABLE")
+}
+
+record(mbbo, "$(P)$(Q):CALIBRATION") {
+  field(DESC, "allows 50% withdrawal/infuse values")
+  field(ZRVL, "1")
+  field(ZRST, "1x")
+  field(ONVL, "2")
+  field(ONST, "0.5x")
+  field(FLNK, "$(P)$(Q):CALIBRATION:RBV")
+}
+
+record(mbbi, "$(P)$(Q):CALIBRATION:RBV") {
+  field(DESC, " Read back value for calibration")
+  field(SCAN, "Passive")
+  field(INP, "$(P)$(Q):CALIBRATION")
+}
+
+record(calc, "$(P)$(Q):IRATEMATCHES") {
+  field(DESC, "True if readback for infuse rate matches setpoint")
+  field(INPA, "$(P)$(Q):IRATE")
+  field(INPB, "$(P)$(Q):IRATE:RBV PP")
+  field(INPC, "$(P)$(Q):IRATEUNITS")
+  field(INPD, "$(P)$(Q):IRATEUNITS:RBV PP")
+  field(SCAN, "Passive")
+  field(CALC, "(A=B)&&(C=D)")
+  field(FLNK, "$(P)$(Q):INFUSEDISABLE")
+}
+
+record(calc, "$(P)$(Q):INFUSEDISABLE") {
+  field(INPA, "$(P)$(Q):DISABLE")
+  field(INPB, "$(P)$(Q):IRATEMATCHES")
+  field(CALC, "(A!=0)||(B!=1)")
+  field(SCAN, "Passive")
+}
+
+record(calc, "$(P)$(Q):WRATEMATCHES") {
+  field(DESC, "True if readback for withdraw rate matches setpoint")
+  field(INPA, "$(P)$(Q):WRATE")
+  field(INPB, "$(P)$(Q):WRATE:RBV PP")
+  field(INPC, "$(P)$(Q):WRATEUNITS")
+  field(INPD, "$(P)$(Q):WRATEUNITS:RBV PP")
+  field(SCAN, "Passive")
+  field(CALC, "(A=B)&&(C=D)")
+  field(FLNK, "$(P)$(Q):WITHDRAWDISABLE")
+}
+
+record(calc, "$(P)$(Q):WITHDRAWDISABLE") {
+  field(INPA, "$(P)$(Q):DISABLE")
+  field(INPB, "$(P)$(Q):IRATEMATCHES")
+  field(CALC, "(A!=0)||(B!=1)")
+  field(SCAN, "Passive")
+}

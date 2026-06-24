@@ -1,0 +1,209 @@
+################################################################################
+# Protocol file for:
+#
+# specs VCU1000 valve controller
+#
+# Communication UDP via port ????
+#
+################################################################################
+
+OutTerminator = CR LF;
+InTerminator = ;
+
+####################
+# General commands
+
+# RESET
+# Power cycles device. Most configuration options retain their current values,
+# with exception of "Regulation", "RemoteMode" and "ValveVoltage".
+# Cmd: 'RESET' Resp: 'OK'
+reset {
+    out "RESET"; in "OK";
+}
+
+####################
+# Get commands
+
+# Get Status
+# Cmd: 'GET Status' Resp: 'OK <Standby|InProgress|Regulating|Error>'
+getStatus {
+    out "GET Status"; in "OK %{Standby|InProgress|Regulating|Error}";
+}
+
+# Get Remote Mode
+# Cmd: 'GET RemoteMode' Resp: 'OK <Local|Remote>'
+getRemoteMode {
+    out "GET RemoteMode"; in "OK %{Local|Remote}";
+}
+
+# Get DeviceType
+# Cmd: 'GET DeviceType' Resp: 'OK <string>'
+getDeviceType {
+    out "GET DeviceType"; in "OK %#s";
+}
+
+# Get DeviceID
+# Cmd: 'GET DeviceId' Resp: 'OK <string>'
+getDeviceId {
+    out "GET DeviceId"; in "OK %s";
+}
+
+# Get Version
+# Cmd: 'GET Version' Resp: 'OK <string>'
+getVersion {
+    out "GET Version"; in "OK %#s";
+}
+
+
+# Get PressureInterface
+# Cmd: 'GET PressureInterface' Resp: 'OK <string>'
+getPInterface {
+    out "GET PressureInterface"; in "OK %s";
+}
+
+# Get Pressure Target (setpoint)
+# Cmd: 'GET PressureTarget' Resp: 'OK 9.0e-09'
+getPTarget {
+    out "GET PressureTarget"; in "OK %f";
+}
+
+# Get Pressure Tolerance
+# Cmd: 'GET PressureTolerance' Resp: 'OK 10'
+getPTolerance {
+    out "GET PressureTolerance"; in "OK %d";
+} 
+
+# Get Current Pressure
+# Cmd: 'GET CurrentPressure' Resp: 'OK 9.0e-09'
+getP {
+    out "GET CurrentPressure"; in "OK %f";
+}
+
+
+# Get Current Valve Voltage
+# Cmd: 'GET CurrentValveVoltage' Resp: 'OK 100.00'
+getV {
+    out "GET CurrentValveVoltage"; in "OK %f";
+}
+
+# Get Current Valve Percentage
+# Cmd: 'GET CurrentValvePercentage' Resp: 'OK 50.00'
+getVPer {
+    out "GET CurrentValvePercentage"; in "OK %f";
+}
+
+# Get Max Voltage
+# Cmd 'GET ValveVoltageMax' Resp: 'OK 1000.00'
+getVMax {
+    out "GET ValveVoltageMax"; in "OK %f";
+}
+
+
+# Get Timer state
+# Cmd 'GET Timer' Resp: 'OK <On|Off>'
+getTimer {
+    out "GET Timer"; in "OK %{Off|On}";
+}
+
+# Get Timer target
+# Cmd 'GET TimerTarget' Resp: 'OK 100'
+getTTarget {
+    out "GET TimerTarget"; in "OK %d";
+}
+
+# Get Current timer value
+# Cmd 'GET CurrentTimer' Resp: 'OK 34'
+getT {
+    out "GET CurrentTimer"; in "OK %d";
+}
+
+
+# Get Regulation state
+# Cmd 'GET Regulation' Resp: 'OK <On|Off>'
+getR {
+    out "GET Regulation"; in "OK %{Off|On}";
+}
+
+# Get Regulation Timeout
+# Cmd 'GET RegulationTimeout' Resp: 'OK 40'
+getRTimeout {
+    out "GET RegulationTimeout"; in "OK %d";
+}
+
+# Get KI/KP (integral/proportional parameters for control loop)
+# Cmd 'GET ValueK<P|I>' Resp: 'OK 2.0e+03'
+getK {
+    out "GET ValueK\$1"; in "OK %f";
+}
+
+####################
+# Set commands
+
+# Set Remote Mode
+setRemoteMode {
+    out "SET RemoteMode %{Local|Remote}"; in "OK %{Local|Remote}";
+    @mismatch {in "ERROR BadRemoteMode";}
+}
+
+
+# Set Pressure Target
+setPTarget {
+    out "SET PressureTarget %e"; in "OK %f";
+}
+
+# Set Pressure Tolerance
+setPTolerance {
+    out "SET PressureTolerance %d"; in "OK %d";
+}
+
+
+# Set Maximum Valve Voltage
+SetVMax {
+    out "SET ValveVoltageMax %f"; in "OK %f";
+}
+
+# Set Valve Voltage 
+# Only does anything when not regulating, but will acknowledge the set message
+# regardless.
+setV {
+    out "SET ValveVoltage %f"; in "OK %f";
+}
+
+
+# Set Timer state
+setTimer {
+    out "SET Timer %{Off|On}"; in "OK %{Off|On}";
+}
+
+# Set Timer Target
+# Note this will return an error message if Regulating and Timer are both On. 
+setTTarget {
+    out "SET TimerTarget %d"; in "OK %d";
+}
+
+
+# Set Regulation (i.e. closed loop control).
+setR {
+    out "SET Regulation %{Off|On}"; in "OK %{Off|On}";
+}
+
+# Set Regulation Timeout - This always succeeds, even if timeout is already 
+# running (although in this case the current timeout won't be affected).
+setRTimeout {
+    out "SET RegulationTimeout %d"; in "OK %d";
+}
+
+# Set KI/KP (integral/proportional parameters for control loop)
+# Note we will get an error message if this message is sent while Regulation is On.
+setK {
+    out "SET ValueK\$1 %e"; in "OK %f";
+}
+
+
+####################
+# Commands not implemented:
+# GET/SET TTL/ADC
+# GET CurrentTicks
+# Info
+# CAN
+# SET PressureInterface

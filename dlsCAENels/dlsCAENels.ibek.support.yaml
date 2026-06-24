@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: dlsCAENels
+
+entity_models:
+  - name: dlsCAENels
+    description: |-
+      Top-level CAENels HV-Adaptos bimorph high-voltage power supply
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS name prefix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: dlsCAENels.template
+        args:
+          .*:
+  - name: dlsCAENelsGroup
+    description: |-
+      A group of channels on a CAENels HV-Adaptos power supply
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS name prefix
+      GR:
+        type: int
+        description: |-
+          Channel group number
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      BUSYIN:
+        type: str
+        description: |-
+          letter indicating the input link on a calc record
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: dlsCAENels_group.template
+        args:
+          .*:
+  - name: dlsCAENelsChannel
+    description: |-
+      A single channel on a CAENels HV-Adaptos power supply
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS name prefix
+      GR:
+        type: int
+        description: |-
+          Channel group number
+      CH:
+        type: int
+        description: |-
+          Channel number
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: dlsCAENels_channel.template
+        args:
+          .*:

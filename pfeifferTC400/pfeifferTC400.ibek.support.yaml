@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: pfeifferTC400
+
+entity_models:
+  - name: pfeifferTC400
+    description: |-
+      Support for Pfeiffer TC400 & TC110 turbo pump controllers supplied as part of Pfeiffer turbo pumps like the HiPace series.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Mandatory. Device prefix for record names.
+      R:
+        type: str
+        description: |-
+          Mandatory. Record name prefix.
+      port:
+        type: str
+        description: |-
+          Mandatory. Name of the serial port the device is on.
+      TC110:
+        type: int
+        description: |-
+          Optional.  Whether actually a TC110, which lacks some features.          0 or 1.     Defaults to zero (i.e. assumes TC400).
+        default: 0
+      unitaddr:
+        type: str
+        description: |-
+          Optional.  Three decimal digit unit number in the RS 485 addressing.     001 to 255. Defaults to 001.
+        default: "001"
+      pump_model:
+        type: str
+        description: |-
+          Optional.  Model of the pump.  For GUI information, makes no difference.             Defaults to Unknown.
+        default: Unknown
+      pump_descr:
+        type: str
+        description: |-
+          Optional.  Description string for the pump.  Record location, function, etc.         Defaults to Pfeiffer turbo pump.
+        default: Pfeiffer turbo pump
+      DISABLED:
+        type: int
+        description: |-
+          Optional.  Set to 1 to disable comms.  Defaults to 0 (enabled).
+        default: 0
+      name:
+        type: id
+        description: |-
+          object and gui association name
+      paramno_display:
+        type: int
+        description: |-
+          Optional.  Whether to display parameter nos on status and control screens. 0 or 1.   Defaults to zero.  Part of Expert Mode.
+        default: 0
+    databases:
+      - file: pfeifferTC400.template
+        args:
+          .*:

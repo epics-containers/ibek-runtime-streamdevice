@@ -1,0 +1,94 @@
+####################################################
+# Protocol file for Tenma PSU
+# Diamond Light Source, Aug 2019
+####################################################
+
+####################################################
+# General
+####################################################
+
+ExtraInput = Ignore;
+ReplyTimeout = 1000;
+
+#############################################
+# Get functions
+#############################################
+
+getCurrentReadback {
+  out "ISET1?";
+  in "%f";
+}
+
+getVoltageReadback {
+  out "VSET1?";
+  in "%f";
+}
+
+getCurrent {
+  out "IOUT1?";
+  in "%f";
+}
+
+getVoltage {
+  out "VOUT1?";
+  in "%f";
+}
+
+getStatus {
+  out "STATUS?";
+  in "%r";
+}
+
+getID {
+  out "*IDN?";
+  in "%#s";
+}
+#############################################
+# Set functions
+#############################################
+
+setCurrent {
+  out "ISET1:%.3f";
+#  in "";
+}
+
+setVoltage {
+  out "VSET1:%.2f";
+#  in "";
+}
+
+on {
+  out "OUT1";
+#  in "";
+}
+
+off {
+  out "OUT0";
+#  in "";
+}
+
+onOCP {
+  out "OCP1";
+#  in "";
+}
+
+offOCP {
+  out "OCP0";
+#  in "";
+}
+
+setOVP {
+  out "OVP%d";
+#  in "";
+}
+
+saveSetting{
+  out "SAV%i";
+#  in "";
+}
+
+recallSetting{
+  out "RCL%i";
+#  in "";
+}
+

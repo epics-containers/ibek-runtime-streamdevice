@@ -1,0 +1,42 @@
+# Stream Device Protocol for the Parker Compax3 motor controller ASCII interface
+# This protocol uses features defined in Stream Device Version 1.5
+#
+# Philip Taylor 14 Aug 2006
+#
+
+outterminator   = CR;
+interminator   = CR;
+locktimeout = 1500;
+writetimeout = 50;
+replytimeout = 200;
+readtimeout  = 200;
+extrainput   = Ignore;
+buffersize   = 300;
+
+util	    { out "O 683,2"; in "%f"; }
+potemp	  { out "O 684,1"; in "%f"; }
+mtemp	    { out "O 684,2"; in "%f"; }
+auxv	    { out "O 685,1"; in "%f"; }
+busv	    { out "O 685,2"; in "%f"; }
+targi	    { out "O 688,1"; in "%f"; }
+acti	    { out "O 688,2"; in "%f"; }
+conv	    { out "O 688,11"; in "%f"; }
+targs     { out "O 681,13"; in "%f"; }
+acts      { out "O 681,12"; in "%f"; }
+input     { out "O 685,3"; in "%f"; }
+offset    { out "O 170,4"; in "%f"; }
+gain      { out "O 170,2"; in "%f"; }
+ctrl1     { out "O 1100,3"; in "%i"; }
+stat1     { out "O 1000,3"; in "%i"; }
+stat2     { out "O 1000,4"; in "%i"; }
+device    { out "O 85,1"; in "%i"; }
+digin     { out "O 120,3"; in "%i"; }
+error0    { out "O 550,1"; in "%i"; }
+error1    { out "O 550,2"; in "%i"; }
+error2    { out "O 550,3"; in "%i"; }
+error3    { out "O 550,4"; in "%i"; }
+error4    { out "O 550,5"; in "%i"; }
+error5    { out "O 550,6"; in "%i"; }
+
+offout    { out "O 170,4=%8.6f"; in ""; }
+

@@ -1,0 +1,149 @@
+
+# Edwards Digital Wide Range Guage Protocol
+
+# Control side communicaton to the pump is done via RS232.  The serial line 
+# must be enabld by a hardware line before the software will talk. This is done 
+# by linking the serial enable input signal (Pin 5) to Pin 2.  This could be 
+# arranged in the cable so that whenever a serial cable is connected, serial
+# comms are enabled.
+
+# The serial enable line acts as an intelock for start commands over the serial
+# interface.  If the pump is running in serial control mode, (ie having been sent
+# a serial start command) and the serial enable subsequently becomes inactive,
+# the pump will flaf a fail condition and will decellerate to rest.  To clear this
+# fail condition you must re-activate the serial enable line and send a serial 
+# stop command
+
+# Serial Protocol:
+
+# 9600 baud
+# 8 bits
+# 1 stop bit
+# No parity
+# No handshaking
+# All alphabetical characters to be sent uppercase
+# Every command will receive a response
+# Characters not framed with start and stop bits are ignored
+# Unrecognised (but correctly formatted) messsages return an error code
+
+# Message Structure:
+
+# <Start Char><Command><Object Number><Data Field (only for some commands)<Stop Char>
+#      !/?       XXX    space if none                   X                     CR
+
+# ! used for commands
+# ? used for queries
+
+# Error Codes (returned behind echoed command):
+
+# 0 - No error
+# 1 - Invalid command for object ID
+# 2 - Invalid query / command
+# 3 - Missing parameter
+# 4 - Parameter out of range
+# 5 - Invalid command in current state
+
+# A wide range of serial commands are available and listed in the manual, but
+# Diamond is only interested in a small subset of these:
+
+Terminator = "\r";
+ExtraInput = Ignore;
+
+# Not allowing EPICS interface to write to this field, as it breaks all other commands
+getMultiDrop {out "?S901"; in "=S901 %u" ; }
+
+getGauge1Pressure{out "?V913" ; in "=V913 %e;%*u;%*u;%*u;%*u" ; }
+getGauge1UnitsType{out "?V913" ; in "=V913 %*e;%u;%*u;%*u;%*u" ; }
+getGauge1State{out "?V913" ; in "=V913 %*e;%*u;%u;%*u;%*u" ; }
+getGauge1AlertID{out "?V913" ; in "=V913 %*e;%*u;%*u;%u;%*u" ; }
+getGauge1Priority{out "?V913" ; in "=V913 %*e;%*u;%*u;%*u;%u" ; }
+
+getInternalTemperature{out "?V920"; in "=V920 %f;%*u;%*u"; }
+getInternalTemperatureAlertID{out "?V920"; in "=V920 %*f;%u;%*u"; }
+getInternalTemperaturePriority{out "?V920"; in "=V920 %*f;%*u;%u"; }
+
+getPressureUnits{out "?S929"; in "=S929 %u"; }
+
+# getTurboState {out "?V902"; in "=V902 %u"}
+
+# TODO: remove everything below here. keeping for reference while rewriting
+
+# # Get measured motor power (in W)
+# # The response gives voltage / current / power
+# # So we ignore the first two numbers here
+# getMotorPower {out "?V809" ; in "=V809 %*u;%*u;%u" ; }
+
+# #Get measured pressures in Pascal
+# #The response gives Nitrogen/Air and Pascal
+# #So we ignore the first number
+# getGaugePressure {out "?V752" ; in "=V752 %*u;%u" ; }
+
+# # Get the total time the pump has run for (in hrs)
+# getTotalTime { out "?V769" ; in "=V769 %u" ; } 
+
+# #Returns the hardware version, software version and gauge name
+# getGaugeName {
+#     out "?S751" ; in "V751" ; 
+#     @mismatch {
+#         in "*V751 %(\$1:LAST_ERR_CODE.VAL)s"
+#     }
+# }
+
+# #Returns the low setpoint threshold in Pascals
+# getLowSetpointThreshold { out "?S754 1" ; in "V754 %e" ; }
+
+# #Returns the high setpoint threshold in Pascals
+# getHighSetpointThreshold { out "?S754 0" ; in "V754 %e" ; }
+
+
+
+# #Returns internal temperature in Celcius
+# getInternalTemp { 
+#     out "?V759" ; in "V759 %f" ; 
+#     @mismatch {
+#         in "*V759 %(\$1:LAST_ERR_CODE.VAL)u";
+#     }
+# }
+
+# #Reads magnetron exposure threshold
+# #Value of 0.0E±00 indicates the staus flag is disabled
+# getMagnetronExposureThreshold { out "?S769" ; in "S769 %e" ; }
+
+# #Sets magnetron exposure threshold
+# #can be set beteen 1x10^-7 and 5x10^5
+# #Setting to 0.0E±00 disables the flag
+# setMagnetronExposureThreshold {
+#     out "!S769" ; in "S769 %e" ;
+#     @mismatch {
+#         in "*S769 %(\$1:LAST_ERR_CODE.VAL)u"
+#     }
+# } 
+
+# #Resets run hours
+# doRunHours { out "!C769 1" ; in "C769 %(\$1:LAST_ERR_CODE.VAL)u" ; }
+
+# #Sets setpoint thresholds
+# doLowSetpointThreshold { 
+#     out "!C754 1" ; in "C754 %e" ; 
+#     @mismatch {
+#         in "*C754 %(\$1:LAST_ERR_CODE.VAL)u"
+#     }
+# }
+
+# #Sets setpoint thresholds
+# doHighSetpointThreshold { 
+#     out "!C754 0" ; in "C754 %e" ; 
+#     @mismatch {
+#         in "*C754 %(\$1:LAST_ERR_CODE.VAL)u"
+#     }
+# }
+
+# #Acknowledges and clears gauge errors
+# #Active gauge errors canot be cleared 
+# #and remain active untic the cause is removed
+# doAcknowledgeGaugeErrors {
+#     out"!S755 1" ; in "S755 %u" ;
+#     @mismatch {
+#         in "*S755 %(\$1:LAST_ERR_CODE.VAL)u"
+#     }
+# }

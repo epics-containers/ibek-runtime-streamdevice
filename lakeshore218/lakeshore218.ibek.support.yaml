@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: lakeshore218
+
+entity_models:
+  - name: lakeshore218
+    description: |-
+      Lakeshore 218 Temperature Monitor
+      Notes: The temperatures in Kelvin are archived once every 10 secs.
+    parameters:
+      P:
+        type: str
+        description: |-
+          prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      TEMPSCAN:
+        type: int
+        description: |-
+          SCAN rate for the temperature/voltage readings
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for non-temperature/voltage parameters.
+      name:
+        type: id
+        description: |-
+          name for the gui element
+      lakeshore218Path:
+        type: str
+        description: |-
+          path for the documentation, e.g. /dls_sw/prod/R3.14.12.3/support/lakeshore218/2-2-1
+      Description:
+        type: str
+        description: |-
+          main use of this device (defaults to Temperature Controller)
+        default: Temperature Controller
+      CH1_label:
+        type: str
+        description: |-
+          what is channel 1 measuring? Defaults to Channel 1
+        default: Channel 1
+      CH2_label:
+        type: str
+        description: |-
+          what is channel 2 measuring? Defaults to Channel 2
+        default: Channel 2
+      CH3_label:
+        type: str
+        description: |-
+          what is channel 3 measuring? Defaults to Channel 3
+        default: Channel 3
+      CH4_label:
+        type: str
+        description: |-
+          what is channel 4 measuring? Defaults to Channel 4
+        default: Channel 4
+      CH5_label:
+        type: str
+        description: |-
+          what is channel 5 measuring? Defaults to Channel 5
+        default: Channel 5
+      CH6_label:
+        type: str
+        description: |-
+          what is channel 6 measuring? Defaults to Channel 6
+        default: Channel 6
+      CH7_label:
+        type: str
+        description: |-
+          what is channel 7 measuring? Defaults to Channel 7
+        default: Channel 7
+      CH8_label:
+        type: str
+        description: |-
+          what is channel 8 measuring? Defaults to Channel 8
+        default: Channel 8
+    databases:
+      - file: lakeshore218.template
+        args:
+          .*:

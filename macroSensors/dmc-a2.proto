@@ -1,0 +1,33 @@
+# Protocol specification for the DMC-A2 dual channel LVDT controller
+
+# General format of a command is:
+#   S {address} R {register} *
+#   S {address} W {register} , {value} *
+# And a response is:
+#   {Response}{CR}{LF}
+
+# The terminator is automatically added to output strings
+# and is used to terminate input strings
+InTerminator = CR LF;
+OutTerminator = "*";
+
+# How long to wait for input
+ReplyTimeout = 1500;
+
+# Get channel 1 reading
+#  $1 = Address
+getChan1
+{
+    out "S\${1}R4";
+    in "%f";
+}
+
+# Get channel 2 reading
+#  $1 = Address
+getChan2
+{
+    out "S\${1}R5";
+    in "%f";
+}
+
+

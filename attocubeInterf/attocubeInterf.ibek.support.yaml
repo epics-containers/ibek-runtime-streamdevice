@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: attocubeInterf
+
+entity_models:
+  - name: ids3010
+    description: |-
+      Controls an attocube ids3010 interferometer
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device prefix 1
+      Q:
+        type: str
+        description: |-
+          Device prefix 2
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      label1:
+        type: str
+        description: |-
+          Axis 1 name to display on GUI
+      label2:
+        type: str
+        description: |-
+          Axis 2 name to display on GUI
+      label3:
+        type: str
+        description: |-
+          Axis 3 name to display on GUI
+      PREC1:
+        type: int
+        description: |-
+          Precision axis 1 (default 0)
+        default: 0
+      SCAN:
+        type: str
+        description: |-
+          Measurement update rate (default 1 second)
+        default: 1 second
+      EGU1:
+        type: str
+        description: |-
+          Units axis 1 (default "")
+        default: ""
+      SCALE1:
+        type: float
+        description: |-
+          Scale axis 1 (default 1)
+        default: 1
+      OFF1:
+        type: float
+        description: |-
+          Offset axis 1 (default 0)
+        default: 0
+      PREC2:
+        type: int
+        description: |-
+          Precision axis 2 (default 0)
+        default: 0
+      EGU2:
+        type: str
+        description: |-
+          Units axis 2 (default "")
+        default: ""
+      SCALE2:
+        type: float
+        description: |-
+          Scale axis 2 (default 2)
+        default: 1
+      OFF2:
+        type: float
+        description: |-
+          Offset axis 2 (default 0)
+        default: 0
+      PREC3:
+        type: int
+        description: |-
+          Precision axis 3 (default 0)
+        default: 0
+      EGU3:
+        type: str
+        description: |-
+          Units axis 3 (default "")
+        default: ""
+      SCALE3:
+        type: float
+        description: |-
+          Scale axis 3 (default 3)
+        default: 1
+      OFF3:
+        type: float
+        description: |-
+          Offset axis 3 (default 0)
+        default: 0
+    databases:
+      - file: ids3010.template
+        args:
+          .*:

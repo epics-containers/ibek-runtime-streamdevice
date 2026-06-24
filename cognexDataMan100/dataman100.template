@@ -1,0 +1,27 @@
+# % macro, P, prefix
+# % macro, R, suffix
+# % macro, PORT, asyn port name
+# % macro, name, gui element name
+# % gui, $(name), edm, dataman100.edl,P=$(P),R=$(R)
+
+record(waveform, "$(P)$(R):CODE")
+{
+  field(DTYP, "stream")
+  field(SCAN, "I/O Intr")
+  field(INP, "@dataman.proto read() $(PORT)")
+  field(FLNK, "$(P)$(R):TCALC")
+}
+record(calcout, "$(P)$(R):TCALC")
+{
+    field(CALC, "1")
+    field(DOPT, "Use CALC")
+    field(OOPT, "Every Time")
+    field(OUT, "$(P)$(R):STATUS.VAL PP")
+}
+record(bo, "$(P)$(R):STATUS")
+{
+    field(DTYP, "Soft Channel")
+    field(HIGH, "5")
+    field(ZNAM, "Invalid")
+    field(ONAM, "Valid")
+}

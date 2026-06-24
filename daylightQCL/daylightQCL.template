@@ -1,0 +1,400 @@
+# % macro, P,      PV name prefix
+# % macro, Q,      PV name suffix
+# % macro, PORT,   asyn port
+
+# % gui, $(name=), edm, daylightQCL.edl, P=$(P),Q=$(Q)
+
+record(longin, "$(P)$(Q):LASER:CURRENT_RBV")
+{
+	field(DESC, "Measured laser current")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(EGU, "mA")
+	field(INP, "@daylightQCL.proto getLaserCurrent $(PORT)")
+}
+record(longout, "$(P)$(Q):LASER:CURRENT")
+{
+	field(DESC, "Laser current")
+	field(DTYP, "stream")
+	field(EGU, "mA")
+	field(OUT, "@daylightQCL.proto setLaserCurrent $(PORT)")
+}
+
+record(ai, "$(P)$(Q):LASER:TEMP")
+{
+	field(DESC, "Laser temperature")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getLaserTemp $(PORT)")
+	field(EGU, "C")
+	field(PREC, "2")
+}
+record(ao, "$(P)$(Q):LASER:TEMP:SETPOINT")
+{
+	field(DESC, "Laser temperature")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setLaserTempSetpoint $(PORT)")
+	field(EGU, "C")
+	field(PREC, "2")
+}
+record(ai, "$(P)$(Q):CASE:TEMP")
+{
+	field(DESC, "Case temperature")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getCaseTemp $(PORT)")
+	field(EGU, "C")
+	field(PREC, "2")
+}
+
+record(mbbi, "$(P)$(Q):LASER:ILOCK")
+{
+	field(DESC, "Interlock status")
+	field(DTYP, "stream")
+	field(INP, "@daylightQCL.proto getInterlockStatus $(PORT)")
+	field(SCAN, "1 second")
+	field(ZRST, "Ready")
+	field(ONST, "Key off")
+	field(THST, "Key off, remote open")
+	field(FVST, "Key off, laser disc.")
+}
+
+record(ai, "$(P)$(Q):LASER:WAVE_RBV")
+{
+	field(DESC, "Laser wavelength/number")
+	field(DTYP, "stream")
+	field(SCAN, ".2 second")
+	field(INP, "@daylightQCL.proto getMeasuredLaserWavelength $(PORT)")
+	field(PREC, "2")
+}
+record(ao, "$(P)$(Q):LASER:WAVE")
+{
+	field(DESC, "Laser wavelength/number")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setLaserWavelength $(PORT)")
+	field(PREC, "2")
+}
+
+record(bi, "$(P)$(Q):LASER:OUTPUT_RBV")
+{
+	field(DESC, "Laser output")
+	field(DTYP, "stream")
+	field(SCAN, ".2 second")
+	field(INP, "@daylightQCL.proto getLaserOutput $(PORT)")
+	field(ONAM, "On")
+	field(ZNAM, "Off")
+}
+record(bo, "$(P)$(Q):LASER:OUTPUT")
+{
+	field(DESC, "Laser output")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setLaserOutput $(PORT)")
+	field(ONAM, "On")
+	field(ZNAM, "Off")
+}
+
+record(ai, "$(P)$(Q):PULSE:MODE_RBV_RAW")
+{
+	field(DESC, "Pulse mode raw")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getPulseMode $(PORT)")
+	field(FLNK, "$(P)$(Q):PULSE:MODE_OFFPLUS.PROC")
+}
+
+record(calc, "$(P)$(Q):PULSE:MODE_OFFPLUS")
+{
+	field(DESC, "Pulse mode offset")
+	field(INPA, "$(P)$(Q):PULSE:MODE_RBV_RAW")
+	field(CALC, "A+1")
+	field(FLNK, "$(P)$(Q):PULSE:MODE_RBV.PROC")
+}
+record(mbbi, "$(P)$(Q):PULSE:MODE_RBV")
+{
+	field(DESC, "Pulse mode")
+	field(INP, "$(P)$(Q):PULSE:MODE_OFFPLUS")
+	field(ZRST, "CW Hop Free")
+	field(ONST, "CW")
+	field(TWST, "Int. pulse")
+	field(THST, "Ext. trig int. pulse")
+	field(FRST, "Ext. pulse cmd")
+}
+
+record(mbbo, "$(P)$(Q):PULSE:MODE")
+{
+	field(DESC, "Set Pulse mode")
+	field(ZRST, "CW Hop Free")
+	field(ONST, "CW")
+	field(TWST, "Int. pulse")
+	field(THST, "Ext. trig int. pulse")
+	field(FRST, "Ext. pulse cmd")
+	field(FLNK, "$(P)$(Q):PULSE:MODE_OFFMINUS.PROC")
+}
+record(calcout, "$(P)$(Q):PULSE:MODE_OFFMINUS")
+{
+	field(DESC, "Pulse mode offset")
+	field(INPA, "$(P)$(Q):PULSE:MODE")
+	field(CALC, "A-1")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setPulseMode $(PORT)")
+}
+
+record(ai, "$(P)$(Q):PULSE:WIDTH_RBV")
+{
+	field(DESC, "Pulse width")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getPulseWidth $(PORT)")
+	field(EGU, "usec")
+	field(PREC, "2")
+}
+record(ao, "$(P)$(Q):PULSE:WIDTH")
+{
+	field(DESC, "Pulse width")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setPulseWidth $(PORT)")
+	field(EGU, "usec")
+	field(PREC, "2")
+}
+
+record(ai, "$(P)$(Q):PULSE:FREQ_RBV")
+{
+	field(DESC, "Pulse frequency")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getPulseFrequency $(PORT)")
+	field(EGU, "kHz")
+	field(PREC, "1")
+}
+record(ao, "$(P)$(Q):PULSE:FREQ")
+{
+	field(DESC, "Pulse frequency")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setPulseFrequency $(PORT)")
+	field(EGU, "kHz")
+	field(PREC, "1")
+}
+
+record(ai, "$(P)$(Q):PULSE:DUTY_RBV")
+{
+	field(DESC, "Pulse duty cycle")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getPulseDutyCycle $(PORT)")
+	field(EGU, "%")
+	field(PREC, "1")
+}
+record(ao, "$(P)$(Q):PULSE:DUTY")
+{
+	field(DESC, "Pulse duty cycle")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setPulseDutyCycle $(PORT)")
+	field(EGU, "%")
+	field(PREC, "1")
+}
+
+record(mbbi, "$(P)$(Q):SCAN:MODE_RBV")
+{
+	field(DESC, "Scan mode")
+	field(ONST, "Auto step")
+	field(TWST, "Manual step")
+	field(THST, "Uni-dir sweep")
+	field(FRST, "Bi-dir sweep")
+	field(DTYP, "stream")
+	field(INP, "@daylightQCL.proto getScanMode $(PORT)")
+	field(SCAN, "1 second")
+	field(FLNK, "$(P)$(Q):SCAN:STEP:MAN_CTRL")
+}
+record(mbbo, "$(P)$(Q):SCAN:MODE")
+{
+	field(DESC, "Set scan mode")
+	field(ONST, "Auto step")
+	field(TWST, "Manual step")
+	field(THST, "Uni-dir sweep")
+	field(FRST, "Bi-dir sweep")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanMode $(PORT)")
+}
+record(calc, "$(P)$(Q):SCAN:STEP:MAN_CTRL")
+{
+	field(DESC, "Disable step control")
+	field(CALC, "A=2?0:1")
+	field(INPA, "$(P)$(Q):SCAN:MODE_RBV")
+	field(FLNK, "$(P)$(Q):SCAN:STEP:NEXT")
+}
+record(calc, "$(P)$(Q):SCAN:SWEEPING")
+{
+	field(DESC, "Sweeping mode")
+	field(CALC, "A<3?0:1")
+	field(INPA, "$(P)$(Q):SCAN:MODE_RBV CP")
+}
+
+record(ai, "$(P)$(Q):SCAN:START_RBV")
+{
+	field(DESC, "Start wavenumber")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getScanStart $(PORT)")
+	field(PREC, "2")
+}
+record(ao, "$(P)$(Q):SCAN:START")
+{
+	field(DESC, "Start wavenumber")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanStart $(PORT)")
+	field(PREC, "2")
+}
+
+record(ai, "$(P)$(Q):SCAN:STOP_RBV")
+{
+	field(DESC, "Stop wavenumber")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getScanStop $(PORT)")
+	field(PREC, "2")
+}
+record(ao, "$(P)$(Q):SCAN:STOP")
+{
+	field(DESC, "Stop wavenumber")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanStop $(PORT)")
+	field(PREC, "2")
+}
+
+record(ai, "$(P)$(Q):SCAN:STEP_RBV")
+{
+	field(DESC, "Step wavenumber")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getScanStep $(PORT)")
+	field(PREC, "2")
+	field(DISV, 1)
+	field(SDIS, "$(P)$(Q):SCAN:SWEEPING")
+}
+record(ao, "$(P)$(Q):SCAN:STEP")
+{
+	field(DESC, "Step wavenumber")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanStep $(PORT)")
+	field(PREC, "2")
+	field(DISV, 1)
+	field(SDIS, "$(P)$(Q):SCAN:SWEEPING")
+}
+
+record(ai, "$(P)$(Q):SCAN:PAUSE_RBV")
+{
+	field(DESC, "Step wavenumber")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getScanPauseTime $(PORT)")
+	field(PREC, "2")
+	field(EGU, "s")
+	field(DISV, 0)
+	field(SDIS, "$(P)$(Q):SCAN:STEP:MAN_CTRL")
+}
+record(ao, "$(P)$(Q):SCAN:PAUSE")
+{
+	field(DESC, "Step wavenumber")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanPauseTime $(PORT)")
+	field(PREC, "2")
+	field(EGU, "s")
+	field(DISV, 0)
+	field(SDIS, "$(P)$(Q):SCAN:STEP:MAN_CTRL")
+}
+
+record(bi, "$(P)$(Q):SCAN:STEP:NEXT_RBV")
+{
+	field(DESC, "Manual step")
+	field(DTYP, "stream")
+	field(SCAN, ".2 second")
+	field(INP, "@daylightQCL.proto getScanNextStep $(PORT)")
+	field(ZNAM, "Tuned")
+	field(ONAM, "Not ready")
+	field(DISV, 1)
+	field(SDIS, "$(P)$(Q):SCAN:STEP:MAN_CTRL")
+}
+record(ao, "$(P)$(Q):SCAN:STEP:NEXT")
+{
+	field(DESC, "Manual step")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanNextStep $(PORT)")
+	field(DISV, 1)
+	field(SDIS, "$(P)$(Q):SCAN:STEP:MAN_CTRL")
+}
+
+record(longin, "$(P)$(Q):SCAN:CYCLES_RBV")
+{
+	field(DESC, "Scan cycles")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getScanCycles $(PORT)")
+}
+record(longout, "$(P)$(Q):SCAN:CYCLES")
+{
+	field(DESC, "Scan cycles")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanCycles $(PORT)")
+}
+
+record(longin, "$(P)$(Q):SCAN:RATE_RBV")
+{
+	field(DESC, "Scan rate")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getScanRate $(PORT)")
+}
+record(longout, "$(P)$(Q):SCAN:RATE")
+{
+	field(DESC, "Scan rate")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanRate $(PORT)")
+}
+
+record(bo, "$(P)$(Q):SCAN:RUN")
+{
+	field(DESC, "Run scan")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setScanRun $(PORT)")
+	field(ZNAM, "Stopped")
+	field(ONAM, "Running")
+}
+
+record(longin, "$(P)$(Q):SCAN:COUNT")
+{
+	field(DESC, "Run scan")
+	field(DTYP, "stream")
+	field(INP, "@daylightQCL.proto getScanCount $(PORT)")
+	field(SCAN, "1 second")
+}
+
+record(ai, "$(P)$(Q):SCAN:SWEEP_TIME")
+{
+	field(DESC, "Last sweep time")
+	field(DTYP, "stream")
+	field(SCAN, "1 second")
+	field(INP, "@daylightQCL.proto getLastScanSweepTime $(PORT)")
+	field(EGU, "ms")
+	field(DISV, 0)
+	field(SDIS, "$(P)$(Q):SCAN:SWEEPING")
+}
+
+record(bi, "$(P)$(Q):DISP:UNITS_RBV")
+{
+	field(DESC, "Display units")
+	field(DTYP, "stream")
+	field(INP, "@daylightQCL.proto getDisplayUnits $(PORT)")
+	field(ZNAM, "Number")
+	field(ONAM, "Length")
+	field(SCAN, "1 second")
+	field(FLNK, "$(P)$(Q):WAVE:UNITS.PROC")
+}
+
+record(bo, "$(P)$(Q):DISP:UNITS")
+{
+	field(DESC, "Display units")
+	field(DTYP, "stream")
+	field(OUT, "@daylightQCL.proto setDisplayUnits $(PORT)")
+	field(ZNAM, "Number")
+	field(ONAM, "Length")
+}

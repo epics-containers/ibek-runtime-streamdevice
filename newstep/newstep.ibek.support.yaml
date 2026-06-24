@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: newstep
+
+entity_models:
+  - name: NSC200
+    description: |-
+      Newport NSC200 single axis motion controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      M:
+        type: str
+        description: |-
+          Device suffix
+      CH:
+        type: int
+        description: |-
+          Controller channel address
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: NSC200.template
+        args:
+          .*:

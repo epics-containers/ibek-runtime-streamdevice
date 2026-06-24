@@ -1,0 +1,74 @@
+#######################################################################
+## \file blueShadow40P.proto
+## \brief Stream device protocol for Knauer BlueShadow 40P HPLC pump
+## Communication via TCP/IP
+##
+#######################################################################
+
+Terminator   = CR;
+
+LockTimeout  = 1500;
+ReplyTimeout = 1500;
+ReadTimeout  = 1500;
+ExtraInput   = Ignore;
+separator    = "/";
+
+## \brief Query status
+## \details Example
+##    STATUS:296974716,1,0,,1000,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+##    Fields:timestamp,
+##                     |state,
+##                       |error,
+##                         |current program runtime (blank here),
+##                          |flow rate,     
+##                               |LPG A B C D%,
+##                                          |Event 0 1 2 3 4 5 6 7,
+##                                                         |Current pressure,
+##                                                           |start_in, error_in 
+queryStatus{
+     out "STATUS?"; 
+     in "STATUS:%i,%(\$1:STATE)i,%(\$1:STATUSERR)i,%(\$1:PRGRUNT)?i,%(\$1:FLOW:RBV)i,%(\$1:A:RBV)i,%(\$1:B:RBV)i,%(\$1:C:RBV)i,%(\$1:D:RBV)i,%*i,%*i,%*i,%*i,%*i,%*i,%*i,%*i,%(\$1:PRESSURE)i,%*i,%*i";
+}
+
+## \brief Monitor for errors and publish to PVs if received.
+errorCode{
+	in "ERROR:%i,%(\$1:ERRORSTR)#s";
+}
+
+## \brief Take remote control
+remoteOn{
+	out "REMOTE";
+	in "OK";
+}
+## \brief Release remote control
+remoteOff{
+	out "LOCAL";
+	in "OK";
+}
+## \brief Query remote control status
+queryRemote{
+	out "REMOTE?";
+	in "REMOTE:%i";
+}
+## \brief Start a ramp
+ramp{
+	out "RAMP:%(\$1:RAMPTIME)i,%(\$1:FLOW)i,%(\$1:A)i,%(\$1:B)i,%(\$1:C)i,%(\$1:D)i,3,3,3,3,3,3,3,3,3";
+#            |  Speedup time  | Flow rate  | Input composition                     | Events: 3=do  | Work state:  
+#            |    (ms)        | (uL / min) |     %A        %B        %C        %D  |  not change   | 3 = "RUN" 
+	in "OK";
+}
+## \brief Stop
+stop{
+	out "STOP:1,0";
+	in "OK";
+}
+## \brief Wake up from standby
+powerup{
+	out "POWERUP";
+	in "OK";
+}
+## \brief Enter standby mode
+shutdown{
+	out "SHUTDOWN";
+	in "OK";
+}

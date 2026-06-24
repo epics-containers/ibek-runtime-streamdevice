@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: omegaIR2C
+
+entity_models:
+  - name: omegaIR2C
+    description: |-
+      Controls an Omega iR2C Pyrometer
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device prefix
+      ADDR:
+        type: int
+        description: |-
+          Device address (e.g. 01)
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: omegaIR2C.template
+        args:
+          .*:

@@ -1,0 +1,26 @@
+@writetimeout { disconnect; }
+@replytimeout { disconnect; }
+@readtimeout  { disconnect; }
+@mismatch     { disconnect; }
+
+ReplyTimeout = 1200;
+InTerminator = "\r";
+OutTerminator = "\r";
+
+getIDN {
+    out "*IDN?";
+    in "%\$1[^\r\n]";
+    ExtraInput = Ignore;
+}
+cmd {
+    out "\$1";
+}
+
+monitor {
+  ReplyTimeout = 10000;
+  out "MONITOR\$1? 10";
+  in "%f,%(\$2){R|mV|K|C|F}";
+  ExtraInput = Ignore;
+}
+
+

@@ -1,0 +1,47 @@
+# This is included in lakeshore218.template
+
+################################################################
+# Read records
+################################################################
+
+## 
+## Read the temperature on channel 0 in Kelvin.
+## This is archived every 10 seconds.
+##
+#% archiver 10 Monitor
+#% alh 
+record(ai, "$(P):KRDG$(CHANNEL)") {
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Channel $(CHANNEL) temperature")
+  field(SCAN, "Passive")
+  field(PREC, "3")
+  field(EGU, "K")
+  field(HHSV,"MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(LLSV,"MAJOR")
+  field(HYST,"1.0")
+  field(HIHI,"1000")
+  field(HIGH,"1000")
+  field(LOW,"-1")
+  field(LOLO,"-1")
+}
+
+## 
+## Read the raw voltage on channel 0.
+##
+record(ai, "$(P):SRDG$(CHANNEL)") {
+  field(DESC, "Channel $(CHANNEL) sensor")
+  field(SDIS, "$(P):DISABLE")
+  field(SCAN, "Passive")
+  field(PREC, "3")
+  field(EGU, "V")
+}
+
+# label PV, PINI set to YES so record isn't considered invalid by gui's
+record(stringout, "$(P):KRDG$(CHANNEL)LABEL") {
+    field(DESC, "channel $(CHANNEL) label")
+    field(VAL,  "$(LABEL)")
+    field(PINI, "YES")
+}
+

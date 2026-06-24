@@ -1,0 +1,427 @@
+# programParameters.template
+#
+# Program template for the Kaufman & Robinson ion beam auto controller.
+# Assumed to be using streamDevice
+#
+# Author: Nicoletta De Maio
+# Date:   July 2017
+#
+
+# Parameters:
+# % macro, P,       EPICS PV prefix
+# % macro, PORT,    asyn port
+# % macro, PROG,    program number
+# % macro, name,    object and gui association name
+# % gui, $(name=), edm, programParameters.edl, P=$(P), TITLE=$(name=)
+
+##### Parameter level (program control) #####
+
+# Get gas channel 1 target flow value
+record(ai, "$(P):$(PROG):GS1_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target gas flow 1")
+    field(EGU, "SCCM")
+    field(INP, "@kriIonBeam.proto getT($(P),GS1,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set gas channel 1 target flow value
+record(ao, "$(P):$(PROG):GS1") {
+    field(DTYP, "stream")
+    field(DESC, "target gas flow 1")
+    field(EGU, "SCCM")
+    field(OUT, "@kriIonBeam.proto setT($(P),GS1,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):GS1_RBV")
+    field(PREC, "1")
+}
+
+# Get gas channel 2 target flow value
+record(ai, "$(P):$(PROG):GS2_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target gas flow 2")
+    field(EGU, "SCCM")
+    field(INP, "@kriIonBeam.proto getT($(P),GS2,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set gas channel 2 target flow value
+record(ao, "$(P):$(PROG):GS2") {
+    field(DTYP, "stream")
+    field(DESC, "target gas flow 2")
+    field(EGU, "SCCM")
+    field(OUT, "@kriIonBeam.proto setT($(P),GS2,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):GS2_RBV")
+    field(PREC, "1")
+}
+
+# Get gas channel 3 target flow value
+record(ai, "$(P):$(PROG):GS3_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target gas flow 3")
+    field(EGU, "SCCM")
+    field(INP, "@kriIonBeam.proto getT($(P),GS3,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set gas channel 3 target flow value
+record(ao, "$(P):$(PROG):GS3") {
+    field(DTYP, "stream")
+    field(DESC, "target gas flow 3")
+    field(EGU, "SCCM")
+    field(OUT, "@kriIonBeam.proto setT($(P),GS3,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):GS3_RBV")
+    field(PREC, "1")
+}
+
+# Get gas channel 4 target flow value
+record(ai, "$(P):$(PROG):GS4_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target gas flow 4")
+    field(EGU, "SCCM")
+    field(INP, "@kriIonBeam.proto getT($(P),GS4,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set gas channel 4 target flow value
+record(ao, "$(P):$(PROG):GS4") {
+    field(DTYP, "stream")
+    field(DESC, "target gas flow 4")
+    field(EGU, "SCCM")
+    field(OUT, "@kriIonBeam.proto setT($(P),GS4,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):GS4_RBV")
+    field(PREC, "1")
+}
+
+# Get beam current target
+record(ai, "$(P):$(PROG):BMI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target beam current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),BMI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "4")
+}
+
+# Set beam current target
+record(ao, "$(P):$(PROG):BMI") {
+    field(DTYP, "stream")
+    field(DESC, "target beam current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),BMI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):BMI_RBV")
+    field(PREC, "3")
+}
+
+# Get beam voltage target
+record(ai, "$(P):$(PROG):BMV_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target beam voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto getT($(P),BMV,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set beam voltage target
+record(ao, "$(P):$(PROG):BMV") {
+    field(DTYP, "stream")
+    field(DESC, "target beam voltage")
+    field(EGU, "V")
+    field(OUT, "@kriIonBeam.proto setT($(P),BMV,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):BMV_RBV")
+    field(PREC, "1")
+}
+
+# Get accelerator current target
+record(ai, "$(P):$(PROG):ACI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target accelerator current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),ACI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "4")
+}
+
+# Set accelerator current target
+record(ao, "$(P):$(PROG):ACI") {
+    field(DTYP, "stream")
+    field(DESC, "target accelerator current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),ACI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):ACI_RBV")
+    field(PREC, "4")
+}
+
+# Get accelerator voltage target
+record(ai, "$(P):$(PROG):ACV_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target accelerator voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto getT($(P),ACV,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set accelerator voltage target
+record(ao, "$(P):$(PROG):ACV") {
+    field(DTYP, "stream")
+    field(DESC, "target accelerator voltage")
+    field(EGU, "V")
+    field(OUT, "@kriIonBeam.proto setT($(P),ACV,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):ACV_RBV")
+    field(PREC, "1")
+}
+
+# Get cathode current target
+record(ai, "$(P):$(PROG):CHI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target cathode current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),CHI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set cathode current target
+record(ao, "$(P):$(PROG):CHI") {
+    field(DTYP, "stream")
+    field(DESC, "target cathode current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),CHI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):CHI_RBV")
+    field(PREC, "2")
+}
+
+# Get cathode heater start current target
+record(ai, "$(P):$(PROG):CHSI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target cathode heater start current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),CHSI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set cathode heater start current target
+record(ao, "$(P):$(PROG):CHSI") {
+    field(DTYP, "stream")
+    field(DESC, "target cathode heater start current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),CHSI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):CHSI_RBV")
+    field(PREC, "2")
+}
+
+# Get discharge current target
+record(ai, "$(P):$(PROG):DSI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target discharge current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),DSI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set discharge current target
+record(ao, "$(P):$(PROG):DSI") {
+    field(DTYP, "stream")
+    field(DESC, "target discharge current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),DSI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):DSI_RBV")
+    field(PREC, "2")
+}
+
+# Get discharge voltage target
+record(ai, "$(P):$(PROG):DSV_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target discharge voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto getT($(P),DSV,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set discharge voltage target
+record(ao, "$(P):$(PROG):DSV") {
+    field(DTYP, "stream")
+    field(DESC, "target discharge voltage")
+    field(EGU, "V")
+    field(OUT, "@kriIonBeam.proto setT($(P),DSV,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):DSV_RBV")
+    field(PREC, "2")
+}
+
+# Get electron emission current target
+record(ai, "$(P):$(PROG):EEI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target electron emission current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),EEI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set electron emission current target
+record(ao, "$(P):$(PROG):EEI") {
+    field(DTYP, "stream")
+    field(DESC, "target electron emission current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),EEI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):EEI_RBV")
+    field(PREC, "2")
+}
+
+# Get electron emission voltage target
+record(ai, "$(P):$(PROG):EEV_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target electron emission voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto getT($(P),EEV,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set electron emission voltage target
+record(ao, "$(P):$(PROG):EEV") {
+    field(DTYP, "stream")
+    field(DESC, "target electron emission voltage")
+    field(EGU, "V")
+    field(OUT, "@kriIonBeam.proto setT($(P),EEV,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):EEV_RBV")
+    field(PREC, "2")
+}
+
+# Get filament heater current target
+record(ai, "$(P):$(PROG):FHI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target filament heater current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),FHI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set filament heater current target
+record(ao, "$(P):$(PROG):FHI") {
+    field(DTYP, "stream")
+    field(DESC, "target filament heater current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),FHI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):FHI_RBV")
+    field(PREC, "1")
+}
+
+# Get filament heater start current target
+record(ai, "$(P):$(PROG):FHSI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target filament heater start current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),FHSI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set filament heater start current target
+record(ao, "$(P):$(PROG):FHSI") {
+    field(DTYP, "stream")
+    field(DESC, "target filament heater start current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),FHSI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):FHSI_RBV")
+    field(PREC, "1")
+}
+
+# Get LFN filament current target
+record(ai, "$(P):$(PROG):LFI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target LFI filament current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),LFI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set LFN filament current target
+record(ao, "$(P):$(PROG):LFI") {
+    field(DTYP, "stream")
+    field(DESC, "target LFI filament current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),LFI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):LFI_RBV")
+    field(PREC, "2")
+}
+
+# Get keeper current target
+record(ai, "$(P):$(PROG):KPI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target keeper current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto getT($(P),KPI,$(PROG)) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set keeper current target
+record(ao, "$(P):$(PROG):KPI") {
+    field(DTYP, "stream")
+    field(DESC, "target keeper current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto setT($(P),KPI,$(PROG)) $(PORT)")
+    field(FLNK, "$(P):$(PROG):KPI_RBV")
+    field(PREC, "1")
+}
+
+##### Target RBV updating (signal from autocontroller template) #####
+
+# Receive and forward signal to refresh program targets
+record(bo, "$(P):$(PROG):FETCH") {
+    field(DESC, "refresh program targets")
+    field(DOL, "$(P):FETCH PP")
+    field(FLNK, "$(P):$(PROG):UPDATE")
+}
+
+# Top-level fanout to refresh program targets
+record(fanout, "$(P):$(PROG):UPDATE") {
+    field(DESC, "top-level refresh block")
+    field(LNK1, "$(P):$(PROG):COL_1")
+    field(LNK2, "$(P):$(PROG):COL_2")
+    field(LNK3, "$(P):$(PROG):COL_3")
+}
+
+# First bottom-level fanout to refresh program targets
+record(fanout, "$(P):$(PROG):COL_1") {
+    field(DESC, "first refresh block")
+    field(LNK1, "$(P):$(PROG):GS1_RBV")
+    field(LNK2, "$(P):$(PROG):GS2_RBV")
+    field(LNK3, "$(P):$(PROG):GS3_RBV")
+    field(LNK4, "$(P):$(PROG):GS4_RBV")
+    field(LNK5, "$(P):$(PROG):BMI_RBV")
+    field(LNK6, "$(P):$(PROG):BMV_RBV")
+}
+
+# Second bottom-level fanout to refresh program targets
+record(fanout, "$(P):$(PROG):COL_2") {
+    field(DESC, "second refresh block")
+    field(LNK1, "$(P):$(PROG):ACI_RBV")
+    field(LNK2, "$(P):$(PROG):ACV_RBV")
+    field(LNK3, "$(P):$(PROG):CHI_RBV")
+    field(LNK4, "$(P):$(PROG):CHSI_RBV")
+    field(LNK5, "$(P):$(PROG):DSI_RBV")
+    field(LNK6, "$(P):$(PROG):DSV_RBV")
+}
+
+# Third bottom-level fanout to refresh program targets
+record(fanout, "$(P):$(PROG):COL_3") {
+    field(DESC, "third refresh block")
+    field(LNK1, "$(P):$(PROG):EEI_RBV")
+    field(LNK2, "$(P):$(PROG):EEV_RBV")
+    field(LNK3, "$(P):$(PROG):FHI_RBV")
+    field(LNK4, "$(P):$(PROG):FHSI_RBV")
+    field(LNK5, "$(P):$(PROG):LFI_RBV")
+    field(LNK6, "$(P):$(PROG):KPI_RBV")
+}

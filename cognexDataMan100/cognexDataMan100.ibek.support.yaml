@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: cognexDataMan100
+
+entity_models:
+  - name: dataman100
+    description: |-
+      Cognex DataMan 100 barcode reader
+    parameters:
+      P:
+        type: str
+        description: |-
+          prefix
+      R:
+        type: str
+        description: |-
+          suffix
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+      name:
+        type: id
+        description: |-
+          gui element name
+    databases:
+      - file: dataman100.template
+        args:
+          .*:

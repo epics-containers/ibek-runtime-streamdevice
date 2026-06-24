@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: lakeshore331
+
+entity_models:
+  - name: lakeshore331
+    description: |-
+      Lakeshore 331 Temperature Controller
+      Notes: The temperatures in Kelvin are archived once every 10 secs.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      TEMPSCAN:
+        type: int
+        description: |-
+          SCAN rate for the temperature/voltage readings
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for non-temperature/voltage parameters.
+      ONOFFDEFAULT:
+        type: int
+        description: |-
+          Default value for ON/OFF
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: lakeshore331.template
+        args:
+          .*:

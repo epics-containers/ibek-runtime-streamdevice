@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: WS300scale
+
+entity_models:
+  - name: WS300
+    description: |-
+      Controls a WS-300 Brecknell scale
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      S:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: WS300.template
+        args:
+          .*:

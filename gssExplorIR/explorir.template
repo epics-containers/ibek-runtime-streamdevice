@@ -1,0 +1,105 @@
+###########################################################
+# Template File for GSS ExplorIR-M-100 CO2 Sensor
+#
+# Macros:
+# % macro,  P,    Prefix for PV name
+# % macro,  PORT, Bus/Port Address (eg. ASYN Port).
+# % macro,  SCAN, SCAN rate for read parameters.
+# % macro,  name, object and gui association name
+
+# % gui, $(name=), edm, explorir.edl, P=$(P)
+
+###########################################################
+
+record(ai, "$(P):CO2_FILT_RAW") {
+    field(DESC, "Filtered raw CO2 val")
+    field(DTYP, "stream")
+    field(SCAN, "1 second")
+    field(INP,  "@explorir.proto read(Z) $(PORT)")
+    field(FLNK, "$(P):SCALE")
+}
+
+record(ai, "$(P):SCALE") {
+    field(SCAN, "Passive")
+    field(DESC, "Multiplier to convert to ppm")
+    field(DTYP, "stream")
+    field(INP, "@explorir.proto read(.) $(PORT)")
+}
+
+record(calc, "$(P):CO2_FILT") {
+    field(DESC, "Filtered CO2 ppm")
+    field(INPA, "$(P):CO2_FILT_RAW")
+    field(INPB, "$(P):SCALE CP")
+    field(EGU, "ppm")
+    field(CALC, "A*B")
+}
+
+record(calcout, "$(P):CO2_FILT_PC") {
+    field(DESC, "Filtered CO2 %")
+    field(INPA, "$(P):CO2_FILT CP")
+    field(EGU, "%")
+    field(CALC, "A*0.0001")
+    field(PREC, 5)
+}
+
+record(fanout, "$(P):READ_SETTINGS") {
+    field(LNK1, "$(P):READ-FILTER")
+    field(LNK2, "$(P):READ-COMPENSATION")
+    field(PINI, "YES")
+    field(SCAN, "10 second")
+}
+
+record(longout, "$(P):READ-FILTER") {
+    field(DESC, "Digital filter value")
+    field(DTYP, "stream")
+    field(OUT, "@explorir.proto write_get_rbv(a,$(P):FILTER_RBV) $(PORT)")
+}
+
+record(longout, "$(P):FILTER") {
+    field(DESC, "Set digital filter value")
+    field(DTYP, "stream")
+    field(OUT, "@explorir.proto write_value_get_rbv(A,$(P):FILTER) $(PORT)")
+}
+
+record(longin, "$(P):FILTER_RBV") {
+    field(DTYP, "Soft Channel")
+}
+
+record(longout, "$(P):READ-COMPENSATION") {
+    field(DESC, "Pressure compensation value")
+    field(DTYP, "stream")
+    field(OUT, "@explorir.proto write_get_rbv(s,$(P):COMPENSATION_RBV) $(PORT)")
+}
+
+record(longout, "$(P):COMPENSATION") {
+    field(DESC, "Set pressure compensation value")
+    field(DTYP, "stream")
+    field(OUT, "@explorir.proto write_value_get_rbv(S,$(P):COMPENSATION) $(PORT)")
+}
+
+record(longin, "$(P):COMPENSATION_RBV") {
+    field(DTYP, "Soft Channel")
+}
+
+record(longout, "$(P):AIR-CALIBRATE") {
+    field(DESC, "Execute calibration in air command")
+    field(DTYP, "stream")
+    field(OUT, "@explorir.proto write_get_rbv(G,$(P):ZERO-POINT_RBV) $(PORT)")
+}
+
+record(longout, "$(P):NITROGEN-CALIBRATE") {
+    field(DESC, "Execute calibration in nitrogen command")
+    field(DTYP, "stream")
+    field(OUT, "@explorir.proto write_get_rbv(U,$(P):ZERO-POINT_RBV) $(PORT)")
+}
+
+
+record(longout, "$(P):ZERO-POINT") {
+    field(DESC, "Execute calibration in air command")
+    field(DTYP, "stream")
+    field(OUT, "@explorir.proto write_value_get_rbv(u,$(P):ZERO-POINT) $(PORT)")
+}
+
+record(longin, "$(P):ZERO-POINT_RBV") {
+    field(DTYP, "Soft Channel")
+}

@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: chemyxFusion
+
+entity_models:
+  - name: Fusion4000
+    description: |-
+      Chemyx Fusion 4000 syringe pump controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      R:
+        type: str
+        description: |-
+          PV name suffix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      name:
+        type: id
+        description: |-
+          module name
+    databases:
+      - file: fusion4000.template
+        args:
+          .*:

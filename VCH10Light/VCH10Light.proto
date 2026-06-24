@@ -1,0 +1,81 @@
+##################################################
+# Protocol file for Prevac Devices
+# Diamond Light Source, April 2019
+##################################################
+
+##################################################
+#Prevac serial communication protocol:
+#
+#  data length   driver address (0x01)
+#   (max 0xFF)     |
+#      |   device group   data
+#      |    (e.g 0x91)     |
+#      |     |     |       |
+#  [ ][ ][ ][ ][ ][ ][ ][ ... ][ ]
+#   |     |     |     |_____    |
+#   | 	 |    logic group  |   CRC (modulo 256 calculated
+#   |     | (default: 0xC8) |       without protocol header)
+# header device address     |   
+# (0xAA)  (default: 0xC8)   |
+#   	 	   	function code
+#		    (e.g GetDeviceStatus 0x53)
+#
+#e.g Read pressure from channel 2 on vacuum gauge 
+#(device group: 0x47, function code: 0x70, data: 0x02)
+#Request: AA 04 C8 47 C8 01 70 00 00 00 02 4E	
+#Answer: AA 04 01 47 C8 C8 70 00 A7 F7 42 2C
+#data: 00 A7 F7 42
+
+##################################################
+#VCH-10 Chamber Lights Protocol
+#Device Group: 0x99
+
+#Read Device Status (function code: 0x53)
+#Answer: 
+#- Byte 1,2 - time in minutes to end of lighting
+#- Byte 3 - value = 0x00 leds turning off
+#         - value > 0x00 leds are turning on
+#- Byte 4,5 - future use
+
+#Write Main Parameters (function code: 0x10)
+#Query:
+#- Byte 1 - 0x01 (always)
+#- Byte 2,3 - time in minutes of lighting (0-600 minutes)
+#- Byte 4 - value = 0x10 turn ON device
+#         - value = 0x00 turn OFF device
+#- Byte 5 - future use
+
+# e.g. write light time 600: \xAA\x05\xC8\x99\xC8\x01\x10\x01\x02\x58\x10\x00\xAA
+
+##################################################
+
+##################################################
+# General Settings
+##################################################
+#terminator   = ""; # checksum terminator
+replytimeout = 1000;
+readtimeout  = 1000;
+locktimeout = 5000;
+
+###################################################
+# Get functions
+###################################################
+
+readVCH10LightStatus {
+ out "\xAA\x05\xC8\x99\xC8\x01\x53\x00\x00\x00\x00\x01%1<sum8>";
+ in "\xAA\x05\x01\x99\xC8\x01\x53\x02\x58%x{00|x01}\x00%1<sum8>";
+    @mismatch {
+        in "%(\$1:MESSAGE)39c";
+    }
+}
+
+###################################################
+# Set functions
+###################################################
+
+writeVCH10LightStatus {
+ out "\xAA\x05\xC8\x99\xC8\x01\x10\x01\x02\x58%{\x00|\x01}\x00%1<sum8>";		      
+}
+
+
+

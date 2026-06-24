@@ -1,0 +1,212 @@
+##################################################
+#
+# Protocol File
+#
+# Protocol file for Lakeshore 336
+# Diamond Light Source, June 2010
+#
+##################################################
+
+
+##################################################
+# General Settings
+##################################################
+
+Terminator = "\r\n";
+ReadTimeout = 1000;
+
+###################################################
+# Get functions
+###################################################
+
+# /// Read the device ID
+getID {
+   out "*IDN?";
+   in "%s";
+}
+
+# /// Read the heater status for output 1 or 2
+getHTR {
+   out "HTR? \$1";
+   in "%f";
+}
+
+getAOUT {
+   out "AOUT? \$1";
+   in "%f"
+}
+
+
+# /// Read the setpoint for outputs 1-4
+getSETP {
+   out "SETP? \$1";
+   in "%f";
+}
+
+# /// Read the temperature in kelvin for inputs 1-4
+getKRDG {
+   out "KRDG? \$1";
+   in "%f";
+}
+
+# /// Read the voltage input for inputs 1-4
+getSRDG {
+   out "SRDG? \$1";
+   in "%f";
+}
+
+# /// Read the range parameter (power range) for outputs 1-4
+getRANGE {
+   out "RANGE? \$1";
+   in "%d";
+}
+
+# /// Read the ramp value for control loop 1 or 2
+getRAMP {
+   out "RAMP? \$1";
+   in "%*d,%f";
+}
+
+# /// Read the ramp status for control loop 1 or 2
+getRAMPSTATUS {
+   out "RAMP? \$1";
+   in "%d,%*f";
+}
+
+# /// Read the manual output value for outputs 1-4
+getMOUT {
+   out "MOUT? \$1";
+   in "%f";
+}
+
+# /// Read the PID P parameter for control loop 1 or 2
+getP {
+   out "PID? \$1";
+   in "%f,%*f,%*f";
+}
+
+# /// Read the PID I parameter for control loop 1 or 2
+getI {
+   out "PID? \$1";
+   in "%*f,%f,%*f";
+}
+
+# /// Read the PID D parameter for control loop 1 or 2
+getD {
+   out "PID? \$1";
+   in "%*f,%*f,%f";
+}
+
+
+# /// Read the output mode mode status for outputs 1-4
+# /// 0=Off
+# /// 1=Closed Loop PID
+# /// 2=Zone
+# /// 3=Open Loop
+# /// 4=Monitor Out
+# /// 5=Warm Up Supply
+getOUTMODEMODE {
+   out "OUTMODE? \$1";
+   in "%d,%*d,%*d";
+}
+
+# /// Read the output mode input for outputs 1-4
+# /// 0=None
+# /// 1=A
+# /// 2=B
+# /// 3=C
+# /// 4=D
+getOUTMODEINPUT {
+   out "OUTMODE? \$1";
+   in "%*d,%d,%*d";
+}
+
+# /// Read the output mode power up enable for outputs 1-4
+# /// 0=Off
+# /// 1=On
+getOUTMODEPE {
+   out "OUTMODE? \$1";
+   in "%*d,%*d,%d";
+}
+
+
+# /// Read the tuning status
+getTUNEST {
+   out "TUNEST?";
+   in "%s";
+}
+
+# /// Read the tuning status success param
+getTUNESTSUCCESS {
+   out "TUNEST?";
+   in "%*d,%*1s,%d,%*d";
+   extrainput = ignore;
+}
+
+
+#######################################################
+# Set functions
+#######################################################
+
+# /// Set the setpoint for outputs 1-4
+setSETP {
+   out "SETP \$1,%f";
+#   @init { getSETP; }
+}
+
+# /// Set the range parameter for outputs 1-4
+setRANGE {
+   out "RANGE \$1,%d";
+#   @init { getRANGE; }
+}
+
+# /// Set the ramp parameter for loops 1-2
+#Need to pass in the PV name for the getRAMPSTATUS protocol.
+setRAMP {
+   out "RAMP \$2,%(\$1.VAL)d,%f";
+#   @init { out "RAMP? \$2"; in "%*d,%f"; }
+}
+
+# /// Set the ramp status for loops 1-2
+#Need to pass in the PV name for the getRAMP protocol.
+setRAMPSTATUS {
+   out "RAMP \$2,%d,%(\$1.VAL)f";
+#   @init { out "RAMP? \$2"; in "%d,%*f"; }
+}
+
+# /// Set the manual output value for outputs 1-4
+setMOUT {
+   out "MOUT \$1,%f";
+#   @init { getMOUT; }
+}
+
+# /// Set the PID P parameter for control loop 1-2
+#Can just send the first argument for this PID command just just set P
+setP {
+   out "PID \$1,%f,%(\$2.VAL)f,%(\$3.VAL)f";
+#   @init { out "PID? \$1"; in "%f,%*f,%*f"; }
+}
+
+# /// Set the PID I parameter for control loop 1-2
+#Have to also set P as the first argument in the list. I corresponds to the second argument.
+setI {
+   out "PID \$2,%(\$1.VAL)f,%f,%(\$3.VAL)f";
+#   @init { out "PID? \$2"; in "%*f,%f,%*f"; }
+}
+
+# /// Set the PID D parameter for control loop 1-2
+#Have to also set the P and I parameters. D corresponds to the third argument.
+setD {
+   out "PID \$3,%(\$1.VAL)f,%(\$2.VAL)f,%f";
+#   @init { out "PID? \$3"; in "%*f,%*f,%f"; }
+}
+
+# /// Set the mode of the output: [loop],[mode],[input],[power up enable]
+setOUTMODE {
+   out "OUTMODE %(A)d,%(B)d,%(C)d,%(D)d";
+}
+
+# /// Start the auto tune process.
+setATUNE {
+   out "ATUNE \$1,%(\$2.VAL)d";
+}

@@ -1,0 +1,49 @@
+Terminator = 0x00;
+
+alive {
+    out 0x34;
+    in "Alive";
+}
+
+lock {
+    ExtraInput = ignore;
+    out "lock";
+    in "Lock Success";
+}
+
+eeprom {
+    out 0x32;
+    InTerminator = 0x0a;
+    MaxInput = 135;
+    in "Eeprom=%r";
+}
+
+configure {
+    out 0x31 "%c";
+    in "Converting";
+}
+
+# This is a hacky way of doing this
+# It relies on the fact that data messages
+# are the only non-terminated messages and that
+# Alive is the only thing send periodically.
+chan1raw {
+    InTerminator = "Alive" 0x00;
+    in 0x00 "%r";
+}
+
+chan2raw {
+    InTerminator = "Alive" 0x00;
+    in 0x04 "%r";
+}
+
+chan3raw {
+    InTerminator = "Alive" 0x00;
+    in 0x08 "%r";
+}
+
+chan4raw {
+    InTerminator = "Alive" 0x00;
+    in 0x0c "%r";
+}
+

@@ -1,0 +1,63 @@
+
+OutTerminator = CR,LF;  
+InTerminator = CR,LF,0x3E,0x20;   # same as "\r\n> "
+ReplyTimeout = 2000;
+
+# Protocol variable $1 designates the axis (1..3)
+
+getVoltage {
+	out "getv \$1";
+	wait 200;
+	in "getv \$1",CR,LF,"voltage = %i V",CR,LF,"OK";
+}
+
+setVoltage {
+	out "setv \$1 %i";
+	wait 200;
+	in "setv \$1 %i",CR,LF,"OK";
+	@init { wait 500; getVoltage; }
+}
+
+getFrequency {
+	out "getf \$1";
+	wait 200;
+	in "getf \$1",CR,LF,"frequency = %i Hz",CR,LF,"OK";
+}
+
+setFrequency {
+	out "setf \$1 %i";
+	wait 200;
+	in "setf \$1 %i",CR,LF,"OK";
+	@init { wait 500; getFrequency; }
+}
+
+getMode {
+	out "getm \$1";
+	wait 200;
+	in "getm \$1",CR,LF,"mode = %{gnd|stp|cap|ext}",CR,LF,"OK";
+}
+
+setMode {
+        out "setm \$1 %{gnd|stp|cap|ext}";
+	wait 200;
+	in "setm \$1 %{gnd|stp|cap|ext}",CR,LF,"OK";
+	@init { getMode; }
+}
+
+movePos {
+	out "stepu \$1 %d";
+	wait 200;
+	in "stepu \$1 %d",CR,LF,"OK";
+}
+
+moveNeg {
+	out "stepd \$1 %d";
+	wait 200;
+	in "stepd \$1 %d",CR,LF,"OK";
+}
+
+stop {
+	out "stop \$1";
+	wait 200;
+	in "stop \$1",CR,LF,"OK";
+}

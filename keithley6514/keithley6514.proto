@@ -1,0 +1,172 @@
+@writetimeout { disconnect; }
+@replytimeout { disconnect; }
+@readtimeout  { disconnect; }
+@mismatch     { disconnect; }
+
+ReplyTimeout = 1200;
+InTerminator = "\r";
+OutTerminator = "\r";
+
+getIDN {
+    out "*IDN?";
+    in "%\$1[^\r\n]";
+    ExtraInput = Ignore;
+}
+cmd {
+    out "\$1";
+}
+
+setD {
+    out "\$1 %d";
+}
+getD {
+    out "\$1?";
+    in "%d";
+    ExtraInput = Ignore;
+}
+
+setF {
+    out "\$1 %f";
+}
+getF {
+    out "\$1?";
+    in "%f";
+    ExtraInput = Ignore;
+}
+
+### Measurements ####
+setFunction {
+  out "SENS:FUNC \x22%{VOLT|CURR|RES|CHAR}\x22";
+}
+getFunction {
+  out "SENS:FUNC?";
+  in "\x22%{VOLT|CURR|RES|CHAR}";
+  ExtraInput = Ignore;
+}
+
+getRange {
+  out "SENS:%(\$1.VAL){VOLT|CURR|RES|CHAR}:RANG?";
+  in "%f";
+  ExtraInput = Ignore;
+}
+
+# Voltage source
+setVoltSourceRange {
+   out "SENS:VOLT:RANGE %{2|20|200}";
+   ExtraInput = Ignore;
+}
+
+# Current source
+setCurrSourceRange {
+   out "SENS:CURR:RANGE %{2E-11|2E-10|2E-9|2E-8|2E-7|2E-6|2E-5|2E-4|2E-3|2E-2}";
+   ExtraInput = Ignore;
+}
+
+# Resistance source
+setResSourceRange {
+   out "SENS:RES:RANGE %{2E3|2E4|2E5|2E6|2E7|2E8|2E9|2E10|2E11}";
+   ExtraInput = Ignore;
+}
+
+# Charge source
+setCharSourceRange {
+   out "SENS:CHAR:RANGE %{2E-8|2E-7|2E-6|2E-5}";
+   ExtraInput = Ignore;
+}
+
+# Read out the top line of the display
+getDisplay {
+    out "DISP:WIND1:TEXT:DATA?";
+    # in "\x22%20c\x22";
+    in "%14c";
+    ExtraInput = Ignore;
+}
+
+getRead {
+    out "READ?";
+    in "%(\$1Measurement.VAL)f,%(\$1Timestamp_RBV.VAL)f,%(\$1Status_RBV.VAL)f";
+    ExtraInput = Ignore
+}
+
+# Set integration
+setNPLC {
+  out "%(\$1.VAL){VOLT|CURR|RES|CHAR}:NPLC %f";
+}
+# Get integration
+getNPLC {
+  out "%(\$1.VAL){VOLT|CURR|RES|CHAR}:NPLC?";
+  in "%f";
+  ExtraInput = Ignore;
+}
+
+
+# Set PLC frequency
+setPLCFreq {
+  out "SYST:LFR %{50|60}";
+}
+
+getPLCFreq {
+  out "SYST:LFR?";
+  in "%d";
+  ExtraInput = Ignore;
+}
+
+getZchk {
+  out "SYST:ZCH?";
+  in "%d";
+  ExtraInput = Ignore;
+}
+
+getZcor {
+  out "SYST:ZCOR?";
+  in "%d";
+  ExtraInput = Ignore;
+}
+
+
+
+############################################################
+#
+#      Manual device control
+#
+# Simple manual control of the device can be achieved
+# by two features of the device protocol: the ability
+# to simulate button presses and read out the display
+# panel string.
+#
+# Simulate Key Presses  
+#   Key codes:
+# 1:  Shift
+# 2:  Voltage
+# 3:  Current
+# 4:  Resistance
+# 5:  Charge
+# 6:  XFBK
+# 7:  ZCHK
+# 8:  ZCOR
+# 11: Range Up Arrow
+# 12: Range Auto
+# 13: Range Down Arrow
+# 14: ENTER
+# 15: Right Arrow
+# 16: GRD
+# 17: LOCAL
+# 18: AVG
+# 19: MEDN
+# 20: REL
+# 21: LIMIT
+# 22: DIGIT
+# 23: RATE
+# 24: Right Arrow
+# 26: STORE
+# 27: RCLL
+# 28: DELAY
+# 29: DAMP
+# 30: HALT
+# 31: TRIG
+# 32: EXIT
+
+keyPress {
+   out "SYST:KEY \$1";
+}
+

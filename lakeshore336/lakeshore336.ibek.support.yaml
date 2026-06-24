@@ -1,0 +1,96 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: lakeshore336
+
+entity_models:
+  - name: lakeshore336
+    description: |-
+      Lakeshore 336 Temperature Controller
+      Notes: The temperatures in Kelvin are archived once every 10 secs.
+    parameters:
+      P:
+        type: str
+        description: |-
+          prefix for PV name
+      DESC:
+        type: str
+        description: |-
+          Lakeshore336 controller description
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      TEMPSCAN:
+        type: int
+        description: |-
+          SCAN rate for the temperature/voltage readings
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for non-temperature/voltage parameters.
+      name:
+        type: id
+        description: |-
+          name for the gui element
+      DISABLED:
+        type: int
+        description: |-
+          disabled by default?
+        default: 0
+      lakeshore336Path:
+        type: str
+        description: |-
+          path for the documentation, e.g. /dls_sw/prod/R3.14.12.3/support/lakeshore336/2-4-3
+      Description:
+        type: str
+        description: |-
+          main use of this device (defaults to Temperature Controller)
+        default: Temperature Controller
+      CH0_label:
+        type: str
+        description: |-
+          what is channel 1 measuring? Defaults to Channel 0
+        default: Channel 0
+      CH1_label:
+        type: str
+        description: |-
+          what is channel 1 measuring? Defaults to Channel 1
+        default: Channel 1
+      CH2_label:
+        type: str
+        description: |-
+          what is channel 2 measuring? Defaults to Channel 2
+        default: Channel 2
+      CH3_label:
+        type: str
+        description: |-
+          what is channel 3 measuring? Defaults to Channel 3
+        default: Channel 3
+      OUT1_label:
+        type: str
+        description: |-
+          what is output channel 1 controlling? Defaults to Output 1 Control
+        default: Output 1 Control
+      OUT2_label:
+        type: str
+        description: |-
+          what is output channel 2 controlling? Defaults to Output 2 Control
+        default: Output 2 Control
+      OUT3_label:
+        type: str
+        description: |-
+          what is output channel 3 controlling? Defaults to Output 3 Control
+        default: Output 3 Control
+      OUT4_label:
+        type: str
+        description: |-
+          what is output channel 4 controlling? Defaults to Output 4 Control
+        default: Output 4 Control
+    databases:
+      - file: lakeshore336.template
+        args:
+          .*:

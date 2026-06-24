@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: linkam
+
+entity_models:
+  - name: linkam
+    description: |-
+      Linkam temperature stage controller.
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      PORT:
+        type: str
+        description: |-
+          asyn name for serial port connected to device
+      DISABLED:
+        type: int
+        description: |-
+          Optional macro for whether device is polled or not.
+        default: 1
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: linkam.template
+        args:
+          .*:

@@ -1,0 +1,283 @@
+################################################################
+#
+# Tenma PSU template file.
+#
+# Macros:
+# % macro,  P,    Prefix for PV name
+# % macro,  PORT, Bus/Port Address (eg. ASYN Port)
+# % macro,  ADDR, Address on the bus (optional)
+# % macro,  SCAN, SCAN rate for read parameters
+# % macro,  MAXI, Max output current (default=5)
+# % macro,  MAXV, Max output voltage (default=30)
+# % macro,  TGET,	Temperature get
+# % macro,  KP,	PID KP
+# % macro,  KI,	PID KI
+# % macro,  KD,	PID KD
+# % macro,  SETPOINT,	PID temperature setpoint
+################################################################
+# % gui, tenma, edm, tenma.edl, P=$(P)
+################################################################
+# Read records
+################################################################
+
+# /// Read the output current
+record(ai, "$(P):CURRENT") {
+  field(DTYP, "stream")
+  field(INP, "@tenma.proto getCurrent($(P)) $(PORT) 0")
+  field(SCAN, "$(SCAN) second")
+  field(EGU, "Amps")
+  field(PREC, "3")
+}
+
+# /// Read the output voltage
+record(ai, "$(P):VOLTAGE") {
+  field(DTYP, "stream")
+  field(INP, "@tenma.proto getVoltage($(P)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(EGU, "Volts")
+  field(PREC, "2")
+}
+
+# /// Calculate the power
+record(calc, "$(P):POWER") {
+  field(DESC, "Power")
+  field(INPA, "$(P):CURRENT")
+  field(INPB, "$(P):VOLTAGE")
+  field(SCAN, "$(SCAN) second")
+  field(EGU, "W")
+  field(CALC, "A*B")
+  field(PREC, "2")
+}
+
+# /// Read current setpoint (read back of setCurrent)
+record(ai, "$(P):SET_CURRENT:RBV") {
+  field(DTYP, "stream")
+  field(INP, "@tenma.proto getCurrentReadback($(P)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "3")
+  field(EGU, "A")
+}
+
+# /// Read voltage setpoint (read back of setVoltage)
+record(ai, "$(P):SET_VOLTAGE:RBV") {
+  field(DTYP, "stream")
+  field(INP, "@tenma.proto getVoltageReadback($(P)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "2")
+  field(EGU, "V")
+}
+
+record(mbbiDirect, "$(P):STATUS_RBV") {
+  field(INP, "$(P):STATUS")
+  field(SCAN, "1 second")
+}
+
+
+# /// Read the status bits
+record(ai, "$(P):STATUS") {
+  field(DTYP, "stream")
+  field(INP, "@tenma.proto getStatus $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+}
+
+record(calc, "$(P):STATUS_B0") {
+  field(SCAN, "$(SCAN) second")
+  field(INPA, "$(P):STATUS")
+  field(CALC, "A&1")
+}
+
+record(calc, "$(P):STATUS_B1") {
+  field(SCAN, "$(SCAN) second")
+  field(INPA, "$(P):STATUS")
+  field(CALC, "A&2")
+}
+
+record(calc, "$(P):STATUS_B6") {
+  field(SCAN, "$(SCAN) second")
+  field(INPA, "$(P):STATUS")
+  field(CALC, "A&7")
+}
+
+# /// Read in the ID
+record(stringin, "$(P):ID") {
+  field(DTYP, "stream")
+  field(INP, "@tenma.proto getID($(P)) $(PORT) 0")
+  field(SCAN, "10 second")
+}
+################################################################
+# Write records
+################################################################
+
+# /// Set output current
+record(ao, "$(P):SET_CURRENT") {
+  field(DTYP, "stream")
+  field(DESC, "Set Current")
+  field(OUT, "@tenma.proto setCurrent $(PORT) $(ADDR)")
+  field(EGU, "A")
+  field(PREC, "3")
+  field(DRVH, "$(MAXI=5)")
+  field(DRVL, "0")
+}
+
+# /// Set output voltage
+record(ao, "$(P):SET_VOLTAGE") {
+  field(DTYP, "stream")
+  field(DESC, "Set Voltage")
+  field(OUT, "@tenma.proto setVoltage $(PORT) $(ADDR)")
+  field(PREC, "2")
+  field(EGU, "V")
+  field(DRVH, "$(MAXV=30)")
+  field(DRVL, "0")
+  field(FLNK, "$(P):POWER_MAX")
+}
+
+# /// Turn off output
+record(ao, "$(P):OUTPUT_OFF") {
+  field(DTYP, "stream")
+  field(DESC, "Turn output off")
+  field(OUT, "@tenma.proto off $(PORT) $(ADDR)")
+}
+
+# /// Turn on output
+record(ao, "$(P):OUTPUT_ON") {
+  field(DTYP, "stream")
+  field(DESC, "Turn output on")
+  field(OUT, "@tenma.proto on $(PORT) $(ADDR)")
+}
+
+# /// Set Over Current Protection (OCP) ON
+record(ao, "$(P):PROT_ON") {
+  field(DTYP, "stream")
+  field(DESC, "Set OCP On")
+  field(OUT, "@tenma.proto onOCP $(PORT) $(ADDR)")
+}
+
+# /// Set Over Current Protection (OCP) OFF
+record(ao, "$(P):PROT_OFF") {
+  field(DTYP, "stream")
+  field(DESC, "Set OCP Off")
+  field(OUT, "@tenma.proto offOCP $(PORT) $(ADDR)")
+}
+
+# /// Set Over Voltage Protection (OVP)
+record(ao, "$(P):OVP") {
+  field(DTYP, "stream")
+  field(DESC, "Set OVP OnOff")
+  field(OUT, "@tenma.proto setOVP $(PORT) $(ADDR)")
+}
+
+#################################################################
+# PID.
+#################################################################
+
+# /// Turn PID Loop on or off
+# ///
+record(mbbo, "$(P):PID_STATE") {
+  field(DTYP, "Soft Channel")
+  field(ZRVL, "0")
+  field(ZRST, "OFF")
+  field(ONVL, "1")
+  field(ONST, "ON")
+  field(OUT, "$(P):PID.FBON PP")
+}
+
+# /// Get the temperature over CA
+# ///
+record(calc, "$(P):TEMP")
+{
+	field(DESC, "Read temperature")
+	field(CALC, "A")
+	field(INPA, "$(TGET) CA")
+	field(SCAN, ".1 second")
+	field(PREC, 3)
+	field(EGU, "C")
+}
+
+record(ao, "$(P):SETPOINT") {
+  field(DESC, "Target temperature")
+  field(PREC, "3")
+  field(EGU, "C")
+}
+
+# /// Average the temperature
+# ///
+record(compress, "$(P):TEMP_SMOOTH")
+{
+	field(SCAN, ".1 second")
+	field(ALG, "N to 1 Average")
+	field(N, "1")
+	field(INP, "$(P):TEMP PP")
+  field(PREC, "3")
+}
+
+# /// Calculate the maximum power based on the voltage
+# ///
+record(calc, "$(P):POWER_MAX") {
+  field(DESC, "Max power at fixed current")
+  field(INPA, "$(P):CURRENT")
+  field(INPB, "$(P):SET_VOLTAGE.DRVH")
+  field(EGU, "W")
+  field(CALC, "A*B")
+  field(PREC, "2")
+}
+
+# /// PID calculation
+# /// INP value of controlled PIV i.e. temperature
+# /// OUTL where output value is sent
+# /// written to link if FBON=1 (always ON)
+# /// $(P):SELECT applies output only if FBON is ON
+# /// $(SETPOINT) is the temperature
+# /// MDT (minimum delta time) is needed for high SCAN rates.
+# /// If unset takes value of one clock tick
+record(epid,"$(P):PID")
+{
+  field(SCAN, "5 second")
+  field(INP,  "$(P):TEMP_SMOOTH PP")
+  field(OUTL, "$(P):SET_VOLTAGE PP MS")
+  field(FLNK, "$(P):SET_VOLTAGE")
+  field(KP,   "$(KP)")
+  field(KI,   "$(KI)")
+  field(KD,   "$(KD)")
+  field(FBON, "0")
+  field(LOPR, "0.0")
+  field(DRVL, "0.0")
+  field(DRVH, "30")
+  field(PREC, "5")
+  field(STPL, "$(SETPOINT)")
+  field(MDT, "5")
+}
+
+# /// Control the voltage
+# /// With output from the PID (power)
+# /// A is set by the epid record, must be converted from power to voltage
+record(calcout, "$(P):POWER_SELECT")
+{
+	field(CALC, "(A/B)")
+  field(INPB, "$(P):CURRENT")
+	field(OUT,  "$(P):SET_VOLTAGE")
+	field(OOPT, "On Change")
+  field(DOPT, "Use CALC")
+	field(EGU, "A")
+	field(PREC, "3")
+	field(FLNK, "$(P):SET_VOLTAGE")
+}
+#################################################################
+# Other.
+#################################################################
+
+# % autosave 1 VAL
+record(bo, "$(P):DISABLE") {
+  field(DESC, "Disable communication")
+  field(PINI, "YES")
+  field(VAL, "1")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+#################################################################
+# Error status (From protocol mismatch)
+#################################################################
+record(stringin, "$(P):ERROR") {
+  field(DESC, "Error response")
+}

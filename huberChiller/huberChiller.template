@@ -1,0 +1,220 @@
+# Database for huber chiller control using streams
+# gnx91527
+# July 16, 2014
+
+# Macros:
+
+# % macro, P, Device Prefix
+# % macro, R, Device Suffix
+# % macro, PORT, Asyn Port name
+# % macro, name, gui element name
+
+# % gui, $(name), edm, huber.edl, P=$(P)$(R)
+
+record(stringin, "$(P)$(R):DEVICE_RBV")
+{
+  field(DTYP, "stream")
+  field(INP,  "@huber.proto getDeviceCmd() $(PORT)")
+  field(SCAN, "10 second")
+  field(FLNK, "$(P)$(R):DISCONNECTED")
+}
+
+#% alh $SEVRCOMMAND UP_ANY dls-alh-handler.py $(P)$(R):DISCONNECTED
+record(calc, "$(P)$(R):DISCONNECTED")
+{
+    field(DESC, "Count Huber chiller disconnect events")
+    field(INPA, "$(P)$(R):DEVICE_RBV.SEVR")
+    field(CALC, "(A==3)?(VAL+1):0")  # Increment count for every 10 secs disconnected
+    field(HIGH, "3")  # After this many consecutive cycles of 10 secs disconnected, raise alarm
+    field(HSV,  "MAJOR")
+    field(VAL,  "0")
+}
+
+###########################################################################
+#  These records read the general command status string from the chiller  #
+###########################################################################
+
+record(stringin, "$(P)$(R):READ:GEN")
+{
+  field(DTYP, "stream")
+  field(INP,  "@huber.proto getGenCmd() $(PORT)")
+  field(SCAN, "1 second")
+  field(FLNK, "$(P)$(R):FORMAT:GEN.PROC PP")
+}
+
+record(genSub, "$(P)$(R):FORMAT:GEN")
+{
+  field(SNAM, "decodeGeneral")
+  field(FTA,  "STRING")
+  field(INPA, "$(P)$(R):READ:GEN")
+  field(FTVA, "LONG")
+  field(OUTA, "$(P)$(R):CTRLMODE_RBV.VAL PP")
+  field(FTVB, "LONG")
+  field(OUTB, "$(P)$(R):ERROR_RBV PP")
+  field(FTVC, "DOUBLE")
+  field(OUTC, "$(P)$(R):SETPOINT_RBV PP")
+  field(FTVD, "DOUBLE")
+  field(OUTD, "$(P)$(R):ACTUAL_RBV PP")
+  field(FTVE, "DOUBLE")
+}
+
+record(mbbo, "$(P)$(R):CTRLMODE_RBV")
+{
+  field("OMSL", "supervisory")
+  field("ZRVL", "0")
+  field("ZRST", "Circulation")
+  field("ONVL", "1")
+  field("ONST", "Internal Control")
+  field("TWVL", "2")
+  field("TWST", "Off")
+}
+
+record(mbbi, "$(P)$(R):CTRLMODEMENU_RBV")
+{
+   field(DTYP, "Raw Soft Channel")
+   field(INP,  "$(P)$(R):CTRLMODE_RBV CP")
+   field(SCAN, "Passive")
+   field(ZRST, "Off")
+   field(ZRVL, "2")
+   field(ONST, "Internal Control")
+   field(ONVL, "1")
+}
+
+record(longout, "$(P)$(R):ERROR_RBV")
+{
+}
+
+# % archiver 10 Monitor
+record(ao, "$(P)$(R):SETPOINT_RBV")
+{
+  field(PREC, "2")
+  field(EGU, "deg C")
+}
+
+# % archiver 10 Monitor
+record(ao, "$(P)$(R):ACTUAL_RBV")
+{
+  field(PREC, "2")
+  field(EGU, "deg C")
+}
+
+###########################################################################
+#  These records set the control mode, error and set point                #
+###########################################################################
+
+record(stringout, "$(P)$(R):SEND:CMD")
+{
+  field(DTYP, "stream")
+  field(OUT,  "@huber.proto sendCmd() $(PORT)")
+}
+
+record(mbbo, "$(P)$(R):CTRLMODEMENU")
+{
+   field(PINI, "YES")
+   field(DTYP, "Raw Soft Channel")
+   field(OUT,  "$(P)$(R):CTRLMODE PP")
+   field(ZRST, "Off")
+   field(ZRVL, "2")
+   field(ONST, "Internal Control")
+   field(ONVL, "1")
+   field(VAL,  "1")
+}
+
+record(mbbo, "$(P)$(R):CTRLMODE")
+{
+  field("OMSL", "supervisory")
+  field("ZRVL", "0")
+  field("ZRST", "Circulation")
+  field("ONVL", "1")
+  field("ONST", "Internal Control")
+  field("TWVL", "2")
+  field("TWST", "Off")
+  field("FLNK", "$(P)$(R):CTRLMODE:CMD")
+}
+
+record(genSub, "$(P)$(R):CTRLMODE:CMD")
+{
+  field(SNAM, "controlCommand")
+  field(FTA,  "LONG")
+  field(INPA, "$(P)$(R):CTRLMODE")
+  field(FTVA, "STRING")
+  field(OUTA, "$(P)$(R):SEND:CMD PP")
+}
+
+record(longout, "$(P)$(R):ERROR")
+{
+  field("FLNK", "$(P)$(R):ERROR:CMD")
+}
+
+record(genSub, "$(P)$(R):ERROR:CMD")
+{
+  field(SNAM, "alarmCommand")
+  field(FTA,  "LONG")
+  field(INPA, "$(P)$(R):ERROR")
+  field(FTVA, "STRING")
+  field(OUTA, "$(P)$(R):SEND:CMD PP")
+}
+
+record(ao, "$(P)$(R):SETPOINT")
+{
+  field(PREC, "2")
+  field(EGU, "deg C")
+  field("FLNK", "$(P)$(R):SETPOINT:CMD")
+}
+
+record(genSub, "$(P)$(R):SETPOINT:CMD")
+{
+  field(SNAM, "setpointCommand")
+  field(FTA,  "DOUBLE")
+  field(INPA, "$(P)$(R):SETPOINT")
+  field(FTVA, "STRING")
+  field(OUTA, "$(P)$(R):SEND:CMD PP")
+}
+
+###########################################################################
+#  These records read the limit values from the chiller                   #
+###########################################################################
+
+record(stringin, "$(P)$(R):READ:LIM")
+{
+  field(DTYP, "stream")
+  field(INP,  "@huber.proto getLimCmd() $(PORT)")
+  field(SCAN, "1 second")
+  field(FLNK, "$(P)$(R):FORMAT:LIM.PROC PP")
+}
+
+record(genSub, "$(P)$(R):FORMAT:LIM")
+{
+  field(SNAM, "decodeLimit")
+  field(FTA,  "STRING")
+  field(INPA, "$(P)$(R):READ:LIM")
+  field(FTVA, "DOUBLE")
+  field(OUTA, "$(P)$(R):SETPOINT:LLIM_RBV PP")
+  field(FTVB, "DOUBLE")
+  field(OUTB, "$(P)$(R):SETPOINT:HLIM_RBV PP")
+  field(FTVC, "DOUBLE")
+  field(OUTC, "$(P)$(R):SETPOINT:MAXLLIM_RBV PP")
+  field(FTVD, "DOUBLE")
+  field(OUTD, "$(P)$(R):SETPOINT:MAXHLIM_RBV PP")
+}
+
+record(ao, "$(P)$(R):SETPOINT:LLIM_RBV")
+{
+  field(PREC, "2")
+}
+
+record(ao, "$(P)$(R):SETPOINT:HLIM_RBV")
+{
+  field(PREC, "2")
+}
+
+record(ao, "$(P)$(R):SETPOINT:MAXLLIM_RBV")
+{
+  field(PREC, "2")
+}
+
+record(ao, "$(P)$(R):SETPOINT:MAXHLIM_RBV")
+{
+  field(PREC, "2")
+}
+

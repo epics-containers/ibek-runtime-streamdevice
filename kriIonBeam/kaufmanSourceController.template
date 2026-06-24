@@ -1,0 +1,507 @@
+# autocontroller.template
+#
+# Top-level template for the Kaufman & Robinson ion beam KSC.
+# Assumed to be using streamDevice
+#
+# Author: Nicoletta De Maio
+# Date:   July 2017
+#
+
+# Parameters:
+# % macro, P,       EPICS PV prefix
+# % macro, PORT,    asyn port
+# % macro, name,    object and gui association name
+# % gui, $(name=), edm, kriIonBeamKSC.edl, P=$(P), TITLE=$(name=)
+
+##### Controller level #####
+
+# Poll remote control status
+record(bi, "$(P):REMOTE_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "current control mode")
+    field(INP, "@kriIonBeam.proto getRemote($(P)) $(PORT)")
+    field(SCAN, "1 second")
+    field(ZNAM, "Local")
+    field(ONAM, "Remote")
+    field(PINI, "1")
+}
+
+# Set to remote or local control
+record(mbbo, "$(P):REMOTE") {
+    field(DTYP, "stream")
+    field(DESC, "set control mode")
+    field(OUT, "@kriIonBeam.proto setRemote($(P)) $(PORT)")
+    field(ZRST, "Set Remote")
+    field(ONST, "Set Local")
+    field(VAL, "1")
+}
+
+# Poll controller identity
+record(stringin, "$(P):IDENT") {
+    field(DTYP, "stream")
+    field(DESC, "controller identity")
+    field(INP, "@kriIonBeam.proto getIdent() $(PORT)")
+    field(SCAN, "10 second")
+    field(PINI, "1")
+}
+
+# Reset the controller to Standby and Terse output mode
+record(bo, "$(P):RESET") {
+    field(DTYP, "stream")
+    field(DESC, "reset controller")
+    field(OUT, "@kriIonBeam.proto reset($(P)) $(PORT)")
+}
+
+# Poll error state
+record(stringin, "$(P):ERRSTATE") {
+    field(DTYP, "stream")
+    field(DESC, "most recent error")
+    field(INP, "@kriIonBeam.proto getLastErrorString() $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+}
+
+# Poll beam and discharge system output state
+record(mbbi, "$(P):OUTPUT_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "current output state")
+    field(INP, "@kriIonBeam.proto getOutput($(P)) $(PORT)")
+    field(SCAN, "1 second")
+    field(ZRVL, "0")
+    field(ZRST, "Both standby")
+    field(ONVL, "10")
+    field(ONST, "No beam, Discharge on")
+    field(TWVL, "11")
+    field(TWST, "Both enabled")
+    field(PINI, "1")
+}
+
+# Set beam and discharge system output state
+record(mbbo, "$(P):OUTPUT") {
+    field(DTYP, "stream")
+    field(DESC, "set output state")
+    field(OUT, "@kriIonBeam.proto setOutput($(P)) $(PORT)")
+    field(ZRVL, "0")
+    field(ZRST, "Both standby")
+    field(ONVL, "10")
+    field(ONST, "No beam, Discharge on")
+    field(TWVL, "11")
+    field(TWST, "Both enabled")
+}
+
+# Poll beam status
+record(bi, "$(P):BEAM") {
+    field(DTYP, "stream")
+    field(DESC, "current beam status")
+    field(INP, "@kriIonBeam.proto beamStatus($(P)) $(PORT)")
+    field(SCAN, "1 second")
+    field(ZNAM, "Bad")
+    field(ONAM, "Good")
+    field(PINI, "1")
+}
+
+# Poll emission
+record(bi, "$(P):EMISSION") {
+    field(DTYP, "stream")
+    field(DESC, "current emission")
+    field(INP, "@kriIonBeam.proto getEmission($(P)) $(PORT)")
+    field(SCAN, "1 second")
+    field(ZNAM, "Bad")
+    field(ONAM, "Good")
+    field(PINI, "1")
+}
+
+# Poll discharge
+record(bi, "$(P):DISCHARGE") {
+    field(DTYP, "stream")
+    field(DESC, "current discharge")
+    field(INP, "@kriIonBeam.proto getDischarge($(P)) $(PORT)")
+    field(SCAN, "1 second")
+    field(ZNAM, "Bad")
+    field(ONAM, "Good")
+    field(PINI, "1")
+}
+
+##### Parameter level (monitoring) #####
+
+# Set beam current target
+record(ao, "$(P):BMI") {
+    field(DTYP, "stream")
+    field(DESC, "target beam current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto set($(P),BMI) $(PORT)")
+    field(FLNK, "$(P):BMI_RBV")
+    field(PREC, "3")
+}
+
+# Beam current target readback
+record(ai, "$(P):BMI_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "beam current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto get($(P),BMI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "3")
+}
+
+# Beam current (actual value)
+#% archiver 1 Monitor
+record(ai, "$(P):BMI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "beam current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto rbv($(P),BMI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "3")
+}
+
+# Set beam voltage target
+record(ao, "$(P):BMV") {
+    field(DTYP, "stream")
+    field(DESC, "target beam voltage")
+    field(EGU, "V")
+    field(OUT, "@kriIonBeam.proto set($(P),BMV) $(PORT)")
+    field(FLNK, "$(P):BMV_RBV")
+    field(PREC, "1")
+}
+
+# Beam voltage target readback
+record(ai, "$(P):BMV_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "beam voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto get($(P),BMV) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Beam voltage (actual value)
+#% archiver 1 Monitor
+record(ai, "$(P):BMV_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "beam voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto rbv($(P),BMV) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set accelerator current target
+record(ao, "$(P):ACI") {
+    field(DTYP, "stream")
+    field(DESC, "target accelerator current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto set($(P),ACI)) $(PORT)")
+    field(FLNK, "$(P):ACI_RBV")
+    field(PREC, "4")
+}
+
+# Accelerator current target readback
+record(ai, "$(P):ACI_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "accelerator current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto get($(P),ACI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "4")
+}
+
+# Accelerator current (actual value)
+#% archiver 1 Monitor
+record(ai, "$(P):ACI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "accelerator current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto rbv($(P),ACI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "4")
+}
+
+# Set accelerator voltage target
+record(ao, "$(P):ACV") {
+    field(DTYP, "stream")
+    field(DESC, "target accelerator voltage")
+    field(EGU, "V")
+    field(OUT, "@kriIonBeam.proto set($(P),ACV) $(PORT)")
+    field(FLNK, "$(P):ACV_RBV")
+    field(PREC, "1")
+}
+
+# Accelerator voltage target readback
+record(ai, "$(P):ACV_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "accelerator voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto get($(P),ACV) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Accelerator voltage (actual value)
+#% archiver 1 Monitor
+record(ai, "$(P):ACV_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "accelerator voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto rbv($(P),ACV) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "1")
+}
+
+# Set cathode current target
+record(ao, "$(P):CHI") {
+    field(DTYP, "stream")
+    field(DESC, "target cathode current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto set($(P),CHI) $(PORT)")
+    field(FLNK, "$(P):CHI_RBV")
+    field(PREC, "2")
+}
+
+# Cathode current target readback
+record(ai, "$(P):CHI_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "cathode current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto get($(P),CHI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Cathode current (actual value)
+#% archiver 1 Monitor
+record(ai, "$(P):CHI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "cathode current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto rbv($(P),CHI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set cathode heater start current target
+record(ao, "$(P):CHSI") {
+    field(DTYP, "stream")
+    field(DESC, "target cathode heater start current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto set($(P),CHSI) $(PORT)")
+    field(FLNK, "$(P):CHSI_RBV")
+    field(PREC, "2")
+}
+
+# Get cathode heater start current target readback
+record(ai, "$(P):CHSI_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "target cathode heater start current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto get($(P),CHSI) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Get cathode heater start current (actual value)
+record(ai, "$(P):CHSI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target cathode heater start current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto rbv($(P),CHV) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set discharge current target
+record(ao, "$(P):DSI") {
+    field(DTYP, "stream")
+    field(DESC, "target discharge current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto set($(P),DSI) $(PORT)")
+    field(FLNK, "$(P):DSI_RBV")
+    field(PREC, "2")
+}
+
+# Discharge current target readback
+record(ai, "$(P):DSI_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "discharge current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto get($(P),DSI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Discharge current (actual value)
+#% archiver 1 Monitor
+record(ai, "$(P):DSI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "discharge current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto rbv($(P),DSI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set discharge voltage target
+record(ao, "$(P):DSV") {
+    field(DTYP, "stream")
+    field(DESC, "target discharge voltage")
+    field(EGU, "V")
+    field(OUT, "@kriIonBeam.proto set($(P),DSV) $(PORT)")
+    field(FLNK, "$(P):DSV_RBV")
+    field(PREC, "2")
+}
+
+# Discharge voltage target readback
+record(ai, "$(P):DSV_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "discharge voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto get($(P),DSV) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Discharge voltage (actual value)
+#% archiver 1 Monitor
+record(ai, "$(P):DSV_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "discharge voltage")
+    field(EGU, "V")
+    field(INP, "@kriIonBeam.proto rbv($(P),DSV) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set electron emission current target
+record(ao, "$(P):EEI") {
+    field(DTYP, "stream")
+    field(DESC, "target electron emission current")
+    field(EGU, "mA")
+    field(OUT, "@kriIonBeam.proto set($(P),EEI) $(PORT)")
+    field(FLNK, "$(P):EEI_RBV")
+    field(PREC, "4")
+}
+
+# Electron emission current target readback
+record(ai, "$(P):EEI_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "electron emission current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto get($(P),EEI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "4")
+}
+
+# Electron emission current (actual value)
+record(ai, "$(P):EEI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "electron emission current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto rbv($(P),EEI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "4")
+}
+
+# Set filament heater current target
+record(ao, "$(P):FHI") {
+    field(DTYP, "stream")
+    field(DESC, "target filament heater current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto set($(P),FHI) $(PORT)")
+    field(FLNK, "$(P):FHI_RBV")
+    field(PREC, "2")
+}
+
+# Filament heater current target readback
+record(ai, "$(P):FHI_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "filament heater current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto get($(P),FHI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Filament heater current (actual value)
+record(ai, "$(P):FHI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "filament heater current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto rbv($(P),FHI) $(PORT)")
+    field(SCAN, "1 second")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Set filament heater start current target
+record(ao, "$(P):FHSI") {
+    field(DTYP, "stream")
+    field(DESC, "target filament heater start current")
+    field(EGU, "A")
+    field(OUT, "@kriIonBeam.proto set($(P),FHSI) $(PORT)")
+    field(FLNK, "$(P):FHSI_RBV")
+    field(PREC, "2")
+}
+
+# Get filament heater start current target
+record(ai, "$(P):FHSI_TRBV") {
+    field(DTYP, "stream")
+    field(DESC, "target filament heater start current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto get($(P),FHSI) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+# Get filament heater start current target
+record(ai, "$(P):FHSI_RBV") {
+    field(DTYP, "stream")
+    field(DESC, "target filament heater start current")
+    field(EGU, "A")
+    field(INP, "@kriIonBeam.proto rbv($(P),FHV) $(PORT)")
+    field(PINI, "1")
+    field(PREC, "2")
+}
+
+##### Target RBV updating #####
+
+# Signal that parameter targets need to be refreshed
+# (used in DOL field in records from other templates)
+record(bo, "$(P):FETCH") {
+    field(DESC, "dummy record for process forwarding")
+}
+
+##### Generic response handling #####
+
+# Catch-all response field to display protocol mismatches
+record(stringin, "$(P):RESPONSE") {
+    field(DESC, "response from device")
+}
+
+# Direct access to the communication channel; useful for monitoring and debugging
+record(asyn, "$(P):ASYN") {
+    field(DESC, "direct line for monitoring and debugging")
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"0")
+    field(OMAX,"80")
+    field(IMAX,"80")
+    field(OEOS,"\r")
+    field(IEOS,"\r")
+}
