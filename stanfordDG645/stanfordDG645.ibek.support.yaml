@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: stanfordDG645
+
+entity_models:
+  - name: stanfordDG645
+    description: |-
+      Support for Stanford DG645 digital delay generator
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+    databases:
+      - file: stanfordDG645.template
+        args:
+          .*:

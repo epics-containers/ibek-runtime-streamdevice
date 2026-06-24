@@ -1,0 +1,76 @@
+# Start of support/tecPeltier/tecPeltier/Db/write_channel_parameter.template
+# Original Author: Lee Hudson 2018
+
+# Writes the value in _DMD to to the parameter specified in $(P):$(PARAM)_ID
+
+#  P, Device P
+#  PORT, Asyn port for the TEC Controller
+#  PARAM, Name for the paramter, must be the same as the $(PARAM) for the parameters.template
+#  CONVERT, Name of the method used by the aSub to convert the input into the desired output
+#  IN_FORMAT, Input data type
+#  OUT_FORMAT, Output data type
+#  DRVH, Input data type
+#  DRVL, Input data type
+
+# Channel 1 
+# Location of the demand input
+record(ao, $(P):$(PARAM)1_DMD){
+    field(DRVH, "$(DRVH)")
+    field(DRVL, "$(DRVL)")
+    field(PINI, "NO")
+    field(FLNK, "$(P):$(PARAM)1_WRITE_CONVERT")
+}
+
+# Convert the input into the desired output format
+record(aSub, "$(P):$(PARAM)1_WRITE_CONVERT"){
+    field(INPA, "$(P):$(PARAM)1_DMD ")
+    field(FTA, "$(IN_FORMAT)")
+    field(SNAM, "$(CONVERT)")
+    field(OUTA, "$(P):$(PARAM)1_WRITE PP")
+    field(FTVA, "$(OUT_FORMAT)")
+    field(PINI, "NO")
+}
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)1_WRITE") {
+  field(DTYP, "stream")
+  field(OUT, "@tecPeltier.proto write_param($(P),$(PARAM),1) $(PORT)")
+  field(PINI, "NO")
+}
+
+# Record the returned sequence number for future use
+record(stringin, "$(P):$(PARAM)1_WRITE_SEQUENCE_NO"){
+}
+
+# Channel 2 
+# Location of the demand input
+record(ao, $(P):$(PARAM)2_DMD){
+    field(DRVH, "$(DRVH)")
+    field(DRVL, "$(DRVL)")
+    field(PINI, "NO")
+    field(FLNK, "$(P):$(PARAM)2_WRITE_CONVERT")
+}
+
+# Convert the input into the desired output format
+record(aSub, "$(P):$(PARAM)2_WRITE_CONVERT"){
+    field(INPA, "$(P):$(PARAM)2_DMD ")
+    field(FTA, "$(IN_FORMAT)")
+    field(SNAM, "$(CONVERT)")
+    field(OUTA, "$(P):$(PARAM)2_WRITE PP")
+    field(FTVA, "$(OUT_FORMAT)")
+    field(PINI, "NO")
+}
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)2_WRITE") {
+  field(DTYP, "stream")
+  field(OUT, "@tecPeltier.proto write_param($(P),$(PARAM),2) $(PORT)")
+  field(PINI, "NO")
+}
+
+# Record the returned sequence number for future use
+record(stringin, "$(P):$(PARAM)2_WRITE_SEQUENCE_NO"){
+}
+
+
+# End of support/tecPeltier/tecPeltier/Db/write_channel_parameter.template

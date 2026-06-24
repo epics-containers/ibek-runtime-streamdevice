@@ -1,0 +1,674 @@
+# One instance created for each channel.
+
+# % macro, P, Domain
+# % macro, CHANNEL, Channel number 1-4
+# % macro, STREAMS_PORT, Asyn port name for stream device
+# % macro, CONTINUOUS_MAX_CURR, Maximum current for continuous mode (A)
+# % macro, PULSED_MAX_CURR, Maximum current for pulsed mode (A)
+
+#% autosave 1 VAL
+record(stringin, "$(P):CH$(CHANNEL):DESCRIPTION")
+{
+  field(DESC, "Description of Channel $(CHANNEL)")
+  field(PINI, "YES")
+}
+
+record(ao, "$(P):CH$(CHANNEL):STATUS")
+{
+  field(DESC, "Channel $(CHANNEL) Status")
+  field(DTYP, "stream")
+  field(SCAN, "1 second")
+  field(OUT,  "@PP400Series.protocol Status($(P),$(CHANNEL)) $(STREAMS_PORT)")
+}
+
+###################### Current & Voltage ###########################
+
+# Suggestion: make the two MD_MAX_CURR PVs editable from the GUI (e.g. in and advanced settings window)
+# Remove the macro and add autosave instead
+record(ai, "$(P):CH$(CHANNEL):CONTINUOUS_MD_MAX_CURR")
+{
+  field(DESC, "Ch$(CHANNEL) Max Current in Continuous Mode")
+  field(VAL, "$(CONTINUOUS_MAX_CURR=2)")
+  field(EGU, "A")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P):CH$(CHANNEL):PULSED_MD_MAX_CURR")
+{
+  field(DESC, "Ch$(CHANNEL) Max Current in Pulsed Mode")
+  field(VAL, "$(PULSED_MAX_CURR=10)")
+  field(EGU, "A")
+  field(PINI, "YES")
+}
+
+record(calcout, "$(P):CH$(CHANNEL):MAX_CURRENT_CALC")
+{
+  field(DESC, "Channel $(CHANNEL) Current Limit Calc")
+  field(CALC, "A==2 ? B : C")
+  field(INPA, "$(P):CH$(CHANNEL):MODE.RVAL CP")
+  field(INPB, "$(P):CH$(CHANNEL):PULSED_MD_MAX_CURR CP")
+  field(INPC, "$(P):CH$(CHANNEL):CONTINUOUS_MD_MAX_CURR CP")
+  field(OUT, "$(P):CH$(CHANNEL):MAX_CURRENT_FAN PP")
+}
+
+record(dfanout, "$(P):CH$(CHANNEL):MAX_CURRENT_FAN")
+{
+  field(OMSL, "supervisory")
+  field(OUTA, "$(P):CH$(CHANNEL):MAX_CURRENT.DRVH PP")
+  field(OUTB, "$(P):CH$(CHANNEL):MAX_CURRENT PP")
+}
+
+record(ao, "$(P):CH$(CHANNEL):SET_MAX_CURRENT")
+{
+  field(DESC, "Set Channel $(CHANNEL) Max Current")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol setMaxCurrent($(P),$(CHANNEL),MAX_CURRENT) $(STREAMS_PORT)")
+}
+
+record(ai, "$(P):CH$(CHANNEL):MAX_CURRENT_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Maximum Current")
+  field(EGU,  "A")
+  field(PREC, "2")
+}
+
+record(ao, "$(P):CH$(CHANNEL):MAX_CURRENT")
+{
+  field(DESC, "Channel $(CHANNEL) Maximum Current")
+  field(DRVH, "2")
+  field(DRVL, "0")
+  field(PREC, "2")
+}
+
+record(ai, "$(P):CH$(CHANNEL):VOLTAGE_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Voltage")
+  field(PREC, "2")
+  field(EGU,  "V")
+}
+
+####################################################
+
+record(ai, "$(P):CH$(CHANNEL):NUMBER_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Number")
+}
+
+# BRIGHTNESS sets the brightness and sends it to the device by processing MODE_SEL
+record(ao, "$(P):CH$(CHANNEL):BRIGHTNESS")
+{
+  field(DESC, "Channel $(CHANNEL) Brightness")
+  field(OUT, "$(P):CH$(CHANNEL):BRIGHTNESS_DO PP")
+  field(DRVH, "100")
+  field(DRVL, "0")
+  field(FLNK, "$(P):CH$(CHANNEL):BRIGHTN:APPLY")
+}
+
+# NOTE SDIS is set: do not apply if value comes from syncing to BRIGHTNESS_DO
+record(fanout, "$(P):CH$(CHANNEL):BRIGHTN:APPLY")
+{
+  field(DESC, "Apply brightness setting")
+  field(LNK1, "$(P):CH$(CHANNEL):MODE_SEL")
+  field(SDIS, "$(P):CH$(CHANNEL):BRIGHT:SYNC.PACT")
+  field(DISV, "1")
+}
+
+# If BRIGHTNESS_DO is set directly (i.e. in the Config screen)
+# then BRIGHTNESS should be synced
+record(ao, "$(P):CH$(CHANNEL):BRIGHT:SYNC")
+{
+  field(OMSL, "closed_loop")
+  field(DOL, "$(P):CH$(CHANNEL):BRIGHTNESS_DO CP")
+  field(OUT, "$(P):CH$(CHANNEL):BRIGHTNESS PP")
+}
+
+# BRIGHTNESS_DO only stores the brightness without sending it directly to the device
+record(ao, "$(P):CH$(CHANNEL):BRIGHTNESS_DO")
+{
+  field(DESC, "Channel $(CHANNEL) Brightness To Be Pushed")
+  field(DRVH, "100")
+  field(DRVL, "0")
+}
+
+record(ai, "$(P):CH$(CHANNEL):BRIGHTNESS_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Brightness")
+  field(EGU,  "%")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):BRIGHTNESS:INIT")
+{
+  field(DESC, "Initialise Brightness from RBV")
+  field(CALC, "AA=='NO_ALARM'")
+  field(INAA, "$(P):CH$(CHANNEL):BRIGHTNESS_RBV.STAT CP")
+  field(INPA, "$(P):CH$(CHANNEL):BRIGHTNESS_RBV")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+  field(OUT, "$(P):CH$(CHANNEL):BRIGHT:INIT_DO PP")
+}
+
+record(ao, "$(P):CH$(CHANNEL):BRIGHT:INIT_DO")
+{
+  field(OUT, "$(P):CH$(CHANNEL):BRIGHTNESS_DO PP")
+  field(FLNK, "$(P):CH$(CHANNEL):BRIGHT_INIT:DIS")
+}
+
+record(bo, "$(P):CH$(CHANNEL):BRIGHT_INIT:DIS")
+{
+  field(DESC, "Disable Init of Brightness When Done")
+  field(VAL, "1")
+  field(OUT, "$(P):CH$(CHANNEL):BRIGHTNESS:INIT.DISA")
+}
+
+record(ai, "$(P):CH$(CHANNEL):SAVE_BRIGHTNESS")
+{
+  field(DESC, "Latest ON Brightness Setting")
+  field(INP, "$(P):CH$(CHANNEL):BRIGHTNESS")
+}
+
+record(dfanout, "$(P):CH$(CHANNEL):RESTORE_BRIGHTNESS")
+{
+  field(DESC, "Restore latest ON Brightness")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(P):CH$(CHANNEL):SAVE_BRIGHTNESS")
+  field(OUTA, "$(P):CH$(CHANNEL):BRIGHTNESS PP")
+}
+
+################### Pulse Settings ##########################
+
+record(ao, "$(P):CH$(CHANNEL):DELAY")
+{
+  field(DESC, "Channel $(CHANNEL) Pulse Delay")
+  field(PREC, "2")
+  field(DRVH, "999")
+  field(DRVL, "0.02")
+}
+
+record(ai, "$(P):CH$(CHANNEL):DELAY_VALUE_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Pulse Delay")
+  field(PREC, "2")
+}
+
+record(stringin, "$(P):CH$(CHANNEL):DELAY_UNIT_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Unit")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):DELAY_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Autosense Flag")
+  field(CALC, "AA=='us' ? A / 1000 : A")
+  field(INAA, "$(P):CH$(CHANNEL):DELAY_UNIT_RBV CP")
+  field(INPA, "$(P):CH$(CHANNEL):DELAY_VALUE_RBV CP")
+  field(PREC, "2")
+  field(EGU, "ms")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):DELAY:INIT")
+{
+  field(DESC, "Initialise Pulse Delay from RBV")
+  field(CALC, "AA=='NO_ALARM' && BB=='NO_ALARM'")
+  field(INAA, "$(P):CH$(CHANNEL):DELAY_UNIT_RBV.STAT")
+  field(INBB, "$(P):CH$(CHANNEL):DELAY_VALUE_RBV.STAT")
+  field(INPA, "$(P):CH$(CHANNEL):DELAY_RBV CP")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+  field(OUT, "$(P):CH$(CHANNEL):DELAY:INIT_DO PP")
+}
+
+record(ao, "$(P):CH$(CHANNEL):DELAY:INIT_DO")
+{
+  field(DESC, "Initialise Pulse Delay from RBV")
+  field(OUT, "$(P):CH$(CHANNEL):DELAY PP")
+  field(FLNK, "$(P):CH$(CHANNEL):DELAY_INIT:DIS")
+}
+
+record(bo, "$(P):CH$(CHANNEL):DELAY_INIT:DIS")
+{
+  field(DESC, "Disable Init of Pulse Delay When Done")
+  field(VAL, "1")
+  field(OUT, "$(P):CH$(CHANNEL):DELAY:INIT.DISA")
+}
+
+record(ao, "$(P):CH$(CHANNEL):WIDTH")
+{
+  field(DESC, "Channel $(CHANNEL) Pulse Width")
+  field(PREC, "2")
+  field(DRVH, "999")
+  field(DRVL, "0.02")
+}
+
+record(stringin, "$(P):CH$(CHANNEL):WIDTH_UNIT_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Unit")
+}
+
+record(ai, "$(P):CH$(CHANNEL):WIDTH_VALUE_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Pulse Width")
+  field(PREC, "2")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):WIDTH_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Autosense Flag")
+  field(CALC, "AA=='us' ? A / 1000 : A")
+  field(INAA, "$(P):CH$(CHANNEL):WIDTH_UNIT_RBV CP")
+  field(INPA, "$(P):CH$(CHANNEL):WIDTH_VALUE_RBV CP")
+  field(PREC, "2")
+  field(EGU, "ms")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):WIDTH:INIT")
+{
+  field(DESC, "Initialise Pulse Width from RBV")
+  field(CALC, "AA=='NO_ALARM' && BB=='NO_ALARM'")
+  field(INAA, "$(P):CH$(CHANNEL):WIDTH_UNIT_RBV.STAT")
+  field(INBB, "$(P):CH$(CHANNEL):WIDTH_VALUE_RBV.STAT")
+  field(INPA, "$(P):CH$(CHANNEL):WIDTH_RBV CP")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+  field(OUT, "$(P):CH$(CHANNEL):WIDTH:INIT_DO PP")
+}
+
+record(ao, "$(P):CH$(CHANNEL):WIDTH:INIT_DO")
+{
+  field(DESC, "Initialise Pulse Width from RBV")
+  field(OUT, "$(P):CH$(CHANNEL):WIDTH PP")
+  field(FLNK, "$(P):CH$(CHANNEL):WIDTH_INIT:DIS")
+}
+
+record(bo, "$(P):CH$(CHANNEL):WIDTH_INIT:DIS")
+{
+  field(DESC, "Disable Init of Pulse Width When Done")
+  field(VAL, "1")
+  field(OUT, "$(P):CH$(CHANNEL):WIDTH:INIT.DISA")
+}
+
+# Retrigger delays are not possible with the current firmware
+#record(ao, "$(P):CH$(CHANNEL):RETRIGGER_DELAY")
+#{
+#  field(DESC, "Channel $(CHANNEL) Retrigger Delay")
+#  field(VAL,  "0.02")
+#  field(PINI, "YES")
+#  field(PREC, "2")
+#}
+
+######################## Flags ###########################
+
+record(mbbo, "$(P):CH$(CHANNEL):AUTOSENSE")
+{
+  field(DESC, "Set Channel $(CHANNEL) Autosense Flag")
+  field(ZRST, "Yes")
+  field(ONST, "No")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+}
+
+record(mbbo, "$(P):CH$(CHANNEL):ERROR_DETECT")
+{
+  field(DESC, "Set Channel $(CHANNEL) Error Detect Flag")
+  field(ZRST, "Yes")
+  field(ONST, "No")
+  field(ZRVL, "0")
+  field(ONVL, "2")
+}
+
+record(mbbo, "$(P):CH$(CHANNEL):TRIGGER_EDGE")
+{
+  field(DESC, "Set Channel $(CHANNEL) Trigger Edge Flag")
+  field(ZRST, "Rising")
+  field(ONST, "Falling")
+  field(ZRVL, "0")
+  field(ONVL, "4")
+}
+
+record(calcout, "$(P):CH$(CHANNEL):FLAGS")
+{
+  field(DESC, "Calculate Channel $(CHANNEL) Flags")
+  field(INPA, "$(P):CH$(CHANNEL):AUTOSENSE.RVAL CP")
+  field(INPB, "$(P):CH$(CHANNEL):ERROR_DETECT.RVAL CP")
+  field(INPC, "$(P):CH$(CHANNEL):TRIGGER_EDGE.RVAL CP")
+  field(CALC, "A+B+C")
+}
+
+record(ao, "$(P):CH$(CHANNEL):SET_FLAGS")
+{
+  field(DESC, "Set Channel $(CHANNEL) Flags")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol setFlags($(P),$(CHANNEL),FLAGS) $(STREAMS_PORT)")
+}
+
+record(mbbiDirect, "$(P):CH$(CHANNEL):FLAGS_RBV") 
+{
+  field(DESC, "Channel $(CHANNEL) Flags")
+  field(NOBT, "3")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):AUTOSENSE_RBV_CALC")
+{
+  field(DESC, "Channel $(CHANNEL) Autosense Flag")
+  field(CALC, "A==1 ? 'No' : 'Yes'")
+  field(INPA, "$(P):CH$(CHANNEL):FLAGS_RBV.B0 CP")
+  field(OUT,  "$(P):CH$(CHANNEL):AUTOSENSE_RBV PP")
+}
+
+record(stringin, "$(P):CH$(CHANNEL):AUTOSENSE_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Autosense Flag")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):AUTOSENSE:INIT")
+{
+  field(DESC, "Initialise Ch$(CHANNEL) Autosense from RBV")
+  field(CALC, "AA=='NO_ALARM'")
+  field(INAA, "$(P):CH$(CHANNEL):FLAGS_RBV.STAT")
+  field(INBB, "$(P):CH$(CHANNEL):AUTOSENSE_RBV CP")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "BB")
+  field(OUT, "$(P):CH$(CHANNEL):AUTOSENSE:INIT_DO PP")
+}
+
+record(stringout, "$(P):CH$(CHANNEL):AUTOSENSE:INIT_DO")
+{
+  field(OUT, "$(P):CH$(CHANNEL):AUTOSENSE.VAL PP")
+  field(FLNK, "$(P):CH$(CHANNEL):AUTOSENSE_INIT:DIS")
+}
+
+record(bo, "$(P):CH$(CHANNEL):AUTOSENSE_INIT:DIS")
+{
+  field(DESC, "Disable Init of Autosense When Done")
+  field(VAL, "1")
+  field(OUT, "$(P):CH$(CHANNEL):AUTOSENSE:INIT.DISA")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):ERROR_DETECT_RBV_CALC")
+{
+  field(DESC, "Channel $(CHANNEL) Error Detect Flag")
+  field(CALC, "A==1 ? 'No' : 'Yes'")
+  field(INPA, "$(P):CH$(CHANNEL):FLAGS_RBV.B1 CP")
+  field(OUT,  "$(P):CH$(CHANNEL):ERROR_DETECT_RBV PP") 
+}
+
+record(stringin, "$(P):CH$(CHANNEL):ERROR_DETECT_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Error Detect Flag")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):ERR_DET:INIT")
+{
+  field(DESC, "Initialise Ch$(CHANNEL) Error Detect from RBV")
+  field(CALC, "AA=='NO_ALARM'")
+  field(INAA, "$(P):CH$(CHANNEL):FLAGS_RBV.STAT")
+  field(INBB, "$(P):CH$(CHANNEL):ERROR_DETECT_RBV CP")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "BB")
+  field(OUT, "$(P):CH$(CHANNEL):ERR_DET:INIT_DO PP")
+}
+
+record(stringout, "$(P):CH$(CHANNEL):ERR_DET:INIT_DO")
+{
+  field(OUT, "$(P):CH$(CHANNEL):ERROR_DETECT.VAL PP")
+  field(FLNK, "$(P):CH$(CHANNEL):ERR_DET_INIT:DIS")
+}
+
+record(bo, "$(P):CH$(CHANNEL):ERR_DET_INIT:DIS")
+{
+  field(DESC, "Disable Init of Error Detect When Done")
+  field(VAL, "1")
+  field(OUT, "$(P):CH$(CHANNEL):ERR_DET:INIT.DISA")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):TRIGGER_EDGE_RBV_CALC")
+{
+  field(DESC, "Channel $(CHANNEL) Trigger Edge Flag")
+  field(CALC, "A==1 ? 'Falling' : 'Rising'")
+  field(INPA, "$(P):CH$(CHANNEL):FLAGS_RBV.B2 CP")
+  field(OUT,  "$(P):CH$(CHANNEL):TRIGGER_EDGE_RBV PP")
+}
+
+record(stringin, "$(P):CH$(CHANNEL):TRIGGER_EDGE_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Trigger Edge Flag")
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):TRIG_EDGE:INIT")
+{
+  field(DESC, "Initialise Ch$(CHANNEL) Trigger Edge from RBV")
+  field(CALC, "AA=='NO_ALARM'")
+  field(INAA, "$(P):CH$(CHANNEL):FLAGS_RBV.STAT")
+  field(INBB, "$(P):CH$(CHANNEL):TRIGGER_EDGE_RBV CP")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "BB")
+  field(OUT, "$(P):CH$(CHANNEL):TRIG_EDGE:INIT_DO PP")
+}
+
+record(stringout, "$(P):CH$(CHANNEL):TRIG_EDGE:INIT_DO")
+{
+  field(OUT, "$(P):CH$(CHANNEL):TRIGGER_EDGE.VAL PP")
+  field(FLNK, "$(P):CH$(CHANNEL):TRIG_EDGE_INIT:DIS")
+}
+
+record(bo, "$(P):CH$(CHANNEL):TRIG_EDGE_INIT:DIS")
+{
+  field(DESC, "Disable Init of Trigger Edge When Done")
+  field(VAL, "1")
+  field(OUT, "$(P):CH$(CHANNEL):TRIG_EDGE:INIT.DISA")
+}
+
+######################### Mode ##########################
+
+record(mbbo, "$(P):CH$(CHANNEL):MODE")
+{
+  field(DESC, "Set Mode")
+  field(ZRST, "Continuous")
+  field(ONST, "Pulsed")
+  field(TWST, "Switched")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(TWVL, "3")  
+}
+
+record(mbbi, "$(P):CH$(CHANNEL):MODE_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Mode")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "Continuous")
+  field(ONST, "Pulsed")
+  field(TWST, "Switched")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+}
+
+record(scalcout, $(P):CH$(CHANNEL):MODE:INIT)
+{
+  field(DESC, "Initialise Channel $(CHANNEL) Mode")
+  field(CALC, "AA=='NO_ALARM'")
+  field(INAA, "$(P):CH$(CHANNEL):MODE_RBV.STAT CP")
+  field(INBB, "$(P):CH$(CHANNEL):MODE_RBV")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "BB")
+  field(OUT, "$(P):CH$(CHANNEL):MODE:INIT_DO PP")
+}
+
+record(stringout, "$(P):CH$(CHANNEL):MODE:INIT_DO")
+{
+  field(OUT, "$(P):CH$(CHANNEL):MODE.VAL PP")
+  field(FLNK, "$(P):CH$(CHANNEL):MODE_INIT:DIS")
+}
+
+record(bo, "$(P):CH$(CHANNEL):MODE_INIT:DIS")
+{
+  field(DESC, "Disable Init of Mode When Done")
+  field(VAL, "1")
+  field(OUT, "$(P):CH$(CHANNEL):MODE:INIT.DISA")
+}
+
+record(seq, "$(P):CH$(CHANNEL):MODE_SEL")
+{
+  field(DESC, "Mode Selection")
+  field(SELM, "Specified")
+  field(SELL, "$(P):CH$(CHANNEL):MODE.RVAL PP")
+  field(DOL1, "1")
+  field(LNK1, "$(P):CH$(CHANNEL):CONTINUOUS.PROC CA")
+  field(DOL2, "1")
+  field(LNK2, "$(P):CH$(CHANNEL):PULSED.PROC CA")
+  field(DOL3, "1")
+  field(LNK3, "$(P):CH$(CHANNEL):SWITCHED.PROC CA")
+}
+
+record(ao, "$(P):CH$(CHANNEL):CONTINUOUS")
+{
+  field(DESC, "Set Channel $(CHANNEL) to Continuous Mode")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol setContinuous($(P),$(CHANNEL),BRIGHTNESS_DO) $(STREAMS_PORT)")
+  field(DRVH, "5")
+  field(DRVL, "0")
+}
+
+record(sseq, "$(P):CH$(CHANNEL):PULSED")
+{
+  field(DESC, "Set Trigger Then Pulsed Mode")
+  field(DOL1, "1")
+  field(LNK1, "$(P):CH$(CHANNEL):SET_TRIGGER.PROC CA")
+  field(WAIT1,"Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):CH$(CHANNEL):PULSED_DO.PROC CA")
+  field(WAIT2,"Wait")
+}
+
+record(ao, "$(P):CH$(CHANNEL):PULSED_DO")
+{
+  field(DESC, "Set Channel $(CHANNEL) to Pulsed Mode")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol setPulsed($(P),$(CHANNEL),WIDTH,DELAY,BRIGHTNESS_DO) $(STREAMS_PORT)")
+  field(DRVH, "5")
+  field(DRVL, "0")
+}
+
+record(sseq, "$(P):CH$(CHANNEL):SWITCHED")
+{
+  field(DESC, "Set Trigger Then Switched Mode")
+  field(DOL1, "1")
+  field(LNK1, "$(P):CH$(CHANNEL):SET_TRIGGER.PROC CA")
+  field(WAIT1,"Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):CH$(CHANNEL):SWITCHED_DO.PROC CA")
+  field(WAIT2,"Wait")
+}
+
+record(ao, "$(P):CH$(CHANNEL):SWITCHED_DO")
+{
+  field(DESC, "Set Channel $(CHANNEL) to Switched Mode")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol setSwitched($(P),$(CHANNEL),BRIGHTNESS_DO) $(STREAMS_PORT)")
+  field(DRVH, "5")
+  field(DRVL, "0")
+}
+
+record(calcout, "$(P):CH$(CHANNEL):TRIGGER_DISABLE")
+{
+  field(DESC, "Disable Ch $(CHANNEL) Trigger gui Features")
+  field(INPA, "$(P):CH$(CHANNEL):MODE CP")
+  field(CALC, "A==0")
+}
+
+record(calcout, "$(P):CH$(CHANNEL):PULSE_DISABLE")
+{
+  field(DESC, "Disable Ch $(CHANNEL) Pulse gui Features")
+  field(INPA, "$(P):CH$(CHANNEL):MODE CP")
+  field(CALC, "A!=1")
+}
+
+#################### Trigger ######################
+
+record(ao, "$(P):CH$(CHANNEL):SET_TRIGGER")
+{
+  field(DESC, "Set Channel $(CHANNEL) Trigger")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol setTriggerInput($(P),$(CHANNEL),TRIGGER_INPUT.VAL) $(STREAMS_PORT)")
+}
+
+record(ao, "$(P):CH$(CHANNEL):TRIGGER")
+{
+  field(DESC, "Channel $(CHANNEL) Trigger")
+  field(DTYP, "stream")
+  field(OUT,  "@PP400Series.protocol fireTrigger($(P),$(CHANNEL)) $(STREAMS_PORT)")
+}
+
+record(mbbo, "$(P):CH$(CHANNEL):TRIGGER_INPUT")
+{
+  field(DESC, "Channel $(CHANNEL) Trigger Input")
+  field(ONST, "1")
+  field(TWST, "2")
+  field(THST, "3")
+  field(FRST, "4")
+  field(ONVL, "1")
+  field(TWVL, "2")  
+  field(THVL, "3")  
+  field(FRVL, "4")
+}
+
+record(mbbi, "$(P):CH$(CHANNEL):TRIGGER_INPUT_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Trigger Input")
+  field(ONST, "1")
+  field(TWST, "2")
+  field(THST, "3")
+  field(FRST, "4")
+  field(ONVL, "1")
+  field(TWVL, "2")  
+  field(THVL, "3")
+  field(FRVL, "4")  
+}
+
+record(scalcout, "$(P):CH$(CHANNEL):TRIG_IN:INIT")
+{
+  field(DESC, "Initiliase Channel $(CHANNEL) Trigger Input")
+  field(CALC, "AA=='NO_ALARM'")
+  field(INAA, "$(P):CH$(CHANNEL):TRIGGER_INPUT_RBV.STAT CP")
+  field(INPA, "$(P):CH$(CHANNEL):TRIGGER_INPUT_RBV")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+  field(OUT, "$(P):CH$(CHANNEL):TRIG_IN:INIT_DO PP")
+}
+
+record(longout, "$(P):CH$(CHANNEL):TRIG_IN:INIT_DO")
+{
+  field(OUT, "$(P):CH$(CHANNEL):TRIGGER_INPUT.VAL PP")
+  field(FLNK, "$(P):CH$(CHANNEL):TRIG_IN_INIT:DIS")
+}
+
+record(bo, "$(P):CH$(CHANNEL):TRIG_IN_INIT:DIS")
+{
+  field(DESC, "Disable Init of Trigger Input When Done")
+  field(VAL, "1")
+  field(OUT, "$(P):CH$(CHANNEL):TRIG_IN:INIT.DISA")
+}
+
+#####################################################
+
+record(sseq, "$(P):CH$(CHANNEL):APPLY")
+{
+  field(DESC, "Apply Channel $(CHANNEL) Settings")
+  field(DOL1, "1")
+  field(LNK1, "$(P):CH$(CHANNEL):SET_FLAGS.PROC CA")
+  field(WAIT1,"Wait")
+  field(DOL2, "1")
+  field(LNK2, "$(P):CH$(CHANNEL):SET_MAX_CURRENT.PROC CA")
+  field(WAIT2,"Wait")
+  field(DOL3, "1")
+  field(LNK3, "$(P):CH$(CHANNEL):MODE_SEL.PROC CA")
+  field(WAIT3,"Wait")
+}
+

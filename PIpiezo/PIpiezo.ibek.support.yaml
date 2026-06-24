@@ -1,0 +1,173 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: PIpiezo
+
+entity_models:
+  - name: E725
+    description: |-
+      Controls a PI E725 piezo controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      C:
+        type: str
+        description: |-
+          Axis Name (use X or Y for standard 2 axis GUI)
+      AXIS:
+        type: str
+        description: |-
+          Axis Description
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+        default: mm
+      TWSIZE:
+        type: float
+        description: |-
+          Default tweak size
+        default: 1.0
+      PREC:
+        type: int
+        description: |-
+          Precision
+        default: 3
+      DEADBAND:
+        type: float
+        description: |-
+          Default Deadband
+        default: 0.1
+      PORT:
+        type: str
+        description: |-
+          Asyn port for I/O with controller
+      name:
+        type: id
+        description: |-
+          object and gui association name
+    databases:
+      - file: E725.template
+        args:
+          .*:
+
+  - name: E871
+    description: |-
+      Controls a PI E871 piezo controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      C:
+        type: str
+        description: |-
+          Axis Name
+      AXIS:
+        type: int
+        description: |-
+          Axis number for daisy chained stages (1-16), default is 1
+        default: 1
+      PORT:
+        type: str
+        description: |-
+          Asyn port for I/O with controller
+      EGU:
+        type: str
+        description: |-
+          engineering units for value of move commands to controller, defaults to mm
+        default: mm
+      MODE:
+        type: int
+        description: |-
+          Mode to select between 'Demand'(1) position and 'Readback'(0) position values in the tweak demand calculation, default is 1
+        default: 1
+      name:
+        type: id
+        description: |-
+          name for gui element
+    databases:
+      - file: E871.template
+        args:
+          .*:
+
+  - name: E816
+    description: |-
+      Controls a PI E816 piezo controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      AXIS:
+        type: str
+        description: |-
+          Axis Description
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      PORT:
+        type: str
+        description: |-
+          Asyn port for I/O with controller
+      DESC:
+        type: str
+        description: |-
+          Description
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: E816.template
+        args:
+          .*:
+
+  - name: C877
+    description: |-
+      Controls a PI C877 piezo controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      C:
+        type: str
+        description: |-
+          Axis Name
+      AXIS:
+        type: int
+        description: |-
+          Axis number for daisy chained stages (1-16), default is 1
+        default: 1
+      PORT:
+        type: str
+        description: |-
+          Asyn port for I/O with controller
+      EGU:
+        type: str
+        description: |-
+          engineering units for value of move commands to controller, defaults to mm
+        default: mm
+    databases:
+      - file: C877.template
+        args:
+          .*:

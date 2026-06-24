@@ -1,0 +1,84 @@
+#% archiver 1 Monitor
+# % macro, P, Device Prefix
+# % macro, STREAMS_PORT, Asyn Port
+# % macro, VAR, Network Input to read/write (e.g. I27010)
+# % macro, SCAN, Scan rate
+# % macro, DESC, Byte description
+# % macro, DESC0, Input bit 0 description
+# % macro, DESC1, Input bit 1 description
+# % macro, DESC2, Input bit 2 description
+# % macro, DESC3, Input bit 3 description
+# % macro, DESC4, Input bit 4 description
+# % macro, DESC5, Input bit 5 description
+# % macro, DESC6, Input bit 6 description
+# % macro, DESC7, Input bit 7 description
+
+record(mbboDirect, "$(P):I$(VAR)") {
+  field(DESC, "$(DESC=)")
+  field(OUT, "$(P):I$(VAR):WRITE PP")
+}
+
+record(mbboDirect, "$(P):I$(VAR):WRITE") {
+  field(DESC, "$(DESC=)")
+  field(SDIS, "$(P):I$(VAR):SYNC.PACT")
+  field(DISV, "1")
+  field(DTYP, "stream")
+  field(OUT, "@yaskawa.proto writei($(P),$(VAR)) $(STREAMS_PORT)")
+}
+
+#% archiver 10 Monitor
+record(mbbiDirect, "$(P):I$(VAR)_RBV") {
+  field(DESC, "$(DESC=)")
+  field(DISP, "1")
+  field(DTYP, "stream")
+  field(INP, "@yaskawa.proto readio($(P),$(VAR)) $(STREAMS_PORT)")
+  field(SCAN, "$(SCAN)")
+  field(FLNK, "$(P):I$(VAR):SYNC")
+}
+
+record(mbboDirect, "$(P):I$(VAR):SYNC") {
+  field(DESC, "$(DESC=)")
+  field(DOL, "$(P):I$(VAR)_RBV NPP")
+  field(OMSL, "closed_loop")
+  field(OUT, "$(P):I$(VAR) PP")
+}
+
+record(stringout, "$(P):I$(VAR):DESC0") {
+  field(VAL, "$(DESC0=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):I$(VAR):DESC1") {
+  field(VAL, "$(DESC1=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):I$(VAR):DESC2") {
+  field(VAL, "$(DESC2=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):I$(VAR):DESC3") {
+  field(VAL, "$(DESC3=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):I$(VAR):DESC4") {
+  field(VAL, "$(DESC4=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):I$(VAR):DESC5") {
+  field(VAL, "$(DESC5=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):I$(VAR):DESC6") {
+  field(VAL, "$(DESC6=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):I$(VAR):DESC7") {
+  field(VAL, "$(DESC7=)")
+  field(PINI, "YES")
+}

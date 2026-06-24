@@ -1,0 +1,204 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: ODPsu
+
+entity_models:
+  - name: ODPsu
+    description: |-
+      ODPsu power supply control
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name prefix (name will be $(P)$(Q))
+      Q:
+        type: str
+        description: |-
+          device name qualifier (name will be $(P)$(Q))
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ODPsu.template
+        args:
+          .*:
+
+  - name: ODPsuV2
+    description: |-
+      ODPsu V2 power supply control
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name prefix (name will be $(P)$(Q))
+      Q:
+        type: str
+        description: |-
+          device name qualifier (name will be $(P)$(Q))
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ODPsuV2.template
+        args:
+          .*:
+
+  - name: ODPsuChannel
+    description: |-
+      ODPsu power supply channel control
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name prefix (name will be $(P)$(Q))
+      Q:
+        type: str
+        description: |-
+          device name qualifier (name will be $(P)$(Q))
+      CHAN:
+        type: int
+        description: |-
+          power supply channel number (0 - 23)
+      BANK:
+        type: int
+        description: |-
+          power supply bank number (0 - 1)
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ODPsuChannel.template
+        args:
+          .*:
+
+  - name: ODPsuChannelV2
+    description: |-
+      ODPsu V2 power supply channel control
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name prefix (name will be $(P)$(Q))
+      Q:
+        type: str
+        description: |-
+          device name qualifier (name will be $(P)$(Q))
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      CHAN:
+        type: int
+        description: |-
+          power supply channel number (0 - 23)
+      ACTIVE:
+        type: int
+        description: |-
+          channel activated (0-1)
+      BANK:
+        type: int
+        description: |-
+          bank to which channel is assigned (0-1)
+      LASTCHAN:
+        type: int
+        description: |-
+          whether channel is last channel in the bank (0-1)
+    databases:
+      - file: ODPsuChannelV2.template
+        args:
+          .*:
+
+  - name: ODPsuBank
+    description: |-
+      ODPsu power supply bank control
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name prefix (name will be $(P)$(Q))
+      Q:
+        type: str
+        description: |-
+          device name qualifier (name will be $(P)$(Q))
+      BANK:
+        type: int
+        description: |-
+          power supply bank number (0 - 1)
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ODPsuBank.template
+        args:
+          .*:
+
+  - name: ODPsuBankV2
+    description: |-
+      ODPsu V2 power supply bank control
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name prefix (name will be $(P)$(Q))
+      Q:
+        type: str
+        description: |-
+          device name qualifier (name will be $(P)$(Q))
+      BANK:
+        type: int
+        description: |-
+          power supply bank number (0 - 1)
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ODPsuBankV2.template
+        args:
+          .*:
+
+  - name: ODPsuFormat16
+    description: |-
+      ODPsu 16-channel format control
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name prefix (name will be $(P)$(Q))
+      Q:
+        type: str
+        description: |-
+          device name qualifier (name will be $(P)$(Q))
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ODPsuFormat16.template
+        args:
+          .*:
+
+  - name: ODPsuFormat22
+    description: |-
+      ODPsu 22-channel format control
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name prefix (name will be $(P)$(Q))
+      Q:
+        type: str
+        description: |-
+          device name qualifier (name will be $(P)$(Q))
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ODPsuFormat22.template
+        args:
+          .*:

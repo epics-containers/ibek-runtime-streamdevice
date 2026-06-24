@@ -1,0 +1,69 @@
+#==============================================================================
+# IC101 CSS screens
+#
+# Ben Bradnick, Diamond Light Source
+#
+#==============================================================================
+
+## Embeddable and detail screens
+# % gui, $(name), boydetail, I400App_opi/IC101_detail.opi,    P=$(P), DESC=IC101 controller
+# % gui, $(name), boyembed,  I400App_opi/IC101_embed.opi,     P=$(P), DESC=IC101 controller
+# % gui, $(name), boyembed,  I400App_opi/IC101_embed_box.opi, P=$(P), DESC=IC101 controller
+
+## Device info
+
+# % gui, $(name), groupHeading, Device info
+# % gui, $(name), readback,     Manufacturer,       $(P):MANUFACTURER
+# % gui, $(name), readback,     Model,              $(P):MODEL
+# % gui, $(name), readback,     Serial,             $(P):SERIAL
+# % gui, $(name), readback,     Firmware,           $(P):FIRMWARE
+# % gui, $(name), groupExit,    Device infoExit
+
+## System
+
+# % gui, $(name), groupHeading, System
+# % gui, $(name), demand,       Admin password,     $(P):ADMIN
+# % gui, $(name), statusbits,   Admin active,       $(P):ADMIN_STATUS
+# % gui, $(name), command,      Save settings,      $(P):SAVE
+# % gui, $(name), command,      Load settings,      $(P):RECALL
+# % gui, $(name), command,      Reset,              $(P):SEQRESET
+# % gui, $(name), statusbits,   Initialising,       $(P):RUNNING
+# % gui, $(name), groupExit,    SystemExit
+
+## Calibration
+
+# % gui, $(name), groupHeading, Calibration
+# % gui, $(name), command,      Run,                $(P):CALIB
+# % gui, $(name), command,      Save,               $(P):SAVECALIB
+# % gui, $(name), command,      Load,               $(P):RECALLCALIB
+# % gui, $(name), enum,         Internal source,    $(P):SOURCE
+# % gui, $(name), readback,     Internal source,    $(P):SOURCE_RBV
+# % gui, $(name), readback,     Channel 1 gain,     $(P):GAIN1
+# % gui, $(name), readback,     Channel 2 gain,     $(P):GAIN2
+# % gui, $(name), groupExit,    CalibrationExit
+
+## Configuration
+
+# % gui, $(name), groupHeading, Configuration
+# % gui, $(name), enum,         Capacitor,          $(P):CAP
+# % gui, $(name), readback,     Capacitor,          $(P):CAP_RBV
+# % gui, $(name), readback,     Capacitance,        $(P):CAP:VALUE
+# % gui, $(name), demand,       Max voltage,        $(P):HV:MAX
+# % gui, $(name), readback,     Max voltage,        $(P):HV:MAX_RBV
+# % gui, $(name), demand,       Voltage,            $(P):HV
+# % gui, $(name), readback,     Voltage,            $(P):HV_RBV
+# % gui, $(name), demand,       Integration time,   $(P):PERIOD
+# % gui, $(name), readback,     Integration time,   $(P):PERIOD_RBV
+# % gui, $(name), demand,       Current range,      $(P):RANGE
+# % gui, $(name), readback,     Current range,      $(P):RANGE_RBV
+# % gui, $(name), groupExit,    ConfigurationExit
+
+## Measurement
+
+# % gui, $(name), groupHeading, Readings
+# % gui, $(name), readback,     Charge,             $(P):CHARGE_RBV
+# % gui, $(name), readback,     Current,            $(P):CURRENT_RBV
+# % gui, $(name), command,      Start,              $(P):INIT
+# % gui, $(name), command,      Stop,               $(P):ABORT
+# % gui, $(name), statusbits,   Digitals,           $(P):DIGITALS_RBV, Measuring, Waiting trigger, Calibrated, HV enabled, External gate
+# % gui, $(name), groupExit,    ReadingsExit

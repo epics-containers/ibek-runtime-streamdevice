@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: LC400-OEM
+
+entity_models:
+  - name: LC400Controller
+    description: |-
+      nPoint LC400 OEM piezo controller - reads the controller connection
+      status over StreamDevice.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      PORT:
+        type: str
+        description: |-
+          Port name
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: npointController.template
+        args:
+          .*:
+  - name: npointTemplate
+    description: |-
+      nPoint LC400 OEM piezo controller StreamDevice template.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      PORT:
+        type: str
+        description: |-
+          Port name
+      name:
+        type: id
+        description: |-
+          Object and gui association name

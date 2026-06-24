@@ -1,0 +1,69 @@
+#% archiver 1 Monitor
+# % macro, P, Device Prefix
+# % macro, STREAMS_PORT, Asyn Port
+# % macro, VAR, Network Output to read (e.g. O37010)
+# % macro, SCAN, Scan rate
+# % macro, DESC, Byte description
+# % macro, DESC0, Output bit 0 description
+# % macro, DESC1, Output bit 1 description
+# % macro, DESC2, Output bit 2 description
+# % macro, DESC3, Output bit 3 description
+# % macro, DESC4, Output bit 4 description
+# % macro, DESC5, Output bit 5 description
+# % macro, DESC6, Output bit 6 description
+# % macro, DESC7, Output bit 7 description
+
+record(mbbiDirect, "$(P):O$(VAR)") {
+  field(DESC, "$(DESC=)")
+  field(INP, "$(P):O$(VAR)_RBV NPP")
+}
+
+#% archiver 10 Monitor
+record(mbbiDirect, "$(P):O$(VAR)_RBV") {
+  field(DESC, "$(DESC=)")
+  field(DISP, "1")
+  field(DTYP, "stream")
+  field(INP, "@yaskawa.proto readio($(P),$(VAR)) $(STREAMS_PORT)")
+  field(SCAN, "$(SCAN)")
+  field(FLNK, "$(P):O$(VAR)")
+}
+
+record(stringout, "$(P):O$(VAR):DESC0") {
+  field(VAL, "$(DESC0=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):O$(VAR):DESC1") {
+  field(VAL, "$(DESC1=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):O$(VAR):DESC2") {
+  field(VAL, "$(DESC2=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):O$(VAR):DESC3") {
+  field(VAL, "$(DESC3=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):O$(VAR):DESC4") {
+  field(VAL, "$(DESC4=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):O$(VAR):DESC5") {
+  field(VAL, "$(DESC5=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):O$(VAR):DESC6") {
+  field(VAL, "$(DESC6=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P):O$(VAR):DESC7") {
+  field(VAL, "$(DESC7=)")
+  field(PINI, "YES")
+}

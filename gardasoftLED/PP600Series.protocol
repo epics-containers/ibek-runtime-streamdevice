@@ -1,0 +1,62 @@
+# Protocol file for the Gardasoft Vision PP612 LED lighting controller
+# Version: 1.0
+# Date:    22-08-2007
+
+# Please refer to the Gardasoft Vision User Manual Revision 11
+
+OutTerminator = CR;
+InTerminator = LF CR ">";
+replytimeout = 100;
+readtimeout  = 2000;
+
+# Save settings to the controller's
+# non-volatile memory
+save {
+	out "AW";
+	in "AW";
+}
+
+# Clear errors.  The errors that were cleared
+# are saved as a String
+resetErrors {
+	out "GR";
+	in "GR%s";
+}
+
+# Report the current settings for the outputs.
+# Format:
+# 		Line 1 - Channel 1 settings (mode, max rating, output currents)
+# 		Line 2 - Channel 2 settings (mode, max rating, output currents)
+# 		Line 3 - Factory use only
+# 		Lines 4 and 5 - Debounce settings
+# $1 - device name
+# NB: Lines 3, 4 and 5 are saved into a status record but not used
+querySettings {
+	out "ST";
+	in "ST\n\r " 
+		"01 M %(\$1:CH1MODE.VAL)[00,01,02,03,04,05,06] "
+			"E %(\$1:CH1MAXCURRENT.VAL)[.0-9] "
+			"V %(\$1:CH1BRIGHTNESS.VAL)f,%*f,%*f,%*f, \n\r "
+		"02 M %(\$1:CH2MODE.VAL)[00,01,02,03,04,05,06] "
+			"E %(\$1:CH2MAXCURRENT.VAL)[.0-9] "
+			"V %(\$1:CH2BRIGHTNESS.VAL)f,%*f,%*f,%*f, \n\r "
+		"%(\$1:STATUS.VAL)s";
+}
+
+# Set the mode of operation
+# NB: Only continuous mode is supported
+# $1 - output channel
+setMode {
+	out "RS\$1S0";
+	in "RS\$1S0";
+}
+
+# Set output current and maximum current rating
+# $1 - output channel
+# $2 - device name
+# Record value - desired output in milliAmps
+setOutput {
+	out "RC\$1C0V%.2fE%(\$2:CH\$1SETMAXCURRENT.VAL).2f";
+	in "RC\$1C0V%*i.%*2cE%*[.0-9]";
+}
+

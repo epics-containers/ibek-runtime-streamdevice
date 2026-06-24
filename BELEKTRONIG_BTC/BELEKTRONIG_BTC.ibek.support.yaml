@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: BELEKTRONIG_BTC
+
+entity_models:
+  - name: belektronig_btc
+    description: |-
+      Belektronig BTC M10 temperature controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      R:
+        type: str
+        description: |-
+          Heater name
+      DESC:
+        type: str
+        description: |-
+          Description
+      PORT:
+        type: str
+        description: |-
+          Device asyn port
+    databases:
+      - file: m10.template
+        args:
+          .*:

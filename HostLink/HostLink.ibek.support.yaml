@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: HostLink
+
+entity_models:
+  - name: HostLink
+    description: |-
+      HostLink FINS protocol module (loads the stream protocol file)
+  - name: HostLinkTemplate
+    description: |-
+      Omron PLC HostLink FINS communications status and clock readbacks
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name / PV prefix
+      port:
+        type: str
+        description: |-
+          asyn port name
+    databases:
+      - file: HostLink.template
+        args:
+          .*:

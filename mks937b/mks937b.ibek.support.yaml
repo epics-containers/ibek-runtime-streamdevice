@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: mks937b
+
+entity_models:
+  - name: mks937b
+    description: |-
+      Template database for an MKS937B Multi-Sensor System (vacuum gauge
+      controller) read over StreamDevice.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      port:
+        type: str
+        description: |-
+          Asyn Port name, e.g. ty_40_0
+      address:
+        type: int
+        description: |-
+          Controller address (001 .. 253)
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: mks937b.template
+        args:
+          .*:

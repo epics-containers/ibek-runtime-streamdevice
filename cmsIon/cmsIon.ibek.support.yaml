@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: cmsIon
+
+entity_models:
+  - name: cmsIon
+    description: |-
+      CMS Ion Chamber radiation dose monitor
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device Prefix
+      port:
+        type: str
+        description: |-
+          Asyn port
+      high:
+        type: float
+        description: |-
+          Integrated dose (since reset) HIGH value
+      hihi:
+        type: float
+        description: |-
+          Integrated dose (since reset) HIHI value
+      target:
+        type: str
+        description: |-
+          Indicates if soft IOC protocol file to be used, default=''
+        default: ""
+      name:
+        type: id
+        description: |-
+          Object name and associated gui name
+      DESC:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: cmsIon.template
+        args:
+          .*:

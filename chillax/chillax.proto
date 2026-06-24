@@ -1,0 +1,45 @@
+
+Terminator =";\n";
+locktimeout = 7000;
+readtime = 200;
+writetime = 100;
+replytimeout = 500;
+
+getai {
+    out ".ADR.\$1,\$2,\$3,\$4?";
+    in "%f";
+    @mismatch {in "Error%*c";}
+}
+
+setao {
+    out ".ADR.\$1,\$2,\$3,\$4=%f"; in "OK"; 
+    @mismatch {in "Error%*c";}
+}
+
+
+getbi {
+    out ".ADR.\$1,\$2,\$3,\$4?";
+    in "%b";
+    @mismatch {in "Error%*c";}
+}
+
+setbo {
+    out ".ADR.\$1,\$2,\$3,\$4=%b"; in "OK";
+    @mismatch {in "Error%*c";}	
+}
+
+getalarm {
+   out ".ADR.\$1,\$2,\$3,\$4?";
+   in "%s";
+   @mismatch {in "Error%*c";}	
+}
+
+getlong {
+    out ".ADR.\$1,\$2,\$3,\$4?";
+    in "%i";
+    @mismatch {in "Error%*c";}
+}
+
+
+
+

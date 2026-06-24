@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: mitsubishiRobot
+
+entity_models:
+  - name: BARTRobot
+    description: |-
+      Mitsubishi BART sample-changing robot - reads PLC DM memory blocks over
+      a FINS port and exposes robot control over StreamDevice.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      PORT:
+        type: str
+        description: |-
+          Fins port (Asyn Port)
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Stream port (Asyn Port)
+      dom:
+        type: str
+        description: |-
+          Beamline Domain
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: BARTRobot.db
+        args:
+          .*:
+  - name: VMXiRobot
+    description: |-
+      Mitsubishi VMXi sample-changing robot - reads PLC DM memory blocks over
+      a FINS port and exposes robot control over StreamDevice.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      PORT:
+        type: str
+        description: |-
+          Fins port (Asyn Port)
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Stream port (Asyn Port)
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: VMXiRobot.db
+        args:
+          .*:
+  - name: J15Robot
+    description: |-
+      Mitsubishi J15 sample-changing robot - control and readback over
+      StreamDevice.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Stream port (Asyn Port)
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: J15Robot.db
+        args:
+          .*:

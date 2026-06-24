@@ -1,0 +1,64 @@
+Terminator = "";
+ReadTimeout = 100;
+PollPeriod = 100;
+ReplyTimeout = 2000;
+MaxInput = 46;
+
+# structure of valid command packet is
+# char size of packet
+# char type of packet
+# char *params, list of params
+
+forcehe   { out "\x03\x14%(\$1:FORCEHE.RVAL)r"; }
+
+
+# read status input
+# 46 byte packet:
+# 0: unsigned char Length = always 46, ignored
+# 1: unsigned char Type
+# 2,3: unsigned short GasSetPoint (centi-Kelvin)
+# 4,5: unsigned short GasTemp (centi-Kelvin)
+# 6,7: signed short GasError (centi-Kelvin)
+# 8: unsigned char Runmode (enum, values 0..6)
+# 9: unsigned char PhaseID (enum, values 0..10)
+# 10,11: unsigned short RampRate (centi-Kelvin/s)
+# 12,13: unsigned short TargetTemp (centi-Kelvin)
+# 14,15: unsigned short ShieldTemp (centi-Kelvin)
+# 16,17: unsigned short NozzleTemp (centi-Kelvin)
+# 18,19: unsigned short TimeRemaining (minutes)
+# 20: unsigned char CryoSpeed (rpm)
+# 21: unsigned char GasHeat (%)
+# 22: unsigned char ShieldHeat (%)
+# 23: unsigned char AverageNozzleHeat (%)
+# 24: unsigned char CryoStatus
+# 25: unsigned char Alarm (enum, values 0..16)
+# 26,27: unsigned short RunTime (minutes)
+# 28,29: unsigned short ControllerNumber
+# 30: unsigned char SoftwareVersion
+# 31: unsigned char GasFlow (deci-litres/m)
+# 32: unsigned char BackPressure (centi-bar)
+# 33: unsigned char CryoAdjust (rpm)
+# 34: unsigned char OuterFlow (l/min)
+# 35: unsigned char DetectedGasType
+# 36: unsigned char SelectedGasType
+# 37: unsigned char HardwareType
+# 38: unsigned char WaterTemp (Kelvin)
+# 39: unsigned char HePressure
+# 40: unsigned char AverageGasHeat
+# 41: unsigned char NozzleHeat (on/off)
+# 42,43: unsigned short TotalHours (hour)
+# 44,45: unsigned short ColdHead
+
+read { in "%0r%(\$1:TYPE.RVAL)0r%(\$1:SETPOINT.RVAL)02r"
+          "%(\$1:TEMP.RVAL)02r%(\$1:ERROR:SIGNED.RVAL)02r"
+          "%(\$1:RUNMODE.RVAL)0r%(\$1:PHASE.RVAL)0r%(\$1:RAMPRATE.RVAL)02r"
+          "%(\$1:TARGETTEMP.RVAL)02r%(\$1:SHIELDTEMP.RVAL)02r"
+          "%(\$1:NOZZLETEMP.RVAL)02r%(\$1:REMAINING.RVAL)02r%(\$1:CRYOSPEED.RVAL)0r"
+          "%(\$1:GASHEAT.RVAL)0r%(\$1:SHIELDHEAT.RVAL)0r%(\$1:NOZZLEHEATAVG.RVAL)0r"
+          "%(\$1:STATUS.RVAL)0r%(\$1:ALARMI.RVAL)0r%(\$1:RUNTIME.RVAL)02r"
+          "%(\$1:CTRLNUM.RVAL)02r%(\$1:VER.RVAL)0r%(\$1:GASFLOW.RVAL)0r"
+          "%(\$1:BACKPRESS.RVAL)0r%(\$1:CRYOADJUST.RVAL)0r%(\$1:OUTERFLOW.RVAL)0r"
+          "%(\$1:DETECTEDGAS.RVAL)0r%(\$1:SELECTEDGAS.RVAL)0r%(\$1:HARDWARETYPE.RVAL)0r"
+          "%(\$1:WATERTEMP.RVAL)0r%(\$1:RETPRESS.RVAL)0r%(\$1:GASHEATAVG.RVAL)0r"
+          "%(\$1:NOZZLEHEAT.RVAL)0r%(\$1:HOURS.RVAL)02r%(\$1:COLDHEAD.RVAL)02r"; }
+

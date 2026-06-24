@@ -1,0 +1,194 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: OxInstCryojet
+
+entity_models:
+  - name: cryojetITC503S
+    description: |-
+      Oxford Instruments Cryojet ITC503S temperature controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      PORT:
+        type: str
+        description: |-
+          asyn name for serial port connected to device
+      DISABLED:
+        type: int
+        description: |-
+          Optional - whether device is polled or not. 1 Disabled, 0 Enabled, defaults to 1.
+        default: 1
+      ST1DESC:
+        type: str
+        description: |-
+          Optional - description/EDM screen label for temperature sensor 1, defaults to empty string.
+        default: ""
+      ST2DESC:
+        type: str
+        description: |-
+          Optional - description/EDM screen label for temperature sensor 2, defaults to empty string.
+        default: ""
+      ST3DESC:
+        type: str
+        description: |-
+          Optional - description/EDM screen label for temperature sensor 3, defaults to empty string.
+        default: ""
+      ST1EGU:
+        type: str
+        description: |-
+          Optional - Engineering units for temperature sensor 1, defaults to K.
+        default: K
+      ST2EGU:
+        type: str
+        description: |-
+          Optional - Engineering units for temperature sensor 2, defaults to K.
+        default: K
+      ST3EGU:
+        type: str
+        description: |-
+          Optional - Engineering units for temperature sensor 3, defaults to mbar.
+        default: mBar
+    databases:
+      - file: cryojetITC503S.template
+        args:
+          .*:
+
+  - name: cryojet
+    description: |-
+      Oxford Instruments Cryojet temperature controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      Q:
+        type: str
+        description: |-
+          PV name suffix
+      PORT:
+        type: str
+        description: |-
+          asyn name for serial port connected to device
+      DISABLED:
+        type: int
+        description: |-
+          Optional macro for whether device is polled or not.
+        default: 1
+      name:
+        type: id
+        description: |-
+          object and gui association name
+      STR:
+        type: str
+        description: |-
+          Gui titlebar label
+        default: ""
+    databases:
+      - file: cryojet.template
+        args:
+          .*:
+
+  - name: MercuryiTC_SCPI_heater
+    description: |-
+      Oxford Instruments MercuryiTC SCPI heater commands
+    parameters:
+      P:
+        type: str
+        description: |-
+          Main PV address
+      Q:
+        type: str
+        description: |-
+          Device Identifier
+      PORT:
+        type: str
+        description: |-
+          AsynIP port to connect to
+      UID:
+        type: str
+        description: |-
+          Heater board/channel UID
+        default: MB0.H1
+    databases:
+      - file: MercuryiTC-SCPI_heater.template
+        args:
+          .*:
+
+  - name: MercuryiTC_SCPI_loop
+    description: |-
+      Oxford Instruments MercuryiTC SCPI loop commands
+    parameters:
+      P:
+        type: str
+        description: |-
+          Main PV address
+      Q:
+        type: str
+        description: |-
+          Device Identifier
+      PORT:
+        type: str
+        description: |-
+          AsynIP port to connect to
+      UID:
+        type: str
+        description: |-
+          Loop board/channel UID
+        default: MB1.T1
+    databases:
+      - file: MercuryiTC-SCPI_loop.template
+        args:
+          .*:
+
+  - name: MercuryiTC_SCPI_system
+    description: |-
+      Oxford Instruments MercuryiTC SCPI system commands
+    parameters:
+      P:
+        type: str
+        description: |-
+          Main PV address
+      Q:
+        type: str
+        description: |-
+          Device Identifier
+      PORT:
+        type: str
+        description: |-
+          AsynIP port to connect to
+    databases:
+      - file: MercuryiTC-SCPI_system.template
+        args:
+          .*:
+
+  - name: MercuryiTC_SCPI_tempSensor
+    description: |-
+      Oxford Instruments MercuryiTC SCPI temperature sensor commands
+    parameters:
+      P:
+        type: str
+        description: |-
+          Main PV address
+      Q:
+        type: str
+        description: |-
+          Device Identifier
+      PORT:
+        type: str
+        description: |-
+          AsynIP port to connect to
+      UID:
+        type: str
+        description: |-
+          Temperature sensor board/channel UID
+        default: MB1.T1
+    databases:
+      - file: MercuryiTC-SCPI_tempSensor.template
+        args:
+          .*:

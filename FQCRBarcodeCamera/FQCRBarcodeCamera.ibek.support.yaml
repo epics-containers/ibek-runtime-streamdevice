@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: FQCRBarcodeCamera
+
+entity_models:
+  - name: FQCRBarcodeCamera
+    description: |-
+      FQCR Barcode camera (Omron camera + PLC barcode read-out).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      cam_port:
+        type: str
+        description: |-
+          Asyn Port for camera
+      plc_port:
+        type: str
+        description: |-
+          Asyn Port for plc
+    databases:
+      - file: FQCRBarcodeCamera.template
+        args:
+          .*:

@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: fw102
+
+entity_models:
+  - name: _fw102Template
+    description: |-
+      Thorlabs FW102 motorised filter wheel
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      R:
+        type: str
+        description: |-
+          PV name suffix
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+      name:
+        type: id
+        description: |-
+          module name
+      FILTER1:
+        type: str
+        description: |-
+          Material in filter slot 1
+      FILTER2:
+        type: str
+        description: |-
+          Material in filter slot 2
+      FILTER3:
+        type: str
+        description: |-
+          Material in filter slot 3
+      FILTER4:
+        type: str
+        description: |-
+          Material in filter slot 4
+      FILTER5:
+        type: str
+        description: |-
+          Material in filter slot 5
+      FILTER6:
+        type: str
+        description: |-
+          Material in filter slot 6
+    databases:
+      - file: fw102.template
+        args:
+          .*:

@@ -1,0 +1,966 @@
+################################################################
+#
+# Norhof LN2 Pump System template file.
+#
+# Matthew Pearson, July 2012.
+#
+# Macros:
+#   P - Prefix for PV name
+#   PORT - Bus/Port Address (eg. ASYN Port).
+#
+################################################################
+
+#Builder support
+# % macro, P, Device Prefix
+# % macro, PORT, Asyn Port
+# % gui, $(name=), edm, norhofLN2.edl, P=$(P)
+
+# /// 
+# /// Disable all comms to the controller.
+# ///
+#% autosave 1 VAL
+record(bo, "$(P):DISABLE") {
+  field(DESC, "Disable comms")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+# /// 
+# /// Disable timer based records.
+# /// This is only for use when directly
+# /// using the low level commands.
+# /// It also does an OFF to ensure we maintain consistency
+# /// when the timers are re-enabled.
+# ///
+record(bo, "$(P):DISABLETIMERS") {
+  field(DESC, "Disable timers")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+  field(FLNK, "$(P):DISABLETIMERSSEQ.PROC")
+}
+
+record(seq, "$(P):DISABLETIMERSSEQ") {
+  field(DESC, "Disable both timers")
+  field(DOL1, "1")
+  field(LNK1, "$(P):OFF.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P):DISABLEWASHTIMER.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P):DISABLESTATETIMER.PROC")
+  field(DOL4, "$(P):DISABLETIMERS.VAL")
+  field(LNK4, "$(P):DISABLETIMERCONTROL.VAL")
+  
+}
+
+record(bo, "$(P):DISABLETIMERCONTROL") {
+  field(DESC, "Disable timer control")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+################################################################
+# Low level read records.
+################################################################
+
+# /// 
+# /// Read the pump control register.
+# ///
+#% archiver 1 Monitor VAL
+record(mbbi, "$(P):PUMP_STATUS_RBV")
+{
+   field(DESC, "Read pump status")
+   field(DTYP, "stream")
+   field(INP, "@norhof.proto getIntVal(114) $(PORT)")
+   field(VAL, "2")
+   field(PINI, "YES")
+   field(ZRVL, "0")
+   field(ZRST, "OFF")
+   field(ONVL, "1")     
+   field(ONST, "STANDBY")
+   field(TWVL, "2")
+   field(TWST, "UNKNOWN")
+   field(THVL, "3")
+   field(THST, "PUMPING")
+   field(SCAN, "2 second")
+   field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Read the flow setpoint pressure MSB
+# ///
+record(longin, "$(P):FLOW_PRES_MSB_RBV") {
+  field(DESC, "Read flow pres MSB")
+  field(DTYP, "stream")
+  field(INP, "@norhof.proto getHexVal(113) $(PORT)")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Read the flow setpoint pressure LSB
+# ///
+record(longin, "$(P):FLOW_PRES_LSB_RBV") {
+  field(DESC, "Read flow pres LSB")
+  field(DTYP, "stream")
+  field(INP, "@norhof.proto getHexVal(112) $(PORT)")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Read the dewar pressure (LOW BYTE)
+# ///
+record(longin, "$(P):DEWAR_PRES_LBYTE_LOW_RBV") {
+  field(DESC, "Read dewar pres lb")
+  field(DTYP, "stream")
+  field(INP, "@norhof.proto getHexVal2LOW(088) $(PORT)")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Read the dewar pressure (HIGH BYTE)
+# ///
+record(longin, "$(P):DEWAR_PRES_HBYTE_LOW_RBV") {
+  field(DESC, "Read dewar pres hb")
+  field(DTYP, "stream")
+  field(INP, "@norhof.proto getHexVal2HIGH(088) $(PORT)")
+  field(SCAN, "I/O Intr")
+  field(SDIS, "$(P):DISABLE")
+}
+
+
+# /// 
+# /// Read the dewar pressure zero calibration (LOW BYTE)
+# ///
+record(longin, "$(P):DEWAR_PRES_ZERO_LBYTE_LOW_RBV") {
+  field(DESC, "Read dewar pres zero lb")
+  field(DTYP, "stream")
+  field(INP, "@norhof.proto getHexVal2LOW(0c8) $(PORT)")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Read the dewar pressure zero calibration (HIGH BYTE)
+# ///
+record(longin, "$(P):DEWAR_PRES_ZERO_HBYTE_LOW_RBV") {
+  field(DESC, "Read dewar pres zero hb")
+  field(DTYP, "stream")
+  field(INP, "@norhof.proto getHexVal2HIGH(0c8) $(PORT)")
+  field(SCAN, "I/O Intr")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Read the pump status register
+# ///
+record(longin, "$(P):STATUS_REG_RBV") {
+  field(DESC, "Read pump status register")
+  field(DTYP, "stream")
+  field(INP, "@norhof.proto getHexVal(19) $(PORT)")
+  field(SCAN, "1 second")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Extract the <5 litre warning bit from the status register
+# ///
+record(calc, "$(P):5L_WARNING_RBV") {
+  field(DESC, "<5 litre warning bit")
+  field(PINI, "YES")
+  field(INPA, "$(P):STATUS_REG_RBV CP")
+  field(CALC, "(A&64)>1")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Read the pump mode
+# ///
+record(longin, "$(P):MODE_RBV") {
+  field(DESC, "Read pump status mode")
+  field(DTYP, "stream")
+  field(INP, "@norhof.proto getHexVal(61) $(PORT)")
+  field(SCAN, "1 second")
+  field(SDIS, "$(P):DISABLE")
+}
+
+################################################################
+# Low level write records.
+################################################################
+
+# /// 
+# /// Set the pump control register to 0.
+# /// This will turn off the pump.
+# ///
+record(longout, "$(P):PUMP_OFF") {
+  field(DESC, "Turn pump off")
+  field(DTYP, "stream")
+  field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
+  field(VAL, "0")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Set the pump control register to 1.
+# /// This will put the pump in standby,
+# /// and stop pumping (if it was pumping).
+# ///
+record(longout, "$(P):PUMP_STANDBY") {
+  field(DESC, "Turn pump off")
+  field(DTYP, "stream")
+  field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
+  field(VAL, "1")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Set the pump control register to 3.
+# /// This will start the pump.
+# ///
+record(longout, "$(P):PUMP_ON") {
+  field(DESC, "Turn pump off")
+  field(DTYP, "stream")
+  field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
+  field(VAL, "3")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Set the flow setpoint pressure (low order byte)
+# ///
+record(longout, "$(P):FLOW_PRES_LSB") {
+  field(DESC, "Set press LSB")
+  field(DTYP, "stream")
+  field(OUT, "@norhof.proto setHexVal(112) $(PORT)")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Set the flow setpoint pressure (high order byte)
+# ///
+record(longout, "$(P):FLOW_PRES_MSB") {
+  field(DESC, "Set press MSB")
+  field(DTYP, "stream")
+  field(OUT, "@norhof.proto setHexVal(113) $(PORT)")
+  field(SDIS, "$(P):DISABLE")
+}
+
+################################################################
+# Records for settings the flow pressure.
+#
+# Pressure setting = 3.7 * demanded pressure (in mBar).
+# Then need to convert in LSB and MSB.
+#
+################################################################
+
+# ///
+# /// Set the flow setpoint pressure
+# ///
+#% archiver 1 Monitor VAL
+record(ao, "$(P):FLOW_PRES") {
+  field(DESC, "Flow pres demand")
+  field(OUT, "$(P):FLOW_PRES_SETTING.A PP MS")
+  field(EGU, "mBar")
+  field(SDIS, "$(P):DISABLE")
+}
+
+record(calcout, "$(P):FLOW_PRES_SETTING") {
+  field(DESC, "Flow pres setting")
+  field(INPB, "3.7")
+  field(CALC, "B*A")
+  field(OUT, "$(P):FLOW_PRES_MSB_OUT.A PP MS")
+}
+
+record(calcout, "$(P):FLOW_PRES_MSB_OUT") {
+  field(DESC, "Flow pres MSB calc")
+  field(CALC, "floor(A/256)")
+  field(OUT, "$(P):FLOW_PRES_LSB_OUT.A PP MS")
+}
+
+record(calcout, "$(P):FLOW_PRES_LSB_OUT") {
+  field(DESC, "Flow pres LSB calc")
+  field(INPB, "$(P):FLOW_PRES_SETTING.VAL")
+  field(CALC, "floor(B-(A*256))")
+  field(FLNK, "$(P):FLOW_PRES_WRITE.PROC MS")
+}
+
+record(seq, "$(P):FLOW_PRES_WRITE") {
+  field(DESC, "Flow pres write")
+  field(DOL1, "$(P):FLOW_PRES_MSB_OUT.VAL")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):FLOW_PRES_MSB.VAL PP MS")
+  field(DOL2, "$(P):FLOW_PRES_LSB_OUT.VAL")
+  field(LNK2, "$(P):FLOW_PRES_LSB.VAL PP MS")
+}
+
+# ///
+# /// Read the flow setpoint pressure
+# ///
+record(seq, "$(P):FLOW_PRES_READ") {
+  field(DESC, "Flow pres read")
+  field(DOL1, "1")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):FLOW_PRES_MSB_RBV.PROC")
+  field(DOL2, "1")
+  field(DLY2, "0.2")
+  field(LNK2, "$(P):FLOW_PRES_LSB_RBV.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P):FLOW_PRES_CALC.PROC")
+  field(SCAN, "2 second")
+  field(SDIS, "$(P):DISABLE")
+}
+
+record(calcout, "$(P):FLOW_PRES_CALC") {
+  field(DESC, "Calc flow pressure")
+  field(INPA, "$(P):FLOW_PRES_LSB_RBV.VAL")
+  field(INPB, "$(P):FLOW_PRES_MSB_RBV.VAL")
+  field(CALC, "(A+(B*256))/3.7")
+  field(OUT, "$(P):FLOW_PRES_RBV.VAL PP")
+  field(SDIS, "$(P):DISABLE")
+}
+
+#% archiver 1 Monitor VAL
+record(ai, "$(P):FLOW_PRES_RBV") {
+  field(DESC, "Actual flow pres RBV")
+  field(EGU, "mBar")
+  field(SDIS, "$(P):DISABLE")
+}
+
+################################################################
+# Records for reading the dewar pressure.
+#
+# Pressure value is in 0x088 and 0x089, so to read it need to do
+# rm 088 2.
+# The zero calibration is held in 0x0C8 and 0x0C9. So to read this
+# do rm 0C8 2. Then multiply by a scale (which is 0.54288mBar).
+#
+# So to read the pressure:
+# (rm 088 2) - (rm 0C8 2) * 0.54288 mBar.
+#
+# The data is in two bytes for each reading, so we need to combine
+# the two into one 16-bit number.
+#
+################################################################
+
+# ///
+# /// Read the dewar pressure
+# ///
+record(seq, "$(P):DEWAR_PRES_READ") {
+  field(DESC, "Dewar press read")
+  field(DOL1, "1")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):DEWAR_PRES_LBYTE_LOW_RBV.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P):DEWAR_PRES_CALC.PROC")
+  field(SCAN, "2 second")
+  field(SDIS, "$(P):DISABLE")
+}
+
+record(calcout, "$(P):DEWAR_PRES_CALC") {
+  field(DESC, "Calc flow pressure")
+  field(INPA, "$(P):DEWAR_PRES_LBYTE_LOW_RBV.VAL")
+  field(INPB, "$(P):DEWAR_PRES_HBYTE_LOW_RBV.VAL")
+  field(CALC, "(A+(B*256))")
+  field(OUT, "$(P):DEWAR_PRES_RBV.VAL PP")
+  field(SDIS, "$(P):DISABLE")
+}
+
+record(ai, "$(P):DEWAR_PRES_RBV") {
+  field(DESC, "Actual dewar press RBV")
+  field(EGU, "mBar")
+  field(SDIS, "$(P):DISABLE")
+  field(FLNK, "$(P):DEWAR_PRES_ZERO_READ.PROC")
+}
+
+# ///
+# /// Read the dewar pressure zero point
+# ///
+record(seq, "$(P):DEWAR_PRES_ZERO_READ") {
+  field(DESC, "Dewar press zero read")
+  field(DOL1, "1")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):DEWAR_PRES_ZERO_LBYTE_LOW_RBV.PROC")
+  field(DOL2, "1")
+  field(DLY2, "0.2")
+  field(LNK2, "$(P):DEWAR_PRES_ZERO_CALC.PROC")
+  field(SCAN, "Passive")
+  field(SDIS, "$(P):DISABLE")
+}
+
+record(calcout, "$(P):DEWAR_PRES_ZERO_CALC") {
+  field(DESC, "Calc dewar pressure")
+  field(INPA, "$(P):DEWAR_PRES_ZERO_LBYTE_LOW_RBV.VAL")
+  field(INPB, "$(P):DEWAR_PRES_ZERO_HBYTE_LOW_RBV.VAL")
+  field(CALC, "(A+(B*256))")
+  field(OUT, "$(P):DEWAR_PRES_ZERO_RBV.VAL PP")
+  field(SDIS, "$(P):DISABLE")
+}
+
+record(ai, "$(P):DEWAR_PRES_ZERO_RBV") {
+  field(DESC, "Actual dewar press zero RBV")
+  field(EGU, "mBar")
+  field(SDIS, "$(P):DISABLE")
+  field(FLNK, "$(P):REAL_DEWAR_PRES_CALC.PROC")
+}
+
+# ///
+# /// Do the dewar pressure calculation using
+# /// the measured pressure and the zero point. 
+# ///
+record(calcout, "$(P):REAL_DEWAR_PRES_CALC") {
+  field(DESC, "Calc dewar pressure")
+  field(INPA, "$(P):DEWAR_PRES_RBV.VAL")
+  field(INPB, "$(P):DEWAR_PRES_ZERO_RBV.VAL")
+  field(CALC, "((A-B)*0.54288)")
+  field(OUT, "$(P):REAL_DEWAR_PRES_RBV.VAL PP")
+  field(SDIS, "$(P):DISABLE")
+}
+
+#% archiver 1 Monitor VAL
+record(ai, "$(P):REAL_DEWAR_PRES_RBV") {
+  field(DESC, "Actual dewar pres RBV")
+  field(EGU, "mBar")
+  field(SDIS, "$(P):DISABLE")
+}
+
+
+################################################################
+# High level control records
+#
+# OFF - flow pressure 0, pump 0
+# SLEEP - flow pressure 0, pump 1 (ie. pump on standby)
+# STANDBY - flow pressure 0, pump 3 (ie. pump running, but no pressure)
+# WASH - flow pressure 100, pump 3 (ie. pump running, high pressure)
+#
+# These are basically seq records that process the above
+# low level records. The also start and stop the timing records
+# which control how long a wash will be done, and to control
+# how automatic state changes.
+#
+# There is also a couple of records to record how many washes
+# have been done. One of these has a reset PV attached to it.
+#
+################################################################
+
+# ///
+# /// OFF - flow pressure 0, pump 0
+# /// Disable both timers.
+# ///
+record(seq, "$(P):OFF") {
+  field(DESC, "No Flow/Pump Off")
+  field(DOL1, "0")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):FLOW_PRES.VAL PP MS")
+  field(DOL2, "1")
+  field(LNK2, "$(P):SET_OFF_STATE.PROC MS")
+  field(DOL3, "1")
+  field(LNK3, "$(P):PUMP_OFF.PROC MS")
+  field(DOL4, "$(P):TIMETOWASH_FROMOFF.VAL")
+  field(LNK4, "$(P):TIMETOWASH.VAL PP")
+  field(DOL5, "1")
+  field(LNK5, "$(P):DISABLEWASHTIMER.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P):DISABLESTATETIMER.PROC")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# ///
+# /// The time to wash if the previous state was OFF.
+# ///
+#% autosave 0 VAL
+record(ai, "$(P):TIMETOWASH_FROMOFF") {
+  field(DTYP, "Soft Channel")
+  field(VAL, "60")
+  field(PINI, "YES")
+  field(EGU, "secs")
+}
+
+# ///
+# /// SLEEP - flow pressure 0, pump 1 (ie. pump on standby)
+# /// Disable the wash timer.
+# /// Enable the state timer, so that an automatic transition to OFF will happen.
+# ///
+record(seq, "$(P):SLEEP") {
+  field(DESC, "No Flow/Pump Standby")
+  field(DOL1, "0")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):FLOW_PRES.VAL PP MS")
+  field(DOL2, "1")
+  field(LNK2, "$(P):SET_SLEEP_STATE.PROC MS")
+  field(DOL3, "1")
+  field(LNK3, "$(P):PUMP_STANDBY.PROC MS")
+  field(DOL4, "$(P):TIMETOWASH_FROMSLEEP.VAL")
+  field(LNK4, "$(P):TIMETOWASH.VAL PP")
+  field(DOL5, "1")
+  field(LNK5, "$(P):DISABLEWASHTIMER.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P):ENABLESTATETIMER.PROC")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# ///
+# /// SLEEP - this is for the state timer.
+# /// It does a sleep, but does not reset the STATE timer.
+# /// This record is for the automatic transition from STANDY to SLEEP.
+# ///
+record(seq, "$(P):SLEEP_NOTIMERRESET") {
+  field(DESC, "No Flow/Pump Standby")
+  field(DOL1, "0")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):FLOW_PRES.VAL PP MS")
+  field(DOL2, "1")
+  field(LNK2, "$(P):SET_SLEEP_STATE.PROC MS")
+  field(DOL3, "1")
+  field(LNK3, "$(P):PUMP_STANDBY.PROC MS")
+  field(DOL4, "$(P):TIMETOWASH_FROMSLEEP.VAL")
+  field(LNK4, "$(P):TIMETOWASH.VAL PP")
+  field(DOL5, "1")
+  field(LNK5, "$(P):DISABLEWASHTIMER.PROC")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# ///
+# /// The time to wash if the previous state was SLEEP.
+# ///
+#% autosave 0 VAL
+record(ai, "$(P):TIMETOWASH_FROMSLEEP") {
+  field(DTYP, "Soft Channel")
+  field(VAL, "45")
+  field(PINI, "YES")
+  field(EGU, "secs")
+}
+
+# ///
+# /// STANDBY - flow pressure 0, pump 3 (ie. pump running, but no pressure).
+# /// Disable the wash timer.
+# /// Enable the state timer, so that an automatic transition to SLEEP will happen.
+# ///
+record(seq, "$(P):STANDBY") {
+  field(DESC, "No Flow/Pump Running")
+  field(DOL1, "0")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):FLOW_PRES.VAL PP MS")
+  field(DOL2, "1")
+  field(LNK2, "$(P):SET_PAUSE_STATE.PROC MS")
+  field(DOL3, "1")
+  field(LNK3, "$(P):PUMP_ON.PROC MS")
+  field(DOL4, "$(P):TIMETOWASH_FROMSTANDBY.VAL")
+  field(LNK4, "$(P):TIMETOWASH.VAL PP")
+  field(DOL5, "1")
+  field(LNK5, "$(P):DISABLEWASHTIMER.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P):ENABLESTATETIMER.PROC")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# ///
+# /// The time to wash if the previous state was STANDBY.
+# ///
+#% autosave 0 VAL
+record(ai, "$(P):TIMETOWASH_FROMSTANDBY") {
+  field(DTYP, "Soft Channel")
+  field(VAL, "30")
+  field(PINI, "YES")
+  field(EGU, "secs")
+}
+
+# ///
+# /// WASH - flow pressure WASH_PRES, pump 3 (ie. pump running, high pressure).
+# /// Enable the wash timer.
+# /// Enable the state timer, so that an automatic transition to STANDBY will happen.
+# ///
+record(seq, "$(P):WASH") {
+  field(DESC, "Flow/Pump Running")
+  field(DOL1, "$(P):WASH_PRES.VAL")
+  field(DLY1, "0.2")
+  field(LNK1, "$(P):FLOW_PRES.VAL PP MS")
+  field(DOL2, "1")
+  field(LNK2, "$(P):SET_WASH_STATE.PROC MS")
+  field(DOL3, "1")
+  field(LNK3, "$(P):PUMP_ON.PROC MS")
+  field(DOL4, "1")
+  field(LNK4, "$(P):ENABLEWASHTIMER.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P):ENABLESTATETIMER.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P):INC_WASH_COUNT.PROC")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# ///
+# /// Set the flow setpoint pressure to use when doing a WASH
+# ///
+#% archiver 1 Monitor VAL
+#% autosave 0 VAL
+record(ao, "$(P):WASH_PRES") {
+  field(DESC, "Wash Pressure")
+  field(DTYP, "Soft Channel")
+  field(EGU, "mBar")
+  field(SDIS, "$(P):DISABLE")
+}
+
+# ///
+# /// Increment the wash counter. This is processed whenever the WASH PV is processed.
+# ///
+record(calcout, "$(P):INC_WASH_COUNT") {
+  field(CALC, "A+1")
+  field(DOPT, "Use CALC")
+  field(SCAN, "Passive")
+  field(OOPT, "Every Time")
+  field(OUT, "$(P):WASH_COUNT.VAL PP")
+  field(INPA, "$(P):WASH_COUNT.VAL")
+  field(FLNK, "$(P):INC_WASH_COUNT_TOTAL.PROC")
+}
+
+# ///
+# /// Increment the total wash counter. This is processed whenever the WASH PV is processed.
+# ///
+record(calcout, "$(P):INC_WASH_COUNT_TOTAL") {
+  field(CALC, "A+1")
+  field(DOPT, "Use CALC")
+  field(SCAN, "Passive")
+  field(OOPT, "Every Time")
+  field(OUT, "$(P):WASH_COUNT_TOTAL.VAL PP")
+  field(INPA, "$(P):WASH_COUNT_TOTAL.VAL")
+}
+
+# ///
+# /// Wash counter record. This can be reset by the user.
+# ///
+#% autosave 0 VAL
+#% archiver 1 Monitor VAL
+record(ai, "$(P):WASH_COUNT") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(EGU, "Washes")
+  field(PINI, "YES")
+}
+
+# ///
+# /// Total wash counter record.
+# ///
+#% autosave 0 VAL
+#% archiver 1 Monitor VAL
+record(ai, "$(P):WASH_COUNT_TOTAL") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(EGU, "Washes")
+  field(PINI, "YES")
+}
+
+# ///
+# /// This resets the WASH_COUNT PV.
+# ///
+record(bo, "$(P):WASH_COUNT_RESET") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(OUT, "$(P):WASH_COUNT.VAL PP")
+}
+
+
+###############################################################
+#
+# Timer records to stop pumping after a time set in TIMETOWASH.
+# If any other state other than WASH is run, then the timer
+# is disabled and TIMETOWASH set to the correct value depending 
+# on state.
+#
+###############################################################
+
+record(calcout, "$(P):CALCWASHTIME") {
+  field(CALC, "A+1")
+  field(DOPT, "Use CALC")
+  field(SCAN, "1 second")
+  field(OOPT, "Every Time")
+  field(OUT, "$(P):TIMESINCEWASH.VAL")
+  field(INPA, "$(P):TIMESINCEWASH.VAL")
+  field(FLNK, "$(P):TIMESINCEWASH.PROC")
+  field(SDIS, "$(P):CONTROLWASHTIMER")
+}
+
+#% archiver 1 Monitor VAL
+record(ai, "$(P):TIMESINCEWASH") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(EGU, "secs")
+  field(FLNK, "$(P):TIMESINCEWASHACTION.PROC")
+}
+
+record(calcout, "$(P):TIMESINCEWASHACTION") {
+  field(CALC, "A=B")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Transition To Non-zero")
+  field(OUT, "$(P):STANDBY.PROC")
+  field(INPA, "$(P):TIMESINCEWASH.VAL")
+  field(INPB, "$(P):TIMETOWASH.VAL")
+}
+
+#% archiver 1 Monitor VAL
+record(ai, "$(P):TIMETOWASH") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL, "60")
+  field(EGU, "secs")
+  field(PINI, "YES")
+}
+
+record(dfanout, "$(P):RESETWASHTIME") {
+  field(DOL, "0")
+  field(OUTA, "$(P):TIMESINCEWASH.VAL PP")
+}
+
+record(dfanout, "$(P):ENABLEWASHTIMER") {
+  field(DOL, "0")
+  field(OUTA, "$(P):CONTROLWASHTIMER.VAL PP")
+  field(FLNK, "$(P):ENABLESTATETIMER.PROC")
+  field(SDIS, "$(P):DISABLETIMERCONTROL")
+}
+
+record(dfanout, "$(P):DISABLEWASHTIMER") {
+  field(DOL, "1")
+  field(OUTA, "$(P):CONTROLWASHTIMER.VAL PP")
+  field(SDIS, "$(P):DISABLETIMERCONTROL")
+}
+
+record(bo, "$(P):CONTROLWASHTIMER") {
+  field(DESC, "Control pump timer")
+  field(PINI, "YES")
+  field(VAL, "1")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+  field(FLNK, "$(P):RESETWASHTIME.PROC")
+}
+
+###############################################################
+#
+# Timer records to control pump state.
+# 15 minutes after STANDBY go to SLEEP.
+# 2 hour after SLEEP go to OFF.
+#
+# This is enabled (and reset) whenever we do a WASH, SLEEP or PAUSE (ie. STANDBY).
+#
+###############################################################
+
+record(calcout, "$(P):CALCSTATETIME") {
+  field(CALC, "A+1")
+  field(DOPT, "Use CALC")
+  field(SCAN, "1 second")
+  field(OOPT, "Every Time")
+  field(OUT, "$(P):TIMESINCESTATE.VAL")
+  field(INPA, "$(P):TIMESINCESTATE.VAL")
+  field(FLNK, "$(P):TIMESINCESTATE.PROC")
+  field(SDIS, "$(P):CONTROLSTATETIMER")
+}
+
+#% archiver 1 Monitor VAL
+record(ai, "$(P):TIMESINCESTATE") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(EGU, "secs")
+  field(FLNK, "$(P):GOTOSLEEPACTION.PROC")
+}
+
+record(calcout, "$(P):GOTOSLEEPACTION") {
+  field(CALC, "A=B")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Transition To Non-zero")
+  field(OUT, "$(P):SLEEP_NOTIMERRESET.PROC")
+  field(INPA, "$(P):TIMESINCESTATE.VAL")
+  field(INPB, "$(P):TIMETOSLEEP.VAL")
+  field(FLNK, "$(P):GOTOOFFACTION.PROC")
+}
+
+record(calcout, "$(P):GOTOOFFACTION") {
+  field(CALC, "A=B")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Transition To Non-zero")
+  field(OUT, "$(P):OFF.PROC")
+  field(INPA, "$(P):TIMESINCESTATE.VAL")
+  field(INPB, "$(P):TIMETOOFF.VAL")
+}
+
+#% autosave 0 VAL
+record(ai, "$(P):TIMETOSLEEP") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL, "900")
+  field(EGU, "secs")
+  field(PINI, "YES")
+}
+
+#% autosave 0 VAL
+record(ai, "$(P):TIMETOOFF") {
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(VAL, "7200")
+  field(EGU, "secs")
+  field(PINI, "YES")
+}
+
+record(dfanout, "$(P):RESETSTATETIME") {
+  field(DOL, "0")
+  field(OUTA, "$(P):TIMESINCESTATE.VAL PP")
+}
+
+record(dfanout, "$(P):ENABLESTATETIMER") {
+  field(DOL, "0")
+  field(OUTA, "$(P):CONTROLSTATETIMER.VAL PP")
+  field(SDIS, "$(P):DISABLETIMERCONTROL")
+}
+
+record(dfanout, "$(P):DISABLESTATETIMER") {
+  field(DOL, "1")
+  field(OUTA, "$(P):CONTROLSTATETIMER.VAL PP")
+  field(SDIS, "$(P):DISABLETIMERCONTROL")
+}
+
+record(bo, "$(P):CONTROLSTATETIMER") {
+  field(DESC, "Control state timer")
+  field(PINI, "YES")
+  field(VAL, "1")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+  field(FLNK, "$(P):RESETSTATETIME.PROC")
+}
+
+##########################################################################
+# Records to save the current state, and read the current state and put 
+# it in a previous state record.
+#
+# I use the user level state names here, rather than the actual pump status.
+#
+##########################################################################
+
+
+# /// 
+# /// Previous state.
+# ///
+#% archiver 1 Monitor VAL
+record(mbbi, "$(P):PUMP_STATUS_PREVIOUS_RBV")
+{
+   field(DESC, "Previous pump status")
+   field(DTYP, "Soft Channel")
+   field(VAL, "0")
+   field(PINI, "YES")
+   field(ZRVL, "0")
+   field(ZRST, "OFF")
+   field(ONVL, "1")     
+   field(ONST, "SLEEP")
+   field(TWVL, "2")
+   field(TWST, "PAUSE")
+   field(THVL, "3")
+   field(THST, "WASH")
+   field(SCAN, "Passive")
+   field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Current state.
+# ///
+#% archiver 1 Monitor VAL
+record(mbbi, "$(P):PUMP_STATUS_CURRENT_RBV")
+{
+   field(DESC, "Current pump status")
+   field(DTYP, "Soft Channel")
+   field(VAL, "0")
+   field(PINI, "YES")
+   field(ZRVL, "0")
+   field(ZRST, "OFF")
+   field(ONVL, "1")     
+   field(ONST, "SLEEP")
+   field(TWVL, "2")
+   field(TWST, "PAUSE")
+   field(THVL, "3")
+   field(THST, "WASH")
+   field(SCAN, "Passive")
+   field(SDIS, "$(P):DISABLE")
+}
+
+# /// 
+# /// Save the previous state.
+# ///
+record(calcout, "$(P):SAVE_PREVIOUS_STATE") {
+  field(CALC, "A")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Every Time")
+  field(OUT, "$(P):PUMP_STATUS_PREVIOUS_RBV.VAL PP")
+  field(INPA, "$(P):PUMP_STATUS_CURRENT_RBV.VAL")
+}
+
+# /// 
+# /// Set the OFF state.
+# ///
+record(seq, "$(P):SET_OFF_STATE") {
+  field(DOL1, "1")
+  field(DLY1, "0.1")
+  field(LNK1, "$(P):SAVE_PREVIOUS_STATE.PROC MS")
+  field(DOL2, "0")
+  field(LNK2, "$(P):PUMP_STATUS_CURRENT_RBV.VAL PP MS")
+}
+
+# /// 
+# /// Set the SLEEP state.
+# ///
+record(seq, "$(P):SET_SLEEP_STATE") {
+  field(DOL1, "1")
+  field(DLY1, "0.1")
+  field(LNK1, "$(P):SAVE_PREVIOUS_STATE.PROC MS")
+  field(DOL2, "1")
+  field(LNK2, "$(P):PUMP_STATUS_CURRENT_RBV.VAL PP MS")
+}
+
+# /// 
+# /// Set the PAUSE state.
+# ///
+record(seq, "$(P):SET_PAUSE_STATE") {
+  field(DOL1, "1")
+  field(DLY1, "0.1")
+  field(LNK1, "$(P):SAVE_PREVIOUS_STATE.PROC MS")
+  field(DOL2, "2")
+  field(LNK2, "$(P):PUMP_STATUS_CURRENT_RBV.VAL PP MS")
+}
+
+
+# /// 
+# /// Set the WASH state.
+# ///
+record(seq, "$(P):SET_WASH_STATE") {
+  field(DOL1, "1")
+  field(DLY1, "0.1")
+  field(LNK1, "$(P):SAVE_PREVIOUS_STATE.PROC MS")
+  field(DOL2, "3")
+  field(LNK2, "$(P):PUMP_STATUS_CURRENT_RBV.VAL PP MS")
+}
+
+
+
+################################################################
+# Generic Asyn record.
+################################################################
+
+record(asyn, "$(P):ASYN") {
+  field(DTYP,"asynRecordDevice")
+  field(PORT, "$(PORT)")
+  field(ADDR,"0")
+  field(OMAX,"1024")
+  field(IMAX,"1024")
+}
+
+

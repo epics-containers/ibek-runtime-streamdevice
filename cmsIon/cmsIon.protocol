@@ -1,0 +1,53 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for an LIS CMS-ION radiation detector
+# This protocol requires Stream Device release 2.1 (tested on CVS 2007-05-11)
+#   (2-1dls2)
+# 
+#
+# Pete Owens 2-9-04
+#
+# Pete Owens 28-10-04
+#      - Inserted Correct CRC values
+#
+# Pete Owens 22-2-05
+#      - RESET=0|1
+#      - Catch RS485 flow control (probably 0xff)
+#
+# Pete Leicester 22-2-06
+#      - Modified for use with StreamDevice2 (added PollPeriod, removed buffersize)
+#
+# Emma Shepherd 26-02-07
+#      - Modified to fix terminators and to use new Streams capability to parse
+#        message into different records
+
+interminator = 3 "\xff\xff";
+outterminator = 3;
+readtimeout = 500;
+PollPeriod = 500;
+
+#
+# Commands
+#
+
+recov { out 1 "001" CR 2 "RECOV=%{0\rEC4B|1\rEDDB}"; }
+reset { out 1 "001" CR 2 "RESET=%{0\r7762|1\r76F2}"; }
+
+#
+# Incoming message
+# Format: id, date, time, CR, rate, dose, last reset time, present hour dose, present day dose, present month dose, previous hour dose, previous day dose, previous month dose, alarm status, equipment status, mode
+#
+
+message {
+	in 1 "%*3d,%(\$1:DATE.VAL)[^,],%(\$1:TIM.VAL)s" CR 2
+	   "01,%(\$1:RATE.VAL)f,%(\$1:DOSE.VAL)f,%(\$1:RESETTIM.VAL)[^,],"
+	   "%(\$1:PRSHRDOSE.VAL)f,%(\$1:PRSDAYDOSE.VAL)f,"
+	   "%(\$1:PRSMONDOSE.VAL)f,%(\$1:PRVHRDOSE.VAL)f,"
+	   "%(\$1:PRVDAYDOSE.VAL)f,%(\$1:PRVMONDOSE.VAL)f,"
+	   "%(\$1:ALMSTA.VAL)2x,%(\$1:EQPSTA.VAL)2x,%(\$1:MODE.VAL)2x" CR
+	   "%#01<crc16r>";
+}

@@ -1,0 +1,741 @@
+# VATLeakValve590series.template
+# % macro, __doc__, Template database for VAT Variable Leak Valve 590 Series
+# Famous Alele - 24/11/2025
+#
+# substitutions:
+#% macro, device, device name
+#% macro, name, Object name and gui association name
+#% macro, port, asyn serial port number (e.g. ty_40_0)
+#% macro, proto, name of protocol file, either V590.proto
+#  records which do not explicitly state their protocols will use the protocol
+#  provided by the macro substitution of 'protocol'
+
+# These define what PVs a valve detail screen should contain
+# Status:
+# % gui, $(name=), readback, Operation Mode,            $(device):ACCESSMODE
+# % gui, $(name=), readback, Control Mode,              $(device):CTRLMODE
+# % gui, $(name=), readback, Warnings,                  $(device):WARNINGS
+# % gui, $(name=), readback, Backup Battery,            $(device):POWERFAIL
+# % gui, $(name=), readback, Compressed Air,            $(device):COMPAIR
+# % gui, $(name=), readback, Current Valve Speed,       $(device):VALVESPEED
+# % gui, $(name=), readback, Controller,                $(device):PRESSCTRLR
+# % gui, $(name=), readback, Current Valve Pressure,    $(device):PRESSURE
+# % gui, $(name=), readback, Current Valve Position,    $(device):POSITION
+# % gui, $(name=), readback, Simulation Mode,           $(device):SIMULATION
+# % gui, $(name=), readback, Service Needed Warning,    $(device):SERVICEWARN
+# % gui, $(name=), readback, Backup Batt. Fail,         $(device):POWERFAIL
+# % gui, $(name=), readback, Measurement Unit,          $(device):PRESSUNIT
+# % gui, $(name=), readback, Fixed 2 Direction,         $(device):F2CTLRDIR
+# % gui, $(name=), readback, Fixed 2 P-gain,            $(device):F2PGAIN
+# % gui, $(name=), readback, Fixed 2 I-gain,            $(device):F2IGAIN
+# % gui, $(name=), readback, Sensor Metric Unit,        $(device):UNIT
+# % gui, $(name=), readback, Sensor Scaling Factor,     $(device):SCALE
+# % gui, $(name=), readback, Sensor Exponent Value,     $(device):EXP
+# % gui, $(name=), readback, Sensor Exponent Sign,      $(device):SIGN
+# % gui, $(name=), readback, Target Pressure,           $(device):TARGETPRESSURE
+# % gui, $(name=), readback, Pressure Reading Range     $(device):PRESSRANGE
+# % gui, $(name=), readback, Position Movement Range    $(device):POSITIONRANGE
+#
+#
+# Control:
+# % gui, $(name=), demand,  Pressure,               $(device):SETPRESSURE
+# % gui, $(name=), demand,  Position,               $(device):SETPOSITION
+# % gui, $(name=), enum,    Pressure Controller,    $(device):SETPRESSCTRLR
+# % gui, $(name=), command, Close valve,            $(device):CLOSE
+# % gui, $(name=), enum,    Clear Warings,          $(device):CLEAR
+# % gui, $(name=), demand,  Fixed 2 P-gain,         $(device):SETF2PGAIN
+# % gui, $(name=), demand,  Fixed 2 I-gain,         $(device):SETF2IGAIN
+# % gui, $(name=), demand,  Value to Inc./Dec. by,  $(device):SETINCDECVAL
+# % gui, $(name=), demand,  Decrememnt Position,    $(device):BUTTONDECPOS
+# % gui, $(name=), demand,  Incrememnt Position,    $(device):BUTTONINCPOS
+
+# Config:
+# % gui, $(name=), enum,    Access Mode,             $(device):SETACCESSMODE
+# % gui, $(name=), demand,  Valve Speed,             $(device):SETVALVESPEED
+# % gui, $(name=), demand,  Pressure Controller,     $(device):SETPRESSRANGE
+# % gui, $(name=), demand,  Sensor Scale,            $(device):SETSCALE
+# % gui, $(name=), enum,    Sensor Exponent,         $(device):SETEXP
+# % gui, $(name=), enum,    Sensor Metric Unit,      $(device):SETUNIT
+# % gui, $(name=), enum,    Sensor Exp. Sign,        $(device):SETSIGN
+# % gui, $(name=), demand,  Position Limit,          $(device):SETPOSITIONLIMIT
+# % gui, $(name=), demand,  Pressure Range,          $(device):SETPRESSRANGE
+# % gui, $(name=), enum,    Position Range,          $(device):SETPOSITIONRANGE
+# % gui, $(name=), enum,    Fixed 2 Direction,       $(device):SETF2CTLRDIRUP
+#
+# This associates an edm screen with the template
+# % gui, $(name=), edm, VATLeakValve590Series.edl, device=$(device)
+# % gui, $(name=), edm, VatValve590.edl, device=$(P)$(R)
+# These define what PVs a valve detail screen should contain
+# 
+
+
+
+record(bo, "$(device):CLEAR")
+{
+    field(DESC, "Clear Warnings")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) reset_warnings $(port)")
+    field(ZNAM, "Clear Service Warnings")
+    field(ONAM, "Clear Fatal Error")
+}
+
+record(bo, "$(device):CLOSE")
+{
+    field(DESC, "Close Valve")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) close_command $(port)")
+    field(ZNAM, "Close Valve")
+    field(ONAM, "Close Valve")
+    field(PINI, "YES")
+}
+
+record(mbbo, "$(device):SETACCESSMODE")
+{
+    field(DESC, "set access mode")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) set_access_mode $(port)")
+    field(ZRST, "Local Operation")
+    field(ONST, "Remote Operation")
+    field(TWST, "Locked Operation")
+    field(DOL,  "0")
+    field(OMSL, "supervisory")
+    field(PINI, "YES")
+    field(FLNK, "$(device):ACCESSMODE")
+}
+
+record (mbbi, "$(device):ACCESSMODE")
+{
+    field(DESC, "current access mode")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) DS_access_mode $(port)")
+    field(ZRST, "Local Op.")
+    field(ONST, "Remote Op.")
+    field(TWST, "Locked Remote Op.")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(THSV, "MINOR")
+}
+
+record(mbbi, "$(device):CTRLMODE")
+{
+    field(DESC, "Control Mode-See Manual Pg-44")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) DS_ctrl_mode $(port)")
+    field(ZRST, "Unknown")
+    field(ONST, "synchronization")
+    field(TWST, "POSITION CONTROL")
+    field(THST, "CLOSED")
+    field(FRST, "OPEN")
+    field(FVST, "PRESSURE CONTROL")
+    field(SXST, "HOLD")
+    field(SVST, "Manf. reserved")
+    field(EIST, "INTERLOCK OPEN")
+    field(NIST, "INTERLOCK CLOSED")
+    field(TEST, "power failure")
+    field(ELST, "safety mode")
+    field(TVST, "fatal error")
+
+    field(UNSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "NO_ALARM")
+    field(FVSV, "NO_ALARM")
+    field(SXSV, "NO_ALARM")
+    field(SVSV, "MAJOR")
+    field(EISV, "NO_ALARM")
+    field(NISV, "NO_ALARM")
+    field(TESV, "MAJOR")
+    field(ELSV, "MINOR")
+    field(TVSV, "MAJOR")
+    field(SCAN, "1 second")
+    field(FLNK, "$(device):ACCESSMODE")
+}
+
+# TO BE PERCENTAGE
+record(ao, "$(device):SETPOSITIONLIMIT")
+{
+    field(DESC, "Set position limit")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) set_pos_limit($(device):SETPOSITIONLIMIT.RVAL) $(port)")
+    field(DRVL, "1")
+    field(LOPR, "1")
+    field(HOPR, "100")
+    field(DRVH, "100")
+    field(LINR, "LINEAR")
+    field(ESLO, "0.001")
+    field(EOFF, "0")
+    field(EGUF, "100")
+    field(DOL,  "80")
+    field(PINI, "YES")
+    field(EGU,  "%")
+    field(FLNK, "$(device):POSITIONLIMIT")
+}
+
+record(bo, "$(device):BUTTONINCPOS")
+{
+    field(DESC, "Command Increment Pos.")
+    field(DTYP, "soft channel")
+    field(ZNAM, "INC")
+    field(ONAM, "INC")
+    field(DOL,  "1")
+    field(FLNK, "$(device):SETINCPOSITION")
+}
+
+record(bo, "$(device):BUTTONDECPOS")
+{
+    field(DESC, "Command Decrement Pos.")
+    field(DTYP, "soft channel")
+    field(ZNAM, "DEC")
+    field(ONAM, "DEC")
+    field(DOL,  "0")
+    field(FLNK, "$(device):SETDECPOSITION")
+}
+
+record(ao, "$(device):SETINCDECVAL")
+{
+    field(DESC, "Inc/dec Value")
+    field(DTYP, "soft channel")
+    field(DRVL, "0.01")
+    field(LOPR, "0.01")
+    field(HOPR, "5")
+    field(DRVH, "5")
+    field(DOL,  "0.1")
+    field(PREC, "4")
+    field(PINI, "YES")
+    field(EGU,  "%")
+}
+
+record(calcout, "$(device):SETINCPOSITION")
+{
+    field(DESC, "Increment Position by 1")
+    field(DTYP, "soft channel")
+    field(HOPR, "100")
+    field(LOPR, "0")
+    field(CALC, "A+B") # Plus B
+    field(EGU,  "%")
+    field(INPA, "$(device):SETPOSITION MS") # READ Position into Input A
+    field(INPB, "$(device):SETINCDECVAL MS") # Read increment value into Input B
+    field(FLNK, "$(device):SETPOSITION")
+    field(OUT,  "$(device):SETPOSITION.VAL PP")
+}
+
+record(calcout, "$(device):SETDECPOSITION")
+{
+    field(DESC, "Decrement Position by 1")
+    field(DTYP, "soft channel")
+    field(HOPR, "100")
+    field(LOPR, "0")
+    field(CALC, "A-B") # Minus B
+    field(EGU,  "%")
+    field(INPA, "$(device):SETPOSITION MS") # READ Position into Input A
+    field(INPB, "$(device):SETINCDECVAL MS") # Read increment value into Input B
+    field(FLNK, "$(device):SETPOSITION")
+    field(OUT,  "$(device):SETPOSITION.VAL PP")
+}
+
+record(ao, "$(device):SETPOSITION")
+{
+    field(DESC, "Input position control in %")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) set_position $(port)")
+    field(HOPR, "100")
+    field(LOPR, "0")
+    field(EGU,  "%")
+    field(LINR, "LINEAR")
+    field(VAL,  "0")
+    field(ESLO, "0.001")
+    field(EOFF, "0")
+    field(EGUF, "100")
+    field(EGUL, "0")
+}
+
+record(mbbi, "$(device):PRESSCTRLR")
+{
+    field(DESC, "Read Pressure controller")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) read_pr_ctlr $(port)")
+    field(ZRST, "Adaptive downstream")
+    field(ONST, "Fixed 1 upstream")
+    field(TWST, "Fixed 2 (dwn/up)-stream")
+    field(THST, "Soft pump")
+    field(UNSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(SCAN, "1 second")
+    field(FLNK, "$(device):F2CTLRDIR")
+}
+
+record(bo, "$(device):SETF2PRESSCTRLR")
+{
+    field(DESC, "Set Press. Ctlr to F2")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) set_pr_ctlr_F2 $(port)")
+    field(ZNAM, "Fixed 2 (dwn/up)-stream")
+    field(ONAM, "Fixed 2 (dwn/up)-stream")
+    field(DOL,  "1")
+    field(PINI, "YES")
+}
+
+# hardcoded direction to upstream in protocol function
+record(bo, "$(device):SETF2CTLRDIRUP")
+{
+    field(DESC, "Set F2 dir upstream")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) set_F2_cdir_up $(port)")
+    field(ZNAM, "Downstream")
+    field(ONAM, "Upstream")
+    field(DOL,  "1")
+    field(PINI, "YES")
+}
+
+record(bi, "$(device):F2CTLRDIR")
+{
+    field(DESC, "Read F2 direction")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) get_F2_cdir $(port)")
+    field(ZNAM, "Downstream")
+    field(ONAM, "Upstream")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "NO_ALARM")
+    field(FLNK, "$(device):F2PGAIN")
+}
+
+record(ao, "$(device):SETF2PGAIN")
+{
+    field(DESC, "Set P-gain for F2 ctlr")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) set_F2_pgain  $(port)")
+    field(EGU,  "units")
+    field(DRVL, "0.001")
+    field(DRVH, "100")
+    field(LOPR, "0.001")
+    field(HOPR, "100")
+    field(DOL,  "0.4")
+    field(PREC, "3")
+    field(FLNK, "$(device):F2PGAIN")
+}
+
+record(ai, "$(device):F2PGAIN")
+{
+    field(DESC, "Read P-gain for F2 ctlr")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) read_F2_pgain $(port)")
+    field(FLNK, "$(device):F2IGAIN")
+    field(EGU,  "units")
+    field(PREC, "3")
+}
+
+record(ao, "$(device):SETF2IGAIN")
+{
+    field(DESC, "Set I-gain for F2 ctlr")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) set_F2_igain  $(port)")
+    field(EGU,  "units")
+    field(DRVL, "0")
+    field(DRVH, "100")
+    field(LOPR, "0")
+    field(HOPR, "100")
+    field(DOL,  "0.1")
+    field(PREC, "2")
+    field(FLNK, "$(device):F2IGAIN")
+}
+
+record(ai, "$(device):F2IGAIN")
+{
+    field(DESC, "Read I-gain for F2 ctlr")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) read_F2_igain $(port)")
+    field(EGU,  "units")
+    field(PREC, "1")
+}
+
+record (bi, "$(device):WARNINGS")
+{
+    field(DESC, "warnings alarm")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) DS_warnings $(port)")
+    field(ZNAM, "No Warnings")
+    field(ONAM, "Warning Alarm!")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MAJOR")
+    field(FLNK, "$(device):SERVICEWARN")
+    field(SCAN, "1 seccond")
+}
+
+record (bi, "$(device):SERVICEWARN")
+{
+    field(DESC, "Maint. Serv. Alarm")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) W_service_sta $(port)")
+    field(ZNAM, "No Warnings")
+    field(ONAM, "Warning Alarm!")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "MAJOR")
+    field(FLNK, "$(device):POWERFAIL")
+}
+
+record (bi, "$(device):POWERFAIL")
+{
+    field(DESC, "Warning - Battery Status")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) W_powerfail_sta $(port)")
+    field(ZNAM, "Backup Battery Ready")
+    field(ONAM, "Backup Battery FAIL")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "MAJOR")
+    field(FLNK, "$(device):COMPAIR")
+}
+
+record (bi, "$(device):COMPAIR")
+{
+    field(DESC, "Warning - Comp. Air Status")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) W_comp_air_sta $(port)")
+    field(ZNAM, "Comp. Air Supply OK")
+    field(ONAM, "Comp. Air FAIL")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "MAJOR")
+    field(FLNK, "$(device):SIMULATION")
+}
+
+record (bi, "$(device):SIMULATION")
+{
+    field(DESC, "Simulation Status")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) DS_simulation $(port)")
+    field(ZNAM, "normal operation")
+    field(ONAM, "simulation running")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(SCAN, "1 second")
+}
+
+record(mbbi, "$(device):EXP")
+{
+    field(DESC, "Read sensor exp.")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) Exp_read $(port)")
+    field(ZRST, "0")
+    field(ONST, "1")
+    field(TWST, "2")
+    field(THST, "3")
+    field(FRST, "4")
+    field(SCAN, "1 second")
+    field(FLNK, "$(device):SIGN")
+}
+
+record(mbbo, "$(device):SETEXP")
+{
+    field(DESC, "Set sensor exponent")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) Exp_write($(device)) $(port)")
+    field(ZRST, "0")
+    field(ONST, "1")
+    field(TWST, "2")
+    field(THST, "3")
+    field(FRST, "4")
+    field(DOL,  "4")
+    field(PINI, "YES")
+    field(FLNK, "$(device):EXP")
+}
+
+record(bi, "$(device):SIGN")
+{
+    field(DESC, "Sensor exp. sign")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) Sign_read $(port)")
+    field(ZNAM, "-")
+    field(ONAM, "+")
+    field(FLNK, "$(device):SCALE")
+}
+
+record(bo, "$(device):SETSIGN")
+{
+    field(DESC, "set sensor sign exp.")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) Sign_write($(device)) $(port)")
+    field(ZNAM, "-")
+    field(ONAM, "+")
+    field(DOL,  "1")
+    field(PINI, "YES")
+    field(FLNK, "$(device):SIGN")
+    #field(FLNK, "$(device):EXP")
+}
+
+record(ao, "$(device):SETSCALE")
+{
+    field(DESC, "Set sensor scale")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) Scale_write($(device)) $(port)")
+    field(DRVL, "0.0001")
+    field(LOPR, "0.0001")
+    field(HOPR, "9.9999")
+    field(DRVH, "9.9999")
+    field(LINR, "LINEAR")
+    field(ESLO, "0.0001")
+    field(EOFF, "0")
+    field(EGUF, "9.9999")
+    field(DOL,  "1.0000")
+    field(PREC, "4")
+    field(PINI, "YES")
+    field(EGU,  "units")
+}
+
+record(ai, "$(device):SCALE")
+{
+    field(DESC, "Read sensor scale")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) Scale_read $(port)")
+    field(HOPR, "9.9999")
+    field(LOPR, "0.0001")
+    field(LINR, "LINEAR")
+    field(ESLO, "0.0001")
+    #field(EGUL, "0.0001")
+    field(EGUF, "9.9999")
+    field(PREC, "4")
+    field(PINI, "YES")
+    field(EGU,  "units")
+    field(FLNK, "$(device):UNIT")
+}
+
+#record(longout, "$(device):SETSCALE")
+#{
+#    field(DESC, "set sensor scale")
+#    field(DTYP, "stream")
+#    field(OUT,  "@$(proto=V590.proto) Scale_write($(device)) $(port)")
+#    field(DRVL, "00001")
+#    field(DRVH, "99999")
+#    field(LOPR, "00001")
+#    field(HOPR, "99999")
+#    field(SEVR, "NO_ALARM")
+#    field(STAT, "NO_ALARM")
+#    field(DOL,  "10000")
+#    #field(PINI, "YES")
+#}
+
+record(mbbo, "$(device):SETUNIT")
+{
+    field(DESC, "set pressure unit")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) Unit_write($(device)) $(port)")
+    field(ZRST, "Pa")
+    field(ONST, "bar")
+    field(TWST, "mbar")
+    field(THST, "ubar")
+    field(FRST, "Torr")
+    field(FVST, "mTorr")
+    field(SXST, "atm")
+    field(SVST, "psi")
+    field(EIST, "psf")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(SVVL, "7")
+    field(EIVL, "8")
+    field(DOL,  "2")
+    field(OMSL, "supervisory")
+}
+
+record(mbbi, "$(device):UNIT")
+{
+    field(DESC, "set pressure unit")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) Unit_read $(port)")
+    field(ZRST, "Pa")
+    field(ONST, "bar")
+    field(TWST, "mbar")
+    field(THST, "ubar")
+    field(FRST, "Torr")
+    field(FVST, "mTorr")
+    field(SXST, "atm")
+    field(SVST, "psi")
+    field(EIST, "psf")
+    field(UNSV, "MINOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "NO_ALARM")
+    field(FVSV, "NO_ALARM")
+    field(SXSV, "NO_ALARM")
+    field(SVSV, "NO_ALARM")
+    field(EISV, "NO_ALARM")
+    field(FLNK, "$(device):TARGETPRESSURE")
+}
+
+record(ai, "$(device):TARGETPRESSURE")
+{
+    field(DESC, "Get the target pressure")
+    field(DTYP, "soft channel")
+    field(INP,  "$(device):SETPRESSURE.VAL")
+    field(EGU,  "mbar")
+    field(PREC, "5")
+    field(SCAN, "1 second")
+    field(PREC, "3")
+    field(PINI,  "yes")
+}
+
+record(ao, "$(device):SETPRESSURE")
+{
+    field(DESC, "set target pressure")
+    field(DTYP, "soft channel")
+    field(OUT,  "")
+    field(EGU,  "mbar")
+    field(DRVL, "1e-11")
+    field(DRVH, "10000")
+    field(LOPR, "1e-11")
+    field(HOPR, "10000")
+    field(DOL,  "1e-11")
+    field(PREC, "5")
+    field(FLNK, "$(device):CALCRAWPRESS")
+}
+
+record(calcout, "$(device):CALCRAWPRESS")
+{
+    field(DESC, "Convert press to raw")
+    field(DTYP, "stream")
+    field(CALC, "0.6*(LOG(A)+12)*100000") # times 100000 makes it raw units from volts
+    field(EGU,  "raw units")
+    field(INPA, "$(device):SETPRESSURE MS") # What to read as INPA?
+    field(FLNK, "$(device):WRITEPRESS")
+    field(OUT,  "@$(proto=V590.proto) set_raw_press $(port)")
+#   field(DOL,  "1e-11")
+#   field(VAL,  "1e-11")
+}
+
+record(calc, "$(device):PRESSURE") # This is a readback/display record!
+{
+    field(DESC, "Convert Pressure")
+    field(DTYP, "stream")
+    field(CALC, "(10**(((A/100000)/0.6)-12))/0.750062")
+    field(EGU,  "mbar")
+    field(INPA, "$(device):RAWPRESSURE MS")
+    field(FLNK, "$(device):VALVESPEED")
+}
+
+
+record(ai, "$(device):RAWPRESSURE") # This is a readback record but NOT for display
+{
+    field(DESC, "read current pressure")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) get_pressure $(port)")
+    field(SCAN, "1 second")
+    field(EGU,  "raw units") # to be converted to mbar/Torrs by $(device):CALCPRESSURE
+    field(FLNK, "$(device):PRESSURE")
+}
+
+# Read current position and output in %
+record(calc, "$(device):POSITION")
+{
+    field(DESC, "Convert read-in Pos to %")
+    field(DTYP, "stream")
+    field(CALC, "A/1000")
+    field(EGU,  "%")
+    field(INPA, "$(device):RAWPOSITION MS")
+    field(SCAN, "1 second")
+    field(FLNK, "$(device):PRESSSURE")
+}
+
+record(longin, "$(device):RAWPOSITION")
+{
+    field(DESC, "read current position")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) get_position $(port)")
+    field(SCAN, "1 second")
+    field(EGU,  "steps")
+    field(FLNK, "$(device):POSITION")
+}
+
+record(longin, "$(device):VALVESPEED")
+{
+    field(DESC, "read valve speed")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) Vlve_speed_read $(port)")
+    field(FLNK, "$(device):PRESSRANGE")
+    #field(SCAN, "1 second")
+}
+
+record(longout, "$(device):SETVALVESPEED")
+{
+    field(DESC, "set valve speed")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) Vlve_speed_write $(port)")
+    field(DRVL, "1")
+    field(LOPR, "1")
+    field(HOPR, "900")
+    field(DRVH, "1000")
+    field(DOL,  "1")
+    field(PINI, "YES")
+    field(FLNK, "$(device):VALVESPEED")
+}
+
+record(longout, "$(device):SETPRESSRANGE")
+{
+    field(DESC, "Set pressure range")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) pr_rng_wrt($(device):SETPOSITIONRANGE) $(port)")
+    field(DRVL, "0")
+    field(LOPR, "0")
+    field(HOPR, "999999")
+    field(DRVH, "1000000")
+    field(DOL,  "1000000")
+    field(PINI, "YES")
+    #field(EGU,  "")
+    field(FLNK, "$(device):PRESSRANGE")
+}
+
+record(longin, "$(device):PRESSRANGE")
+{
+    field(DESC, "Read Pressure Range")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) pr_rng_rd $(port)")
+    field(FLNK, "$(device):POSITIONRANGE")
+}
+
+record(mbbo, "$(device):SETPOSITIONRANGE")
+{
+    field(DESC, "Set position range")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) pos_rng_wrt($(device):SETPRESSRANGE) $(port)")
+    field(ZRST, "1% of MAX")
+    field(ONST, "10% of MAX")
+    field(TWST, "100% of MAX")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(DOL,  "2")
+    field(PINI, "YES")
+    field(FLNK, "$(device):POSITIONRANGE")
+}
+
+record(mbbi, "$(device):POSITIONRANGE")
+{
+    field(DESC, "Read position range")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) pos_rng_rd $(port)")
+    field(ZRST, "0-1000")
+    field(ONST, "0-10000")
+    field(TWST, "0-100000")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+}

@@ -1,0 +1,51 @@
+
+#% archiver 1 Monitor
+
+# % macro, P, Device Prefix
+# % macro, STREAMS_PORT, Asyn Port
+# % macro, VAR, Long integer (int32) to read/write.  D Variable (e.g. D001) as Yaskawa refers to these as double precision variables.
+# % macro, DISWRITE, When the given PV is equal to DISV this variable cannot be written to.  Default can't just be set to the prefix otherwise record will not be processed.  STA2=64 is used as this prevents this variable being changed when the robot servo is on.
+# % macro, DISV, Value that DISWRITE is compared to
+# % macro, SCAN, Scan rate
+# % macro, DRVL, Low limit
+# % macro, DRVH, High limit
+# % macro, DESC, Variable's description
+
+# See above for SDIS and DISV defaults.
+record(ao, "$(P):D$(VAR)") {
+    field(DESC, "$(DESC=)")
+    field(SDIS, "$(P):$(DISWRITE=STA2)")
+    field(DISV, "$(DISV=64)")
+    field(OUT, "$(P):D$(VAR):WRITE PP")
+    field(PREC, "0")
+}
+
+record(ao, "$(P):D$(VAR):WRITE") {
+    field(DESC, "$(DESC=)")
+    field(SDIS, "$(P):D$(VAR):SYNC.PACT")
+    field(DISV, "1")
+    field(DTYP, "stream")
+    field(OUT, "@yaskawa.proto writed($(P),$(VAR)) $(STREAMS_PORT)")
+    field(PREC, "0")
+    field(DRVL, "$(DRVL)")
+    field(DRVH, "$(DRVH)")
+}
+
+#% archiver 10 Monitor
+record(ai, "$(P):D$(VAR)_RBV") {
+    field(DESC, "$(DESC=)")
+    field(DISP, "1")
+    field(DTYP, "stream")
+    field(INP, "@yaskawa.proto readd($(P),$(VAR)) $(STREAMS_PORT)")
+    field(PREC, "0")
+    field(SCAN, "$(SCAN)")
+    field(FLNK, "$(P):D$(VAR):SYNC")
+}
+
+record(ao, "$(P):D$(VAR):SYNC")
+{
+    field(DESC, "$(DESC=)")
+    field(DOL, "$(P):D$(VAR)_RBV NPP")
+    field(OMSL, "closed_loop")
+    field(OUT, "$(P):D$(VAR) PP")
+}

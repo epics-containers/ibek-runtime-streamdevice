@@ -1,0 +1,240 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: laudaRE2xx
+
+entity_models:
+  - name: lRE2xx
+    description: |-
+      Lauda ecoline star edition recirculating chiller, also valid for
+      ecoline silver, ecoline gold and proline devices.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters.
+      HIHI:
+        type: float
+        description: |-
+          HIHI value for input temperature
+      HIGH:
+        type: float
+        description: |-
+          HIGH value for input temperature
+      LOW:
+        type: float
+        description: |-
+          LOW value for input temperature
+      LOLO:
+        type: float
+        description: |-
+          LOLO value for input temperature
+      TEMPDESC:
+        type: str
+        description: |-
+          DESC field value on the TEMP record (water temperature).
+          Defaults to Chiller water temp
+        default: Chiller water temp
+      RRDRVH:
+        type: float
+        description: |-
+          Ramp rate upper clipping point [C/min]
+        default: 10.00
+      RRDRVL:
+        type: float
+        description: |-
+          Ramp rate lower clipping point [C/min]
+        default: 0.01
+      name:
+        type: id
+        description: |-
+          object and gui association name
+      DESC:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: lRE2xx.template
+        args:
+          .*:
+  - name: lIntegralT
+    description: |-
+      Lauda Integral T process thermostat / recirculating chiller.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters.
+      HIHI:
+        type: float
+        description: |-
+          HIHI value for input temperature
+      HIGH:
+        type: float
+        description: |-
+          HIGH value for input temperature
+      LOW:
+        type: float
+        description: |-
+          LOW value for input temperature
+      LOLO:
+        type: float
+        description: |-
+          LOLO value for input temperature
+      TEMPDESC:
+        type: str
+        description: |-
+          DESC field value on the TEMP record (water temperature).
+          Defaults to Chiller water temp
+        default: Chiller water temp
+      RRDRVH:
+        type: float
+        description: |-
+          Ramp rate upper clipping point [C/min]
+        default: 10.00
+      RRDRVL:
+        type: float
+        description: |-
+          Ramp rate lower clipping point [C/min]
+        default: 0.01
+      name:
+        type: id
+        description: |-
+          object and gui association name
+      DESC:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: lIntegralT.template
+        args:
+          .*:
+  - name: lVariocool
+    description: |-
+      Lauda Variocool recirculating chiller (uses the lREVariocool protocol).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters.
+      HIHI:
+        type: float
+        description: |-
+          HIHI value for input temperature
+      HIGH:
+        type: float
+        description: |-
+          HIGH value for input temperature
+      LOW:
+        type: float
+        description: |-
+          LOW value for input temperature
+      LOLO:
+        type: float
+        description: |-
+          LOLO value for input temperature
+      RRDRVH:
+        type: float
+        description: |-
+          Ramp rate upper clipping point [C/min]
+        default: 10.00
+      RRDRVL:
+        type: float
+        description: |-
+          Ramp rate lower clipping point [C/min]
+        default: 0.01
+      name:
+        type: id
+        description: |-
+          object and gui association name
+      DESC:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: lVariocool.template
+        args:
+          .*:
+  - name: lMCxxx
+    description: |-
+      Lauda Microcool recirculating chiller.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for PV name
+      PORT:
+        type: str
+        description: |-
+          Bus/Port Address (eg. ASYN Port).
+      ADDR:
+        type: int
+        description: |-
+          Address on the bus (optional)
+      SCAN:
+        type: int
+        description: |-
+          SCAN rate for read parameters.
+      HIHI:
+        type: float
+        description: |-
+          HIHI value for input temperature
+      HIGH:
+        type: float
+        description: |-
+          HIGH value for input temperature
+      LOW:
+        type: float
+        description: |-
+          LOW value for input temperature
+      LOLO:
+        type: float
+        description: |-
+          LOLO value for input temperature
+      name:
+        type: id
+        description: |-
+          object and gui association name
+      DESC:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: lMCxxx.template
+        args:
+          .*:

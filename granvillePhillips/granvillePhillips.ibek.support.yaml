@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: granvillePhillips
+
+entity_models:
+  - name: gp350
+    description: |-
+      Support for a Granville Phillips GP350 gauge controller, typically for Hot Cathode Gauges on End Stations.
+    parameters:
+      gctrl:
+        type: str
+        description: |-
+          Mandatory.  Device name of the GP350 gauge controller (e.g.BLnnX-VA-GCTLR-nn).
+      port:
+        type: str
+        description: |-
+          Mandatory.  Serial port (stream device code).
+    databases:
+      - file: gp350.template
+        args:
+          .*:
+  - name: gp307
+    description: |-
+      Support for a Granville Phillips GP307 gauge controller, typically used on End Stations for Hot Cathode Gauges.
+    parameters:
+      gctrl:
+        type: str
+        description: |-
+          Mandatory.  Device name of the GP307 gauge controller
+      port:
+        type: str
+        description: |-
+          Mandatory.  Serial port (stream device code)
+    databases:
+      - file: gp307.template
+        args:
+          .*:

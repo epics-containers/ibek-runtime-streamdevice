@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: leyboldCenterOne
+
+entity_models:
+  - name: centerOne
+    description: |-
+      Leybold CenterOne vacuum gauge controller - reads pressure with a
+      validity watchdog over StreamDevice.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Stream/serial port (Asyn Port)
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: centerOne.db
+        args:
+          .*:

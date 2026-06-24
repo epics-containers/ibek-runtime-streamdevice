@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: capaNCDT
+
+entity_models:
+  - name: capaNCDT
+    description: |-
+      Controls a capacative sensor controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      MAXCHAN:
+        type: int
+        description: |-
+          Number of channels in controller (1..8)
+      MAXRANGE:
+        type: int
+        description: |-
+          Sensor max range
+        default: 100
+      OFFSET:
+        type: float
+        description: |-
+          Sensor value offset
+        default: 0.0
+      EGU:
+        type: str
+        description: |-
+          Units
+        default: "%"
+      PREC:
+        type: int
+        description: |-
+          Data value precision
+        default: 0
+      SCAN:
+        type: str
+        description: |-
+          Position update rate
+        default: .1 second
+      SAMPLES:
+        type: int
+        description: |-
+          N samples to average
+        default: 1
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: capaNCDT.template
+        args:
+          .*:
+  - name: capaNCDTextraChan
+    description: |-
+      Controls a capacative sensor controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      MAXRANGE:
+        type: int
+        description: |-
+          Sensor max range
+        default: 100
+      OFFSET:
+        type: float
+        description: |-
+          Sensor value offset
+        default: 0.0
+      EGU:
+        type: str
+        description: |-
+          Units
+        default: "%"
+      PREC:
+        type: int
+        description: |-
+          Data value precision
+        default: 0
+      CHAN:
+        type: int
+        description: |-
+          cap sensor channel (2..8)
+      SAMPLES:
+        type: int
+        description: |-
+          N samples to average
+        default: 1
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: capaNCDTextraChan.template
+        args:
+          .*:

@@ -1,0 +1,73 @@
+##################################################
+#
+# Protocol file for Norhof LN2 pump systems.
+#
+# Description:
+#   Write commands have to sent twice.
+#   Read commands are ok to be sent once.
+#   The RS232 command registers are set/read:
+#     0x112 - Flow setpoint pressure (LSB)
+#     0x113 - Flow setpoint pressure (MSB)  
+#     0x114 - Pump control on/off.
+#             Bit 0 - Pump active
+#             Bit 1 - Pumping on.
+#          So,0x114=0=OFF
+#             0x114=1=STANDBY (also stops pumping).
+#             0x114=2=PUMP ON
+#
+# Matthew Pearson, June 2012
+# Diamond Light Source. 
+#
+##################################################
+
+
+##################################################
+# General Settings
+##################################################
+
+OutTerminator = "\r";
+ReplyTimeout = 1000;
+
+
+##################################################
+# Get functions
+##################################################
+
+getIntVal {
+   out "rm \$1";
+   in "rm \$1\r\n%d\r\nReady\r\n";
+}
+
+getHexVal {
+   out "rm \$1";
+   in "rm \$1\r\n%x\r\nReady\r\n";
+}
+
+getHexVal2LOW {
+   out "rm \$1 2";
+   in "rm \$1 2\r\n%x %*x\r\nReady\r\n";
+}
+getHexVal2HIGH {
+   in "rm \$1 2\r\n%*x %x\r\nReady\r\n";
+}
+
+##################################################
+# Set functions
+##################################################
+
+setIntVal {
+   out "wm \$1 %d";
+   wait 200;
+   out "wm \$1 %d";
+   in "wm \$1 %d\r\n\r\nReady\r\n";
+}
+
+setHexVal {
+   out "wm \$1 %x";
+   wait 200;
+   out "wm \$1 %x";
+   in "wm \$1 %x\r\n\r\nReady\r\n";
+}
+
+
+

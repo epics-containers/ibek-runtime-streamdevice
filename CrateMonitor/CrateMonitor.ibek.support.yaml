@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: CrateMonitor
+
+entity_models:
+  - name: CrateMonitor
+    description: |-
+      VME Crate Monitor (fan speeds, supply voltages, temperatures and status).
+    parameters:
+      device:
+        type: str
+        description: |-
+          Asyn IP Port, also used for device prefix
+      name:
+        type: id
+        description: |-
+          Object Name
+    databases:
+      - file: CrateMonitor.template
+        args:
+          .*:

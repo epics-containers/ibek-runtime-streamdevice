@@ -1,0 +1,89 @@
+# % macro, P,          PV name prefix
+# % macro, R,          PV name suffix
+# % macro, PORT,       asyn port
+# % macro, name,       module name
+# % macro, FILTER1,    Material in filter slot 1
+# % macro, FILTER2,    Material in filter slot 2
+# % macro, FILTER3,    Material in filter slot 3
+# % macro, FILTER4,    Material in filter slot 4
+# % macro, FILTER5,    Material in filter slot 5
+# % macro, FILTER6,    Material in filter slot 6
+
+# % gui, $(name=), edm, fw102.edl, P=$(P),R=$(R)
+
+record(stringin, "$(P)$(R):ID") {
+    field(DESC, "Model Number and Firmware Version")
+    field(SCAN, "Passive")
+    field(PINI, "RUNNING")
+    field(DTYP, "stream")
+    field(INP, "@fw102.proto getID $(PORT)")
+}
+
+record(stringin, "$(P)$(R):FILTER_RBV") {
+    field(DESC, "Filter Position Readback Value")
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(INP, "@fw102.proto getPos $(PORT)")
+}
+
+record(mbbo, "$(P)$(R):FILTER") {
+    field(DESC, "Filter Types")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@fw102.proto setPos $(PORT)")
+    field(ZRST, "1 - $(FILTER1)")
+    field(ONST, "2 - $(FILTER2)")
+    field(TWST, "3 - $(FILTER3)")
+    field(THST, "4 - $(FILTER4)")
+    field(FRST, "5 - $(FILTER5)")
+    field(FVST, "6 - $(FILTER6)")
+    field(ZRVL, 1)
+    field(ONVL, 2)
+    field(TWVL, 3)
+    field(THVL, 4)
+    field(FRVL, 5)
+    field(FVVL, 6)
+}
+
+record(stringout, "$(P)$(R):FILTER1") {
+    field(DESC, "Filter 1 Type")
+    field(SCAN, "Passive")
+    field(PINI, "YES")
+    field(VAL, "$(FILTER1)")
+    #field(OUT, "$(P)$(R):FILTERS")
+}
+
+record(stringout, "$(P)$(R):FILTER2") {
+    field(DESC, "Filter 2 Type")
+    field(SCAN, "Passive")
+    field(PINI, "YES")
+    field(VAL, "$(FILTER2)")
+}
+
+record(stringout, "$(P)$(R):FILTER3") {
+    field(DESC, "Filter 3 Type")
+    field(SCAN, "Passive")
+    field(PINI, "YES")
+    field(VAL, "$(FILTER3)")
+}
+
+record(stringout, "$(P)$(R):FILTER4") {
+    field(DESC, "Filter 4 Type")
+    field(SCAN, "Passive")
+    field(PINI, "YES")
+    field(VAL, "$(FILTER4)")
+}
+
+record(stringout, "$(P)$(R):FILTER5") {
+    field(DESC, "Filter 5 Type")
+    field(SCAN, "Passive")
+    field(PINI, "YES")
+    field(VAL, "$(FILTER5)")
+}
+
+record(stringout, "$(P)$(R):FILTER6") {
+    field(DESC, "Filter 6 Type")
+    field(SCAN, "Passive")
+    field(PINI, "YES")
+    field(VAL, "$(FILTER6)")
+}

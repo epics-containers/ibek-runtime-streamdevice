@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: digitelSpc
+
+entity_models:
+  - name: digitelSpc
+    description: |-
+      Template database for digitel SPC - Controller
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial
+        default: "01"
+    databases:
+      - file: digitelSpc.template
+        args:
+          .*:

@@ -1,0 +1,269 @@
+#% macro, P, Device
+#% macro, STREAMS_PORT, Serial port
+
+#
+# centerOne.template
+#
+
+# Pressure monitor limit, in mbar. Alarm is raised if above this limit.
+
+#% autosave 2 VAL
+record(ao, "$(P,undefined):PRESSURE_LIMIT")
+{
+    field(DESC, "Vacuum alarm limit (mbar)")
+    field(DTYP, "Soft Channel")
+    field(VAL,  "1e-2")  # default value, can be changed by the user
+    field(EGU,  "mbar")
+}
+
+# Initialisation entry point. Go through this strictly sequential chain 
+# then leave the device in continuous transmit mode.
+
+record(stringout, "$(P,undefined):RESETCOMM")
+{
+    field(TPRO, "1")
+    field(OUT,  "@centerOne.proto resetComm($(P,undefined)) $(STREAMS_PORT,undefined)")
+    field(DESC, "Reset the communication with the device")
+    field(PINI, "YES")
+    field(DTYP, "stream")
+    field(FLNK, "$(P,undefined):SENSORID")
+}
+
+record(stringin, "$(P,undefined):SENSORID")
+{
+    field(TPRO, "1")
+    field(INP,  "@centerOne.proto getSensorId $(STREAMS_PORT,undefined)")
+    field(DESC, "Get the sensor ID")
+    field(FLNK, "$(P,undefined):FIRMWARE")
+    field(DTYP, "stream")
+}
+
+record(stringin, "$(P,undefined):FIRMWARE")
+{
+    field(TPRO, "1")
+    field(INP,  "@centerOne.proto getFirmwareVersion $(STREAMS_PORT,undefined)")
+    field(DESC, "Get the firmware version")
+    field(FLNK, "$(P,undefined):SWP_LOW")
+    field(DTYP, "stream")
+}
+
+# High and low switching pressure value
+record(ai, "$(P,undefined):SWP_HIGH")
+{
+    field(TPRO, "1")
+    # Written by SWP_LOW
+    field(PREC, "3")
+    field(DESC, "Vacuum bad switching (OFF) pressure")
+}
+
+# Raw measurement value from the device, in mbar
+record(ai, "$(P,undefined):SWP_LOW")
+{
+    field(TPRO, "1")
+    # Also writes directly SWP_HIGH
+    field(INP,  "@centerOne.proto getSwitchingPressures($(P,undefined)) $(STREAMS_PORT,undefined)")
+    field(DESC, "Vacuum good switching (ON) pressure")
+    field(DTYP, "stream")
+    field(PREC, "3")
+    field(FLNK, "$(P,undefined):STARTMEAS")
+}
+
+record(stringout, "$(P,undefined):STARTMEAS")
+{
+    field(TPRO, "1")
+    field(OUT,  "@centerOne.proto startMeas $(STREAMS_PORT,undefined)")
+    field(DESC, "Start the measurement")
+    field(DTYP, "stream")
+}
+
+# --------------
+
+# Raw measurement value from the device, in mbar
+record(waveform, "$(P,undefined):RAWINPUT")
+{
+    field(DESC, "Input that failed matching as measument")
+    field(FTVL, "CHAR") 
+    field(NELM, "512") 
+}
+
+# Raw measurement value from the device, in mbar
+record(waveform, "$(P,undefined):RESETINPUT")
+{
+    field(DESC, "Input that failed matching as measument")
+    field(FTVL, "CHAR") 
+    field(NELM, "512") 
+}
+
+# Raw measurement value from the device, in mbar
+record(ai, "$(P,undefined):RMEAS")
+{
+    # Also writes directly RMSTATUS
+    # field(TPRO, "1")
+    field(INP,  "@centerOne.proto parseMeasurement($(P,undefined)) $(STREAMS_PORT,undefined)")
+    field(DESC, "Parse new measurement received")
+    field(DTYP, "stream")
+    field(FLNK, "$(P,undefined):PROC_RMEAS")
+    field(PREC, "3")
+    field(SCAN, "I/O Intr")
+}
+
+
+record(mbbo, "$(P,undefined):RMSTATUS")
+{
+    # field(TPRO, "1")
+    field(DESC, "Last received measurement status")
+    field(DTYP, "Soft Channel")
+    field(ZRVL, "0")
+    field(ZRST, "Ok")
+    field(ZRSV, "NO_ALARM")
+    field(ONVL, "1")
+    field(ONST, "Sensor Underrange")
+    field(ONSV, "MAJOR")
+    field(TWVL, "2")
+    field(TWST, "Sensor Overrange")
+    field(TWSV, "MAJOR")
+    field(THVL, "3")
+    field(THST, "Sensor Error")
+    field(THSV, "MAJOR")
+    field(FRVL, "4")
+    field(FRST, "Sensor Off")
+    field(FRSV, "MAJOR")
+    field(FVVL, "5")
+    field(FVST, "No Sensor")
+    field(FVSV, "MAJOR")
+    field(SXVL, "6")
+    field(SXST, "Identification Error")
+    field(SXSV, "MAJOR")
+    field(SVVL, "7")
+    field(SVST, "ITR Error")
+    field(SVSV, "MAJOR")
+}
+
+# ----
+
+record(fanout, "$(P,undefined):PROC_RMEAS")
+{
+    field(DESC, "Fanout steps for new measurement")
+    field(LNK1, "$(P,undefined):WD:RESET_TIMER")
+    field(LNK2, "$(P,undefined):WD:RESET_STALE")
+    field(LNK3, "$(P,undefined):PROC:VALID_RMSTATUS")
+    field(LNK4, "$(P,undefined):PROC:VALID_PRESSURE")
+}
+
+
+# ----
+# Check the pressure against the limit
+
+#% archiver 1 Monitor
+record(calc, "$(P,undefined):PROC:VALID_PRESSURE")
+{
+    field(DESC, "pressure below limit?")
+    field(CALC, "A < B")  # Boolean, 0 or 1
+    field(INPA, "$(P,undefined):RMEAS")
+    field(INPB, "$(P,undefined):PRESSURE_LIMIT")
+    field(SCAN, "Passive")
+    field(LOLO, "0.5")  # Alarm for 0=false 
+    field(LLSV, "MAJOR")
+}
+
+# Check the measurement status
+
+#% archiver 1 Monitor
+record(calc, "$(P,undefined):PROC:VALID_RMSTATUS")
+{
+    field(DESC, "last measurement report valid?")
+    field(CALC, "A = 0")  # Boolean, 0 or 1
+    field(INPA, "$(P,undefined):RMSTATUS")
+    field(SCAN, "Passive")
+    field(LOLO, "0.5")
+    field(LLSV, "MAJOR")
+}
+
+record(calcout, "$(P,undefined):PRESSURE_VALID")
+{
+    field(DESC, "All 3 indicators ok?")
+    # Valid if not stale and pressure is valid and RMSTATUS is valid
+    field(CALC, "A && B && !C")  # Boolean, 0 or 1
+    field(INPA, "$(P,undefined):PROC:VALID_PRESSURE")
+    field(INPB, "$(P,undefined):PROC:VALID_RMSTATUS")
+    field(INPC, "$(P,undefined):WD:STALE")
+    field(LOLO, "0.5")  # Alarm for 0=false 
+    field(LLSV, "MAJOR")
+    field(OUT, "$(P,undefined):VALID PP")
+    field(FLNK, "$(P,undefined):PRESSURE")
+    field(SCAN, ".5 second")
+}
+
+#% archiver 1 Monitor
+record(bo, "$(P,undefined):VALID")
+{
+    field(DESC, "Pressure validity boolean")
+    field(DTYP, "Soft Channel")
+    field(VAL, "0") # Init to invalid
+    field(ZNAM, "Invalid")
+    field(ONAM, "Valid")
+    field(ZSV,  "MAJOR")  # 0=Invalid
+    field(OSV,  "NO_ALARM")    # 1=Valid
+}
+
+#% archiver 1 Monitor
+record(calc, "$(P,undefined):PRESSURE")
+{
+    field(DESC, "Pressure (mbar) with validity alarm")
+    field(CALC, "A")
+    field(EGU, "mbar")
+    field(INPA, "$(P,undefined):RMEAS")  # Get value
+    field(INPB, "$(P,undefined):PRESSURE_VALID MS")  # Get alarm
+    field(PREC, "3")
+    field(SCAN, "Passive")
+}
+
+# ----
+
+# Pressure watchdog
+record(calc, "$(P,undefined):WD:TIMER")
+{
+    field(DESC, "Watchdog timer counter")
+    field(CALC, "A > 1000000 ? A : A + 1") # Increment the timer, but avoid overflow
+    field(VAL, "0")
+    field(INPA, "$(P,undefined):WD:TIMER NMS")
+    field(FLNK, "$(P,undefined):WD:CHECK_TIMEOUT")
+    field(SCAN, ".5 second")
+}
+
+record(calcout, "$(P,undefined):WD:CHECK_TIMEOUT")
+{
+    field(DESC, "Timeout ?")
+    field(CALC, "A > 19") # 10s timeout
+    field(INPA, "$(P,undefined):WD:TIMER NMS")
+    field(VAL, "0") # Init to not timeout
+    field(OUT, "$(P,undefined):WD:STALE PP")
+}
+
+#% archiver 1 Monitor
+record(bo, "$(P,undefined):WD:STALE")
+{
+    field(DESC, "Watchdog stale status")
+    field(DTYP, "Soft Channel")
+    field(VAL, "1") # Init to stale
+    field(ZNAM, "Ok")
+    field(ONAM, "Stale")
+    field(ZSV,  "NO_ALARM")  # 0=OK
+    field(OSV,  "MAJOR")    # 1=Stale
+}
+
+record(bo, "$(P,undefined):WD:RESET_STALE")
+{
+    field(DESC, "Reset the watchdog stale status")
+    field(DTYP, "Soft Channel")
+    field(VAL, "0")
+    field(OUT, "$(P,undefined):WD:STALE PP NMS")
+}
+
+record(bo, "$(P,undefined):WD:RESET_TIMER")
+{
+    field(DESC, "Reset the watchdog timer")
+    field(DTYP, "Soft Channel")
+    field(VAL, "0")
+    field(OUT, "$(P,undefined):WD:TIMER NPP NMS")
+}

@@ -1,0 +1,94 @@
+
+# Mitsubishi Robot Controller
+
+# Serial Protocol:
+
+# 19200 baud
+# 8 Data bits
+# 1 Stop bit
+# No parity
+# No handshaking
+# CR or CR+LF terminator
+# Maximum command size is 255 bytes
+
+# Command Format:
+
+# <Robot Number>;<Slot Number>;<Command Argument>
+
+# Response Format:
+
+# QoK<Answer> or Qer<Error Number>
+
+# A wide range of serial commands are available and listed in the manual, but
+# Diamond is only interested in a small subset of these:
+
+Terminator = CR;
+ExtraInput = Ignore;
+ReplyTimeout = 1000;
+ReadTimeout = 10;
+InTerminator = "";
+
+############## Status  / Main Control ###################
+
+getState {out "1;1;STATE" ; in "Qo%*c%(\$1:PROGRAM_NAME)[^;];%(\$1:LINE_NUMBER)d;%(\$1:OVERRIDE_RBV)d;%(\$1:EDIT_STATUS)d;%(\$1:RUN_STATUS)#2X%(\$1:STOP_STATUS)#2X%(\$1:CNTL_ERR_CODE)d;%(\$1:STEP_NUMBER)d;%(\$1:MECH_INFO)d;;;;;;;;;%(\$1:TASK_MODE){REP|CYC};%(\$1:TASK_CONDITION){START|ALWAYS|ERROR};%(\$1:TASK_PRIORITY)d;%(\$1:MECH_NUM_IN_USE)d" ; }
+
+runProgram { out "1;1;RUN%s;1" ; in "Qo%*c" ; @mismatch { in "%*s"}}
+loadProgramToSlot { out "1;1;PRGLOAD=%s" ; in "Qo%*c" ; @mismatch { in "%*s"}}
+servoOn { out "1;1;SRVON" ; in "Qo%*c" ; }
+servoOff { out "1;1;SRVOFF" ; in "Qo%*c" ; }
+
+writeVariable { out "1;1;HOT\$2;\$3=%f" ; in "Qo%*c" ; @init { out "1;1;VAL\$3" ; in "Qo%*c\$3=%f" ; } @mismatch { in "%*s"}}
+readVariable { out "1;1;VAL\$1" ; in "Qo%*c\$1=%f" ; @mismatch { in "%*s" } }
+
+writeOverride { out "1;1;OVRD=%d" ; in "Qo%*c%(\$1:OVERRIDE_RBV)d" ; @init { out "1;1;OVRD" ; in "Qo%*c%d" ; }}
+
+currentLine { out "1;1;LINERD;1" ; in "%(\$1:LINE_CONTENTS)255c" ; }
+
+readErrors { in "Qe%*c%(\$1:RUN_ERR_CODE)4c" ; }
+errorMessage { out "1;1;ERRORMES%d;1" ; in "%(\$1:CNTL_ERR_RET)255c" ; }
+runErrorMessage { out "1;1;ERRORMES%d;1" ; in "%(\$1:RUN_ERR_RET)255c" ; }
+
+########################## I/O ##############################
+
+ioState0 { out "1;1;IOSIGNAL0;0" ; in "Qo%*c%(\$1:ROBOT_IP_0)#4X%(\$1:ROBOT_OP_0)#4X" ; }
+ioState1 { out "1;1;IOSIGNAL16;16" ; in "Qo%*c%(\$1:ROBOT_IP_16)#4X%(\$1:ROBOT_OP_16)#4X" ; }
+
+writeOutput { out "1;1;OUT=0;%X" ; in  "Qo%*c" ; }
+
+######################### Resets ############################
+
+openComms { out "1;1;OPEN=EPICS" ; in "Q%(\$1:RESET_ALARM.PROC)#{oK=1|ok=1}%*s" ; }
+resetAlarm { out "1;1;RSTALRM" ; in "Q%(\$1:RESET_CONTROL_ON.PROC)#{oK=1|ok=1}" ; }
+resetProgram { out "1;1;RSTPRG" ; in "Q%(\$1:RESET_ERROR_CODE)#{oK=0|ok=0}" ; }
+rebootController { out "1;1;RSTPWR" ; in "Qo%*c" ; }
+
+################### Advanced / Debug #####################
+
+freeCommand { out "%s" ; in "%(\$1:CMD_RESPONSE)255c" ; }
+
+controlOn { out "1;1;CNTLON" ; in "Qo%*c" ; } 
+
+openGripper { out "1;1;HNDON1" ; in "Qo%*c" ; }
+closeGripper { out "1;1;HNDOFF1" ; in "Qo%*c" ; }
+
+powerTime { out "1;1;ENCBATTM" ; in "Qo%*c%(\$1:POWER_ON_TIME)d;%(\$1:BATT_REMAIN_TIME)d" ; }
+
+watchVariable { out "1;9;VAL%s" ; in "Qo%*c%[^=]=%(\$1:VAR_\$2_RBV)s" ; @mismatch { in "%*s"}}
+
+fetchPosition { out "1;9;VAL%s" ; in "Qo%*c%*[^=]=(%(\$1:FETCHED_X)f,%(\$1:FETCHED_Y)f,%(\$1:FETCHED_Z)f,%(\$1:FETCHED_A)f,%(\$1:FETCHED_B)f,%(\$1:FETCHED_C)f,%(\$1:FETCHED_L1)f,%(\$1:FETCHED_L2)f)(%(\$1:FETCHED_F1)f,%(\$1:FETCHED_F2)f)" ; @mismatch { in "%*s"}}
+
+##################### Teach Mode ##########################
+
+getEditState {out "1;9;STATE" ; in "Qo%*c%(\$1:EDIT_NAME)[^;];%*s" ; }
+
+loadProgram { out "1;9;LOAD=POSITIONS" ; in "Qo%*c" ; }
+saveProgram { out "1;9;SAVE" ; in "Qo%*c" ; }
+undoProgram { out "1;9;NEW" ; in "Qo%*c" ; }
+
+getCurrentPosition  { out "1;9;PPOSF" ; in "Qo%*cX;%(\$1:X)f;Y;%(\$1:Y)f;Z;%(\$1:Z)f;A;%(\$1:A)f;B;%(\$1:B)f;C;%(\$1:C)f;;%(\$1:F1)f" ; @mismatch { in "Qo%*cX;%(\$1:X)f;Y;%(\$1:Y)f;Z;%(\$1:Z)f;A;%(\$1:A)f;B;%(\$1:B)f;C;%(\$1:C)f;L1;%(\$1:L1)f;;%(\$1:F1)f" ; }}
+
+getPosition { out "1;9;LISTP%(\$1:\$2)s" ; in "Qo%*c%*[^=]=(%(\$1:X_RBV)f,%(\$1:Y_RBV)f,%(\$1:Z_RBV)f,%(\$1:A_RBV)f,%(\$1:B_RBV)f,%(\$1:C_RBV)f,%(\$1:L1_RBV)f,%(\$1:L2_RBV)f)(%(\$1:F1_RBV)f,%(\$1:F2_RBV)f)" ; @mismatch { in "%*s"}}
+
+setPosition { out "1;9;EDATA%(\$1:TP)s=(%(\$1:\$2)f,%(\$1:\$3)f,%(\$1:\$4)f,%(\$1:\$5)f,%(\$1:\$6)f,%(\$1:\$7)f,%(\$1:\$8)f,0)(%(\$1:\$9)f,0)" ; in "Qo%*c" ; }
+
+directCommand { out "1;9;EXEC%s" ; in "%(\$1:CMD_RESPONSE)255c" ; }

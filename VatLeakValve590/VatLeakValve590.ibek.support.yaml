@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: VatLeakValve590
+
+entity_models:
+  - name: _VatLeakValve590seriesTemplate
+    description: |-
+      Template database for VAT Variable Leak Valve 590 Series
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+      port:
+        type: str
+        description: |-
+          asyn serial port number (e.g. ty_40_0)
+      proto:
+        type: str
+        description: |-
+          name of protocol file, either V590.proto
+        default: V590.proto
+    databases:
+      - file: VATLeakValve590series.template
+        args:
+          .*:
+
+  - name: VatLeakValve590series
+    description: |-
+      VAT Variable Leak Valve 590 Series
+    parameters:
+      name:
+        type: id
+        description: |-
+          Gui tag
+      device:
+        type: str
+        description: |-
+          Device name
+      port:
+        type: str
+        description: |-
+          Asyn Port
+      proto:
+        type: str
+        description: |-
+          Protocol file to use (V590.proto)
+        default: V590.proto
+    databases:
+      - file: VATLeakValve590series.template
+        args:
+          .*:

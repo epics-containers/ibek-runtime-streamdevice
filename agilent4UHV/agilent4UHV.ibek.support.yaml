@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: agilent4UHV
+
+entity_models:
+  - name: _agilent4UHVTemplate
+    description: |-
+      Agilent 4UHV Ion Pump Controller (controller-level template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      pump:
+        type: int
+        description: |-
+          Controller pumpnel
+    databases:
+      - file: agilent4UHV.template
+        args:
+          .*:
+  - name: _agilent4UHVIonpTemplate
+    description: |-
+      Agilent 4UHV Ion Pump Controller (per-pump template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      pump:
+        type: int
+        description: |-
+          Controller pumpnel
+    databases:
+      - file: agilent4UHVIonp.template
+        args:
+          .*:
+  - name: agilent4UHV
+    description: |-
+      Agilent 4UHV Ion Pump Controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Gui tag
+      device:
+        type: str
+        description: |-
+          Device name
+      port:
+        type: str
+        description: |-
+          Asyn port
+  - name: agilent4UHVIonp
+    description: |-
+      Agilent 4UHV Ion Pump Controller (per-pump device)
+    parameters:
+      CTLR:
+        type: str
+        description: |-
+          agilent4 object
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      device:
+        type: str
+        description: |-
+          device name
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+      pump:
+        type: int
+        description: |-
+          Controller pumpnel
+    databases:
+      - file: agilent4UHVIonp.template
+        args:
+          .*:

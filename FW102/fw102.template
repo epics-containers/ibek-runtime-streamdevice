@@ -1,0 +1,40 @@
+# % macro, P,      PV name prefix
+# % macro, R,      PV name suffix
+# % macro, PORT,   asyn port
+# % macro, name,   module name
+
+# % gui, $(name=), edm, fw102.edl, P=$(P),R=$(R)
+
+record(stringin, "$(P)$(R):ID") {
+    field(DESC, "Model Number and Firmware Version")
+    field(SCAN, "Passive")
+    field(PINI, "RUNNING")
+    field(DTYP, "stream")
+    field(INP, "@fw102.proto getID $(PORT)")
+}
+
+record(mbbo, "$(P)$(R):FILTER") {
+    field(DESC, "Filter Position Set")
+    field(DTYP, "stream")
+    field(SCAN, "Passive")
+    field(OUT, "@fw102.proto setPos $(PORT)")
+    field(ZRST, "1")
+    field(ONST, "2")
+    field(TWST, "3")
+    field(THST, "4")
+    field(FRST, "5")
+    field(FVST, "6")
+    field(ZRVL, 1)
+    field(ONVL, 2)
+    field(TWVL, 3)
+    field(THVL, 4)
+    field(FRVL, 5)
+    field(FVVL, 6)
+}
+
+record(stringin, "$(P)$(R):FILTER_RBV") {
+    field(DESC, "Filter Position Readback Value")
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(INP, "@fw102.proto getPos $(PORT)")
+}

@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: caenN1470
+
+entity_models:
+  - name: _caenN1470chan
+    description: |-
+      CAEN N1470 HV power supply (per-channel template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      ADDR:
+        type: int
+        description: |-
+          Address of unit, normally 0
+      CHAN:
+        type: int
+        description: |-
+          Channel number in range 0..3
+    databases:
+      - file: caenN1470chan.template
+        args:
+          .*:
+  - name: _caenN1470
+    description: |-
+      CAEN N1470 HV power supply (board-level template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      ADDR:
+        type: int
+        description: |-
+          Address of unit, normally 0
+      DISABLED:
+        type: int
+        description: |-
+          Default disable mode for comms
+        default: 1
+      name:
+        type: id
+        description: |-
+          Gui association name
+      label0:
+        type: str
+        description: |-
+          Label for channel 0
+      label1:
+        type: str
+        description: |-
+          Label for channel 1
+      label2:
+        type: str
+        description: |-
+          Label for channel 2
+      label3:
+        type: str
+        description: |-
+          Label for channel 3
+    databases:
+      - file: caenN1470.template
+        args:
+          .*:

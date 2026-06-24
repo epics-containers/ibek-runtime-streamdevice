@@ -1,0 +1,60 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for Oxford instruments ITC503 intelligent Temperature Controller
+#
+#
+
+terminator   = CR;
+replytimeout = 4000;
+readtimeout  = 500;
+locktimeout = 20000;
+extrainput   = Ignore;
+separator = "";
+
+#################################################################################
+# Command set
+
+
+#Monitor commands
+
+set_ctrl{out"%{C0|C1|C2|C3}"; in "C"}
+
+get_param{out"R%2u"; in"R%f"}
+get_ttemp{out"R0"; in"R%f"}
+get_stemp{out"R1"; in"R%f"}
+get_s2temp{out"R2"; in"R%f"}
+get_s3temp{out"R3"; in"R%f"}
+get_etemp{out"R4"; in"R%f"}
+get_htrp{out"R5"; in"R%f"}
+get_htrv{out"R6"; in"R%f"}
+get_gflow{out"R7"; in"R%f"}
+get_p{out"R8"; in"R%f"}
+get_i{out"R9"; in"R%f"}
+get_d{out"R10"; in"R%f"}
+get_chnf{out"R11"; in"R%f"}
+get_sh_flo{out"R18"; in"R%f"}
+get_sa_flo{out"R19"; in"R%f"}
+
+get_sta{out"X"; in "X0%{A0|A1|A2|A3}%(\$1.VAL){C0|C1|C2|C3}"}
+
+
+#Control comamnds
+
+set_act{out"%{A0|A1|A2|A3}"; in "A"}
+set_d{out"D%.1f"; in"D"}
+set_i{out"I%.1f"; in"I"}
+set_sh_flo{out"J%.1f"; in"J"}
+set_sa_flo{out"K%.1f"; in"K"}
+set_maxv{out"M%.1f"; in"M"}
+set_manv{out"O%.1f"; in"O"}
+set_gflow{out"G%.1f"; in"G"}
+set_p{out"P%.2f"; in"P"}
+set_ttemp{out"T%.2f"; in"T"}
+
+
+
+#################################################################################

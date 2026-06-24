@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: OxInstIPS
+
+entity_models:
+  - name: OxInstIPS
+    description: |-
+      OxInstIPS Oxford Instruments superconducting magnet power supply controller device class.
+    parameters:
+      P:
+        type: str
+        description: |-
+          The PV prefix for the power controller
+      port:
+        type: str
+        description: |-
+          Asyn Port
+      name:
+        type: id
+        description: |-
+          Object name, also used for gda_name if gda
+      desc:
+        type: str
+        description: |-
+          Object description, also used for gda_desc if gda
+        default: ""
+      DISABLED:
+        type: int
+        description: |-
+          Optional - whether device is polled or not. Defaults to 1 (disabled).
+        default: 1
+    databases:
+      - file: OxInstIPS.template
+        args:
+          .*:

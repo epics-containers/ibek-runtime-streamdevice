@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: CryoconM32
+
+entity_models:
+  - name: CryoconM32
+    description: |-
+      CryoconM32 temperature controller device class (includes sensors and control loops configured with other classes).
+    parameters:
+      tctrlr:
+        type: str
+        description: |-
+          The PV prefix for the temperature controller
+      port:
+        type: str
+        description: |-
+          Asyn Port
+      egu:
+        type: str
+        description: |-
+          Engineering units for sink temperature
+        default: K
+    databases:
+      - file: M32_system.template
+        args:
+          .*:

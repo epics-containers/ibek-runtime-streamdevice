@@ -1,0 +1,709 @@
+# This associates an edm screen with the template
+# % gui, $(name=None), edm, CrateMon.edl, device=$(device)
+
+record(seq, "$(device):SEQ")
+{
+	field(SELM, "Mask")
+	field(SELN, "111")
+	field(SCAN, "5 second")
+
+	field(DOL1, "1")
+	field(LNK1, "$(device):STATUS.PROC")
+	field(DLY1, "0")
+
+	field(DOL2, "1")
+	field(LNK2, "$(device):FAN.PROC")
+	field(DLY2, "1")
+
+	field(DOL3, "1")
+	field(LNK3, "$(device):SUPPLY.PROC")
+	field(DLY3, "1")
+
+	field(DOL4, "1")
+	field(LNK4, "$(device):TEMP.PROC")
+	field(DLY4, "1")
+		
+	field(DOL5, "1")
+	field(LNK5, "$(device):POLY:PSUSTAT.PROC")
+	field(DLY5, "1")
+	
+	field(DOL6, "1")
+	field(LNK6, "$(device):FTYPE.PROC")
+	field(DLY6, "0")
+	
+	field(DOL7, "1")
+	field(LNK7, "$(device):ELMA:PSUSTAT.PROC")
+	field(DLY7, "0")
+}
+
+################################################################################
+
+record(calcout, "$(device):FAN")
+{
+	field(CALC, "1")
+	field(DTYP, "stream")
+	field(OUT,  "@CrateMon.proto fans $(device)")
+
+	field(SDIS, "$(device):DISA")
+
+	field(FLNK, "$(device):FAN1")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):FAN1")
+{
+	field(DESC, "Fan 1 speed")
+	field(INP,  "$(device):FAN.A MS")
+	field(PREC, "0")
+	field(EGU,  "rpm")
+	field(HOPR, "10000")
+	field(LOPR, "0")
+	field(LOLO, "2000")
+	field(LLSV, "MINOR")
+	field(ADEL, "100")
+
+	field(FLNK, "$(device):FAN2")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):FAN2")
+{
+	field(DESC, "Fan 2 speed")
+	field(INP,  "$(device):FAN.B MS")
+	field(PREC, "0")
+	field(EGU,  "rpm")
+	field(HOPR, "10000")
+	field(LOPR, "0")
+	field(LOLO, "2000")
+	field(LLSV, "MINOR")
+	field(ADEL, "100")
+
+	field(FLNK, "$(device):FAN3")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):FAN3")
+{
+	field(DESC, "Fan 3 speed")
+	field(INP,  "$(device):FAN.C MS")
+	field(PREC, "0")
+	field(EGU,  "rpm")
+	field(HOPR, "10000")
+	field(LOPR, "0")
+	field(LOLO, "2000")
+	field(LLSV, "MINOR")
+	field(ADEL, "100")
+
+	field(FLNK, "$(device):FAN4")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):FAN4")
+{
+	field(DESC, "Fan 4 speed")
+	field(INP,  "$(device):FAN.D MS")
+	field(PREC, "0")
+	field(EGU,  "rpm")
+	field(HOPR, "10000")
+	field(LOPR, "0")
+	field(LOLO, "2000")
+	field(LLSV, "MINOR")
+	field(ADEL, "100")
+
+	field(FLNK, "$(device):FAN5")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):FAN5")
+{
+	field(DESC, "Fan 5 speed")
+	field(INP,  "$(device):FAN.E MS")
+	field(PREC, "0")
+	field(EGU, "rpm")
+	field(HOPR, "10000")
+	field(LOPR, "0")
+	field(LOLO, "6000")
+	field(LLSV, "MINOR")
+	field(ADEL, "100")
+
+	field(FLNK, "$(device):FAN6")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):FAN6")
+{
+	field(DESC, "Fan 6 speed")
+	field(INP,  "$(device):FAN.F MS")
+	field(PREC, "0")
+	field(EGU,  "rpm")
+	field(HOPR, "10000")
+	field(LOPR, "0")
+	field(LOLO, "6000")
+	field(LLSV, "MINOR")
+	field(ADEL, "100")
+
+	field(FLNK, "$(device):FAN7")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):FAN7")
+{
+	field(DESC, "Fan 7 speed")
+	field(INP,  "$(device):FAN.G MS")
+	field(PREC, "0")
+	field(EGU,  "rpm")
+	field(HOPR, "10000")
+	field(LOPR, "0")
+	field(LOLO, "6000")
+	field(LLSV, "MINOR")
+	field(ADEL, "100")
+
+	field(FLNK, "$(device):FAN8")
+}
+
+# No crate has 8 fans but use for modified Elma PSU status
+
+#  archiver 2 Monitor
+#  alh
+
+record(ai, "$(device):FAN8")
+{
+	field(DESC, "Fan 8 speed")
+	field(INP,  "$(device):FAN.H MS")
+	field(PREC, "0")
+	field(EGU,  "rpm")
+	field(HOPR, "10000")
+	field(LOPR, "0")
+	field(LOLO, "6000")
+	field(LLSV, "MINOR")
+	field(ADEL, "100")
+}
+
+################################################################################
+
+# This makes the component icon reflect the severity
+# % gui, $(name=None), sevr
+# % archiver 2 Monitor
+# % alh
+
+record(mbbiDirect, "$(device):STATUS")
+{
+	field(DESC, "System status bits")
+	field(DTYP, "stream")
+	field(NOBT, "8")
+	field(INP,  "@CrateMon.proto status $(device)")
+
+	field(FLNK, "$(device):DISA")
+}
+
+# disable other comms commands when status fails
+
+record(calc, "$(device):DISA")
+{
+	field(CALC, "A#0")
+	field(INPA, "$(device):STATUS.SEVR")
+
+	field(FLNK, "$(device):STATUS1")
+}
+
+record(bi, "$(device):STATUS1")
+{
+	field(DESC, "+3.3V status")
+	field(INP,  "$(device):STATUS.B0 MS")
+	field(ZSV,  "MINOR")
+	field(OSV,  "NO_ALARM")
+	field(ZNAM, "Bad")
+	field(ONAM, "Good")
+
+	field(FLNK, "$(device):STATUS2")
+}
+
+record(bi, "$(device):STATUS2")
+{
+	field(DESC, "+5V status")
+	field(INP,  "$(device):STATUS.B1 MS")
+	field(ZSV,  "MINOR")
+	field(OSV,  "NO_ALARM")
+	field(ZNAM, "Bad")
+	field(ONAM, "Good")
+
+	field(FLNK, "$(device):STATUS3")
+}
+
+record(bi, "$(device):STATUS3")
+{
+	field(DESC, "+12V status")
+	field(INP,  "$(device):STATUS.B2 MS")
+	field(ZSV,  "MINOR")
+	field(OSV,  "NO_ALARM")
+	field(ZNAM, "Bad")
+	field(ONAM, "Good")
+
+	field(FLNK, "$(device):STATUS4")
+}
+
+record(bi, "$(device):STATUS4")
+{
+	field(DESC, "-12V status")
+	field(INP,  "$(device):STATUS.B3 MS")
+	field(ZSV,  "MINOR")
+	field(OSV,  "NO_ALARM")
+	field(ZNAM, "Bad")
+	field(ONAM, "Good")
+
+	field(FLNK, "$(device):STATUS5")
+}
+
+record(bi, "$(device):STATUS5")
+{
+	field(DESC, "+5V standby status")
+	field(INP,  "$(device):STATUS.B4 MS")
+	field(ZSV,  "MINOR")
+	field(OSV,  "NO_ALARM")
+	field(ZNAM, "Bad")
+	field(ONAM, "Good")
+
+	field(FLNK, "$(device):STATUS6")
+}
+
+record(bi, "$(device):STATUS6")
+{
+	field(DESC, "Fans + Temps status")
+	field(INP,  "$(device):STATUS.B5 MS")
+	field(ZSV,  "MINOR")
+	field(OSV,  "NO_ALARM")
+	field(ZNAM, "Bad")
+	field(ONAM, "Good")
+
+	field(FLNK, "$(device):STATUS7")
+}
+
+record(bi, "$(device):STATUS7")
+{
+	field(DESC, "Shutdown state")
+	field(INP,  "$(device):STATUS.B6 MS")
+	field(ZSV,  "MINOR")
+	field(OSV,  "NO_ALARM")
+	field(ZNAM, "Crate Off")
+	field(ONAM, "Crate On")
+
+	field(FLNK, "$(device):STATUS8")
+}
+
+record(bi, "$(device):STATUS8")
+{
+	field(DESC, "SYSFAIL status")
+	field(INP,  "$(device):STATUS.B7 MS")
+	field(ZSV,  "MINOR")
+	field(OSV,  "NO_ALARM")
+	field(ZNAM, "Off")
+	field(ONAM, "On")
+}
+
+################################################################################
+
+record(calcout, "$(device):SUPPLY")
+{
+	field(CALC, "1")
+	field(DTYP, "stream")
+	field(OUT,  "@CrateMon.proto supply $(device)")
+
+	field(SDIS, "$(device):DISA")
+
+	field(FLNK, "$(device):P33VSUPPLY")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):P33VSUPPLY")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SUPPLY.B MS")
+	field(PREC, "2")
+	field(EGU,  "V")
+	field(HOPR, "15")
+	field(LOPR, "-15")
+	field(DESC, "+3.3V suuply")
+	field(ASLO, "0.001")
+	field(HIHI, "3.63")
+	field(LOLO, "2.97")
+	field(HHSV, "MINOR")
+	field(LLSV, "MINOR")
+	field(ADEL, "0.05")
+
+	field(FLNK, "$(device):P50VSUPPLY")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):P50VSUPPLY")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SUPPLY.A MS")
+	field(PREC, "2")
+	field(EGU,  "V")
+	field(HOPR, "15")
+	field(LOPR, "-15")
+	field(DESC, "+5.0V supply")
+	field(ASLO, "0.001")
+	field(HIHI, "5.5")
+	field(LOLO, "4.5")
+	field(HHSV, "MINOR")
+	field(LLSV, "MINOR")
+	field(ADEL, "0.05")
+
+	field(FLNK, "$(device):P12VSUPPLY")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):P12VSUPPLY")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SUPPLY.C MS")
+	field(PREC, "2")
+	field(EGU,  "V")
+	field(HOPR, "15")
+	field(LOPR, "-15")
+	field(DESC, "+12V supply")
+	field(ASLO, "0.001")
+	field(HIHI, "13.2")
+	field(LOLO, "10.8")
+	field(HHSV, "MINOR")
+	field(LLSV, "MINOR")
+	field(ADEL, "0.05")
+
+	field(FLNK, "$(device):M12VSUPPLY")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):M12VSUPPLY")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SUPPLY.D MS")
+	field(PREC, "2")
+	field(EGU,  "V")
+	field(HOPR, "15")
+	field(LOPR, "-15")
+	field(DESC, "-12V supply")
+	field(ASLO, "-0.001")
+	field(HIHI, "-10.8")
+	field(LOLO, "-13.2")
+	field(HHSV, "MINOR")
+	field(LLSV, "MINOR")
+	field(ADEL, "0.05")
+}
+
+################################################################################
+
+record(calcout, "$(device):TEMP")
+{
+	field(CALC, "1")
+	field(DTYP, "stream")
+	field(OUT,  "@CrateMon.proto temps $(device)")
+
+	field(SDIS, "$(device):DISA")
+
+	field(FLNK, "$(device):INLET")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):INLET")
+{
+	field(INP,  "$(device):TEMP.A MS")
+	field(PREC, "0")
+	field(EGU,  "C")
+	field(HOPR, "80")
+	field(LOPR, "0")
+	field(DESC, "Inlet temp")
+	field(HIGH, "35")
+	field(HSV,  "MINOR")
+	field(HIHI, "40")
+	field(HHSV, "MAJOR")
+	field(ADEL, "0")
+
+	field(FLNK, "$(device):INTERNAL")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):INTERNAL")
+{
+	field(INP,  "$(device):TEMP.B MS")
+	field(PREC, "0")
+	field(EGU,  "C")
+	field(HOPR, "80")
+	field(LOPR, "0")
+	field(DESC, "Internal Temp")
+	field(HIGH, "35")
+	field(HSV,  "MINOR")
+	field(HIHI, "40")
+	field(HHSV, "MAJOR")
+	field(ADEL, "0")
+
+	field(FLNK, "$(device):OUTLET")
+}
+
+# % archiver 2 Monitor
+# % alh
+
+record(ai, "$(device):OUTLET")
+{
+	field(INP,  "$(device):TEMP.C MS")
+	field(PREC, "0")
+	field(EGU,  "C")
+	field(HOPR, "80")
+	field(LOPR, "0")
+	field(DESC, "Outlet Temp")
+	field(HIGH, "35")
+	field(HSV,  "MINOR")
+	field(HIHI, "40")
+	field(HHSV, "MAJOR")
+	field(ADEL, "0")
+}
+
+################################################################################
+
+record(bo, "$(device):ENABLE")
+{
+	field(HIGH, "2.0")
+	field(ZNAM, "Disabled")
+	field(ONAM, "Enabled")
+	field(VAL,  "0")
+}
+
+record(bo, "$(device):SHUTDOWN")
+{
+	field(DESC, "Shutdown crate")
+	field(DTYP, "stream")
+	field(OUT,  "@CrateMon.proto shutdown $(device)")
+	field(VAL,  "0")
+	field(DISV, "0")
+	field(SDIS, "$(device):ENABLE.VAL")
+}
+
+record(bo, "$(device):RESET")
+{
+	field(DESC, "Reset crate")
+	field(DTYP, "stream")
+	field(OUT,  "@CrateMon.proto reset $(device)")
+	field(ZNAM, "Reboot")
+	field(ONAM, "Reboot")
+	field(VAL,  "0")
+	field(DISV, "0")
+	field(SDIS, "$(device):ENABLE.VAL")
+}
+
+record(calc, "$(device):STA:PSU")
+{
+	field(DESC, "PSU Alarm")
+	field(SCAN, "10 second")
+	field(CALC, "A+B+C+D")
+	field(INPA, "$(device):P33VSUPPLY NPP MS")
+	field(INPB, "$(device):P50VSUPPLY NPP MS")
+	field(INPC, "$(device):P12VSUPPLY NPP MS")
+	field(INPD, "$(device):M12VSUPPLY NPP MS")
+}
+
+record(calc, "$(device):STA:TEMP")
+{
+	field(SCAN, "10 second")
+	field(CALC, "A+B+C")
+	field(INPA, "$(device):INLET NPP MS")
+	field(INPB, "$(device):INTERNAL NPP MS")
+	field(INPC, "$(device):OUTLET NPP MS")
+	field(DESC, "Temp Alarm")
+}
+
+record(calc, "$(device):STA:FAN")
+{
+	field(SCAN, "10 second")
+	field(CALC, "A+B")
+	field(INPA, "$(device):FAN1 NPP MS")
+	field(INPB, "$(device):FAN2 NPP MS")
+	field(DESC, "Fan Alarm")
+}
+
+record(calc, "$(device):STA:SYS")
+{
+	field(CALC, "A+B")
+	field(INPA, "$(device):STATUS7 NPP MS")
+	field(INPB, "$(device):STATUS8 NPP MS")
+	field(DESC, "Sys Alarm")
+	field(SCAN, "10 second")
+}
+
+### PolyRack SMC-2 Commands ################################
+
+record(calcout, "$(device):POLY:VERSION")
+{
+	field(CALC, "1")
+	field(DTYP, "stream")
+	field(OUT,  "@CrateMon.proto version $(device)")
+	
+	field(DISV, "0")
+	field(SDIS, "$(device):TYPE")
+}
+
+#-----------------------------------------------------------
+
+record(longin, "$(device):POLY:PSUSTAT")
+{
+	field(DTYP, "stream")
+	field(INP,  "@CrateMon.proto getPSUstatus $(device)")
+
+	field(DISV, "0")
+	field(SDIS, "$(device):TYPE")
+	
+	field(FLNK, "$(device):POLY:COPY")
+}
+
+record(ao, "$(device):POLY:COPY")
+{
+	field(OMSL, "closed_loop")
+	field(DOL,  "$(device):POLY:PSUSTAT")
+	field(OUT,  "$(device):PSUSTAT PP")
+}
+
+# % archiver 2 Monitor
+
+record(longin, "$(device):PSUSTAT")
+{
+	field(DESC, "Indicates PSU fault")
+
+	field(HIGH, "1")
+	field(HSV,  "MINOR")
+	
+	field(PINI, "YES")
+}
+
+#-----------------------------------------------------------
+
+# Determine the crate type
+
+record(seq, "$(device):PCRATE")
+{
+	field(SELM, "All")
+	field(PINI, "YES")
+
+	field(DO1,  "1")
+	field(LNK1, "$(device):FAN.PROC")
+	field(DLY1, "1")
+
+	field(DO2,  "1")
+	field(LNK2, "$(device):FTYPE.PROC")
+	field(DLY2, "2")
+}
+
+# polyrack  4U 	1 1 1 0 0 0 0	100 = 2	2 temps	
+# elma      4U 	1 1 1 1 1 1 1	111 = 0	3 temps	no 5V
+# polyrack 11U 	1 1 1 1 0 0 0	110 = 1	3 temps	
+# elma     11U 	1 1 0 0 0 0 0	000 = 3	3 temps	
+
+record(calc, "$(device):FTYPE")
+{
+	field(DESC, "")
+	field(CALC, "(A=0)+(B=0)+(C=0)")
+	field(INPA, "$(device):FAN3")
+	field(INPB, "$(device):FAN4")
+	field(INPC, "$(device):FAN5")
+
+	field(FLNK, "$(device):TYPE")
+}
+
+# defaults to zero to inhibit newer PolyRack commands
+
+record(calc, "$(device):TYPE")
+{
+	field(DESC, "1=PolyRack, 0=Elma")
+	field(CALC, "(A=1||A=2)&&(B=0)")
+	field(INPA, "$(device):FTYPE")
+	field(INPB, "$(device):OUTLET")
+
+	field(FLNK, "$(device):CRATE")
+}
+
+# crate type
+
+record(mbbi, "$(device):CRATE")
+{
+	field(DTYP, "Soft Channel")
+	field(INP,  "$(device):FTYPE")
+	
+	field(ZRST, "Elma 4U")
+	field(ONST, "PolyRack 11U")
+	field(TWST, "PolyRack 4U")
+	field(THST, "Elma 11U")
+	
+	field(UNSV, "MINOR")
+	
+	field(FLNK, "$(device):MASK")
+}
+
+# set the mask in the sequence record so that we don't process records valid
+# only for PolyRack crates
+
+record(calcout, "$(device):MASK")
+{
+	field(CALC, "(A=1)?63:111")
+	field(INPA, "$(device):TYPE")
+	field(OUT,  "$(device):SEQ.SELN")
+	field(OOPT, "On Change")
+}
+
+# for displaying the alarm state of both the STATUS and PSUSTAT PV
+# on the overview screen
+
+record(calc, "$(device):ALARM")
+{
+	field(DESC, "Alarm state")
+	field(SCAN, "1 second")
+	field(CALC, "(A+B+C+D+E)#0")
+	field(INPA, "$(device):STATUS.SEVR")
+	field(INPB, "$(device):PSUSTAT.SEVR")
+	field(INPC, "$(device):STA:PSU.SEVR")
+	field(INPD, "$(device):STA:TEMP.SEVR")
+	field(INPE, "$(device):STA:FAN.SEVR")
+}
+
+### Elma 4U PSU status #####################################
+
+record(calc, "$(device):ELMA:PSUSTAT")
+{
+	field(CALC, "A>100")
+	field(INPA, "$(device):FAN8")
+
+	field(DISV, "1")
+	field(SDIS, "$(device):TYPE")
+
+	field(FLNK, "$(device):ELMA:COPY")
+}
+
+record(ao, "$(device):ELMA:COPY")
+{
+	field(OMSL, "closed_loop")
+	field(DOL,  "$(device):ELMA:PSUSTAT")
+	field(OUT,  "$(device):PSUSTAT PP")
+}

@@ -1,0 +1,36 @@
+#% macro, P, Device name
+#% macro, PORT, Port name
+
+record(longin, $(P):C_CON_RAW) {
+  field(DTYP, "stream")
+  field(INP, "@npoint.proto getInteger(0xA0,0x03,0x83,0x11) $(PORT)")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(FLNK,"$(P):C_CON")
+}
+
+record(mbbiDirect,  $(P):C_CON) {
+  field(INP,"$(P):C_CON_RAW")
+  field(SCAN, "Passive")
+  field(FLNK,"$(P):C1_CON")
+}
+
+record(calc,  $(P):C1_CON) {
+  field(INPA,"$(P):C_CON.B0")
+  field(CALC,"!A")
+  field(SCAN, "Passive")
+  field(FLNK,"$(P):C2_CON")
+}
+
+record(calc,  $(P):C2_CON) {
+  field(INPA,"$(P):C_CON.B1")
+  field(CALC,"!A")
+  field(SCAN, "Passive")
+  field(FLNK,"$(P):C3_CON")
+}
+
+record(calc,  $(P):C3_CON) {
+  field(INPA,"$(P):C_CON.B2")
+  field(CALC,"!A")
+  field(SCAN, "Passive")
+}

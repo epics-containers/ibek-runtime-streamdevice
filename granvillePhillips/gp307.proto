@@ -1,0 +1,52 @@
+################################################################################################
+# Protocol file for:
+#
+# Granville-Phillipts 307 Gauge ccontroller
+#
+# Default serial configuration: 300 baud, no parity, 7 data bits, 2 stop bit.
+#
+################################################################################################
+
+Terminator = LF;
+
+LockTimeout = 5000;
+ReplyTimeout = 5000;
+ReadTimeout = 3000;
+ExtraInput = Ignore;
+
+##################
+# Set Commands
+
+# set Degas on or off
+# Cmd: 'DG <ON|OFF>\r\n' Resp: 'OK\r\0\n'
+setDG { out "DG %{OFF|ON}\r"; in "OK\r"; }
+
+# Set Gauge on or off
+# Cmd: 'IG<1|2> <ON|OFF>\r\n' Resp: 'OK\r\0\n'
+setIG { out "IG\$1 %{OFF|ON}\r"; in "OK\r";  }
+
+##################
+# Get Commands
+
+# Get IG (Hot cathode) Pressure reading 
+# Cmd: 'DS IG<1|2>\r\n' Resp: '9.90e+09\r\0\n'
+getIG { out "DS IG\$1\r"; in "%f\r"; }
+
+# Get CG (Pirani) Pressure reading 
+# Cmd: 'DS CG<1|2>\r\n' Resp: '9.90e+09\r\0\n'
+getCG { out "DS CG\$1\r"; in "%f\r"; }
+
+# Get Degas status
+# Cmd: 'DGS\r\n' Resp: '<0|1>\r\0\n'
+getDGS { out "DGS\r"; in "%{0|1}\r"; }
+
+# Get process control channel status
+# NB Poll getPCS1 and use 'I/O Intr' on getPCS2..6
+# Cmd: 'PCS\r' Resp: '<0|1>,<0|1>,<0|1>,<0|1>,<0|1>,<0|1>\r\0\n'
+getPCS1 { out "PCS\r"; in "%{0|1},%*{0|1},%*{0|1},%*{0|1},%*{0|1},%*{0|1}\r"; }
+getPCS2 { in "%*{0|1},%{0|1},%*{0|1},%*{0|1},%*{0|1},%*{0|1}\r"; }
+getPCS3 { in "%*{0|1},%*{0|1},%{0|1},%*{0|1},%*{0|1},%*{0|1}\r"; }
+getPCS4 { in "%*{0|1},%*{0|1},%*{0|1},%{0|1},%*{0|1},%*{0|1}\r"; }
+getPCS5 { in "%*{0|1},%*{0|1},%*{0|1},%*{0|1},%{0|1},%*{0|1}\r"; }
+getPCS6 { in "%*{0|1},%*{0|1},%*{0|1},%*{0|1},%*{0|1},%{0|1}\r"; }
+

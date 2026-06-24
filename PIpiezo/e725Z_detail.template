@@ -1,0 +1,67 @@
+## This file was generated using detailConverter.py
+
+## This associates a BOY screen with the template
+# % gui, $(PORT), boydetail, PIpiezoApp_opi/e725Z_detail.opi, P=$(P), R=$(R), DESC=Piezo
+# % gui, $(PORT), boyembed, PIpiezoApp_opi/e725Z_embed_box.opi, P=$(P), R=$(R), DESC=Piezo
+# % gui, $(PORT), boyembed, PIpiezoApp_opi/e725Z_embed.opi, P=$(P), R=$(R), DESC=Piezo
+
+##  Controller 
+# % gui, $(PORT), groupHeading,  Controller 
+# % gui, $(PORT), readback,  Device ID , $(P)$(Q):IDN:RD
+# % gui, $(PORT), enum, Process  , $(P)$(Q):IDN:RD.PROC
+# % gui, $(PORT), readback, Error Code , $(P)$(Q):ERR:RD
+# % gui, $(PORT), enum, Device Communication , $(P)$(Q):DISABLEPOLL
+# % gui, $(PORT), groupExit,  Controller Exit
+##  X Axis 
+# % gui, $(PORT), groupHeading,  X Axis 
+# % gui, $(PORT), enum,  Servo Control X, $(P)$(Q):X:SVO:WR
+# % gui, $(PORT), readback,  Servo Control X, $(P)$(Q):X:SVO:RD
+# % gui, $(PORT), readback,  On Target X, $(P)$(Q):X:ONT:RD
+# % gui, $(PORT), readback,  Overflow X, $(P)$(Q):X:OVF:RD
+# % gui, $(PORT), demand,  In-position Deadband X , $(P)$(Q):X:ACT:DEADBAND
+# % gui, $(PORT), readback,  Current Position X , $(P)$(Q):X:POS:RD
+# % gui, $(PORT), statusbits,  Busy X , $(P)$(Q):X:ACT:BUSY
+# % gui, $(PORT), demand,  Demand Position X, $(P)$(Q):X:MOV:WR
+# % gui, $(PORT), command, Tweak Down X  , $(P)$(Q):X:ACT:TWDOWN.PROC
+# % gui, $(PORT), command,  Tweak Up X , $(P)$(Q):X:ACT:TWUP.PROC
+# % gui, $(PORT), demand,  Tweak Step Size X , $(P)$(Q):X:ACT:TWSTEP
+# % gui, $(PORT), readback,  Piezo Voltage X , $(P)$(Q):X:VOL:RD
+# % gui, $(PORT), demand,  Absolute Voltage X , $(P)$(Q):X:SVA:WR
+# % gui, $(PORT), readback,  Absolute Voltage X , $(P)$(Q):X:SVA:RD
+# % gui, $(PORT), groupExit,  X Axis Exit
+
+##  Y Axis
+# % gui, $(PORT), groupHeading,  Y Axis 
+# % gui, $(PORT), enum,  Servo Control Y, $(P)$(Q):Y:SVO:WR
+# % gui, $(PORT), readback,  Servo Control Y, $(P)$(Q):Y:SVO:RD
+# % gui, $(PORT), readback,  On Target Y, $(P)$(Q):Y:ONT:RD
+# % gui, $(PORT), readback,  Overflow Y, $(P)$(Q):Y:OVF:RD
+# % gui, $(PORT), demand,  In-position Deadband Y , $(P)$(Q):Y:ACT:DEADBAND
+# % gui, $(PORT), readback,  Current Position Y , $(P)$(Q):Y:POS:RD
+# % gui, $(PORT), statusbits,  Busy Y , $(P)$(Q):Y:ACT:BUSY
+# % gui, $(PORT), demand,  Demand Position Y, $(P)$(Q):Y:MOV:WR
+# % gui, $(PORT), command, Tweak Down Y  , $(P)$(Q):Y:ACT:TWDOWN.PROC
+# % gui, $(PORT), command,  Tweak Up Y , $(P)$(Q):Y:ACT:TWUP.PROC
+# % gui, $(PORT), demand,  Tweak Step Size Y , $(P)$(Q):Y:ACT:TWSTEP
+# % gui, $(PORT), readback,  Piezo Voltage Y , $(P)$(Q):Y:VOL:RD
+# % gui, $(PORT), demand,  Absolute Voltage Y , $(P)$(Q):Y:SVA:WR
+# % gui, $(PORT), readback,  Absolute Voltage Y , $(P)$(Q):Y:SVA:RD
+# % gui, $(PORT), groupExit,  Y Axis Exit
+
+##  Z Axis 
+# % gui, $(PORT), groupHeading,  Z Axis 
+# % gui, $(PORT), enum,  Servo Control Z, $(P)$(Q):Z:SVO:WR
+# % gui, $(PORT), readback,  Servo Control Z, $(P)$(Q):Z:SVO:RD
+# % gui, $(PORT), readback,  On Target Z, $(P)$(Q):Z:ONT:RD
+# % gui, $(PORT), readback,  Overflow Z, $(P)$(Q):Z:OVF:RD
+# % gui, $(PORT), demand,  In-position Deadband Z , $(P)$(Q):Z:ACT:DEADBAND
+# % gui, $(PORT), readback,  Current Position Z , $(P)$(Q):Z:POS:RD
+# % gui, $(PORT), statusbits,  Busy Z , $(P)$(Q):Z:ACT:BUSY
+# % gui, $(PORT), demand,  Demand Position Z, $(P)$(Q):Z:MOV:WR
+# % gui, $(PORT), command, Tweak Down Z  , $(P)$(Q):Z:ACT:TWDOWN.PROC
+# % gui, $(PORT), command,  Tweak Up Z , $(P)$(Q):Z:ACT:TWUP.PROC
+# % gui, $(PORT), demand,  Tweak Step Size Z , $(P)$(Q):Z:ACT:TWSTEP
+# % gui, $(PORT), readback,  Piezo Voltage Z , $(P)$(Q):Z:VOL:RD
+# % gui, $(PORT), demand,  Absolute Voltage Z , $(P)$(Q):Z:SVA:WR
+# % gui, $(PORT), readback,  Absolute Voltage Z , $(P)$(Q):Z:SVA:RD
+# % gui, $(PORT), groupExit,  Z Axis Exit

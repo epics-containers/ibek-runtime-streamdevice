@@ -1,0 +1,138 @@
+##################################################
+#
+# Protocol file for Lauda devices
+# IntegralT
+#
+##################################################
+
+
+##################################################
+# General Settings
+##################################################
+
+Terminator = "\r\n";
+ReplyTimeout = 1000;
+	
+###################################################
+# Get functions
+###################################################
+
+# /// Read water bath temperature
+# /// using the IN_PV_00 command
+getTemp {
+   ExtraInput = Ignore;
+   out "IN_PV_00";
+   in "%f";
+}
+
+# /// Read external pt100 temperature using the in_pv_01 command,
+# /// valid for integral T model
+getExtTemp {
+   ExtraInput = Ignore;
+   out "IN_PV_01";
+   in "%f";
+   # Parse error status
+   @mismatch{in "%(\$1:ERROR)s";}
+}
+
+# /// Read error diagnosis response, using the "stat" command
+getStatus {
+   ExtraInput = Ignore;
+   Separator = "";
+   out "STAT";
+   in "%5d";
+}
+
+# /// Read temperature setpoint 
+getTempReadback {
+    ExtraInput = Ignore;
+    out "IN_SP_00";
+    in "%f";
+}
+
+# /// Read power status
+getPowerStatus {
+    ExtraInput = Ignore;
+    out "IN_MODE_02";
+    in "%i";
+}
+
+# /// Read program status
+getProgRunning {
+   ExtraInput = Ignore;
+   out "RMP_IN_05";
+   in "%f";
+}
+
+# /// Read control variable
+getControlVariable {
+   ExtraInput = Ignore;
+   out "IN_MODE_01";
+   in "%d";
+}
+
+###################################################
+# Set functions
+###################################################
+
+# /// Set the setpoint for water temperature (temperature must be specific format (up to 3 digits before decimal point and up to 2 digits after decimal point).
+setTemp {
+   out "OUT_SP_00_%.2f";
+}
+
+# /// Switch device on (from standby)
+start {
+   out "START";
+}
+
+# /// Switch device to standby (pump, heating and chiller off)
+stop {
+   out "STOP";
+}
+
+# /// Start a program running:
+# /// RMP_SELECT_X: Selection of program (1-5) to which further commands apply. The unit defaults to program 5 when it's switched on
+# /// RMP_RESET: delete program (all segments)
+# /// RMP_OUT_00_XXX.XX_XXX: append a programmer segment, specifying target temperature and ramp time
+# /// RMP_OUT_02_XXX: number of program loops 0-250 (with 0 meaning endless)
+# /// RMP_START: start the programmer
+# /// NOTE: if we don't read the "OK" in between the out commands, only the first out command is processed by the device
+startProg {
+   out "RMP_SELECT_5";
+   in "OK";
+   out "RMP_RESET";
+   in "OK";
+   out "RMP_OUT_00_%(\$1:TEMP.VAL).2f_0";
+   in "OK";
+   out "RMP_OUT_00_%(\$1:RTEMP.VAL).2f_%(\$1:RTIME.VAL)d";   
+   in "OK";
+   out "RMP_OUT_02_1";
+   in "OK";
+   out "RMP_START";
+   in "OK";
+}
+
+# /// Stop a program running
+stopProg {
+   out "RMP_STOP";
+   in "OK";
+}
+
+# /// Set the control variable 0=internal, 1=external Pt100
+setControlVariable {
+   out "OUT_MODE_01_%d";
+   in "OK";
+   # Parse error status
+   @mismatch{in "%(\$1:ERROR)s";}
+}
+
+#############################################################
+# Generic protocol
+############################################################
+
+# /// Use this send any command and get back the response (max 39 chars).
+gen {
+    ExtraInput = Ignore;
+    out "%s";
+    in "%39c"
+}

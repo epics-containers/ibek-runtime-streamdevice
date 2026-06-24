@@ -1,0 +1,170 @@
+ReplyTimeout = 2000; # Affects in commands - ms to wait for first byte of the input.
+                     # Other records may be waiting to access device during this time
+                     # so LockTimeout should be larger than ReplyTimeout (default=5000).
+ReadTimeout = 100; # Affects in commands when device sends input in pieces.
+
+OutTerminator = "\r\n";
+InTerminator = "\r";
+
+ExtraInput = Ignore;
+
+# @mismatch - the device has sent something other than the protocol expected.
+# If the mismatch handler starts with an in command, then this command reparses the
+# old input from the unsuccessful in.  Error messages from the unsuccessful in
+# are suppressed in this case but the record will end up in INVALID/CALC state
+# (see StreamDevice->Record Processing).  Once proto functions (other than connect) are
+# tested more useful to use mismatch to parse the robot controller error message format:
+
+error { in "ERROR: %(\$1:ERRCMD.VAL)s is not successful(%(\$1:ERR.VAL)04d)."; }
+
+connect { out "CONNECT Robot_access Keep-Alive:-1";
+          in "OK: \$2 Information Server( %4s) Keep-Alive:-1.";
+          @mismatch{in "%(\$1:CONNMSG)39c";} }
+
+# This test message is not really useful for the robot controller as most commands
+# need more than one out ""; or more than one in "";.
+sendTestString{out "%(\$1:TESTSTROUT)s";
+               in "%39c"; }
+
+# Remember can use @init to initialise records, e.g. setA{ out ""; @init{ getA; } }.
+# Again not really useful for the robot controller as records are constantly polled.
+
+# Fills the status bytes STA1 and STA2 that give the current robot state including whether in
+# play or teach mode, whether the servo is on, the current job is paused (hold is enabled), etc.
+# The robot position is then read firstly as raw motor counts and then in the coordinate
+# system defined in the PV COORDSYS.
+status { out "HOSTCTRL_REQUEST RSTATS 0";
+         in "OK: RSTATS";
+         in "%(\$1:STA1.VAL)d,%(\$1:STA2.VAL)d";
+         out "HOSTCTRL_REQUEST RPOSJ 0";
+         in "OK: RPOSJ";
+         in "%(\$1:S.VAL)d,%(\$1:L.VAL)d,%(\$1:U.VAL)d,%(\$1:R.VAL)d,%(\$1:B.VAL)d,"
+            "%(\$1:T.VAL)d,%*d,%*d,%*d,%*d,%*d,%*d";
+         out "HOSTCTRL_REQUEST RPOSC 6";
+         in "OK: RPOSC";
+         out "%(\$1:COORDSYS.VAL)s, 0";
+         in "%(\$1:X.VAL)f,%(\$1:Y.VAL)f,%(\$1:Z.VAL)f,"
+            "%(\$1:TX.VAL)f,%(\$1:TY.VAL)f,%(\$1:TZ.VAL)f,%*f,%*f";
+         @mismatch{error;}; }
+
+# Gets the current job name, line number and step (we think step could be the index
+# of the robot position within the current job).
+# JOBCUR currently also contains JOBCURLINE and JOBCURSTEP as can't split text - unsuccessful
+# attempts commented below.
+jobcur { out "HOSTCTRL_REQUEST RJSEQ 0";
+         in "OK: RJSEQ";
+         in "%(\$1:JOBCUR.VAL)s";
+#	 in "%(\$1:JOBCUR.VAL)s,%(\$1:JOBCURLINE.VAL)d,%(\$1:JOBCURSTEP.VAL)d";
+#	 in "%[_a-zA-Z0-9],%(\$1:JOBCURLINE.VAL)d,%(\$1:JOBCURSTEP.VAL)d";
+         @mismatch{error;}; }
+
+# Servo on switch.  Previously had single switch for on/off with out "%1i".
+# Now separate push switches for on/off as most jobs now automatically switch
+# the servo off from the robot controller when finished.  This avoids asking users to
+# switch off manually.  Scientists, etc do still need manual control for the other jobs.
+# Am currently manually calling status to immediately update the servo status as used to
+# disable controls - am now moving to use a yaskawa network output so could remove this
+# extra manual call of status.
+svon { out "HOSTCTRL_REQUEST SVON 3";
+       in "OK: SVON";
+	   out "1";
+	   in "0000";
+       status;
+       @mismatch{error;}; }
+svoff{ out "HOSTCTRL_REQUEST SVON 3";
+       in "OK: SVON";
+	   out "0";
+	   in "0000"; @mismatch{error;}; }
+
+# Starts the job in JOBTGT.
+start { svon;
+        out "HOSTCTRL_REQUEST START %(\$1:JOBTGTLEN.VAL)i";
+        in "OK: START";
+	    out "%(\$1:JOBTGT.VAL)s";
+        in "0000"; @mismatch{error;}; }
+
+# A "user job" is hardcoded using USERJOB when the ioc is built.  A user button
+# can then call the following.  The above start that runs the job set by JOBTGT
+# can then be hidden from users to prevent them running jobs that could lead to a collision.
+startUserJob { svon;
+	           out "HOSTCTRL_REQUEST START %(\$1:USERJOBLEN.VAL)i";
+               in "OK: START";
+	           out "%(\$1:USERJOB.VAL)s";
+	           in "0000"; @mismatch{error;}; }
+
+# Hold switch now also separated as usually hold only used in an emergency, e.g.
+# to avoid a collision.  If the robot is then moved with the pendant hold would
+# first need to be switched off before if would be active again.  If the ioc is
+# restarted in the meantime a hold on signal and hold off signal need to be sent
+# to the controller before hold can be used again.  So using push button with below.
+holdon { out "HOSTCTRL_REQUEST HOLD 3";
+         in "OK: HOLD";
+	     out "1";
+	     in "0000"; @mismatch{error;}; }
+holdoff{ out "HOSTCTRL_REQUEST HOLD 3";
+         in "OK: HOLD";
+	     out "0";
+	     in "0000"; @mismatch{error;}; }
+
+# Robot axis position read/write
+readp { out "HOSTCTRL_REQUEST SAVEV 8";
+        in "OK: SAVEV";
+        out "4, \$2";
+        in "1,%*d,%(\$1:P\$2:X.VAL)f,%(\$1:P\$2:Y.VAL)f,%(\$1:P\$2:Z.VAL)f,%(\$1:P\$2:TX.VAL)f,"
+           "%(\$1:P\$2:TY.VAL)f,%(\$1:P\$2:TZ.VAL)f,%(\$1:P\$2:TYPE.VAL)i,%(\$1:P\$2:TOOL.VAL)i";
+        @mismatch{error;}; }
+writep{ out "HOSTCTRL_REQUEST LOADV 87";
+        in "OK: LOADV";
+        out "4, \$2, 1, 1, %(\$1:P\$2:X.VAL) 09.3f, %(\$1:P\$2:Y.VAL) 09.3f,"
+            "%(\$1:P\$2:Z.VAL) 09.3f, %(\$1:P\$2:TX.VAL) 08.2f, %(\$1:P\$2:TY.VAL) 08.2f,"
+            "%(\$1:P\$2:TZ.VAL) 08.2f, %(\$1:P\$2:TYPE.VAL)03i, %(\$1:P\$2:TOOL.VAL)03i";
+   	    in "0000"; @mismatch{error;}; }
+
+# Double precision integer (robot datatype 2) read/write.
+readd { out "HOSTCTRL_REQUEST SAVEV 8";
+        in "OK: SAVEV";
+        out "2, \$2";
+        in "%f";
+        @mismatch{error;}; }
+writed {out "HOSTCTRL_REQUEST LOADV 19";
+        in "OK: LOADV";
+        out "2, \$2, % 09i";
+   	    in "0000"; @mismatch{error;}; }
+
+# Real (robot datatype 3) read/write.
+readr { out "HOSTCTRL_REQUEST SAVEV 8";
+        in "OK: SAVEV";
+        out "3, \$2";
+        in "%f";
+        @mismatch{error;}; }
+writer {out "HOSTCTRL_REQUEST LOADV 22";
+        in "OK: LOADV";
+        out "3, \$2, % 12f";
+        in "0000"; @mismatch{error;}; }
+
+# Byte (robot datatype 0) read/write.
+readb { out "HOSTCTRL_REQUEST SAVEV 8";
+        in "OK: SAVEV";
+        out "0, \$2";
+        in "%f";
+        @mismatch{error;}; }
+writeb {out "HOSTCTRL_REQUEST LOADV 19";
+        in "OK: LOADV";
+        out "0, \$2, % 09i";
+        in "0000"; @mismatch{error;}; }
+
+# IO - Always read/write a single byte.
+# Network Inputs can be written to over ethernet but not by the robot controller.
+# After inputs have been set their value can be checked using the below readio.
+# Their addresses are typically 27010 to 29567.
+# Network outputs use different addresses and can only be written by the robot controller.
+# Their addresses are typically 37010 to 39567.
+readio { out "HOSTCTRL_REQUEST IOREAD 9";
+         in "OK: IOREAD";
+         out "\$2, 8";
+         in "%i";
+         @mismatch{error;}; }
+writei { out "HOSTCTRL_REQUEST IOWRITE 21";
+         in "OK: IOWRITE";
+         out "\$2, 8, % 09i";
+         in "0000"; @mismatch{error;}; }

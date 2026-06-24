@@ -1,0 +1,348 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: vici
+
+entity_models:
+  - name: viciE2CA
+    description: |-
+      Controls a Valco Vici E2CA multiposition valve actuator controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+      POSA:
+        type: str
+        description: |-
+          Name for position A
+      POSB:
+        type: str
+        description: |-
+          Name for position B
+    databases:
+      - file: viciE2CA.template
+        args:
+          .*:
+
+  - name: viciEMT
+    description: |-
+      Controls a Valco Vici EMT multiposition valve actuator controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+      POS1:
+        type: str
+        description: |-
+          Name for position 1
+        default: Pos 1
+      POS2:
+        type: str
+        description: |-
+          Name for position 2
+        default: Pos 2
+      POS3:
+        type: str
+        description: |-
+          Name for position 3
+        default: Pos 3
+      POS4:
+        type: str
+        description: |-
+          Name for position 4
+        default: Pos 4
+      POS5:
+        type: str
+        description: |-
+          Name for position 5
+        default: ""
+      POS6:
+        type: str
+        description: |-
+          Name for position 6
+        default: ""
+      POS7:
+        type: str
+        description: |-
+          Name for position 7
+        default: ""
+      POS8:
+        type: str
+        description: |-
+          Name for position 8
+        default: ""
+      POS9:
+        type: str
+        description: |-
+          Name for position 9
+        default: ""
+      POS10:
+        type: str
+        description: |-
+          Name for position 10
+        default: ""
+      POS11:
+        type: str
+        description: |-
+          Name for position 11
+        default: ""
+      POS12:
+        type: str
+        description: |-
+          Name for position 12
+        default: ""
+      POS13:
+        type: str
+        description: |-
+          Name for position 13
+        default: ""
+      POS14:
+        type: str
+        description: |-
+          Name for position 14
+        default: ""
+      POS15:
+        type: str
+        description: |-
+          Name for position 15
+        default: ""
+      POS16:
+        type: str
+        description: |-
+          Name for position 16
+        default: ""
+    databases:
+      - file: viciEMT.template
+        args:
+          .*:
+
+  - name: viciEUTA
+    description: |-
+      Controls a Valco Vici EUTA multiposition valve actuator controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+      POS1:
+        type: str
+        description: |-
+          Name for position 1
+        default: Pos 1
+      POS2:
+        type: str
+        description: |-
+          Name for position 2
+        default: Pos 2
+      POS3:
+        type: str
+        description: |-
+          Name for position 3
+        default: Pos 3
+      POS4:
+        type: str
+        description: |-
+          Name for position 4
+        default: Pos 4
+      POS5:
+        type: str
+        description: |-
+          Name for position 5
+        default: ""
+      POS6:
+        type: str
+        description: |-
+          Name for position 6
+        default: ""
+      POS7:
+        type: str
+        description: |-
+          Name for position 7
+        default: ""
+      POS8:
+        type: str
+        description: |-
+          Name for position 8
+        default: ""
+      POS9:
+        type: str
+        description: |-
+          Name for position 9
+        default: ""
+      POS10:
+        type: str
+        description: |-
+          Name for position 10
+        default: ""
+      POS11:
+        type: str
+        description: |-
+          Name for position 11
+        default: ""
+      POS12:
+        type: str
+        description: |-
+          Name for position 12
+        default: ""
+      POS13:
+        type: str
+        description: |-
+          Name for position 13
+        default: ""
+      POS14:
+        type: str
+        description: |-
+          Name for position 14
+        default: ""
+      POS15:
+        type: str
+        description: |-
+          Name for position 15
+        default: ""
+      POS16:
+        type: str
+        description: |-
+          Name for position 16
+        default: ""
+    databases:
+      - file: viciEUTA.template
+        args:
+          .*:
+
+  - name: viciUM
+    description: |-
+      Controls a Valco Vici UMH/UMD/UMT modular universal valve actuator controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+      POS1:
+        type: str
+        description: |-
+          Name for position 1
+      POS2:
+        type: str
+        description: |-
+          Name for position 2
+      POS3:
+        type: str
+        description: |-
+          Name for position 3
+      POS4:
+        type: str
+        description: |-
+          Name for position 4
+      POS5:
+        type: str
+        description: |-
+          Name for position 5
+        default: ""
+      POS6:
+        type: str
+        description: |-
+          Name for position 6
+        default: ""
+      POS7:
+        type: str
+        description: |-
+          Name for position 7
+        default: ""
+      POS8:
+        type: str
+        description: |-
+          Name for position 8
+        default: ""
+      POS9:
+        type: str
+        description: |-
+          Name for position 9
+        default: ""
+      POS10:
+        type: str
+        description: |-
+          Name for position 10
+        default: ""
+      POS11:
+        type: str
+        description: |-
+          Name for position 11
+        default: ""
+      POS12:
+        type: str
+        description: |-
+          Name for position 12
+        default: ""
+      POS13:
+        type: str
+        description: |-
+          Name for position 13
+        default: ""
+      POS14:
+        type: str
+        description: |-
+          Name for position 14
+        default: ""
+      POS15:
+        type: str
+        description: |-
+          Name for position 15
+        default: ""
+      POS16:
+        type: str
+        description: |-
+          Name for position 16
+        default: ""
+    databases:
+      - file: viciUM.template
+        args:
+          .*:

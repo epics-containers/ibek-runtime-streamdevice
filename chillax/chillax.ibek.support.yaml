@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: chillax
+
+entity_models:
+  - name: _chillaxOpiTemplate
+    description: |-
+      Chillax cryocooler CSS screen association template
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      R:
+        type: str
+        description: |-
+          Device PV suffix
+      DESC:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: chillax_opi.template
+        args:
+          .*:
+  - name: _chillaxSubstituionsTemplate
+    description: |-
+      Chillax cryocooler records template
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      R:
+        type: str
+        description: |-
+          Device PV suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn IP port
+    databases:
+      - file: chillax_abs.db
+        args:
+          .*:
+  - name: chillaxController
+    description: |-
+      Chillax cryocooler controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Device object name
+      P:
+        type: str
+        description: |-
+          Device PV prefix
+      R:
+        type: str
+        description: |-
+          Device PV suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn IP port
+      DESC:
+        type: str
+        description: |-
+          Device descritpion
+        default: Chillax cryocooler

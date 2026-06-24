@@ -1,0 +1,55 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for Jena EDA40 Controller
+#
+
+terminator   = CR;
+replytimeout = 1000;
+readtimeout  = 200;
+locktimeout = 5000;
+extrainput   = Ignore;
+pollperiod = 200;
+#separator = ",";
+
+# There are 4 DAC's, 8 ADC, 8 DIN, 8 DOUT 
+
+# M - device id
+M1{ out "M"; in "EDA2,%d" }
+M2{ in "EDA2,%*d,%d" }
+
+# set voltage - set,ch,wert(0-4095)
+# $1 the channel
+#set{ out "set,\$1,%d" }
+# NB set now automatically enables the channel using setk cmd
+set{ out "setk,\$1,1\rset,\$1,%d" }
+
+# read voltage - rk,ch,0|1|2|3(range 0..10, 0-5, +/-10, +/-5)
+# $1 the channel
+# $2 the range (0..3)
+rk{ out "rk,\$1,\$2"; in "rk,%*d,%f";
+	@mismatch { in "\nrk,%*d,%f"; }
+}
+
+# activate/deactivate analogue channel - setk,ch,0(off)|1(on)
+# $1 the channel
+setk{ out "%{setk,\$1,0|setk,\$1,1}" }
+
+# activate/deactivate digital channel - cset,ch,0(on)|1(off)
+# $1 the channel
+#cset{ out "%{cset,\$1,1|cset,\$1,0}" }
+
+# switch all active channels on - ke or off ka
+#kake{ out "%{ka|ke}" }
+
+# autostart - as,ch,0(off)|1(on)
+#as{ out "%{as,\$1,0|as,\$1,1}" }
+
+# clear function on channel - cl,ch
+#cl{ out "cl,\$1" }
+
+
+#################################################################################

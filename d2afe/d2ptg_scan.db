@@ -1,0 +1,19 @@
+# d2ptg_scan.template
+# Records trigger record processing for the entire ptg / d2afe chain
+# % macro, P, Device prefix
+# % macro, CELL, Cell number
+# % macro, MON_SCAN, Scan rate for general monitor
+# % macro, CAL_SCAN, Scan rate for calibration monitor
+record(bo, "$(P,undefined):MON_SCAN") {
+    field(SCAN, "$(MON_SCAN,undefined)")
+    field(PHAS, "1")
+    field(PINI, "YES")
+    field(FLNK,"SR$(CELL,undefined)C-DI-EBPM-01:AFE:MON PP")
+}
+
+record(bo, "$(P,undefined):CAL_SCAN") {
+    field(SCAN, "$(CAL_SCAN,undefined)")
+    field(PHAS, "2")
+    field(PINI, "YES")
+    field(FLNK,"SR$(CELL,undefined)C-DI-EBPM-01:AFE:CAL:MON PP")
+}

@@ -1,0 +1,601 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for Oxford Instruments Mercury iTC Temperature Controller
+# Using the SCPI command set
+#
+
+terminator   = LF;
+replytimeout = 2000;
+separator    = "";
+
+#################################################################################
+
+# System commands
+
+# stringin
+READ_IDENT {
+  ExtraInput = Ignore;
+  out "*IDN?";
+  in  "IDN:%40c";
+}
+###################################
+
+# stringout
+SET_TIME {
+  out "SET:SYS:TIME:%s";
+}
+
+# stringin
+READ_TIME {
+  ExtraInput = Ignore;
+  out "READ:SYS:TIME";
+  in  "STAT:SYS:TIME:%12c";
+}
+
+##################################
+
+# stringin
+READ_DATE {
+  ExtraInput = Ignore;
+  out "READ:SYS:DATE";
+  in  "STAT:SYS:DATE:%12c";
+}
+#################################
+
+# stringin
+READ_HVER {
+  ExtraInput = Ignore;
+  out "READ:SYS:MAN:HVER";
+  in  "STAT:SYS:MAN:HVER:%12c";
+}
+
+# stringin
+READ_FVER {
+  ExtraInput = Ignore;
+  out "READ:SYS:MAN:FVER";
+  in  "STAT:SYS:MAN:FVER:%12c";
+}
+
+# stringin
+READ_SERL {
+  ExtraInput = Ignore;
+  out "READ:SYS:MAN:SERL";
+  in  "STAT:SYS:MAN:SERL:%12c";
+}
+
+#################################
+
+# MBBI
+READ_MODE {
+    out "READ:SYS:MODE"; 
+    in  "STAT:SYS:MODE:%{NORM|ENG|INVALID}";
+}
+
+# MBBO
+SET_MODE {
+    out "SET:SYS:MODE:%{NORM|ENG}";
+    @init { read_mode; }
+}
+
+#################################
+
+# analogue in
+READ_FLSH {
+  out "READ:SYS:FLSH";
+  in  "STAT:SYS:FLSH:%f";
+}
+
+#################################
+
+# MBBI
+READ_DIMA {
+  out "READ:SYS:DISP:DIMA";
+  in  "STAT:SYS:DISP:DIMA:%{OFF|ON}";
+}
+
+# MBBO
+SET_DIMA {
+    out "SET:SYS:DISP:DIMA:%{OFF|ON}";
+    @init { read_dima; }
+}
+
+#################################
+
+# analogue out
+SET_DIMT {
+  out "SET:SYS:DISP:DIMT:%f";
+}
+
+# analogue in
+READ_DIMT {
+  out "READ:SYS:DISP:DIMT";
+  in  "STAT:SYS:DISP:DIMT:%f";
+}
+
+###################################
+
+# analogue out
+SET_BRIG {
+  out "SET:SYS:DISP:BRIG:%f";
+}
+
+# analogue in
+READ_BRIG {
+  ExtraInput = Ignore;
+  out "READ:SYS:DISP:BRIG";
+  in  "STAT:SYS:DISP:BRIG:%f";
+}
+
+####################################
+
+# stringin
+READ_CAT {
+  ExtraInput = Ignore;
+  out "READ:SYS:CAT";
+  in  "STAT:SYS:CAT:%255c";
+}
+
+#################################################
+
+
+# Temperature Sensor commands
+
+# stringin
+READ_TEMP_HVER {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:MAN:HVER";
+  in  "STAT:DEV:\$1:TEMP:MAN:HVER:%12c";
+}
+
+# stringin
+READ_TEMP_FVER {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:MAN:FVER";
+  in  "STAT:DEV:\$1:TEMP:MAN:FVER:%12c";
+}
+
+# stringin
+READ_TEMP_SERL {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:MAN:SERL";
+  in  "STAT:DEV:\$1:TEMP:MAN:SERL:%12c";
+}
+
+###########################################
+
+# stringout
+SET_TEMP_NICK {
+  out "SET:DEV:\$1:TEMP:NICK:%s";
+}
+
+# stringin
+READ_TEMP_NICK {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:NICK";
+  in  "STAT:DEV:\$1:TEMP:NICK:%12c";
+}
+
+############################################
+
+# MBBI
+READ_TEMP_TYPE {
+    out "READ:DEV:\$1:TEMP:TYPE";
+    in  "STAT:DEV:\$1:TEMP:TYPE:%{PTC|NTC|DDE|TCE}";
+}
+
+# MBBO
+SET_TEMP_TYPE {
+    out "SET:DEV:\$1:TEMP:TYPE:%{PTC|NTC|DDE|TCE}";
+    @init { read_temp_type; };
+}
+
+###########################################
+
+# MBBI
+READ_TEMP_EXCT_TYPE {
+    out "READ:DEV:\$1:TEMP:EXCT:TYPE";
+    in  "STAT:DEV:\$1:TEMP:EXCT:TYPE:%{UNIP|BIP|SOFT|NONE|INVALID}";
+}
+
+# MBBO
+SET_TEMP_EXCT_TYPE {
+    out "SET:DEV:\$1:TEMP:EXCT:TYPE:%{UNIP|BIP|SOFT|NONE}";
+    @init { read_temp_exct_type; }
+}
+
+############################################
+
+# analogue out
+SET_TEMP_EXCT_MAG {
+  out "SET:DEV:\$1:TEMP:EXCT:MAG:%f";
+}
+
+# analogue in
+READ_TEMP_EXCT_MAG {
+  out "READ:DEV:\$1:TEMP:EXCT:MAG";
+  in  "STAT:DEV:\$1:TEMP:EXCT:MAG:%f";
+}
+
+############################################
+
+# stringout
+SET_TEMP_CAL_FILE {
+  out "SET:DEV:\$1:TEMP:CAL:FILE:%s";
+}
+
+# stringin
+READ_TEMP_CAL_FILE {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:CAL:FILE";
+  in  "STAT:DEV:\$1:TEMP:CAL:FILE:%12c";
+}
+
+############################################
+
+# MBBI
+READ_TEMP_CAL_INT {
+    out "READ:DEV:\$1:TEMP:CAL:INT";
+    in  "STAT:DEV:\$1:TEMP:CAL:INT:%{LIN|SPL|LAGR|NON|INVALID}";
+}
+
+# MBBO
+SET_TEMP_CAL_INT {
+    out "SET:DEV:\$1:TEMP:CAL:INT:%{LIN|SPL|LAGR|NON}";
+    @init { read_temp_cal_int; }
+}
+
+############################################
+
+# analogue out
+SET_TEMP_CAL_SCAL {
+  out "SET:DEV:\$1:TEMP:CAL:SCAL:%f";
+}
+
+# analogue in
+READ_TEMP_CAL_SCAL {
+  out "READ:DEV:\$1:TEMP:CAL:SCAL";
+  in  "STAT:DEV:\$1:TEMP:CAL:SCAL:%f";
+}
+
+############################################
+
+# analogue out
+SET_TEMP_CAL_OFFS {
+  out "SET:DEV:\$1:TEMP:CAL:OFFS:%f";
+}
+
+# analogue in
+READ_TEMP_CAL_OFFS {
+  out "READ:DEV:\$1:TEMP:CAL:OFFS";
+  in  "STAT:DEV:\$1:TEMP:CAL:OFFS:%f";
+}
+
+############################################
+
+# analogue in
+READ_TEMP_CAL_HOTL {
+  out "READ:DEV:\$1:TEMP:CAL:HOTL";
+  in  "STAT:DEV:\$1:TEMP:CAL:HOTL:%f";
+}
+
+# stringin
+READ_TEMP_CAL_COLD {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:CAL:COLD";
+  in  "STAT:DEV:\$1:TEMP:CAL:COLD:%10c";
+}
+
+# analogue in
+READ_TEMP_SIG_VOLT {
+  out "READ:DEV:\$1:TEMP:SIG:VOLT";
+  in  "STAT:DEV:\$1:TEMP:SIG:VOLT:%fmV";
+}
+
+# string in
+READ_TEMP_SIG_CURR {
+  out "READ:DEV:\$1:TEMP:SIG:CURR";
+  in  "STAT:DEV:\$1:TEMP:SIG:CURR:%20c";
+}
+
+# string in
+READ_TEMP_SIG_POWR {
+  out "READ:DEV:\$1:TEMP:SIG:POWR";
+  in  "STAT:DEV:\$1:TEMP:SIG:POWR:%20c";
+}
+
+# analogue in
+READ_TEMP_SIG_RES {
+  out "READ:DEV:\$1:TEMP:SIG:RES";
+  in  "STAT:DEV:\$1:TEMP:SIG:RES:%fO";
+}
+
+# analogue in
+READ_TEMP_SIG_TEMP {
+  out "READ:DEV:\$1:TEMP:SIG:TEMP";
+  in  "STAT:DEV:\$1:TEMP:SIG:TEMP:%fK";
+}
+
+# analogue in
+READ_TEMP_SIG_SLOP {
+  out "READ:DEV:\$1:TEMP:SIG:SLOP";
+  in  "STAT:DEV:\$1:TEMP:SIG:SLOP:%fO/K";
+}
+
+# Heater Controller commands
+
+# stringin
+READ_HTR_HVER {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:HTR:MAN:HVER";
+  in  "STAT:DEV:\$1:HTR:MAN:HVER:%12c";
+}
+
+# stringin
+READ_HTR_FVER {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:HTR:MAN:FVER";
+  in  "STAT:DEV:\$1:HTR:MAN:FVER:%12c";
+}
+
+# stringin
+READ_HTR_SERL {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:HTR:MAN:SERL";
+  in  "STAT:DEV:\$1:HTR:MAN:SERL:%12c";
+}
+
+###########################################
+
+# stringout
+SET_HTR_NICK {
+  out "SET:DEV:\$1:HTR:NICK:%s";
+}
+
+# stringin
+READ_HTR_NICK {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:HTR:NICK";
+  in  "STAT:DEV:\$1:HTR:NICK:%12c";
+}
+
+############################################
+
+# analogue out
+SET_HTR_VLIM {
+  out "SET:DEV:\$1:HTR:VLIM:%f";
+}
+
+# analogue in
+READ_HTR_VLIM {
+  out "READ:DEV:\$1:HTR:VLIM";
+  in  "STAT:DEV:\$1:HTR:VLIM:%f";
+}
+
+############################################
+
+# analogue out
+SET_HTR_RES {
+  out "SET:DEV:\$1:HTR:RES:%f";
+}
+
+# analogue in
+READ_HTR_RES {
+  out "READ:DEV:\$1:HTR:RES";
+  in  "STAT:DEV:\$1:HTR:RES:%f";
+}
+
+############################################
+
+# analogue in
+READ_HTR_PMAX {
+  out "READ:DEV:\$1:HTR:PMAX";
+  in  "STAT:DEV:\$1:HTR:PMAX:%f";
+}
+
+############################################
+
+# analogue out
+SET_HTR_SIG_VOLT {
+  out "SET:DEV:\$1:HTR:SIG:VOLT:%f";
+}
+
+# analogue in
+READ_HTR_SIG_VOLT {
+  out "READ:DEV:\$1:HTR:SIG:VOLT";
+  in  "STAT:DEV:\$1:HTR:SIG:VOLT:%fV";
+}
+
+############################################
+
+# analogue in
+READ_HTR_SIG_CURR {
+  out "READ:DEV:\$1:HTR:SIG:CURR";
+  in  "STAT:DEV:\$1:HTR:SIG:CURR:%fA";
+}
+
+############################################
+
+# analogue out
+SET_HTR_SIG_POWR {
+  out "SET:DEV:\$1:HTR:SIG:POWR:%f";
+}
+
+# analogue in
+READ_HTR_SIG_POWR {
+  out "READ:DEV:\$1:HTR:SIG:POWR";
+  in  "STAT:DEV:\$1:HTR:SIG:POWR:%fW";
+}
+
+############################################
+
+
+# Control Loop commands
+
+###########################################
+
+# stringout
+SET_TEMP_LOOP_HTR {
+  out "SET:DEV:\$1:TEMP:LOOP:HTR:%s";
+}
+
+# stringin
+READ_TEMP_LOOP_HTR {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:LOOP:HTR";
+  in  "STAT:DEV:\$1:TEMP:LOOP:HTR:%32c";
+}
+
+############################################
+
+# stringout
+SET_TEMP_LOOP_AUX {
+  out "SET:DEV:\$1:TEMP:LOOP:AUX:%s";
+}
+
+# stringin
+READ_TEMP_LOOP_AUX {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:LOOP:AUX";
+  in  "STAT:DEV:\$1:TEMP:LOOP:AUX:%32c";
+}
+
+############################################
+
+# stringout
+SET_TEMP_LOOP_LVL {
+  out "SET:DEV:\$1:TEMP:LOOP:LVL:%s";
+}
+
+# stringin
+READ_TEMP_LOOP_LVL {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:LOOP:LVL";
+  in  "STAT:DEV:\$1:TEMP:LOOP:LVL:%32c";
+}
+
+############################################
+
+# MBBI
+READ_TEMP_LOOP_ENAB {
+    out "READ:DEV:\$1:TEMP:LOOP:ENAB";
+    in  "STAT:DEV:\$1:TEMP:LOOP:ENAB:%{OFF|ON}";
+}
+
+# MBBO
+SET_TEMP_LOOP_ENAB {
+    out "SET:DEV:\$1:TEMP:LOOP:ENAB:%{OFF|ON}";
+    @init { READ_TEMP_LOOP_ENAB; }
+}
+
+############################################
+
+# analogue out
+SET_TEMP_LOOP_HSET {
+  out "SET:DEV:\$1:TEMP:LOOP:HSET:%f";
+}
+
+# analogue in
+READ_TEMP_LOOP_HSET {
+  out "READ:DEV:\$1:TEMP:LOOP:HSET";
+  in  "STAT:DEV:\$1:TEMP:LOOP:HSET:%f";
+}
+
+############################################
+
+# analogue out
+SET_TEMP_LOOP_TSET {
+  out "SET:DEV:\$1:TEMP:LOOP:TSET:%f";
+}
+
+# analogue in
+READ_TEMP_LOOP_TSET {
+  out "READ:DEV:\$1:TEMP:LOOP:TSET";
+  in  "STAT:DEV:\$1:TEMP:LOOP:TSET:%f";
+}
+
+############################################
+
+# MBBI
+READ_TEMP_LOOP_PIDT {
+    out "READ:DEV:\$1:TEMP:LOOP:PIDT";
+    in  "STAT:DEV:\$1:TEMP:LOOP:PIDT:%{OFF|ON}";
+}
+
+# MBBO
+SET_TEMP_LOOP_PIDT {
+    out "SET:DEV:\$1:TEMP:LOOP:PIDT:%{OFF|ON}";
+    @init { READ_TEMP_LOOP_PIDT; }
+}
+
+############################################
+
+# analogue out
+SET_TEMP_LOOP_P {
+  out "SET:DEV:\$1:TEMP:LOOP:P:%f";
+}
+
+# analogue in
+READ_TEMP_LOOP_P {
+  out "READ:DEV:\$1:TEMP:LOOP:P";
+  in  "STAT:DEV:\$1:TEMP:LOOP:P:%f";
+}
+
+############################################
+
+# analogue out
+SET_TEMP_LOOP_I {
+  out "SET:DEV:\$1:TEMP:LOOP:I:%f";
+}
+
+# analogue in
+READ_TEMP_LOOP_I {
+  out "READ:DEV:\$1:TEMP:LOOP:I";
+  in  "STAT:DEV:\$1:TEMP:LOOP:I:%f";
+}
+
+############################################
+
+# analogue out
+SET_TEMP_LOOP_D {
+  out "SET:DEV:\$1:TEMP:LOOP:D:%f";
+}
+
+# analogue in
+READ_TEMP_LOOP_D {
+  out "READ:DEV:\$1:TEMP:LOOP:D";
+  in  "STAT:DEV:\$1:TEMP:LOOP:D:%f";
+}
+
+############################################
+
+# stringout
+SET_TEMP_LOOP_SWFL {
+  out "SET:DEV:\$1:TEMP:LOOP:SWFL:/opt/OxfordInstruments/cryosys/sweep_tables/%s";
+}
+
+# stringin
+READ_TEMP_LOOP_SWFL {
+  ExtraInput = Ignore;
+  out "READ:DEV:\$1:TEMP:LOOP:SWFL";
+  in  "STAT:DEV:\$1:TEMP:LOOP:SWFL:/opt/OxfordInstruments/cryosys/sweep_tables/%32c";
+}
+
+############################################
+
+# MBBI
+READ_TEMP_LOOP_SWMD {
+    out "READ:DEV:\$1:TEMP:LOOP:SWMD";
+    in  "STAT:DEV:\$1:TEMP:LOOP:SWMD:%{OFF|ON|FIX}";
+}
+
+# MBBO
+SET_TEMP_LOOP_SWMD {
+    out "SET:DEV:\$1:TEMP:LOOP:SWMD:%{OFF|ON|FIX}";
+    @init { READ_TEMP_LOOP_SWMD; }
+}
+
+############################################

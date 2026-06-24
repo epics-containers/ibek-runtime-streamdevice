@@ -1,0 +1,59 @@
+Terminator = CR LF;
+ReplyTimeout = 2000; # First byte for "in"
+ReadTimeout = 500; # Max wait before consider "in" terminated after first byte
+LockTimeout = 5000; # Time to wait to get exclusive internal lock for "out" cmd
+ExtraInput = Error;
+
+getSensorId {
+    out "TID";
+    in ACK;
+    out ENQ;
+    in "%32s";
+}
+
+getFirmwareVersion {
+    out "PNR";
+    in ACK;
+    out ENQ;
+    in "%32s";
+}
+
+# Get the high and low switching pressures
+getSwitchingPressures {
+    out "UNI,0"; # Set and check unit as mbar
+    in ACK;
+    out ENQ;
+    in "0";
+    out "SP1";
+    in ACK;
+    out ENQ;
+    in "%f,%(\$1:SWP_HIGH)f";
+}
+
+# 1 -> 1s, 2 -> 1min
+startMeas {
+    # First reading may follow so close that will be 
+    # considered by the "in" here
+    ExtraInput = Ignore; 
+    out "COM,1";
+    in ACK;
+}
+
+resetComm {
+    out ETX;
+    out;
+    wait 500;  # Wait for silence
+    @mismatch { in "%(\$1:RESETINPUT)s"; };           # swallow mismatch without error
+}
+
+# We only match readings in mbar
+parseMeasurement {
+    PollPeriod = 200;
+    # Nothing to wait for as "reply", 
+    # release read lock if there is nothing to read
+    ReplyTimeout = 10;  
+    ReadTimeout = 50;
+    in "%(\$1:RMSTATUS)1d,%(VAL)f mbar";
+    @mismatch {  in "%(\$1:RAWINPUT)s"; };           # swallow mismatch without error
+}
+

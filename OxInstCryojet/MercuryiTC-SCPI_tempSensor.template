@@ -1,0 +1,192 @@
+
+
+#######################
+# Temperature commands
+#######################
+
+record(stringin, "$(P)$(Q):READ_TEMP_HVER") {
+  field(DESC, "$(UID=MB1.T1)")
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_HVER($(UID=MB1.T1)) $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_TEMP_FVER") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_FVER($(UID=MB1.T1)) $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_TEMP_SERL") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_SERL($(UID=MB1.T1)) $(PORT)")
+}
+
+record(stringout, "$(P)$(Q):SET_TEMP_NICK") {
+  field(DTYP, "stream")
+  field(OUT, "@MercuryiTC-SCPI.proto SET_TEMP_NICK($(UID=MB1.T1)) $(PORT)")
+  field(MPST, "Always")
+}
+
+record(stringin, "$(P)$(Q):READ_TEMP_NICK") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_NICK($(UID=MB1.T1)) $(PORT)")
+}
+
+record(mbbi, "$(P)$(Q):READ_TEMP_TYPE") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(ZRST, "PTC")
+  field(ONST, "NTC")
+  field(TWST, "DDE")
+  field(THST, "TCE")
+  field(FRST, "INVALID")
+  field(INP,  "@MercuryiTC-SCPI.proto READ_TEMP_TYPE($(UID=MB1.T1)) $(PORT)")
+}
+
+record(mbbo, "$(P)$(Q):SET_TEMP_TYPE") {
+  field(DTYP, "stream")
+  field(ZRST, "PTC")
+  field(ONST, "NTC")
+  field(TWST, "DDE")
+  field(THST, "TCE")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_TEMP_TYPE($(UID=MB1.T1)) $(PORT)")
+}
+
+record(mbbi, "$(P)$(Q):READ_TEMP_EXCT_TYPE") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(ZRST, "UNIP")
+  field(ONST, "BIP")
+  field(TWST, "SOFT")
+  field(THST, "NONE")
+  field(FRST, "INVALID")
+  field(INP,  "@MercuryiTC-SCPI.proto READ_TEMP_EXCT_TYPE($(UID=MB1.T1)) $(PORT)")
+}
+
+record(mbbo, "$(P)$(Q):SET_TEMP_EXCT_TYPE") {
+  field(DTYP, "stream")
+  field(ZRST, "UNIP")
+  field(ONST, "BIP")
+  field(TWST, "SOFT")
+  field(THST, "NONE")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_TEMP_EXCT_TYPE($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SET_TEMP_EXCT_MAG") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_TEMP_EXCT_MAG($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_TEMP_EXCT_MAG") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_EXCT_MAG($(UID=MB1.T1)) $(PORT)")
+}
+
+record(stringout, "$(P)$(Q):SET_TEMP_CAL_FILE") {
+  field(DTYP, "stream")
+  field(OUT, "@MercuryiTC-SCPI.proto SET_TEMP_CAL_FILE($(UID=MB1.T1)) $(PORT)")
+  field(MPST, "Always")
+}
+
+record(stringin, "$(P)$(Q):READ_TEMP_CAL_FILE") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_CAL_FILE($(UID=MB1.T1)) $(PORT)")
+}
+
+record(mbbi, "$(P)$(Q):READ_TEMP_CAL_INT") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(ZRST, "LIN")
+  field(ONST, "SPL")
+  field(TWST, "LAGR")
+  field(THST, "NON")
+  field(FRST, "INVALID")
+  field(INP,  "@MercuryiTC-SCPI.proto READ_TEMP_CAL_INT($(UID=MB1.T1)) $(PORT)")
+}
+
+record(mbbo, "$(P)$(Q):SET_TEMP_CAL_INT") {
+  field(DTYP, "stream")
+  field(ZRST, "LIN")
+  field(ONST, "SPL")
+  field(TWST, "LAGR")
+  field(THST, "NON")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_TEMP_CAL_INT($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SET_TEMP_CAL_SCAL") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_TEMP_CAL_SCAL($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_TEMP_CAL_SCAL") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_CAL_SCAL($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SET_TEMP_CAL_OFFS") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_TEMP_CAL_OFFS($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_TEMP_CAL_OFFS") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_CAL_OFFS($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_TEMP_CAL_HOTL") {
+  field(SCAN, "2 second")
+  field(PREC, "3")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_CAL_HOTL($(UID=MB1.T1)) $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_TEMP_CAL_COLD") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_CAL_COLD($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_TEMP_SIG_VOLT") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_SIG_VOLT($(UID=MB1.T1)) $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_TEMP_SIG_CURR") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_SIG_CURR($(UID=MB1.T1)) $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_TEMP_SIG_POWR") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_SIG_POWR($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_TEMP_SIG_RES") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_SIG_RES($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_TEMP_SIG_TEMP") {
+  field(SCAN, "2 second")
+  field(PREC, "3")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_SIG_TEMP($(UID=MB1.T1)) $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_TEMP_SIG_SLOP") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TEMP_SIG_SLOP($(UID=MB1.T1)) $(PORT)")
+}
+

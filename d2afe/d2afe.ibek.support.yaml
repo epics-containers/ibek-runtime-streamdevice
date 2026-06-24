@@ -1,0 +1,177 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: d2afe
+
+entity_models:
+  - name: d2ptg
+    description: |-
+      D2AFE PTG controller (scanning chain master for a cell of D2AFE EBPM front ends).
+    parameters:
+      name:
+        type: id
+        description: |-
+          Device name
+      CELL:
+        type: int
+        description: |-
+          Prefix
+      ID:
+        type: str
+        description: |-
+          Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      D2AFE_MASK:
+        type: int
+        description: |-
+          Mask describing present D2AFEs for gui
+      MON_SCAN:
+        type: str
+        description: |-
+          Scan rate for general monitor
+        default: 1 second
+      CAL_SCAN:
+        type: str
+        description: |-
+          Scan rate for general monitor
+        default: Passive
+  - name: _d2afeStatus
+    description: |-
+      Records to trigger mon command and split the response over the relevant PVs.
+      Also takes care of firmware, calid and eid reading.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      ADDR:
+        type: int
+        description: |-
+          D2AFE RS485 address
+      STREAMS_PORT:
+        type: str
+        description: |-
+          PTG streams port
+      NEXT:
+        type: str
+        description: |-
+          PV of CAL:MON for next D2AFE.
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+    databases:
+      - file: d2afeStatus.db
+        args:
+          .*:
+  - name: _fwVersionCheck
+    description: |-
+      Template to check the current firmware matches that of the redirector tag "d2afe-fw".
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+    databases:
+      - file: fwVersionCheck.db
+        args:
+          .*:
+  - name: _cal_table
+    description: |-
+      Records to trigger calmon command and split the response over the relevant PVs.
+      Also takes care of firmware, calid and eid reading.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      ADDR:
+        type: int
+        description: |-
+          D2AFE RS485 address
+      STREAMS_PORT:
+        type: str
+        description: |-
+          PTG streams port
+      NEXT:
+        type: str
+        description: |-
+          PV of CAL:MON for next D2AFE.
+    databases:
+      - file: cal_table.db
+        args:
+          .*:
+  - name: _d2ptg_cal_scan_list
+    description: |-
+      Template instantiated 16 times to create a complete calibration FLNK list.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      NEXT:
+        type: str
+        description: |-
+          PV of CAL:MON for next D2AFE.
+    databases:
+      - file: d2ptg_cal_scan_list.db
+        args:
+          .*:
+  - name: _d2ptg_mon_scan_list
+    description: |-
+      Template instantiated 16 times to create a complete monitor FLNK list.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      NEXT:
+        type: str
+        description: |-
+          PV of CAL:MON for next D2AFE.
+    databases:
+      - file: d2ptg_mon_scan_list.db
+        args:
+          .*:
+  - name: _d2ptg_scan
+    description: |-
+      Records trigger record processing for the entire ptg / d2afe chain.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      CELL:
+        type: int
+        description: |-
+          Cell number
+      MON_SCAN:
+        type: str
+        description: |-
+          Scan rate for general monitor
+      CAL_SCAN:
+        type: str
+        description: |-
+          Scan rate for calibration monitor
+    databases:
+      - file: d2ptg_scan.db
+        args:
+          .*:
+  - name: _d2ptg
+    description: |-
+      D2AFE PTG mask record (reflects which D2AFEs are present for the gui).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      D2AFE_MASK:
+        type: int
+        description: |-
+          Mask describing present D2AFEs for gui
+    databases:
+      - file: d2ptg.db
+        args:
+          .*:

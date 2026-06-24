@@ -1,0 +1,120 @@
+# System commands
+
+record(stringin, "$(P)$(Q):READ_IDENT") {
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_IDENT $(PORT)")
+}
+
+record(stringout, "$(P)$(Q):SET_TIME") {
+  field(DTYP, "stream")
+  field(OUT, "@MercuryiTC-SCPI.proto SET_TIME $(PORT)")
+  field(MPST, "Always")
+}
+
+record(stringin, "$(P)$(Q):READ_TIME") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_TIME $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_DATE") {
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_DATE $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_HVER") {
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_HVER $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_FVER") {
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_FVER $(PORT)")
+}
+
+record(stringin, "$(P)$(Q):READ_SERL") {
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_SERL $(PORT)")
+}
+
+record(mbbo, "$(P)$(Q):SET_MODE") {
+  field(DTYP, "stream")
+  field(ZRST, "NORM")
+  field(ONST, "ENG")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_MODE $(PORT)")
+}
+
+record(mbbi, "$(P)$(Q):READ_MODE") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(ZRST, "NORM")
+  field(ONST, "ENG")
+  field(TWST, "INVALID")
+  field(INP, "@MercuryiTC-SCPI.proto READ_MODE $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_FLSH") {
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_FLSH $(PORT)")
+}
+
+record(mbbo, "$(P)$(Q):SET_DIMA") {
+  field(DTYP, "stream")
+  field(ZRST, "OFF")
+  field(ONST, "ON")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_DIMA $(PORT)")
+}
+
+record(mbbi, "$(P)$(Q):READ_DIMA") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(ZRST, "OFF")
+  field(ONST, "ON")
+  field(TWST, "INVALID")
+  field(INP, "@MercuryiTC-SCPI.proto READ_DIMA $(PORT)")
+}
+
+record(ao, "$(P)$(Q):SET_DIMT") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_DIMT $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_DIMT") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_DIMT $(PORT)")
+  field(EGU, "seconds")
+}
+
+record(ao, "$(P)$(Q):SET_BRIG") {
+  field(DTYP, "stream")
+  field(OUT,  "@MercuryiTC-SCPI.proto SET_BRIG $(PORT)")
+}
+
+record(ai, "$(P)$(Q):READ_BRIG") {
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_BRIG $(PORT)")
+  field(EGU, "%")
+}
+
+record(waveform, "$(P)$(Q):READ_CAT") {
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@MercuryiTC-SCPI.proto READ_CAT $(PORT)")
+  field(FTVL, "CHAR")
+  field(NELM, "256")
+}
+
+
+##################################################################
+
+record(asyn, "$(P)$(Q):ASYN") {
+  field(PORT, "$(PORT)")
+}

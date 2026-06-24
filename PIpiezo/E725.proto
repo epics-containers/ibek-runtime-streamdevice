@@ -1,0 +1,98 @@
+#######################################################################
+#
+# Stream device protocol for PI E-816 Command Interface (for PI621 and PI625 piezo controllers)
+#
+# 
+# Device is supplied set to 115200 baud, 8 bit, 1 stop bit, no parity, rts/cts
+# (but communications parameters can be changed and saved to NV ram in the device)
+#
+#######################################################################
+
+Terminator   = LF;
+
+LockTimeout  = 1000;
+ReplyTimeout = 1000;
+ReadTimeout  = 100;
+ExtraInput   = Ignore;
+separator    = "";
+
+
+####################################################################### 
+#Send arbitrary command string
+
+send_cmd{
+    out "%#s";
+}
+
+####################################################################### 
+#Controller Status 
+ 
+get_version{
+     out "*IDN?"; 
+     in "%52c";
+}
+
+get_last_error{
+     out "ERR?"; 
+     in "%d";
+}
+
+
+#######################################################################
+#Axis Control Mode
+#### /$1 should be passed in order to indetify axis
+
+get_servo_mode{
+     out "SVO? \$1";
+     in "\$1=%{0|1}";
+}
+
+set_servo_mode{
+     out "SVO \$1 %{0|1}";
+}
+
+######################################################################
+#Close Loop Control Mode
+
+get_demand_pos{
+     out "MOV? \$1";
+     in "\$1=%f";
+}
+
+set_demand_pos{
+     out "MOV \$1 %f";
+}
+
+get_current_pos{
+     out "POS? \$1";
+     in "\$1=%f";
+}
+
+get_servo_on_target{
+     out "ONT? \$1";
+     in "\$1=%{0|1}";
+}
+
+######################################################################
+#Open Loop Control Mode
+
+set_vol_abs{
+     out "SVA \$1 %f";
+}
+
+get_vol_abs{
+     out "SVA? \$1";
+     in "\$1=%f";
+}
+
+get_current_vol{
+     out "VOL? \$1";
+     in "\$1=%f";
+}
+
+get_overflow{
+     out "OVF? \$1";
+     in "\$1=%{0|1}";
+}
+
+################################

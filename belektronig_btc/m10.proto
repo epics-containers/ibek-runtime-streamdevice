@@ -1,0 +1,102 @@
+readtimeout  = 100;
+replytimeout = 100;
+
+
+actual {
+    out "T1";	
+in "%4r";
+}
+
+current {
+    out "I2";
+    in "%4r";
+}
+
+power_read {
+    out "A1";
+    in "%4r";
+}
+
+power {
+    out "a1%.4r" CR;
+    in 0x01;
+    @init {
+	out "A1";
+	in "%4r";
+    }
+}
+
+
+setpoint_read {
+    out "S1";
+    in "%4r";
+}
+
+setpoint {
+    out "s1%.4r" CR;
+    in 0x01;
+    @init {
+	out "S1";
+	in "%4r";
+    }
+}
+
+mode {
+    out "b1%.1r" CR;
+    in 0x01;
+    @init {
+	out "B1";
+	in "%1r";
+    }
+}
+
+mode_read {
+    out "B1";
+    in "%1r";
+}
+
+
+proportional_read {
+    out "P1";
+    in "%2r";
+}
+
+
+proportional {
+    out "p1%.2r" CR;
+    in 0x01;
+    @init {
+	out "P1";
+	in "%2r";
+    }
+}
+
+integral_read {
+    out "I1";
+    in "%2r";
+}
+
+
+integral {
+    out "i1%.2r" CR;
+    in 0x01;
+    @init {
+	out "I1";
+	in "%2r";
+    }
+}
+
+differential_read {
+    out "D1";
+    in "%2r";
+}
+
+differential {
+    out "d1%.2r" CR;
+    in 0x01;
+    @init {
+	out "D1";
+	in "%2r";
+    }
+}
+

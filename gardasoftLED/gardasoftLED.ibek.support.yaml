@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: gardasoftLED
+
+entity_models:
+  - name: gardasoftLED
+    description: |-
+      Gardasoft PP612 LED controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+    databases:
+      - file: PP612LED.template
+        args:
+          .*:
+  - name: gardasoftLEDChannel
+    description: |-
+      Gardasoft PP600 series LED controller channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      N:
+        type: int
+        description: |-
+          Channel number
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+    databases:
+      - file: PP600SeriesChannel.template
+        args:
+          .*:
+  - name: gardasoftLED420
+    description: |-
+      Gardasoft PP420 LED controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Domain
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn port name for stream device
+      name:
+        type: id
+        description: |-
+          gui element name
+    databases:
+      - file: PP420LED.template
+        args:
+          .*:
+  - name: gardasoftLED400Channel
+    description: |-
+      Gardasoft PP400 series LED controller channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          Domain
+      CHANNEL:
+        type: int
+        description: |-
+          Channel number 1-4
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn port name for stream device
+      CONTINUOUS_MAX_CURR:
+        type: float
+        description: |-
+          Maximum current for continuous mode (A)
+        default: 2.0
+      PULSED_MAX_CURR:
+        type: float
+        description: |-
+          Maximum current for pulsed mode (A)
+        default: 10.0
+    databases:
+      - file: PP400SeriesChannel.template
+        args:
+          .*:
+  - name: gardasoftLEDRT460Channel
+    description: |-
+      Gardasoft RT460 series LED controller channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+      MAXCURRENT:
+        type: float
+        description: |-
+          Maximum current rating (mA)
+        default: 100.0
+    databases:
+      - file: RT460LED.template
+        args:
+          .*:
