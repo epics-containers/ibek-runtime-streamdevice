@@ -13,7 +13,7 @@ ReadTimeout  = 1000;
 
 getID       { out "*idn?"; in "*idn?\r%[ .a-zA-Z0-9]"; }
 
-getPos      { out "pos?"; in "pos?\r%[0-9]"; }
+getPos      { out "pos?"; in "pos?\r%d"; }
 
-setPos      { out "pos=%i"; in ""; }
+setPos      { out "pos=%i"; in "pos=%*d"; }
 
