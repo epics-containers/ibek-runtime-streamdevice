@@ -1,0 +1,204 @@
+##################################################################################
+# Database to calculate the calibrated currents (in uA) from ADC channels
+# connected to the voltage outputs of an ODCurrAmp.  This is based on the
+# range selected using serial comms by YMCS0009/12.template, as well as
+# configurable offsets for dark current.
+# 
+# Macros:
+# P - device name (must correspond to the device name used in YMCS0009/12.template)
+# INP1..INP4 - PV names of the ADC channels, which must update on a periodic scan
+# RANGE - range of the voltage output (normally 10V)
+#
+###################################################################################
+
+record(calcout, "$(P):INTEN_ADC") {
+  field(DESC, "Intensity")
+  field(SCAN, "Passive")
+  field(CALC, "A+B+C+D")
+  field(INPA, "$(P):PHD1:I_ADC.VAL")
+  field(INPB, "$(P):PHD2:I_ADC.VAL")
+  field(INPC, "$(P):PHD3:I_ADC.VAL")
+  field(INPD, "$(P):PHD4:I_ADC.VAL")
+  field(EGU, "uA")
+}
+
+# % alh
+# % archiver 1 Monitor
+record(calcout, "$(P):PHD1:I_ADC") {
+  field(DESC, "ADC current 1")
+  field(CALC, "(A/$(RANGE))*B")
+  field(INPA, "$(INP1) CP MS")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(ADEL, "0.1")
+}
+
+# % alh
+# % archiver 1 Monitor
+record(calcout, "$(P):PHD2:I_ADC") {
+  field(DESC, "ADC current 2")
+  field(CALC, "(A/$(RANGE))*B")
+  field(INPA, "$(INP2) CP MS")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(ADEL, "0.1")
+}
+
+# % alh
+# % archiver 1 Monitor
+record(calcout, "$(P):PHD3:I_ADC") {
+  field(DESC, "ADC current 3")
+  field(CALC, "(A/$(RANGE))*B")
+  field(INPA, "$(INP3) CP MS")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(ADEL, "0.1")
+}
+
+# % alh
+# % archiver 1 Monitor
+record(calcout, "$(P):PHD4:I_ADC") {
+  field(DESC, "ADC current 4")
+  field(CALC, "(A/$(RANGE))*B")
+  field(INPA, "$(INP4) CP MS")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(FLNK, "$(P):INTEN_ADC")
+  field(ADEL, "0.1")
+}
+
+record(calc, "$(P):INTEN_ADC_N") {
+  field(DESC, "Normalized intensity")
+  field(CALC, "B>1?(A/B)*100:0")
+  field(INPB, "SR21C-DI-DCCT-01:SIGNAL")
+  field(PREC, "4")
+  field(LOW, "0")
+  field(LSV, "MAJOR")
+}
+
+substitute "_RANGE=1"
+
+include "currAmpRangeADC.template"
+
+
+substitute "_RANGE=2"
+
+include "currAmpRangeADC.template"
+
+
+substitute "_RANGE=3"
+
+include "currAmpRangeADC.template"
+
+
+substitute "_RANGE=4"
+
+include "currAmpRangeADC.template"
+
+
+substitute "_RANGE=5"
+
+include "currAmpRangeADC.template"
+
+
+substitute "_RANGE=6"
+
+include "currAmpRangeADC.template"
+
+
+record(calcout, "$(P):PHD1:I_ADC_C") {
+  field(DESC, "Calibrated ADC current 1")
+  field(CALC, "((A-C)/$(RANGE))*B")
+  field(INPA, "$(INP1) CP MS")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "100")
+  field(LOPR, "0.0000001")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(INPC, "$(P):C2ADC.VAL")
+}
+
+record(calcout, "$(P):PHD2:I_ADC_C") {
+  field(DESC, "Calibrated ADC current 2")
+  field(CALC, "((A-C)/$(RANGE))*B")
+  field(INPA, "$(INP2) CP MS")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "100")
+  field(LOPR, "0.0000001")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(INPC, "$(P):B2ADC.VAL")
+}
+
+record(calcout, "$(P):PHD3:I_ADC_C") {
+  field(DESC, "Calibrated ADC current 3")
+  field(CALC, "((A-C)/$(RANGE))*B")
+  field(INPA, "$(INP3) CP MS")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "100")
+  field(LOPR, "0.0000001")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(INPC, "$(P):D2ADC.VAL")
+}
+
+record(calcout, "$(P):PHD4:I_ADC_C") {
+  field(DESC, "Calibrated ADC current 4")
+  field(CALC, "((A-C)/$(RANGE))*B")
+  field(INPA, "$(INP4) CP MS")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "100")
+  field(LOPR, "0.0000001")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(FLNK, "$(P):INTEN_ADC_C")
+  field(INPC, "$(P):A2ADC.VAL")
+}
+
+record(calcout, "$(P):INTEN_ADC_C") {
+  field(DESC, "Calibrated intensity")
+  field(SCAN, "Passive")
+  field(CALC, "A+B+C+D")
+  field(INPA, "$(P):PHD1:I_ADC_C.VAL")
+  field(INPB, "$(P):PHD2:I_ADC_C.VAL")
+  field(INPC, "$(P):PHD3:I_ADC_C.VAL")
+  field(INPD, "$(P):PHD4:I_ADC_C.VAL")
+  field(EGU, "uA")
+  field(OUT, "$(P):INTEN_ADC_N.A PP")
+}
+
+# % autosave 2 VAL
+record(ai, "$(P):C2ADC") {
+  field(DESC, "C2 offset")
+  field(EGU, "V")
+}
+
+#% autosave 2 VAL
+record(ai, "$(P):B2ADC") {
+  field(DESC, "B2 offset")
+  field(EGU, "V")
+}
+
+# % autosave 2 VAL
+record(ai, "$(P):D2ADC") {
+  field(DESC, "D2 offset")
+  field(EGU, "V")
+}
+
+# % autosave 2 VAL
+record(ai, "$(P):A2ADC") {
+  field(DESC, "A2 offset")
+  field(EGU, "V")
+}

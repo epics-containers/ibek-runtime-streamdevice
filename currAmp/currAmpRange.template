@@ -1,0 +1,47 @@
+# Copy the offsets to the records which push them down
+# to the current amplifier.
+record(seq, "$(P):R$(_RANGE):SETOFFSETS") {
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "$(P):R$(_RANGE):A2.VAL")
+  field(LNK1, "$(P):A2_SP PP")
+  field(DOL2, "$(P):R$(_RANGE):B2.VAL")
+  field(LNK2, "$(P):B2_SP PP")
+  field(DOL3, "$(P):R$(_RANGE):C2.VAL")
+  field(LNK3, "$(P):C2_SP PP")
+  field(DOL4, "$(P):R$(_RANGE):D2.VAL")
+  field(LNK4, "$(P):D2_SP PP")
+  field(DESC, "Apply new offsets")
+}
+
+#% autosave 2 VAL
+record(ai, "$(P):R$(_RANGE):A2") {
+  field(DESC, "A2 offset for range $(_RANGE)")
+}
+
+#% autosave 2 VAL
+record(ai, "$(P):R$(_RANGE):C2") {
+  field(DESC, "C2 offset for range $(_RANGE)")
+}
+
+# Processed whenever the user changes the range.
+# If the user selects this range, trigger the SETOFFSETS
+# record, otherwise do nothing.
+record(calcout, "$(P):R$(_RANGE):TRIGGER") {
+  field(CALC, "A=$(_RANGE)")
+  field(INPA, "$(P):RANGE_MENU CP")
+  field(OUT, "$(P):R$(_RANGE):SETOFFSETS.VAL PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(DESC, "Trigger new offsets")
+}
+
+#% autosave 2 VAL
+record(ai, "$(P):R$(_RANGE):B2") {
+  field(DESC, "B2 offset for range $(_RANGE)")
+}
+
+#% autosave 2 VAL
+record(ai, "$(P):R$(_RANGE):D2") {
+  field(DESC, "D2 offset for range $(_RANGE)")
+}

@@ -1,0 +1,114 @@
+# This database instantiates six templates which allow you to define a set of offsets
+# to be applied for each range of the current amplifier.  It works with both the
+# YMCS0009 and YMCS0012 models as they have the same number of ranges.
+substitute "_RANGE=6"
+
+include "currAmpRange.template"
+
+
+substitute "_RANGE=5"
+
+include "currAmpRange.template"
+
+
+substitute "_RANGE=4"
+
+include "currAmpRange.template"
+
+
+substitute "_RANGE=3"
+
+include "currAmpRange.template"
+
+
+substitute "_RANGE=2"
+
+include "currAmpRange.template"
+
+
+substitute "_RANGE=1"
+
+include "currAmpRange.template"
+
+
+# First apply the offset and then calibrate using the current range.
+record(calcout, "$(P):PHD1:I_C") {
+  field(DESC, "Calibrated current 1")
+  field(CALC, "((A-C)/1048575)*B")
+  field(INPA, "$(P):PHD1:I_R.VAL CP")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(INPC, "$(P):C2_SP")
+  field(OUT, "$(P):INTEN_C.A PP")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "100")
+  field(LOPR, "0.0000001")
+}
+
+# First apply the offset and then calibrate using the current range.
+record(calcout, "$(P):PHD2:I_C") {
+  field(DESC, "Calibrated current 2")
+  field(CALC, "((A-C)/1048575)*B")
+  field(INPA, "$(P):PHD2:I_R.VAL CP")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(INPC, "$(P):B2_SP")
+  field(OUT, "$(P):INTEN_C.B PP")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "100")
+  field(LOPR, "0.0000001")
+}
+
+# First apply the offset and then calibrate using the current range.
+record(calcout, "$(P):PHD3:I_C") {
+  field(DESC, "Calibrated current 3")
+  field(CALC, "((A-C)/1048575)*B")
+  field(INPA, "$(P):PHD3:I_R.VAL CP")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(INPC, "$(P):D2_SP")
+  field(OUT, "$(P):INTEN_C.C PP")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "100")
+  field(LOPR, "0.0000001")
+}
+
+# First apply the offset and then calibrate using the current range.
+record(calcout, "$(P):PHD4:I_C") {
+  field(DESC, "Calibrated current 4")
+  field(CALC, "((A-C)/1048575)*B")
+  field(INPA, "$(P):PHD4:I_R.VAL CP")
+  field(INPB, "$(P):RANGE_HI.VAL")
+  field(INPC, "$(P):A2_SP")
+  field(OUT, "$(P):INTEN_C.D PP")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "100")
+  field(LOPR, "0.0000001")
+}
+
+#% gdatag,pv,ro,$(gda_bpm_name=),CAL_INTENSITY,Intensity calibrated with offsets
+record(calcout, "$(P):INTEN_C") {
+  field(DESC, "Calibrated intensity")
+  field(SCAN, "Passive")
+  field(CALC, "A+B+C+D")
+  field(OUT, "$(P):INTEN_N.A PP")
+  field(EGU, "uA")
+  field(PREC, "4")
+  field(HOPR, "2800")
+  field(LOPR, "0")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+# Normalize the intensity with respect to the beam current.
+# First check that the beam is greater than 1mA, if not set to zero and MAJOR alarm status.
+#% gdatag,pv,ro,$(gda_bpm_name=),NORM_INTENSITY,Intensity normalized to ring current
+record(calc, "$(P):INTEN_N") {
+  field(DESC, "Normalized intensity")
+  field(CALC, "B>1?(A/B)*100:0")
+  field(INPB, "$(SIGNAL=SR-DI-DCCT-01:SIGNAL)")
+  field(PREC, "4")
+  field(LOW, "0")
+  field(LSV, "MAJOR")
+}

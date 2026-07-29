@@ -2,9 +2,22 @@
 
 # Imported from DLS production support module: currAmp 1-45
 # Source: /dls_sw/prod/R3.14.12.7/support/currAmp/1-45
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
-# To check for updates: diff this pattern's files against that path, or against the
-# newest /dls_sw/prod/*/support/currAmp/ release.
+#
+# ymcs.protocol is a pristine copy of that release.
+#
+# The .template files are DERIVED, not pristine: they come from that release's
+# currAmpApp/Db VDCT sources, converted to msi-native include/substitute by
+# vdct2template (VDCT does not exist in the EPICS 7 base epics-containers uses).
+# Annotation-only macros driving DLS EDM/GDA tooling (name, gda_bpm_name,
+# gda_bpm_desc, gda_curr_name) carry empty defaults rather than parameters.
+#
+# currAmpRange.template and currAmpRangeADC.template are msi `include` targets
+# pulled in six times each by currAmpOffsets / currAmpADC. They have no entity
+# model of their own but must ship alongside them. Their macros carry a _ prefix
+# because msi will not apply a default when substituting a macro with its own name.
+#
+# To check for updates: diff against that path, or the newest
+# /dls_sw/prod/*/support/currAmp/ release.
 
 module: currAmp
 
@@ -29,10 +42,6 @@ entity_models:
         type: int
         description: |-
           Precision (Number of decimal places)
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       SCAN:
         type: str
         description: |-
@@ -42,6 +51,7 @@ entity_models:
       - file: YMCS0012.template
         args:
           .*:
+
   - name: YMCS0009
     description: |-
       Oxford Danfysik YMCS0009 current amplifier / quad beam position monitor
@@ -62,11 +72,155 @@ entity_models:
         type: int
         description: |-
           Precision (Number of decimal places)
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: YMCS0009.template
+        args:
+          .*:
+
+  - name: currAmpOffsets
+    description: |-
+      Per-range dark-current offsets for a current amplifier. Stores a set of
+      offsets for each of the six amplifier ranges and pushes the correct set down
+      to the amplifier whenever the range changes. Works with both YMCS0009 and
+      YMCS0012 as they have the same number of ranges. Also provides
+      offset-calibrated and ring-current-normalised intensity.
+      Includes currAmpRange.template six times via msi.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name, must match the P used on the YMCS0009/YMCS0012 entity
+      SIGNAL:
+        type: str
+        description: |-
+          Ring current PV, used to normalise the calibrated intensity
+        default: SR-DI-DCCT-01:SIGNAL
+    databases:
+      - file: currAmpOffsets.template
+        args:
+          .*:
+
+  - name: currAmpADC
+    description: |-
+      Calculates calibrated currents (in uA) from ADC channels wired to the voltage
+      outputs of an OD current amplifier, using the range selected over serial by
+      YMCS0009/YMCS0012 plus configurable dark-current offsets.
+      Includes currAmpRangeADC.template six times via msi.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name, must match the P used on the YMCS0009/YMCS0012 entity
+      RANGE:
+        type: float
+        description: |-
+          Range of the voltage output in volts (normally 10)
+        default: 10
+      INP1:
+        type: str
+        description: |-
+          PV name of the ADC channel for signal 1, must update on a periodic scan
+      INP2:
+        type: str
+        description: |-
+          PV name of the ADC channel for signal 2, must update on a periodic scan
+      INP3:
+        type: str
+        description: |-
+          PV name of the ADC channel for signal 3, must update on a periodic scan
+      INP4:
+        type: str
+        description: |-
+          PV name of the ADC channel for signal 4, must update on a periodic scan
+    databases:
+      - file: currAmpADC.template
+        args:
+          .*:
+
+  - name: currAmpSingle
+    description: |-
+      Interface for extracting a single value from a current amplifier, copying the
+      amplifier's high and low limits across to the derived record.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      Q:
+        type: str
+        description: |-
+          Tail of full PV name
+      DESC:
+        type: str
+        description: |-
+          Description
+      PCURR:
+        type: str
+        description: |-
+          Name of the current amplifier
+      N:
+        type: int
+        description: |-
+          Channel number of the amplifier
+    databases:
+      - file: currAmpSingle.template
+        args:
+          .*:
+
+  - name: currAmp_ai
+    description: |-
+      Simple ai record to use with an ADC input for reading an individual amplifier
+      current.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      Q:
+        type: str
+        description: |-
+          Tail of full PV name
+      INP:
+        type: str
+        description: |-
+          Input link for the ai record
+      DTYPE:
+        type: str
+        description: |-
+          Device type of the ai record
+      SCAN:
+        type: str
+        description: |-
+          SCAN rate for the reading
+      PREC:
+        type: int
+        description: |-
+          Precision (number of decimal places)
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      EGUF:
+        type: float
+        description: |-
+          Engineering units full scale, for LINEAR conversion
+      EGUL:
+        type: float
+        description: |-
+          Engineering units low scale, for LINEAR conversion
+      HOPR:
+        type: float
+        description: |-
+          High operating range
+      LOPR:
+        type: float
+        description: |-
+          Low operating range
+      DESC:
+        type: str
+        description: |-
+          Description
+    databases:
+      - file: currAmp_ai.template
         args:
           .*:
