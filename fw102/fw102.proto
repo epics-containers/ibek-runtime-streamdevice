@@ -15,5 +15,5 @@ getID       { out "*idn?"; in "*idn?\r%[ .a-zA-Z0-9]"; }
 
 getPos      { out "pos?"; in "pos?\r%[0-9]"; }
 
-setPos      { out "pos=%i"; }
+setPos      { out "pos=%i"; in "pos=%*d"; }
 
