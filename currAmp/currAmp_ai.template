@@ -1,0 +1,20 @@
+# Simple ai record template to use with an ADC input
+# to read the individual amplifier currents.
+
+#% gdatag,template,simplePv,$(gda_name=),$(gda_desc=)
+#% gdatag,pv,ro,$(gda_name=),RECORD,Current Value
+# % archiver 0.1 Monitor
+record(ai, "$(P)$(Q)") {
+  field(DESC, "$(DESC)")
+  field(DTYP, "$(DTYPE)")
+  field(INP, "$(INP)")
+  field(LINR, "LINEAR")
+  field(EGUF, "$(EGUF)")
+  field(EGUL, "$(EGUL)")
+  field(EGU, "$(EGU)")
+  field(HOPR, "$(HOPR)")
+  field(LOPR, "$(LOPR)")
+  field(SCAN, "$(SCAN)")
+  field(PREC, "$(PREC)")
+  field(ADEL, "0.002")
+}

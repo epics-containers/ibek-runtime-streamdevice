@@ -52,18 +52,62 @@ lakeshore340/
   lakeshore340.template            # EPICS records
 ```
 
-## Pristine storage and the vendored header
+## Faithful storage and the vendored header
 
-**The extracted device files are stored PRISTINE.** The `.proto`/`.protocol` and
-`.template`/`.db` files are copied byte-for-byte from their DLS production support
-module and must stay identical to it (that is what lets us diff them against future DLS
-releases). They carry **no provenance header**.
+**Extracted device files stay as close to their DLS source as possible.** Copy
+byte-for-byte wherever the file works unmodified; where it cannot, apply only
+**mechanical, scripted, re-runnable** transformations and record that you did. Never
+hand-edit an extracted file. They carry **no provenance header**.
 
-The repo-authored **`*.ibek.support.yaml`** is the one exception: because we generate it
-here (it is not extracted), it may begin with a short DLS-source provenance comment —
-the originating module, version and `/dls_sw/prod/...` path — recording where the
-pattern came from. That comment is static and deterministic, so it does not affect
-consumer-side hashing.
+The point of the old byte-for-byte rule was to keep patterns diffable against future
+DLS releases. Reproducible derivation preserves that — you re-run the conversion on the
+new release and compare, instead of diffing text.
+
+### Pristine — always
+
+`.proto`/`.protocol` files. StreamDevice protocol syntax is the same at DLS and in
+epics-containers, so these are always exact copies.
+
+### Derived — VDCT-authored databases
+
+Many DLS modules author their databases in **VisualDCT**, which does not exist in the
+vanilla EPICS 7 base the generic IOC images build against. A verbatim VDCT template
+cannot load at runtime, so `.template`/`.db` from those modules are **derived**, via two
+mechanical steps:
+
+1. **VDCT → msi.** `expand()` blocks become native msi `substitute`/`include`
+   directives, `#!` layout lines and `template() { }` blocks are dropped, and macros
+   passed into an included template gain a `_` prefix. Done by
+   [vdct2template](https://github.com/epics-containers/vdct2template).
+2. **Annotation-only macro defaults.** Macros appearing only inside `#%` annotation
+   comments — DLS EDM/GDA tooling such as `name` and `gda_*` — get an empty default
+   (`$(name)` → `$(name=)`), so they are not mistaken for required entity parameters.
+   This already matches DLS practice: `$(gda_name=)` and `$(gda_desc=)` ship defaulted
+   upstream.
+
+A derived pattern **must** say so in its `*.ibek.support.yaml` header, naming the source
+module, version and `/dls_sw/prod/...` path, and which files are derived versus
+pristine. See `currAmp/` for the worked example.
+
+The procedure and its helper scripts live in the `vdct-conversion` skill in
+[builder2ibek](https://github.com/epics-containers/builder2ibek).
+
+### Checking a pattern against a newer DLS release
+
+- **Pristine files** — diff directly against `/dls_sw/prod/*/support/<module>/`.
+- **Derived files** — re-run the conversion on the new release and diff the outputs.
+
+For a stronger check than text diffing, expand both the pattern's template and the DLS
+module's built `db/` copy with `msi` using the same macros, then compare canonical
+record/field sets. That is invariant to comment, ordering and whitespace changes, and it
+is what proves a conversion preserved behaviour. `currAmp` passes this on all six
+templates.
+
+### The support yaml
+
+The repo-authored **`*.ibek.support.yaml`** is generated here rather than extracted, so
+it may begin with the DLS-source provenance comment described above. That comment is
+static and deterministic, so it does not affect consumer-side hashing.
 
 Either way, **the consumer-side vendor header below must never be committed here.**
 
@@ -221,11 +265,15 @@ the test used to tell them apart — are listed in [BUILD-TIME-ONLY.md](BUILD-TI
      template/DB files),
    - the `*.proto`, `*.template`/`*.db`, and any other files that support yaml
      references.
-3. Keep every file **pristine** — no vendored header (that is added by `ibek pattern`
-   at vendor time).
+3. Copy each file unmodified where it works as-is. If the module is VDCT-authored,
+   convert it as described in [Faithful storage](#faithful-storage-and-the-vendored-header)
+   — scripted, never hand-edited — and record the derivation in the support yaml header.
+   No vendored header (that is added by `ibek pattern` at vendor time).
 4. Validate locally by vendoring into a scratch IOC instance:
    `ibek pattern add ibek-runtime-streamdevice:mydevice@HEAD <instance>` (or test
    against a branch) and run `ibek pattern check`.
+   For a derived pattern also check `msi` expands it with no undefined macros, and that
+   its canonical record/field set matches the DLS module's built `db/` copy.
 5. Open a PR. Once merged, **cut a new semver tag** (`vX.Y.Z`) so consumers can pin the
    new pattern; Renovate will then offer the bump downstream.
 

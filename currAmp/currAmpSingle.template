@@ -1,0 +1,39 @@
+# currAmpSingle.vdb
+# % macro, __doc__, interface for extarcting a single value from a current amplifier.
+# also copies limits across.
+#
+# Macros:
+# % macro, P,         device name
+# % macro, Q,         tail of full PV name
+# % macro, DESC,      description
+# % macro, PCURR,     name of current amplifier
+# % macro, N,         channel number of amplifier
+# % macro, name,      Object and gui association name
+#% gui, $(name=), edmembed, CurrAmp-embed.edl, P=$(P),Q=$(Q),PCURR=$(PCURR),N=$(N)
+
+#% gdatag,template,simplePv,$(gda_name=),$(gda_desc=)
+#% gdatag,pv,ro,$(gda_name=),RECORD,Current Value
+#% alh
+#% archiver 1 Monitor
+record(calcout, "$(P)$(Q)") {
+  field(CALC, "A")
+  field(DESC, "$(DESC)")
+  field(INPA, "$(PCURR):PHD$(N):I CP")
+  field(PREC, "3")
+}
+
+record(ao, "$(P)$(Q):HIHI") {
+  field(DTYP, "Soft Channel")
+  field(DESC, "Copy high limit")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(PCURR):R_HI_SEL CP")
+  field(OUT, "$(P)$(Q).HIHI")
+}
+
+record(ao, "$(P)$(Q):LOLO") {
+  field(DTYP, "Soft Channel")
+  field(DESC, "Copy low limit")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(PCURR):R_LO_SEL CP")
+  field(OUT, "$(P)$(Q).LOLO")
+}

@@ -1,0 +1,57 @@
+# This template stores a set of analogue signal offsets for each range of the
+# amplifier.  When the user changes the range it automatically copies the
+# correct offsets to the records used in the calibration calculations.
+
+
+
+# % autosave 2 VAL
+record(ai, "$(P):R$(_RANGE):A2ADC") {
+  field(DESC, "A2 offset for range $(_RANGE)")
+  field(EGU, "V")
+}
+
+#% autosave 2 VAL
+record(ai, "$(P):R$(_RANGE):B2ADC") {
+  field(DESC, "B2 offset for range $(_RANGE)")
+  field(EGU, "V")
+}
+
+# % autosave 2 VAL
+record(ai, "$(P):R$(_RANGE):C2ADC") {
+  field(DESC, "C2 offset for range $(_RANGE)")
+  field(EGU, "V")
+}
+
+# % autosave 2 VAL
+record(ai, "$(P):R$(_RANGE):D2ADC") {
+  field(DESC, "D2 offset for range $(_RANGE)")
+  field(EGU, "V")
+}
+
+# Processed whenever the user changes the range.
+# If the user selects this range, trigger the SETOFFSETS
+# record, otherwise do nothing.
+record(calcout, "$(P):R$(_RANGE):TRIGGERADC") {
+  field(CALC, "A=$(_RANGE)")
+  field(INPA, "$(P):RANGE_MENU CP")
+  field(OUT, "$(P):R$(_RANGE):SETOFFSETSADC.VAL PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(DESC, "Trigger new offsets")
+}
+
+# Copy the offsets to the records which are used in the
+# calibration calculations.
+record(seq, "$(P):R$(_RANGE):SETOFFSETSADC") {
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "$(P):R$(_RANGE):A2ADC.VAL")
+  field(LNK1, "$(P):A2ADC PP")
+  field(DOL2, "$(P):R$(_RANGE):B2ADC.VAL")
+  field(LNK2, "$(P):B2ADC PP")
+  field(DOL3, "$(P):R$(_RANGE):C2ADC.VAL")
+  field(LNK3, "$(P):C2ADC PP")
+  field(DOL4, "$(P):R$(_RANGE):D2ADC.VAL")
+  field(LNK4, "$(P):D2ADC PP")
+  field(DESC, "Apply new offsets")
+}
