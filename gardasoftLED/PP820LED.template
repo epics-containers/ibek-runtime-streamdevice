@@ -1,0 +1,117 @@
+# % macro, P, The PV device name prefix for the lighting controller.
+# % macro, PORT, The lighting controller stream device serial comms port.
+# % macro, name, The name for gui elements.
+# % gui, $(name=), edm, PP800Series.edl, P=$(P)
+
+##################### Save ######################
+
+record(stringout, "$(P):SAVE") {
+  field(DESC, "Save settings")
+  field(DTYP, "stream")
+  field(OUT, "@PP800Series.protocol save $(PORT)")
+}
+
+##################### Versions ######################
+
+record(ao, "$(P):VERSION") {
+  field(DESC, "Get version information")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(OUT, "@PP800Series.protocol getVersion($(P)) $(PORT)")
+}
+
+record(stringin, "$(P):MODEL_RBV") {
+  field(DESC, "Model Number")
+}
+
+record(stringin, "$(P):HW_VERSION_RBV") {
+  field(DESC, "Hardware Version Number")
+}
+
+record(stringin, "$(P):FW_VERSION_RBV") {
+  field(DESC, "Firmware Version Number")
+}
+
+##################### Read Errors  ######################
+
+record(stringin, "$(P):READERRORS") {
+  field(DESC, "Read any error messages")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(VAL, "0")
+  field(INP, "@PP800Series.protocol readErrors $(PORT)")
+}
+
+##################### Trigger Mode ######################
+
+#0 channels triggerd individually
+#1 all channels tirggerd by inupt 0
+#2 channels 0-3 triggerd form inupt 0 channes 4-7 triggerd form input 4
+#Note when all channes being triggered from input 0, the other triggers shoudl not be pulsed
+record(mbbi, "$(P):TRIGGER_MODE_RBV") {
+  field(DESC, "Trigger mode readback")
+  field(ZRST, "INDIVIDUAL")
+  field(ONST, "INPUT0")
+  field(TWST, "INP0INP1")
+}
+
+record(mbbo, "$(P):TRIGGER_MODE"){
+  field(ZRST, "INDIVIDUAL")
+  field(ONST, "INP0")
+  field(TWST, "INP0INP1")
+  field(FLNK, "$(P):SET_MODE PP")
+}
+
+record(ao, "$(P):SET_MODE") {
+  field(DESC, "channels triggerd individually")
+  field(DTYP, "stream")
+  field(OUT, "@PP800Series.protocol setTriggerMode($(P),TRIGGER_MODE) $(PORT)")
+}
+
+##################### Internal Trigger ######################
+
+record(bo, "$(P):TRIG_STATE")
+{
+  field(DESC, "Internal Trigger State")
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(FLNK, "$(P):INTERNAL_TRIGGER PP")
+}
+
+#% autosave 1 VAL
+record(ai, "$(P):PERIOD")
+{
+  field(DESC, "Internal Trigger Period")
+  field(PINI, "YES")
+  field(FLNK, "$(P):INTERNAL_TRIGGER PP")
+}
+
+record(ao, "$(P):INTERNAL_TRIGGER")
+{
+  field(DESC, "Set Internal Trigger Mode")
+  field(DTYP, "stream")
+  field(OUT,  "@PP800Series.protocol setInternalTrigger($(P),TRIG_STATE,PERIOD) $(PORT)")
+}
+
+record(bi, "$(P):TRIG_STATE_RBV")
+{
+  field(DESC, "Internal Trigger State")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+}
+
+record(ai, "$(P):PERIOD_RBV")
+{
+  field(DESC, "Internal Trigger Period")
+  field(EGU, "ms")
+}
+
+##################### CLear Settings ######################
+
+record(stringout, "$(P):CLEAR") {
+  field(DESC, "Clear settings")
+  field(DTYP, "stream")
+  field(OUT, "@PP800Series.protocol clear $(PORT)")
+}
+

@@ -2,9 +2,25 @@
 
 # Imported from DLS production support module: OXCS700 2-22
 # Source: /dls_sw/prod/R3.14.12.7/support/OXCS700/2-22
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
-# To check for updates: diff this pattern's files against that path, or against the
-# newest /dls_sw/prod/*/support/OXCS700/ release.
+#
+# OXCS700.proto is a pristine copy of that release's OXCS700App/protocol.
+#
+# The .template files are DERIVED, not pristine: they come from that release's
+# OXCS700App/Db VDCT sources, converted to msi-native include/substitute by
+# vdct2template (VDCT does not exist in the EPICS 7 base epics-containers uses).
+#
+# OXcommon700.template is an msi `include` target pulled in by both entity
+# templates, not an entity of its own. Its macros carry a _ prefix because msi
+# will not apply a default when substituting a macro with its own name.
+#
+# Verified: both entity templates expand under msi to the same record and field
+# set as that release's VDCT-built db/ copies.
+#
+# NOTE: the two __doc__ annotations are swapped in 2-22 upstream (OXCS700.vdb
+# is labelled "(Phenix)"). The descriptions below follow the device names.
+#
+# To check for updates: diff OXCS700.proto against that path, and re-run the
+# conversion on the newest /dls_sw/prod/*/support/OXCS700/ release.
 
 module: OXCS700
 

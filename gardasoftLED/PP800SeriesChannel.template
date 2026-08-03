@@ -1,0 +1,156 @@
+# One instance created for each channel.
+
+# % macro, P, Domain
+# % macro, CHANNEL, Channel number 1-7
+# % macro, STREAMS_PORT, Asyn port name for stream device
+
+#################### Status ######################
+record(ao, "$(P):CH$(CHANNEL):STATUS")
+{
+   field(DESC, "Channel $(CHANNEL) Status")
+   field(DTYP, "stream")
+   field(SCAN, "1 second")
+   field(OUT,  "@PP800Series.protocol status($(P),$(CHANNEL)) $(STREAMS_PORT)")
+}
+
+record(mbbi, "$(P):CH$(CHANNEL):MODE_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Mode")
+  field(DTYP, "Soft Channel")
+  field(ONST, "Pulsed")
+  field(TWST, "Continuous")
+  field(THST, "Switch")
+}
+
+record(mbbo, "$(P):CH$(CHANNEL):MODE")
+{
+  field(DESC, "Channel $(CHANNEL) Mode")
+  field(VAL, "1")
+  field(ONST, "Pulsed")
+  field(TWST, "Continuous")
+  field(THST, "Switch") 
+}
+
+record(ai, "$(P):CH$(CHANNEL):NUMBER_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Number")
+}
+
+record(calc, "$(P):CH$(CHANNEL):DISP_MAX_CURRENT_RBV")
+{
+  field(INPA, "$(P):CH$(CHANNEL):MAX_CURRENT_RBV CP")
+  field(CALC, "A*1000")
+  field(PREC, "2")
+  field(EGU,  "mA")
+}
+
+record(calc,"$(P):CH$(CHANNEL):MAX_CURRENT")
+{
+  field(INPA, "$(P):CH$(CHANNEL):DISP_MAX_CURRENT CP")
+  field(CALC, "A/1000")
+}
+
+record(ai, "$(P):CH$(CHANNEL):MAX_CURRENT_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Maximum Current")
+  field(PREC, "5")
+}
+
+record(ao, "$(P):CH$(CHANNEL):DISP_MAX_CURRENT")
+{
+  field(DESC, "Channel $(CHANNEL) Maximum Current")
+  field(EGU,  "mA")
+  field(PREC, "2")
+  field(DRVH, "100")
+  field(DRVL, "0")
+}
+
+record(ao, "$(P):CH$(CHANNEL):DELAY")
+{
+  field(DESC, "Channel $(CHANNEL) Pulse Delay")
+  field(EGU,  "us")
+  field(PREC, "2")
+}
+
+record(ai, "$(P):CH$(CHANNEL):DELAY_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Pulse Delay")
+  field(EGU,  "us")
+  field(PREC, "2")
+}
+
+record(ai, "$(P):CH$(CHANNEL):WIDTH_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Pulse Width")
+  field(EGU,  "us")
+  field(PREC, "2")
+}
+
+record(ao, "$(P):CH$(CHANNEL):WIDTH")
+{
+  field(DESC, "Channel $(CHANNEL) Pulse Width")
+  field(EGU,  "us")
+  field(PREC, "2")
+}
+
+record(ai, "$(P):CH$(CHANNEL):RETRIGGER_RBV")
+{
+  field(DESC, "Channel $(CHANNEL) Retrigger Delay")
+  field(EGU,  "us")
+  field(PREC, "2")
+}
+
+record(ao, "$(P):CH$(CHANNEL):RETRIGGER")
+{
+  field(DESC, "Channel $(CHANNEL) Retrigger Delay")
+  field(EGU,  "us")
+  field(PREC, "2")
+}
+
+#################### Trigger ######################
+record(ao, "$(P):CH$(CHANNEL):TRIGGER")
+{
+  field(DESC, "Channel $(CHANNEL) Trigger")
+  field(DTYP, "stream")
+  field(OUT,  "@PP800Series.protocol fireTrigger($(P),$(CHANNEL)) $(STREAMS_PORT)")
+}
+
+#### APPLY ######
+record(seq, "$(P):CH$(CHANNEL):APPLY")
+{
+  field(DESC, "Apply Selection")
+  field(SELM, "Specified")
+  field(SELL, "$(P):CH$(CHANNEL):MODE")
+  field(DOL1, "1")
+  field(LNK1, "$(P):CH$(CHANNEL):PULSED PP")
+  field(DOL2, "1")
+  field(LNK2, "$(P):CH$(CHANNEL):CONTINUOUS PP")
+  field(DOL3, "1")
+  field(LNK3, "$(P):CH$(CHANNEL):SWITCHED PP")
+  field(TPRO, "1")
+}
+
+record(ao, "$(P):CH$(CHANNEL):PULSED")
+{
+   field(DESC, "Channel $(CHANNEL) Status")
+   field(DTYP, "stream")
+   field(TPRO, "1")
+   field(OUT,  "@PP800Series.protocol setPulsedMode($(P),$(CHANNEL)) $(STREAMS_PORT)")
+}
+
+record(ao, "$(P):CH$(CHANNEL):SWITCHED")
+{
+   field(DESC, "Channel $(CHANNEL) Status")
+   field(DTYP, "stream")
+   field(TPRO, "1")
+   field(OUT,  "@PP800Series.protocol setSwitchedMode($(P),$(CHANNEL)) $(STREAMS_PORT)")
+}
+
+record(ao, "$(P):CH$(CHANNEL):CONTINUOUS")
+{
+   field(DESC, "Channel $(CHANNEL) Status")
+   field(DTYP, "stream")
+   field(TPRO, "1")
+   field(OUT,  "@PP800Series.protocol setContinuousMode($(P),$(CHANNEL)) $(STREAMS_PORT)")
+}
+

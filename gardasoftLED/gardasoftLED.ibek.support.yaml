@@ -1,10 +1,37 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
 
-# Imported from DLS production support module: gardasoftLED 2.9
-# Source: /dls_sw/prod/R3.14.12.7/support/gardasoftLED/2.9
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
-# To check for updates: diff this pattern's files against that path, or against the
-# newest /dls_sw/prod/*/support/gardasoftLED/ release.
+# Imported from DLS production support module: gardasoftLED 2-13
+# Source: /dls_sw/prod/R3.14.12.7/support/gardasoftLED/2-13
+#
+# The .protocol files are pristine copies of that release's
+# gardasoftLEDApp/protocol.
+#
+# The .template files are DERIVED, not pristine: they come from that release's
+# gardasoftLEDApp/Db VDCT sources, converted to msi-native include/substitute by
+# vdct2template (VDCT does not exist in the EPICS 7 base epics-containers uses).
+# Annotation-only macros driving DLS EDM/GDA tooling carry empty defaults rather
+# than parameters.
+#
+# PP600SeriesChannel.template has two roles: DLS installs it standalone (the
+# gardasoftLEDChannel entity below) and PP612LED expands it twice, once per
+# output channel. Its macros therefore keep their plain names -- an msi
+# `substitute` beats a value supplied from the substitution file, so PP612LED
+# can pin N=1 and N=2 without the _ prefix the other patterns need.
+#
+# Verified: all ten templates expand under msi to the same record and field set
+# as that release's VDCT-built db/ copies.
+#
+# UPSTREAM BUG: PP600SeriesChannel.template's SETMODE and SETOUTPUT records name
+# "@gardasoft.protocol", which no release of this module ships. Those two
+# records will fail to connect. Reproduced verbatim rather than patched.
+#
+# NOTE: this pattern previously tracked release "2.9" -- a mis-numbered
+# directory that sorts after 2-13 but predates it (Jan 2024 vs Jun 2025). Moving
+# to 2-13 replaces RT460LED.template with the RTSeries pair and adds the PP800
+# and PP420Profile families.
+#
+# To check for updates: diff the .protocol files against that path, and re-run
+# the conversion on the newest /dls_sw/prod/*/support/gardasoftLED/ release.
 
 module: gardasoftLED
 
@@ -25,6 +52,7 @@ entity_models:
       - file: PP612LED.template
         args:
           .*:
+
   - name: gardasoftLEDChannel
     description: |-
       Gardasoft PP600 series LED controller channel
@@ -45,6 +73,7 @@ entity_models:
       - file: PP600SeriesChannel.template
         args:
           .*:
+
   - name: gardasoftLED420
     description: |-
       Gardasoft PP420 LED controller
@@ -65,6 +94,7 @@ entity_models:
       - file: PP420LED.template
         args:
           .*:
+
   - name: gardasoftLED400Channel
     description: |-
       Gardasoft PP400 series LED controller channel
@@ -95,24 +125,141 @@ entity_models:
       - file: PP400SeriesChannel.template
         args:
           .*:
-  - name: gardasoftLEDRT460Channel
+
+  - name: gardasoftLED420Profile
     description: |-
-      Gardasoft RT460 series LED controller channel
+      Gardasoft PP420 LED controller pulse profile
     parameters:
       P:
         type: str
         description: |-
-          PV name prefix
+          Domain
+      PROFILE:
+        type: int
+        description: |-
+          Profile number 1-6
+      LINKPOS:
+        type: str
+        description: |-
+          EPICS link prefix, use ZR = profile 1, ON = profile 2, TW = profile 3, TH = profile 4, FR = profile 5, FV = profile 6
+    databases:
+      - file: PP420Profile.template
+        args:
+          .*:
+
+  - name: gardasoftLED420ProfileChannel
+    description: |-
+      Gardasoft PP420 LED controller pulse profile channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          Domain
+      PROFILE:
+        type: int
+        description: |-
+          Profile number 1-6
+      CHANNEL:
+        type: int
+        description: |-
+          Channel number 1-4
+    databases:
+      - file: PP420ProfileChannel.template
+        args:
+          .*:
+
+  - name: gardasoftLED820
+    description: |-
+      Gardasoft PP820 LED controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          The PV device name prefix for the lighting controller.
       PORT:
         type: str
         description: |-
-          asyn port name
+          The lighting controller stream device serial comms port.
+      name:
+        type: id
+        description: |-
+          The name for gui elements.
+    databases:
+      - file: PP820LED.template
+        args:
+          .*:
+
+  - name: gardasoftLED800Channel
+    description: |-
+      Gardasoft PP800 series LED controller channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          Domain
+      CHANNEL:
+        type: int
+        description: |-
+          Channel number 1-7
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn port name for stream device
+    databases:
+      - file: PP800SeriesChannel.template
+        args:
+          .*:
+
+  - name: gardasoftLEDRTSeries
+    description: |-
+      Gardasoft RT series LED controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          The PV device name prefix for the lighting controller.
+      PORT:
+        type: str
+        description: |-
+          The lighting controller stream device serial comms port.
+      name:
+        type: id
+        description: |-
+          The name for gui elements.
+    databases:
+      - file: RTSeriesLED.template
+        args:
+          .*:
+
+  - name: gardasoftLEDRTSeriesChannel
+    description: |-
+      Gardasoft RT series LED controller channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          The PV device name prefix for the lighting controller.
+      PORT:
+        type: str
+        description: |-
+          The lighting controller stream device serial comms port.
+      N:
+        type: int
+        description: |-
+          The lighting controller channel number.
+      DESCRIPTION:
+        type: str
+        description: |-
+          Channel description label.
       MAXCURRENT:
         type: float
         description: |-
-          Maximum current rating (mA)
-        default: 100.0
+          The maximum current to allow for the channel current limits (milliamp).
+      MAXVOLTAGE:
+        type: float
+        description: |-
+          The maximum voltage to allow for the channel voltage limits (volts).
     databases:
-      - file: RT460LED.template
+      - file: RTSeriesChannel.template
         args:
           .*:

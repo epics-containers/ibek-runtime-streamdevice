@@ -2,9 +2,28 @@
 
 # Imported from DLS production support module: microlab500 1-5
 # Source: /dls_sw/prod/R3.14.12.7/support/microlab500/1-5
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
-# To check for updates: diff this pattern's files against that path, or against the
-# newest /dls_sw/prod/*/support/microlab500/ release.
+#
+# microlab500.proto is a pristine copy of that release's microlab500App/protocol.
+#
+# The .template files are DERIVED, not pristine: they come from that release's
+# microlab500App/Db VDCT sources, converted to msi-native include/substitute by
+# vdct2template (VDCT does not exist in the EPICS 7 base epics-containers uses).
+#
+# microlab500half.template is an msi `include` target, not an entity: the whole
+# pump is two halves, so microlab500whole includes it twice with _SIDE=LEFT and
+# _SIDE=RIGHT. Its macros carry a _ prefix because msi will not apply a default
+# when substituting a macro with its own name.
+#
+# Two VDCT instance-port references in the parent ($(microlab500Left.STARTUP),
+# $(microlab500Right.STARTUP)) have been resolved to the record names the
+# includes produce -- $(P)$(R):LEFT:STARTUP and $(P)$(R):RIGHT:STARTUP -- which
+# is what VisualDCT does at flatten time and vdct2template does not.
+#
+# Verified: microlab500whole expands under msi to the same record and field set
+# as that release's VDCT-built db/ copy.
+#
+# To check for updates: diff microlab500.proto against that path, and re-run the
+# conversion on the newest /dls_sw/prod/*/support/microlab500/ release.
 
 module: microlab500
 
