@@ -1,0 +1,467 @@
+## 
+## \file microlab500half.vdb
+## \brief Control half of a Microlab 500 syringe pump
+## \details Control and monitor one syringe and one valve.
+##          Has a soft motor for the syringe.
+##          Implements continuous pumping function.
+##
+## \author Giles Knap, Andrew Wilson
+##
+
+## Make STARTUP available to call from higher level template
+
+
+## Pickup tweak
+record(ao, "$(_P)$(_R):$(_SIDE):MOVOUT") {
+  field(DESC, "Control left syringe pickup")
+  field(DTYP, "stream")
+  field(OUT, "@microlab500.proto pickup($(_SIDEPARM)) $(_PORT)")
+}
+## Dispense tweak
+record(ao, "$(_P)$(_R):$(_SIDE):MOVIN") {
+  field(DESC, "Control left syringe dispense")
+  field(DTYP, "stream")
+  field(OUT, "@microlab500.proto dispense($(_SIDEPARM)) $(_PORT)")
+}
+
+## Pickup or dispense tweak size
+record(ao, "$(_P)$(_R):$(_SIDE):STEP") {
+  field(PREC, "0")
+  field(EGU, "Steps")
+  field(VAL, "50")
+}
+
+## User input for raw speed
+record(longout, "$(_P)$(_R):$(_SIDE):SPEED") {
+  field(VAL, "9")
+  field(OUT, "$(_P)$(_R):$(_SIDE):SETSPEED PP")
+  field(EGU, "s/stroke")
+}
+
+## ??
+record(calcout, "$(_P)$(_R):$(_SIDE):CALC") {
+  field(DTYP, "Soft Channel")
+  field(CALC, "A")
+  field(INPA, "$(_P)$(_R):$(_SIDE):STEP.VAL PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+## Set raw speed
+record(longout, "$(_P)$(_R):$(_SIDE):SETSPEED") {
+  field(DESC, "Control speed of $(_SIDE) syringe")
+  field(DTYP, "stream")
+  field(OUT, "@microlab500.proto speed($(_SIDEPARM)) $(_PORT)")
+  field(DRVH, "250") # Maximum accepted by device
+  field(DRVL, "0")
+  field(EGU, "s/stroke")
+}
+
+##  \name Return steps
+##  \{
+
+##  User input for return steps
+record(longout, "$(_P)$(_R):$(_SIDE):RETURN") {
+  field(VAL, "0")
+  field(OUT, "$(_P)$(_R):$(_SIDE):SETRETURN PP")
+}
+## Write return steps to hardware
+record(longout, "$(_P)$(_R):$(_SIDE):SETRETURN") {
+  field(DESC, "Control backuoff return steps")
+  field(DTYP, "stream")
+  field(OUT, "@microlab500.proto return($(_SIDEPARM)) $(_PORT)")
+  field(DRVH, "9")
+  field(DRVL, "0") # Controller will not accept values >= 10
+  field(EGU, "steps")
+}
+## \}
+
+##  Read current syringe position
+record(ai, "$(_P)$(_R):$(_SIDE):GETSPOS") {
+  field(DESC, "Get syringe position")
+  field(DTYP, "stream")
+  field(INP, "@microlab500.proto positionS($(_SIDEPARM)) $(_PORT)")
+  field(EGU, "Steps")
+}
+
+##
+##  \name To implement "Pickup" button
+## \{
+##
+record(bo, "$(_P)$(_R):$(_SIDE):PICKUP") {
+  field(FLNK, "$(_P)$(_R):$(_SIDE):PICKUPA")
+}
+record(ao, "$(_P)$(_R):$(_SIDE):PICKUPA") {
+  field(DESC, "Drives syringe pickup")
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(_P)$(_R):$(_SIDE):MOVOUT.VAL PP")
+  field(FLNK, "$(_P)$(_R):$(_SIDE):MOVOUT")
+  field(DOL, "$(_P)$(_R):$(_SIDE):CALC.VAL PP")
+  field(OMSL, "closed_loop")
+}
+## \}
+
+##
+## \name To implement "Dispense" button
+## \{
+##
+record(bo, "$(_P)$(_R):$(_SIDE):DISPENSE") {
+  field(FLNK, "$(_P)$(_R):$(_SIDE):DISPENSEA")
+}
+record(ao, "$(_P)$(_R):$(_SIDE):DISPENSEA") {
+  field(DESC, "drives syringe dispense")
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(_P)$(_R):$(_SIDE):MOVIN.VAL")
+  field(FLNK, "$(_P)$(_R):$(_SIDE):MOVIN")
+  field(DOL, "$(_P)$(_R):$(_SIDE):CALC.VAL PP")
+  field(OMSL, "closed_loop")
+}
+## \}
+
+##
+## \name Get valve position
+## \{
+##
+record(longin, "$(_P)$(_R):$(_SIDE):GETVPOSA") {
+  field(DTYP, "stream")
+  field(INP, "@microlab500.proto positionV($(_SIDEPARM)) $(_PORT)")
+}
+## Make valve position readback human-readable
+record(mbbi, "$(_P)$(_R):$(_SIDE):GETVPOS") {
+  field(DESC, "Get valve position")
+  field(DTYP, "Raw Soft Channel")
+  field(INP, "$(_P)$(_R):$(_SIDE):GETVPOSA PP")
+  field(ZRVL, "1")
+  field(ONVL, "3")
+  field(TWVL, "4")
+  field(ONST, "Wash")
+  field(TWST, "Ouput")
+  field(VAL, "0")
+  field(ZRST, "Input")
+}
+## \}
+
+##
+## \name Set valve position:
+## \{
+
+## Translate valve position for device
+record(mbbo, "$(_P)$(_R):$(_SIDE):SETVPOS") {
+  field(DESC, "Set valve position")
+  field(DTYP, "Raw Soft Channel")
+  field(OUT, "$(_P)$(_R):$(_SIDE):SETVPOSA PP")
+  field(ZRVL, "1")
+  field(ONVL, "3")
+  field(TWVL, "4")
+  field(ONST, "Wash")
+  field(TWST, "Output")
+  field(VAL, "0")
+  field(ZRST, "Input")
+}
+## Write valve position to device
+record(longout, "$(_P)$(_R):$(_SIDE):SETVPOSA") {
+  field(DTYP, "stream")
+  field(VAL, "0")
+  field(OUT, "@microlab500.proto setvalve($(_SIDEPARM)) $(_PORT)")
+  field(OMSL, "closed_loop")
+}
+## \}
+
+##   Tasks required on startup
+record(seq, "$(_P)$(_R):$(_SIDE):STARTUP") {
+  field(LNK1, "$(_P)$(_R):$(_SIDE):RETURN.PROC")
+  #
+  #  Make sure the motor record is initialised properly
+  #
+  field(DO2, "1")
+  field(LNK2, "$(_P)$(_R):$(_SIDE):MOTOR.SYNC NPP")
+#  field(LNK3, "$(_P)$(_R):$(_SIDE):MOTOR.PROC")
+  #
+  #  Make sure velocity is written immediately
+  #
+  field(DLY3, "0.1")
+  field(LNK3, "$(_P)$(_R):$(_SIDE):VELTORAW.PROC")
+  #
+  #  Trick to get soft motor to read correct RBV on startup:
+  #  Instantaneous disable and re-enable of record reading sytring position
+  #  forces motor record to update RBV.
+  #
+#  field(DO4, "1")
+#  field(LNK4, "$(_P)$(_R):$(_SIDE):GETSPOS.DISA PP")
+#  field(DO5, "0")
+#  field(LNK5, "$(_P)$(_R):$(_SIDE):GETSPOS.DISA PP")
+}
+
+
+##  \brief Performs polling
+##  Disabled when DISABLEPOLL is set
+record(fanout, "$(_P)$(_R):$(_SIDE)SCAN") {
+  field(SCAN, "1 second")
+  field(SDIS, "$(_DISABLE)")
+  field(LNK1, "$(_P)$(_R):$(_SIDE):GETSPOS")
+  field(LNK2, "$(_P)$(_R):$(_SIDE):GETVPOS")
+  field(LNK3, "$(_P)$(_R):$(_SIDE):GETSPEED")
+}
+
+##
+## \name Write raw position:
+## \{
+
+## User input
+record(longout, "$(_P)$(_R):$(_SIDE):POSITION") {
+  field(OUT, "$(_P)$(_R):$(_SIDE):SETPOSITION PP")
+  field(EGU, "Steps")
+}
+## Write raw absolute position to device
+record(longout, "$(_P)$(_R):$(_SIDE):SETPOSITION") {
+  field(DESC, "Control absolute position")
+  field(DTYP, "stream")
+  field(OUT, "@microlab500.proto move($(_SIDEPARM)) $(_PORT)")
+  field(EGU, "steps")
+}
+## \}
+
+##
+##  \name Following records control the pumping mechanism
+##    Move back and forth over the whole range until told to stop
+## \{
+##
+record(seq, "$(_P)$(_R):$(_SIDE):PUMPSEQ") {
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "0")
+  field(LNK1, "$(_P)$(_R):$(_SIDE):SETVPOS PP")
+  field(DLY2, "1")
+  field(DOL2, "1000")
+  field(LNK2, "$(_P)$(_R):$(_SIDE):POSITION PP")
+}
+record(bo, "$(_P)$(_R):$(_SIDE):PUMP") {
+  field(VAL, "1")
+  field(ZNAM, "Pumping")
+  field(ONAM, "Start Pump")
+}
+record(seq, "$(_P)$(_R):$(_SIDE):PUMPSEQ2") {
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "2")
+  field(LNK1, "$(_P)$(_R):$(_SIDE):SETVPOS PP")
+  field(DLY2, "1")
+  field(DOL2, "0")
+  field(LNK2, "$(_P)$(_R):$(_SIDE):POSITION PP")
+}
+record(calcout, "$(_P)$(_R):$(_SIDE):PUMPCTL") {
+  field(SCAN, ".5 second")
+  field(SDIS, "$(_P)$(_R):$(_SIDE):PUMP")
+  field(CALC, "A=0 && B=0")
+  field(INPA, "$(_P)$(_R):$(_SIDE):GETSPOS")
+  field(INPB, "$(_P)$(_R):$(_SIDE):PUMP")
+  field(OUT, "$(_P)$(_R):$(_SIDE):PUMPSEQ PP")
+  field(OOPT, "Transition To Non-zero")
+}
+record(calcout, "$(_P)$(_R):$(_SIDE):PUMPCTL2") {
+  field(SCAN, ".5 second")
+  field(SDIS, "$(_P)$(_R):$(_SIDE):PUMP")
+  field(CALC, "A=1000 && B=0")
+  field(INPA, "$(_P)$(_R):$(_SIDE):GETSPOS")
+  field(INPB, "$(_P)$(_R):$(_SIDE):PUMP")
+  field(OUT, "$(_P)$(_R):$(_SIDE):PUMPSEQ2 PP")
+  field(OOPT, "Transition To Non-zero")
+}
+## \}
+
+## \name Syringe soft mootor
+## \{
+
+##  \brief Soft motor record representing the syringe
+##
+record(motor, "$(_P)$(_R):$(_SIDE):MOTOR") {
+  field(DESC, "$(_SIDE) syringe")
+  field(DTYP, "Soft Channel")
+  field(DINP, "$(_P)$(_R):$(_SIDE):DMOV NPP NMS") # Input link for DMOV
+  field(OUT, "$(_P)$(_R):$(_SIDE):GO PP NMS") # Link to "seq" record to set speed and write demand
+  field(RDBL, "$(_P)$(_R):$(_SIDE):POSTOEGU") # Readback location
+  field(STOO, "$(_P)$(_R):STOP PP NMS") # STOP output link
+  field(URIP, "1") # Use readback from RDBL
+  field(DIR, "0") # Direction positive
+  field(SCAN, "Passive")
+
+  field(VBAS, "50") # Minimum velocity
+  field(VMAX, "$(_SYRINGEVOL)") # Maximum velocity is 1 second per full stroke = 1 syringe per second
+  field(VELO, "50") # Default velocity on startup
+
+  field(EGU, "uL")
+  field(PREC, "1")
+  field(VAL, "0") # Initialise VAL field to zero
+
+# Fixed resolution: conversion performed in separate record
+  field(MRES, "1")
+  field(RRES, "1")
+
+# Soft limits
+  field(DHLM, "$(_SYRINGEVOL)") # High soft limit = full syringe volume
+  field(DLLM, "0")
+}
+
+##
+##  \brief Hack to set motor RRES = MRES.
+##  Processed once at startup
+##
+record(ao, "$(_P)$(_R):$(_SIDE):SETRRES"){
+  field(DESC, "Set RRES = MRES")
+  field(DOL, "$(_P)$(_R):$(_SIDE):MOTOR.MRES NPP NMS")
+  field(OMSL, "closed_loop")
+  field(OUT, "$(_P)$(_R):$(_SIDE):MOTOR.RRES CA")
+}
+
+##
+## \brief Start move from soft motor
+## \details This record gets processed when a move is initiated from the motor record
+## It sets the velocity and writes the position demand
+##
+record(seq, "$(_P)$(_R):$(_SIDE):GO"){
+  field(DESC, "$(_SIDE) syringe: write velocity and demand")
+# Calculate (then write) velocity
+  field(DOL1, "1")
+  field(LNK1, "$(_P)$(_R):$(_SIDE):VELTORAW.PROC")
+# Write demand
+  field(DOL2, "1")
+  field(LNK2, "$(_P)$(_R):$(_SIDE):POSTORAW PP NMS")
+}
+## \}
+
+##
+## \brief Convert velocity from EGUs per second to seconds per full stroke
+## ...and pass on to be written to device
+##
+record(calcout, "$(_P)$(_R):$(_SIDE):VELTORAW"){
+  field(DESC, "$(_SIDE) convert velocity")
+  field(INPA, "$(_P)$(_R):$(_SIDE):MOTOR.VELO NPP")
+  field(INPB, "$(_SYRINGEVOL)") # Syringe volume
+  field(CALC, "B/A") # velocity (s per full stroke) = Syringe volume / velocity (volume per second)
+  field(OUT, "$(_P)$(_R):$(_SIDE):SETSPEED.VAL PP NMS") # Write converted velocity
+  field(SCAN, "Passive")
+  field(EGU, "s/stroke")
+  field(TPRO, "1")
+}
+
+##
+## \brief Read in raw speed in seconds per full stroke
+## ... and pass on to be written to device
+##
+record(longin, "$(_P)$(_R):$(_SIDE):GETSPEED") {
+  field(DTYP, "stream")
+  field(INP, "@microlab500.proto getSpeed($(_SIDEPARM)) $(_PORT)")
+  field(FLNK, "$(_P)$(_R):$(_SIDE):VELTOEGU.PROC")
+  field(EGU, "s/stroke")
+}
+
+##
+## \brief Convert velocity from seconds per full stroke to EGUs per second
+##
+record(calcout, "$(_P)$(_R):$(_SIDE):VELTOEGU"){
+  field(DESC, "$(_SIDE) convert velocity")
+  field(INPA, "$(_P)$(_R):$(_SIDE):GETSPEED NPP")
+  field(INPB, "$(_SYRINGEVOL)") # Syringe volume
+  field(CALC, "B/A") # velocity (volume per second) = Syringe volume / velocity (s per full stroke)
+  field(SCAN, "Passive")
+  field(EGU, "uL/s")
+}
+
+##
+##  \name Set the syringe volume
+##  \{
+
+## Set syringe volume
+record(longout, "$(_P)$(_R):$(_SIDE):SVOL") {
+  field(VAL, "$(_SYRINGEVOL)")
+  field(FLNK, "$(_P)$(_R):$(_SIDE):DISTSVOL.PROC")
+  field(EGU, "uL")
+  field(DRVL, "1") # Avoid division by zero 
+  field(DRVH, "1000000")
+}
+## Read back syringe volume
+record(longin, "$(_P)$(_R):$(_SIDE):SVOL:RBV") {
+  field(VAL, "0")
+  field(EGU, "uL")
+}
+## Distribute new volume to everywhere it's required
+record(seq, "$(_P)$(_R):$(_SIDE):DISTSVOL") {
+  # Syringe volume readback
+  field(DOL1, "$(_P)$(_R):$(_SIDE):SVOL NPP")
+  field(LNK1, "$(_P)$(_R):$(_SIDE):SVOL:RBV PP")
+
+  # Make sure offset is zero
+  field(DO2, "0")
+  field(DLY2, "1")
+  field(LNK2, "$(_P)$(_R):$(_SIDE):MOTOR.OFF NPP")
+  # Velocity calculations
+  field(DOL3, "$(_P)$(_R):$(_SIDE):SVOL")
+  field(LNK3, "$(_P)$(_R):$(_SIDE):VELTORAW.B PP")
+  field(DOL4, "$(_P)$(_R):$(_SIDE):SVOL")
+  field(LNK4, "$(_P)$(_R):$(_SIDE):VELTOEGU.B PP")
+  field(DOL5, "$(_P)$(_R):$(_SIDE):SVOL")
+  field(LNK5, "$(_P)$(_R):$(_SIDE):MOTOR.VMAX NPP")
+  field(DOL6, "$(_P)$(_R):$(_SIDE):SVOL")
+  field(LNK6, "$(_P)$(_R):$(_SIDE):MOTOR.DHLM NPP")
+
+  field(DO7, "1")
+  field(LNK7, "$(_P)$(_R):$(_SIDE):MOTOR.SYNC")
+}
+## \}
+
+## \name Greedy write of velocity from motor record
+## \{
+
+##  Monitor the VELO field of the soft motor
+##  and write it staright to hardware when it changes
+##  so that we can see the readback from the hardware
+##  straight away and know it's happy with the value
+##
+record(calcout, "$(_P)$(_R):$(_SIDE):COPYVELO") {
+  field(DESC, "Write speed when VELO changes")
+  field(INPA, "$(_P)$(_R):$(_SIDE):MOTOR.VELO NPP")
+  field(SCAN, ".1 second")
+  field(CALC, "A")
+  field(OOPT, "On Change")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(_P)$(_R):$(_SIDE):VELTORAW PP")
+}
+##
+##  Same as above but runs once on init
+##    Workaround because "On Change" DOPT doesn't seem to 
+##    let me process once on init 
+##
+record(calcout, "$(_P)$(_R):$(_SIDE):STARTUPVELO") {
+  field(DESC, "Write velocity on startup")
+  field(INPA, "$(_P)$(_R):$(_SIDE):MOTOR.VELO NPP")
+  field(SCAN, "Passive")
+  field(CALC, "A")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(_P)$(_R):$(_SIDE):VELTORAW PP")
+  field(TPRO, "1")
+}
+## \}
+
+## \name Convert between EGUs and counts
+## \{
+record(calcout, "$(_P)$(_R):$(_SIDE):POSTOEGU"){
+  field(DESC, "Convert position to EGU")
+  field(INPA, "$(_P)$(_R):$(_SIDE):GETSPOS CP")
+  field(INPB, "$(_P)$(_R):$(_SIDE):SVOL CP") # Syringe volume
+  field(INPC, "$(_STROKESIZE)") # Steps per stroke
+  field(CALC, "A*B/C") # position (volume) = position (steps) / steps per stroke * volume per stroke
+  field(SCAN, "Passive")
+  field(EGU, "uL/s")
+}
+record(calcout, "$(_P)$(_R):$(_SIDE):POSTORAW"){
+  field(DESC, "Convert position to steps")
+  field(INPA, "$(_P)$(_R):$(_SIDE):MOTOR.RVAL NPP")
+  field(INPB, "$(_P)$(_R):$(_SIDE):SVOL CP") # Syringe volume
+  field(INPC, "$(_STROKESIZE)") # Steps per stroke
+  field(CALC, "A/B*C") # position (steps) = position (volume) / volume per stroke * steps per stroke
+  field(SCAN, "Passive")
+  field(EGU, "steps")
+  field(OUT, "$(_P)$(_R):$(_SIDE):POSITION PP NMS")
+}
+## \}

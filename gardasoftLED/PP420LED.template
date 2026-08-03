@@ -3,7 +3,7 @@
 # % macro, P, Domain
 # % macro, STREAMS_PORT, Asyn port name for stream device
 # % macro, name, gui element name
-# % gui, $(name).LED, edm, PP400Series.edl, P=$(P)
+# % gui, $(name=).LED, edm, PP400Series.edl, P=$(P)
 
 record(ao, "$(P):SAVE")
 {

@@ -1,0 +1,253 @@
+# %autosave 2 VAL
+
+
+# % macro, P, The PV device name prefix for the lighting controller.
+# % macro, PORT, The lighting controller stream device serial comms port.
+# % macro, N, The lighting controller channel number.
+# % macro, DESCRIPTION, Channel description label.
+# % macro, MAXCURRENT, The maximum current to allow for the channel current limits (milliamp).
+# % macro, MAXVOLTAGE, The maximum voltage to allow for the channel voltage limits (volts).
+# % macro, gda_name, The name for GDA.
+# % macro, gda_desc, The description for GDA.
+# %autosave 2 VAL
+record(ao, "$(P):CH$(N):SETMAXVOLTAGE") {
+  field(DESC, "Set max voltage rating")
+  field(EGU, "V")
+  field(DTYP, "stream")
+  field(OUT, "@RTSeries.protocol setVoltageRating($(N),$(P):CH$(N)) $(PORT)")
+  field(PREC, "0")
+  field(DRVH, "$(MAXVOLTAGE=0)")
+  field(DRVL, "0")
+  field(PINI, "NO")
+  field(VAL, "$(MAXVOLTAGE)")
+}
+
+# Set by protocol in rbv
+record(ai, "$(P):CH$(N):MAXVOLTAGE") {
+  field(DESC, "Max voltage rating")
+  field(PREC, "0")
+  field(EGU, "V")
+}
+
+# Set by protocol in rbv
+record(ai, "$(P):CH$(N):MAXCURRENT") {
+  field(DESC, "Max current rating")
+  field(PREC, "0")
+  field(EGU, "mA")
+}
+
+# %autosave 2 VAL
+record(ao, "$(P):CH$(N):SETMAXCURRENT") {
+  field(DESC, "Set max current rating")
+  field(EGU, "mA")
+  field(DTYP, "stream")
+  field(OUT, "@RTSeries.protocol setRating($(N),$(P):CH$(N)) $(PORT)")
+  field(PREC, "0")
+  field(DRVH, "$(MAXCURRENT=0)")
+  field(DRVL, "0")
+  field(PINI, "YES")
+  field(VAL, "$(MAXCURRENT)")
+}
+
+# Outputs '0' to switch off
+record(calcout, "$(P):CH$(N):SENDOUTPUT") {
+  field(DESC, "Sends desired current output")
+  field(DTYP, "stream")
+  field(CALC, "B?A:B")
+  field(OUT, "@RTSeries.protocol setOutput($(N),$(P):CH$(N)) $(PORT)")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(INPA, "$(P):CH$(N):SETOUTPUT.VAL")
+  field(INPB, "$(P):CH$(N):ON.VAL")
+}
+
+# %gdatag,pv,ro,$(gda_name=).CH$(N):READBACK,RECORD,Current readback
+# 
+# Set by protocol in rbv
+record(ai, "$(P):CH$(N):BRIGHTNESS") {
+  field(DESC, "Brightness")
+  field(PREC, "0")
+  field(EGU, "%")
+}
+
+# %gdatag,template,simplePv,$(gda_name=).CH$(N):SETPOINT,$(gda_desc=) channel $(N) brightness setpoint
+# %gdatag,template,simplePv,$(gda_name=).CH$(N):READBACK,$(gda_desc=) channel $(N) brightness readback
+# %gdatag,template,simpleBinary,$(gda_name=).CH$(N):SWITCH,$(gda_desc=) channel $(N) on/off switch
+# %gdatag,pv,rw,$(gda_name=).CH$(N):SETPOINT,RECORD,Brightness setpoint
+# %autosave 2 VAL
+record(ao, "$(P):CH$(N):SETOUTPUT") {
+  field(DESC, "Set brightness")
+  field(FLNK, "$(P):CH$(N):SENDOUTPUT")
+  field(VAL, "0")
+  field(PREC, "0")
+  field(EGU, "%")
+  field(HOPR, "100")
+  field(LOPR, "0")
+  field(DRVH, "100")
+  field(DRVL, "0")
+}
+
+# %autosave 2 VAL
+# %gdatag,binary,rw,$(gda_name=).CH$(N):SWITCH,RECORD,On/Off switch
+record(bo, "$(P):CH$(N):ON") {
+  field(DESC, "Turns LED On/Off")
+  field(ZNAM, "LED OFF")
+  field(ONAM, "LED ON")
+  field(ZSV, "MAJOR")
+  field(FLNK, "$(P):CH$(N):SENDOUTPUT")
+  field(PINI, "YES")
+}
+
+record(stringin, "$(P):CH$(N):DESCRIPTION") {
+  field(DESC, "Description of the channel")
+  field(VAL, "$(DESCRIPTION)")
+  field(PINI, "YES")
+}
+
+# Set by protocol in rbv
+record(mbbiDirect, "$(P):CH$(N):OPTIONS") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P):CH$(N):OPTIONS:FLNK")
+}
+
+record(fanout, "$(P):CH$(N):OPTIONS:FLNK") {
+  field(LNK1, "$(P):CH$(N):OPTIONS:GET-01")
+  field(LNK2, "$(P):CH$(N):OPTIONS:GET-02")
+  field(LNK3, "$(P):CH$(N):OPTIONS:GET-03")
+  field(LNK4, "$(P):CH$(N):OPTIONS:GET-06")
+}
+
+record(bi, "$(P):CH$(N):OPTIONS:GET-01") {
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(INP, "$(P):CH$(N):OPTIONS.B1 PP")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+  field(DESC, "Error detection disable")
+}
+
+# %autosave 2 VAL
+record(bo, "$(P):CH$(N):OPTIONS:SET-01") {
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(FLNK, "$(P):CH$(N):OPTIONS:MASK-01")
+  field(VAL, "0")
+  field(DESC, "Error detection disable")
+  field(OMSL, "supervisory")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+record(calcout, "$(P):CH$(N):OPTIONS:MASK-01") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(CALC, "(A)? (1<<1)|B : ~((1<<1))&B")
+  field(INPA, "$(P):CH$(N):OPTIONS:SET-01.VAL")
+  field(INPB, "$(P):CH$(N):OPTIONS CA")
+  field(OUT, "$(P):CH$(N):SETOPTIONS PP")
+  field(OOPT, "Every Time")
+}
+
+record(bi, "$(P):CH$(N):OPTIONS:GET-02") {
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(INP, "$(P):CH$(N):OPTIONS.B2 PP")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+  field(DESC, "Negative triggers")
+}
+
+record(bi, "$(P):CH$(N):OPTIONS:GET-03") {
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(INP, "$(P):CH$(N):OPTIONS.B3 PP")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+  field(DESC, "Autosense disable")
+}
+
+record(bi, "$(P):CH$(N):OPTIONS:GET-06") {
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(INP, "$(P):CH$(N):OPTIONS.B6 PP")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+  field(DESC, "Current adjust disable")
+}
+
+# %autosave 2 VAL
+record(ao, "$(P):CH$(N):SETOPTIONS") {
+  field(DESC, "Set option flags")
+  field(DTYP, "stream")
+  field(OUT, "@RTSeries.protocol setOptionFlags($(N),$(P):CH$(N)) $(PORT)")
+  field(PREC, "0")
+  field(VAL, "0")
+  field(PINI, "YES")
+}
+
+# %autosave 2 VAL
+record(bo, "$(P):CH$(N):OPTIONS:SET-02") {
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(FLNK, "$(P):CH$(N):OPTIONS:MASK-02")
+  field(VAL, "0")
+  field(DESC, "Negative triggers")
+  field(OMSL, "supervisory")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+# %autosave 2 VAL
+record(bo, "$(P):CH$(N):OPTIONS:SET-03") {
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(FLNK, "$(P):CH$(N):OPTIONS:MASK-03")
+  field(VAL, "0")
+  field(DESC, "Autosense disable")
+  field(OMSL, "supervisory")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+record(calcout, "$(P):CH$(N):OPTIONS:MASK-02") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(CALC, "(A)? (1<<2)|B : ~((1<<2))&B")
+  field(INPA, "$(P):CH$(N):OPTIONS:SET-02.VAL")
+  field(INPB, "$(P):CH$(N):OPTIONS CA")
+  field(OUT, "$(P):CH$(N):SETOPTIONS PP")
+  field(OOPT, "Every Time")
+}
+
+record(calcout, "$(P):CH$(N):OPTIONS:MASK-03") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(CALC, "(A)? (1<<3)|B : ~((1<<3))&B")
+  field(INPA, "$(P):CH$(N):OPTIONS:SET-03.VAL")
+  field(INPB, "$(P):CH$(N):OPTIONS CA")
+  field(OUT, "$(P):CH$(N):SETOPTIONS PP")
+  field(OOPT, "Every Time")
+}
+
+# %autosave 2 VAL
+record(bo, "$(P):CH$(N):OPTIONS:SET-06") {
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(FLNK, "$(P):CH$(N):OPTIONS:MASK-06")
+  field(VAL, "0")
+  field(DESC, "Current adjust disable")
+  field(OMSL, "supervisory")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+record(calcout, "$(P):CH$(N):OPTIONS:MASK-06") {
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(CALC, "(A)? (1<<6)|B : ~((1<<6))&B")
+  field(INPA, "$(P):CH$(N):OPTIONS:SET-06.VAL")
+  field(INPB, "$(P):CH$(N):OPTIONS CA")
+  field(OUT, "$(P):CH$(N):SETOPTIONS PP")
+  field(OOPT, "Every Time")
+}

@@ -11,9 +11,9 @@ replytimeout = 100;
 readtimeout  = 2000;
 
 # Report the firmware version
-getVersion {
-	out "VR";
-	in "%s";
+getVersion { 
+	out "VR"; 
+	in "VR%(\$1:MODEL)s %(\$1:HW_VERSION)s %(\$1:FW_VERSION)s"; 
 }
 
 # Save settings to the controller's
@@ -32,12 +32,33 @@ resetErrors {
 
 # Set the max current rating for a light (mA)
 # $1 - output channel
+# $2 - PV prefix
 setRating {
 	out "VL\$1,0,%fma";
+	in "VL\$1,%(\$2:MAXVOLTAGE)f,%(\$2:MAXCURRENT)fMA";
+}
+
+# Set the max voltage rating for a light (V)
+# $1 - output channel
+# $2 - PV prefix
+setVoltageRating {
+	out "VL\$1,%f,0";
+	in "VL\$1,%(\$2:MAXVOLTAGE)f,%(\$2:MAXCURRENT)f";
 }
 
 # Set continuous output (at a percentage of full brightness)
 # $1 - output channel
+# $2 - PV prefix
 setOutput {
-	out "RS\$1,%u"
+	out "RS\$1,%u";
+	in "RS\$1,%(\$2:BRIGHTNESS)f";
+}
+
+
+# Set the option flags (at a percentage of full brightness)
+# $1 - output channel
+# $2 - PV prefix
+setOptionFlags {
+	out "RE\$1,%u";
+	in "RE\$1,%(\$2:OPTIONS)f";
 }

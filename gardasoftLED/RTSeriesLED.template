@@ -1,0 +1,37 @@
+# % macro, P, The PV device name prefix for the lighting controller.
+# % macro, PORT, The lighting controller stream device serial comms port.
+# % macro, name, The name for gui elements.
+# % gui, $(name=), edm, RT200Series.edl, P=$(P)
+
+record(stringout, "$(P):SAVE") {
+  field(DESC, "Save settings")
+  field(DTYP, "stream")
+  field(OUT, "@RTSeries.protocol save $(PORT)")
+}
+
+record(ao, "$(P):VERSION") {
+  field(DESC, "Get version information")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(OUT, "@RTSeries.protocol getVersion($(P)) $(PORT)")
+}
+
+record(stringin, "$(P):MODEL") {
+  field(DESC, "Model Number")
+}
+
+record(stringin, "$(P):HW_VERSION") {
+  field(DESC, "Hardware Version Number")
+}
+
+record(stringin, "$(P):FW_VERSION") {
+  field(DESC, "Firmware Version Number")
+}
+
+record(stringin, "$(P):RESETERRORS") {
+  field(DESC, "Reset all error conditions")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(VAL, "0")
+  field(INP, "@RTSeries.protocol resetErrors $(PORT)")
+}
