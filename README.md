@@ -254,7 +254,15 @@ Treat them as two views of one device and keep them in step.
 Not every DLS StreamDevice module can take the runtime path: some need a module-specific
 **compiled** library, `.dbd`, or SNL sequencer program that the generic
 `ioc-streamdevice` image does not ship, so they are build-time-only. Those modules — and
-the test used to tell them apart — are listed in [BUILD-TIME-ONLY.md](BUILD-TIME-ONLY.md).
+the test used to tell them apart — are listed in [BUILD-TIME-ONLY.md](BUILD-TIME-ONLY.md),
+which is **generated** by the `streamdevice-sweep` skill in
+[builder2ibek](https://github.com/epics-containers/builder2ibek) and rewritten whole on
+every sweep. Edit it there, not here.
+
+Analysis a sweep cannot rederive — patterns that were shipped and later withdrawn, what
+those withdrawals cost, and modules that carry no protocol file and so never reach the
+gates — is hand-written in
+[WITHDRAWN-PATTERNS.md](WITHDRAWN-PATTERNS.md).
 
 ## Adding a new pattern
 
