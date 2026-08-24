@@ -26,10 +26,6 @@ entity_models:
         type: str
         description: |-
           Asyn port to connect to
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       CTEMP_MIN:
         type: float
         description: |-
@@ -45,14 +41,6 @@ entity_models:
         description: |-
           Optional macro to control whether comms are disabled (1) or not (0) on startup. Defaults to disabled
         default: 1
-      CTEMP_DRVL:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVL
-      CTEMP_DRVH:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVH
     databases:
       - file: OXPH700.template
         args:
@@ -75,10 +63,6 @@ entity_models:
         type: str
         description: |-
           Asyn port to connect to
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       CTEMP_MIN:
         type: float
         description: |-
@@ -94,14 +78,6 @@ entity_models:
         description: |-
           Optional macro to control whether comms are disabled (1) or not (0) on startup. Defaults to disabled
         default: 1
-      CTEMP_DRVL:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVL
-      CTEMP_DRVH:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVH
     databases:
       - file: OXCS700.template
         args:
@@ -124,10 +100,6 @@ entity_models:
         type: str
         description: |-
           Asyn port to connect to
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       CTEMP_MIN:
         type: float
         description: |-
@@ -143,14 +115,6 @@ entity_models:
         description: |-
           Optional macro to control whether comms are disabled (1) or not (0) on startup. Defaults to disabled
         default: 1
-      CTEMP_DRVL:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVL
-      CTEMP_DRVH:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVH
     databases:
       - file: OXCB700.template
         args:
@@ -173,10 +137,6 @@ entity_models:
         type: str
         description: |-
           Asyn port to connect to
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       CTEMP_MIN:
         type: float
         description: |-
@@ -192,14 +152,6 @@ entity_models:
         description: |-
           Optional macro to control whether comms are disabled (1) or not (0) on startup. Defaults to disabled
         default: 1
-      CTEMP_DRVL:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVL
-      CTEMP_DRVH:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVH
     databases:
       - file: OXNH700.template
         args:
@@ -222,10 +174,6 @@ entity_models:
         type: str
         description: |-
           Asyn port to connect to
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       CTEMP_MIN:
         type: float
         description: |-
@@ -241,14 +189,6 @@ entity_models:
         description: |-
           Optional macro to control whether comms are disabled (1) or not (0) on startup. Defaults to disabled
         default: 1
-      CTEMP_DRVL:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVL
-      CTEMP_DRVH:
-        type: float
-        description: |-
-          macro to set CTEMP.DRVH
     databases:
       - file: OXCB800.template
         args:
