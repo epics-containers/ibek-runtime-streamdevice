@@ -6,7 +6,7 @@
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/OXCryo/ release.
 
-module: OXCryo
+module: oxCryo
 
 entity_models:
   - name: OXPH700
