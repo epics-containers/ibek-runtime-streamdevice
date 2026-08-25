@@ -9,38 +9,38 @@
 
 InTerminator = LF;
 OutTerminator = LF;
-replytimeout = 1000;
-readtimeout  = 1000;
-locktimeout = 60000;
+ReplyTimeout = 1000;
+ReadTimeout  = 200;
+LockTimeout = 60000;
 
 # Reset the device
 reset { out "*RST\$1"; in "\6"; InTerminator = ""; }
 
 # Read as a long in the range [0..2^20=1048576]
-readCurr { out ":READ\$1:CURR\$2?"; in "\6%d"; }
+readCurr { out ":READ\$1:CURR\$2?"; in "\6%d"; wait 5;}
 
 # Read as a double
-readPos { out ":READ\$1:POS\$2?"; in "\6%f"; }
+readPos { out ":READ\$1:POS\$2?"; in "\6%f"; wait 5; }
 
 # Read range number
-readRang {out ":CONF\$1:CURR:RANG?"; in "\6%d"; }
+readRang { out ":CONF\$1:CURR:RANG?"; in "\6%d"; wait 5; }
 setRang {out ":CONF\$1:CURR:RANG %d"; in "\6"; InTerminator = "";
 	@init {out ":CONF\$1:CURR:RANG?"; in "\6%d" LF; }
 	}
 
 # Gain parameters
-readGL {out ":CONF\$1:\$2?"; in "\6%d"; }
+readGL { out ":CONF\$1:\$2?"; in "\6%d"; wait 5; }
 setGL  {out ":CONF\$1:\$2 %d"; in "\6"; InTerminator = ""; 
 	@init {out ":CONF\$1:\$2?"; in "\6%d" LF; }
 	}
 
-readGF {out ":CONF\$1:\$2?"; in "\6%f"; }
+readGF { out ":CONF\$1:\$2?"; in "\6%f"; wait 5; }
 setGF  {out ":CONF\$1:\$2 %f"; in "\6"; InTerminator = ""; 
 	@init {out ":CONF\$1:\$2?"; in "\6%f" LF; }
 	}
 
 # Averaging and filtering
-readMode {out ":CONF\$1:MODE?"; in "\6%d"; }
+readMode {out ":CONF\$1:MODE?"; in "\6%d"; wait 5; }
 setSingle { out ":CONF\$1:SINGLE"; in "\6"; InTerminator = ""; }
 setAvg {out ":CONF\$1:AVGCURR %d"; in "\6"; InTerminator = ""; }
 setWdw {out ":CONF\$1:WDWCURR %d"; in "\6"; InTerminator = ""; }
