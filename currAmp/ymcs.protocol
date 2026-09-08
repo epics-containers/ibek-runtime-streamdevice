@@ -1,4 +1,3 @@
-# Vendored from github.com/epics-containers/ibek-runtime-streamdevice@i03-1107 — DO NOT EDIT
 # This file covers the stream device protocols for both types
 # of current amplifiers (ymcs0012 and ymcs0009)
 # Original author: Igor Verstovsek (Cosylab)
@@ -11,7 +10,8 @@
 InTerminator = LF;
 OutTerminator = LF;
 ReplyTimeout = 1500;
-ReadTimeout  = 500;
+# There may be gaps between the ACK and value responses
+ReadTimeout  = 1000;
 LockTimeout = 60000;
 
 # Reset the device
