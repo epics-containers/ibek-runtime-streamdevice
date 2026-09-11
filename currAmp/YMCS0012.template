@@ -20,7 +20,7 @@
 #% gui, $(name=), edm, CurrAmp.edl, name=$(P)
 # % gui, $(name=), boyembed, currAmpApp_opi/CurrAmp.opi, name=$(P)
 record(longin, "$(P):A2") {
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGL($(addr),A2) $(port) 0")
   field(SDIS, "$(P):DISABLE")
@@ -35,7 +35,7 @@ record(longout, "$(P):A2_SP") {
 record(longin, "$(P):B2") {
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGL($(addr),B2) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -48,7 +48,7 @@ record(longout, "$(P):B2_SP") {
 record(longin, "$(P):C2") {
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGL($(addr),C2) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -61,7 +61,7 @@ record(longout, "$(P):C2_SP") {
 record(longin, "$(P):D2") {
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGL($(addr),D2) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -75,7 +75,7 @@ record(ai, "$(P):GX") {
   field(DESC, "Get X gain factor")
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGF($(addr),GX) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -92,7 +92,7 @@ record(ao, "$(P):GX_SP") {
 record(ai, "$(P):GY") {
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGF($(addr),GY) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -108,7 +108,7 @@ record(ao, "$(P):GY_SP") {
 record(ai, "$(P):A1") {
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGF($(addr),A1) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -124,7 +124,7 @@ record(ao, "$(P):A1_SP") {
 record(ai, "$(P):C1") {
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGF($(addr),C1) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -140,7 +140,7 @@ record(ao, "$(P):C1_SP") {
 record(ai, "$(P):B1") {
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGF($(addr),B1) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -156,7 +156,7 @@ record(ao, "$(P):B1_SP") {
 record(ai, "$(P):D1") {
   field(DTYP, "stream")
   field(INP, "@ymcs.protocol readGF($(addr),D1) $(port) 0")
-  field(SCAN, "2 second")
+  field(SCAN, "$(GSCAN=2 second)")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -416,7 +416,7 @@ record(calc, "$(P):RANGE_C") {
   field(INPC, "$(P):PHD4:I_R.VAL NPP MS")
   field(INPD, "$(P):PHD3:I_R.VAL NPP MS")
   field(INPK, "134333")
-  field(SCAN, "1 second")
+  field(SCAN, "$(SCAN=1 second)")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -449,7 +449,7 @@ record(ai, "$(P):XPOS") {
   field(EGU, "mm")
   field(HOPR, "10")
   field(LOPR, "-10")
-  field(SCAN, "1 second")
+  field(SCAN, "$(PSCAN=1 second)")
   field(ADEL, "0.001")
   field(SDIS, "$(P):DISABLE")
 }
@@ -464,7 +464,7 @@ record(ai, "$(P):YPOS") {
   field(EGU, "mm")
   field(HOPR, "10")
   field(LOPR, "-10")
-  field(SCAN, "1 second")
+  field(SCAN, "$(PSCAN=1 second)")
   field(ADEL, "0.001")
   field(SDIS, "$(P):DISABLE")
 }

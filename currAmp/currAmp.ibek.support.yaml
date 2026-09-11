@@ -45,7 +45,17 @@ entity_models:
       SCAN:
         type: str
         description: |-
-          SCAN rate for the raw current readbacks
+          SCAN rate for the raw current readbacks and the range-fault check
+        default: 1 second
+      GSCAN:
+        type: str
+        description: |-
+          SCAN rate for the gain/level readbacks and setpoints
+        default: 2 second
+      PSCAN:
+        type: str
+        description: |-
+          SCAN rate for the beam position readbacks
         default: 1 second
     databases:
       - file: YMCS0012.template
