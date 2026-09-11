@@ -30,7 +30,7 @@ setRang {out ":CONF\$1:CURR:RANG %d"; in "\6"; InTerminator = ""; wait 4;
 	}
 
 # Gain parameters
-readGL { out ":CONF\$1:\$2?"; in "\6%d"; wait 10; }
+readGL { out ":CONF\$1:\$2?"; in "\6%d"; wait 5; }
 setGL  {out ":CONF\$1:\$2 %d"; in "\6"; InTerminator = ""; wait 5;
 	@init {out ":CONF\$1:\$2?"; in "\6%d" LF; wait 5; }
 	}
