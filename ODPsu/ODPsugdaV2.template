@@ -1,0 +1,674 @@
+
+
+# ODPsugdaV2.template
+# substitutions
+# % macro, P, device name prefix (name will be $(P)$(Q))
+# % macro, Q, device name qualifier (name will be $(P)$(Q))
+# % macro, BANK, power supply bank number (0 - 1)
+# % macro, BSTART, Bstart substitution ?
+# % macro, NCHAN, Number of channels in PSU? (1-24)
+# % macro, PV, PV substitution ?
+# % macro, gda_name, GDA name
+# % macro, gda_desc, GDA description
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT5") {
+  field(DESC, "if A=$(NCHAN)+$(BSTART)-1")
+  field(CALC, "A=($(NCHAN)+$(BSTART)-1)?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT.VAL")
+  field(OUT, "$(PV):VOUT.PROC")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT6")
+}
+
+record(compress, "$(P)$(Q):GDA:B$(BANK):CMP") {
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT5")
+  field(INP, "$(P)$(Q):GDA:B$(BANK):SEL2.VAL")
+  field(ALG, "Circular Buffer")
+  field(NSAM, "$(NCHAN)")
+  field(HOPR, "10000")
+  field(LOPR, "0")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL2") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):SEL0.VAL")
+  field(INPB, "$(P)$(Q):GDA:B$(BANK):SEL1.VAL")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT4") {
+  field(DESC, "if A >= 12")
+  field(CALC, "A>=12?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEL2.SELN PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CMP")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL1") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):V12R")
+  field(INPB, "$(P)$(Q):V13R")
+  field(INPC, "$(P)$(Q):V14R")
+  field(INPD, "$(P)$(Q):V15R")
+  field(INPE, "$(P)$(Q):V16R")
+  field(INPF, "$(P)$(Q):V17R")
+  field(INPG, "$(P)$(Q):V18R")
+  field(INPH, "$(P)$(Q):V19R")
+  field(INPI, "$(P)$(Q):V20R")
+  field(INPJ, "$(P)$(Q):V21R")
+  field(INPK, "$(P)$(Q):V22R")
+  field(INPL, "$(P)$(Q):V23R")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL0") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):V0R")
+  field(INPB, "$(P)$(Q):V1R")
+  field(INPC, "$(P)$(Q):V2R")
+  field(INPD, "$(P)$(Q):V3R")
+  field(INPE, "$(P)$(Q):V4R")
+  field(INPF, "$(P)$(Q):V5R")
+  field(INPG, "$(P)$(Q):V6R")
+  field(INPH, "$(P)$(Q):V7R")
+  field(INPI, "$(P)$(Q):V8R")
+  field(INPJ, "$(P)$(Q):V9R")
+  field(INPK, "$(P)$(Q):V10R")
+  field(INPL, "$(P)$(Q):V11R")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT2") {
+  field(DESC, "if < 12")
+  field(CALC, "A<12?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEL0.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT3")
+  field(OCAL, "A")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT3") {
+  field(DESC, "if 12<=A<24")
+  field(CALC, "A>=12&&A<24?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEL1.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT4")
+  field(OCAL, "A-12")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT") {
+  field(DESC, "count $(BSTART) to $(BSTART)+$(NCHAN)-1")
+  field(CALC, "A<($(NCHAN)+$(BSTART)-1)?A+1:$(BSTART)")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT.VAL")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT2")
+  field(VAL, "-1")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT6") {
+  field(DESC, "A<$(NCHAN)+$(BSTART)-1")
+  field(CALC, "A<($(NCHAN)+$(BSTART)-1)?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):CNT.PROC CA")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+}
+
+record(dfanout, "$(P)$(Q):GDA:B$(BANK):START") {
+  field(DESC, "start conversion")
+  field(SELM, "All")
+  field(OUTA, "$(P)$(Q):GDA:B$(BANK):CMP.RES")
+  field(OUTB, "$(P)$(Q):GDA:B$(BANK):CNT.PROC CA")
+  field(DOL, "1")
+}
+
+record(seq, "$(P)$(Q):GDA:B$(BANK):SEQ") {
+  field(DESC, "Delay")
+  field(PINI, "YES")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT7")
+  field(DLY1, "0.5")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(Q):GDA:B$(BANK):START.PROC CA")
+}
+
+# This record starts another conversion if a conversion
+# is already in progress to make sure we don't miss voltage
+# changes that occure mid way through the conversion process.
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT7") {
+  field(DESC, "if ! idle")
+  field(CALC, "B#0?1:0")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEQ.PROC CA")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(INPB, "$(P)$(Q):GDA:B$(BANK):CNT.PACT")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL3") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):V0R CP")
+  field(INPB, "$(P)$(Q):V1R CP")
+  field(INPC, "$(P)$(Q):V2R CP")
+  field(INPD, "$(P)$(Q):V3R CP")
+  field(INPE, "$(P)$(Q):V4R CP")
+  field(INPF, "$(P)$(Q):V5R CP")
+  field(INPG, "$(P)$(Q):V6R CP")
+  field(INPH, "$(P)$(Q):V7R CP")
+  field(INPI, "$(P)$(Q):V8R CP")
+  field(INPJ, "$(P)$(Q):V9R CP")
+  field(INPK, "$(P)$(Q):V10R CP")
+  field(INPL, "$(P)$(Q):V11R CP")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):SEQ")
+  field(DESC, "Monitor voltages")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL4") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):V12R CP")
+  field(INPB, "$(P)$(Q):V13R CP")
+  field(INPC, "$(P)$(Q):V14R CP")
+  field(INPD, "$(P)$(Q):V15R CP")
+  field(INPE, "$(P)$(Q):V16R CP")
+  field(INPF, "$(P)$(Q):V17R CP")
+  field(INPG, "$(P)$(Q):V18R CP")
+  field(INPH, "$(P)$(Q):V19R CP")
+  field(INPI, "$(P)$(Q):V20R CP")
+  field(INPJ, "$(P)$(Q):V21R CP")
+  field(INPK, "$(P)$(Q):V22R CP")
+  field(INPL, "$(P)$(Q):V23R CP")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):SEQ")
+  field(DESC, "Monitor voltages")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT15") {
+  field(DESC, "if < 12")
+  field(CALC, "A<12?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT14.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEL5.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT16")
+  field(OCAL, "A")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT16") {
+  field(DESC, "if 12<=A<24")
+  field(CALC, "A>=12&&A<24?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT14.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEL6.SELN PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT17")
+  field(OCAL, "A-12")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL5") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):FMT:V0DR")
+  field(INPB, "$(P)$(Q):FMT:V1DR")
+  field(INPC, "$(P)$(Q):FMT:V2DR")
+  field(INPD, "$(P)$(Q):FMT:V3DR")
+  field(INPE, "$(P)$(Q):FMT:V4DR")
+  field(INPF, "$(P)$(Q):FMT:V5DR")
+  field(INPG, "$(P)$(Q):FMT:V6DR")
+  field(INPH, "$(P)$(Q):FMT:V7DR")
+  field(INPI, "$(P)$(Q):FMT:V8DR")
+  field(INPJ, "$(P)$(Q):FMT:V9DR")
+  field(INPK, "$(P)$(Q):FMT:V10DR")
+  field(INPL, "$(P)$(Q):FMT:V11DR")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL7") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):SEL5.VAL")
+  field(INPB, "$(P)$(Q):GDA:B$(BANK):SEL6.VAL")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT17") {
+  field(DESC, "if A >= 12")
+  field(CALC, "A>=12?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT14.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEL7.SELN PP")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CMP2")
+}
+
+record(compress, "$(P)$(Q):GDA:B$(BANK):CMP2") {
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT18")
+  field(INP, "$(P)$(Q):GDA:B$(BANK):SEL7.VAL")
+  field(ALG, "Circular Buffer")
+  field(NSAM, "$(NCHAN)")
+  field(HOPR, "10000")
+  field(LOPR, "0")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT18") {
+  field(DESC, "if A=$(NCHAN)+$(BSTART)-1")
+  field(CALC, "A=($(NCHAN)+$(BSTART)-1)?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT14.VAL")
+  field(OUT, "$(PV):TARGETRBV.PROC")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT19")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL9") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):FMT:V12DR CP")
+  field(INPB, "$(P)$(Q):FMT:V13DR CP")
+  field(INPC, "$(P)$(Q):FMT:V14DR CP")
+  field(INPD, "$(P)$(Q):FMT:V15DR CP")
+  field(INPE, "$(P)$(Q):FMT:V16DR CP")
+  field(INPF, "$(P)$(Q):FMT:V17DR CP")
+  field(INPG, "$(P)$(Q):FMT:V18DR CP")
+  field(INPH, "$(P)$(Q):FMT:V19DR CP")
+  field(INPI, "$(P)$(Q):FMT:V20DR CP")
+  field(INPJ, "$(P)$(Q):FMT:V21DR CP")
+  field(INPK, "$(P)$(Q):FMT:V22DR CP")
+  field(INPL, "$(P)$(Q):FMT:V23DR CP")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):SEQ2")
+  field(DESC, "Monitor voltages")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL8") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):FMT:V0DR CP")
+  field(INPB, "$(P)$(Q):FMT:V1DR CP")
+  field(INPC, "$(P)$(Q):FMT:V2DR CP")
+  field(INPD, "$(P)$(Q):FMT:V3DR CP")
+  field(INPE, "$(P)$(Q):FMT:V4DR CP")
+  field(INPF, "$(P)$(Q):FMT:V5DR CP")
+  field(INPG, "$(P)$(Q):FMT:V6DR CP")
+  field(INPH, "$(P)$(Q):FMT:V7DR CP")
+  field(INPI, "$(P)$(Q):FMT:V8DR CP")
+  field(INPJ, "$(P)$(Q):FMT:V9DR CP")
+  field(INPK, "$(P)$(Q):FMT:V10DR CP")
+  field(INPL, "$(P)$(Q):FMT:V11DR CP")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):SEQ2")
+  field(DESC, "Monitor voltages")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT20") {
+  field(DESC, "if ! idle")
+  field(CALC, "B#0?1:0")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEQ2.PROC CA")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(INPB, "$(P)$(Q):GDA:B$(BANK):CNT14.PACT")
+}
+
+record(seq, "$(P)$(Q):GDA:B$(BANK):SEQ2") {
+  field(DESC, "Delay")
+  field(PINI, "YES")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT20")
+  field(DLY1, "0.5")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(Q):GDA:B$(BANK):START3.PROC CA")
+}
+
+record(dfanout, "$(P)$(Q):GDA:B$(BANK):START3") {
+  field(DESC, "start conversion")
+  field(SELM, "All")
+  field(OUTA, "$(P)$(Q):GDA:B$(BANK):CMP2.RES")
+  field(OUTB, "$(P)$(Q):GDA:B$(BANK):CNT14.PROC CA")
+  field(DOL, "1")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT19") {
+  field(DESC, "A<$(NCHAN)+$(BSTART)-1")
+  field(CALC, "A<($(NCHAN)+$(BSTART)-1)?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT14.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):CNT14.PROC CA")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT14") {
+  field(DESC, "count $(BSTART) to $(BSTART)+$(NCHAN)-1")
+  field(CALC, "A<($(NCHAN)+$(BSTART)-1)?A+1:$(BSTART)")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT14.VAL")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT15")
+  field(VAL, "-1")
+}
+
+record(busy, "$(P)$(Q):GDA:B$(BANK):TSB") {
+  field(OMSL, "supervisory")
+}
+
+record(seq, "$(P)$(Q):GDA:B$(BANK):START2") {
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(Q):GDA:B$(BANK):CNT8.PROC CA")
+  field(SELM, "All")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(Q):GDA:B$(BANK):TSB.VAL PP")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT8") {
+  field(DESC, "counter (0 to NCHAN-1)")
+  field(CALC, "A<($(NCHAN)-1)?A+1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT8.VAL")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):SUB")
+  field(VAL, "$(NCHAN)")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SUB.INDX")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT13") {
+  field(DESC, "A=$(NCHAN)-1")
+  field(CALC, "A=($(NCHAN)-1)?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT8.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):TSB.VAL CA")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "0")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT9") {
+  field(DESC, "if A<$(NCHAN)-1")
+  field(CALC, "A<($(NCHAN)-1)?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT8.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):CNT8.PROC CA")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT22")
+}
+
+record(subArray, "$(P)$(Q):GDA:B$(BANK):SUB") {
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):INC")
+  field(INP, "$(PV):TARGET.VAL")
+  field(FTVL, "FLOAT")
+  field(MALM, "$(NCHAN)")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):INC") {
+  field(DESC, "A+1+$(BSTART)")
+  field(CALC, "(A-(FLOOR(A/8)*8))+1")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):SUB.INDX")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT10")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT10") {
+  field(DESC, "if A < 8")
+  field(CALC, "A<8?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT8.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):WR.PROC PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT11")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT11") {
+  field(DESC, "if 8 <= A < 16 ")
+  field(CALC, "A>=8&&A<16?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT8.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):WR2.PROC PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT12")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT12") {
+  field(DESC, "if 16 <= A < 24 ")
+  field(CALC, "A>=16&&A<24?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT8.VAL")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):WR3.PROC PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+}
+
+record(dfanout, "$(P)$(Q):GDA:B$(BANK):WR") {
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT9")
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(Q):GDA:B$(BANK):INC.VAL")
+  field(OUTA, "$(P)$(Q):FMT:V0D PP")
+  field(OUTB, "$(P)$(Q):FMT:V1D PP")
+  field(OUTC, "$(P)$(Q):FMT:V2D PP")
+  field(OUTD, "$(P)$(Q):FMT:V3D PP")
+  field(OUTE, "$(P)$(Q):FMT:V4D PP")
+  field(OUTF, "$(P)$(Q):FMT:V5D PP")
+  field(OUTG, "$(P)$(Q):FMT:V6D PP")
+  field(OUTH, "$(P)$(Q):FMT:V7D PP")
+  field(DOL, "$(P)$(Q):GDA:B$(BANK):SUB.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(dfanout, "$(P)$(Q):GDA:B$(BANK):WR2") {
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT9")
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(Q):GDA:B$(BANK):INC.VAL")
+  field(OUTA, "$(P)$(Q):FMT:V8D PP")
+  field(OUTB, "$(P)$(Q):FMT:V9D PP")
+  field(OUTC, "$(P)$(Q):FMT:V10D PP")
+  field(OUTD, "$(P)$(Q):FMT:V11D PP")
+  field(OUTE, "$(P)$(Q):FMT:V12D PP")
+  field(OUTF, "$(P)$(Q):FMT:V13D PP")
+  field(OUTG, "$(P)$(Q):FMT:V14D PP")
+  field(OUTH, "$(P)$(Q):FMT:V15D PP")
+  field(DOL, "$(P)$(Q):GDA:B$(BANK):SUB.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(dfanout, "$(P)$(Q):GDA:B$(BANK):WR3") {
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT9")
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(Q):GDA:B$(BANK):INC.VAL")
+  field(OUTA, "$(P)$(Q):FMT:V16D PP")
+  field(OUTB, "$(P)$(Q):FMT:V17D PP")
+  field(OUTC, "$(P)$(Q):FMT:V18D PP")
+  field(OUTD, "$(P)$(Q):FMT:V19D PP")
+  field(OUTE, "$(P)$(Q):FMT:V20D PP")
+  field(OUTF, "$(P)$(Q):FMT:V21D PP")
+  field(OUTG, "$(P)$(Q):FMT:V22D PP")
+  field(OUTH, "$(P)$(Q):FMT:V23D PP")
+  field(DOL, "$(P)$(Q):GDA:B$(BANK):SUB.VAL")
+  field(OMSL, "closed_loop")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT21") {
+  field(DESC, "A=$(NCHAN)-1")
+  field(CALC, "A=($(NCHAN)-1)?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT8")
+  field(OUT, "$(P)$(Q):FMTB$(BANK):SET.PROC")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "1")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT13")
+}
+
+#% gdatag,template,bimorphpsu,$(gda_name=),$(gda_desc=)
+#% gdatag,array,ro,$(gda_name=),VOUT,Output voltage
+# %gda,interface,$(gda_name=),general,bimorphpsu,Elettra bimorph PSU
+# %gda,subsystem,elettraSY900SBimorph,monitor,VOUT,Output voltage
+record(waveform, "$(PV):VOUT") {
+  field(INP, "$(P)$(Q):GDA:B$(BANK):CMP.VAL")
+  field(HOPR, "10000")
+  field(LOPR, "0")
+  field(NELM, "$(NCHAN)")
+  field(FTVL, "FLOAT")
+  field(PREC, "1")
+}
+
+#% gdatag,array,ro,$(gda_name=),TARGETRBV,Read target voltages
+# %gda,subsystem,$(gda_name=),monitor,TARGETRBV,Read target voltages
+record(waveform, "$(PV):TARGETRBV") {
+  field(INP, "$(P)$(Q):GDA:B$(BANK):CMP2.VAL")
+  field(HOPR, "10000")
+  field(LOPR, "0")
+  field(NELM, "$(NCHAN)")
+  field(FTVL, "FLOAT")
+  field(PREC, "1")
+}
+
+#% gdatag,array,rw,$(gda_name=),TARGET,Set target voltages
+# %gda,subsystem,$(gda_name=),controlPoint,TARGET,Set target voltages
+record(waveform, "$(PV):TARGET") {
+  field(HOPR, "10000")
+  field(LOPR, "0")
+  field(NELM, "$(NCHAN)")
+  field(FTVL, "FLOAT")
+  field(PREC, "1")
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):START2")
+}
+
+#% gdatag,binary,rw,$(gda_name=),POWERONSET,Power on control
+# %gda,subsystem,$(gda_name=),controlPoint,POWERONSET,Power on control
+record(bo, "$(PV):POWERONSET") {
+  field(FLNK, "$(P)$(Q):GDA:PWR$(BANK):CALC3")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+#% gdatag,binary,ro,$(gda_name=),POWERON,Power on status
+# %gda,subsystem,$(gda_name=),monitor,POWERON,Power on status
+record(bi, "$(PV):POWERON") {
+  field(FLNK, "$(P)$(Q):GDA:PWR$(BANK):CALC")
+  field(INP, "$(P)$(Q):OUTPUT CP")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+record(busy, "$(P)$(Q):GDA:PWR$(BANK):BUSY") {
+}
+
+record(calcout, "$(P)$(Q):GDA:PWR$(BANK):CALC") {
+  field(CALC, "A=B?0:1")
+  field(INPA, "$(PV):POWERON.VAL")
+  field(INPB, "$(PV):POWERONSET.VAL")
+  field(OUT, "$(P)$(Q):GDA:PWR$(BANK):BUSY.VAL CA")
+  field(OOPT, "When Zero")
+  field(DOPT, "Use CALC")
+}
+
+record(calcout, "$(P)$(Q):GDA:PWR$(BANK):CALC3") {
+  field(CALC, "A=1?1:0")
+  field(INPA, "$(PV):POWERONSET.VAL")
+  field(OUT, "$(P)$(Q):OUTPUT:SET CA")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(Q):GDA:PWR$(BANK):CALC2")
+}
+
+record(calcout, "$(P)$(Q):GDA:PWR$(BANK):CALC2") {
+  field(CALC, "A#B?1:0")
+  field(INPA, "$(PV):POWERON.VAL")
+  field(INPB, "$(PV):POWERONSET.VAL")
+  field(OUT, "$(P)$(Q):GDA:PWR$(BANK):BUSY.VAL PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+}
+
+#% gdatag,pv,ro,$(gda_name=),ELECTRODES,Electrodes
+# %gda,subsystem,$(gda_name=),monitor,ELECTRODES,Electrodes
+record(longin, "$(PV):ELECTRODES") {
+  field(VAL, "$(NCHAN)")
+}
+
+#% gdatag,binary,rw,$(gda_name=),APPLYTARGET,Start ramping voltages
+# %gda,subsystem,$(gda_name=),controlPoint,APPLYTARGET,Start ramping voltages
+record(busy, "$(PV):APPLYTARGET") {
+}
+
+record(calcout, "$(P)$(Q):GDA:TR$(BANK):CALC1") {
+  field(CALC, "A")
+  field(INPA, "$(PV):APPLYTARGET.VAL CP")
+  field(OUT, "$(P)$(Q):FORMAT:SET CA")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "B")
+  field(INPB, "$(P)$(Q):FMT:GET")
+}
+
+record(longin, "$(P)$(Q):GDA:ST$(BANK):RD") {
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P)$(Q):GDA:TR$(BANK):CALC2")
+  field(INP, "$(P)$(Q):STATUS CP")
+}
+
+record(calcout, "$(P)$(Q):GDA:TR$(BANK):CALC2") {
+  field(CALC, "A#1?1:0")
+  field(OUT, "$(PV):APPLYTARGET.VAL CA")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "0")
+  field(FLNK, "$(P)$(Q):GDA:ST$(BANK):CALC")
+  field(INPA, "$(P)$(Q):GDA:ST$(BANK):RD.VAL")
+  field(DESC, "if !slewing clear busy rec")
+}
+
+record(calcout, "$(P)$(Q):GDA:ST$(BANK):CALC") {
+  field(FLNK, "$(PV):STATUS")
+  field(CALC, "A=1?1:A=2?0:2")
+  field(INPB, "$(P)$(Q):GDA:ST$(BANK):RD.VAL")
+  field(OUT, "$(PV):STATUS.VAL")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+#% gdatag,mbbinary,ro,$(gda_name=),STATUS,Status
+# %gda,subsystem,$(gda_name=),monitor,STATUS,Status
+record(mbbo, "$(PV):STATUS") {
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(ZRST, "Idle")
+  field(ONST, "Busy")
+  field(TWST, "Failed")
+  field(TWSV, "MAJOR")
+}
+
+record(sel, "$(P)$(Q):GDA:B$(BANK):SEL6") {
+  field(SELM, "Specified")
+  field(INPA, "$(P)$(Q):FMT:V12DR")
+  field(INPB, "$(P)$(Q):FMT:V13DR")
+  field(INPC, "$(P)$(Q):FMT:V14DR")
+  field(INPD, "$(P)$(Q):FMT:V15DR")
+  field(INPE, "$(P)$(Q):FMT:V16DR")
+  field(INPF, "$(P)$(Q):FMT:V17DR")
+  field(INPG, "$(P)$(Q):FMT:V18DR")
+  field(INPH, "$(P)$(Q):FMT:V19DR")
+  field(INPI, "$(P)$(Q):FMT:V20DR")
+  field(INPJ, "$(P)$(Q):FMT:V21DR")
+  field(INPK, "$(P)$(Q):FMT:V22DR")
+  field(INPL, "$(P)$(Q):FMT:V23DR")
+}
+
+record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT22") {
+  field(DESC, "A=$(NCHAN)-1")
+  field(CALC, "A=($(NCHAN)-1)?1:0")
+  field(INPA, "$(P)$(Q):GDA:B$(BANK):CNT8")
+  field(OUT, "$(P)$(Q):GDA:B$(BANK):SEQ3.PROC PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "1")
+}
+
+record(seq, "$(P)$(Q):GDA:B$(BANK):SEQ3") {
+  field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT21")
+  field(SELM, "All")
+  field(DOL1, "$(BANK)")
+  field(LNK1, "$(P)$(Q):FMT:BANK CA")
+  field(DLY2, "0.1")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(Q):FMT:SET CA")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(Q):GDA:B$(BANK):SEQ4.PROC CA")
+}
+
+record(bo, "$(P)$(Q):GDA:B$(BANK):BO") {
+  field(DESC, "Poll reading of target")
+  field(SCAN, "10 second")
+  field(OMSL, "closed_loop")
+  field(DOL, "1")
+  field(OUT, "$(P)$(Q):FMT:GET.PROC CP")
+}
+
+record(seq, "$(P)$(Q):GDA:B$(BANK):SEQ4") {
+  field(DESC, "Poll reading of target")
+  field(DLY1, "1")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(Q):FMT:GET.PROC CP")
+}
+
