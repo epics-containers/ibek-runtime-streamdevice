@@ -1,0 +1,56 @@
+module: eurotherm2k
+
+entity_models:
+  - name: eurotherm2k
+    description: |-
+      Eurotherm 2k temperature controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      GAD:
+        type: int
+        description: |-
+          Global address number, normally 0
+      LAD:
+        type: int
+        description: |-
+          Local address number, normally 1
+      SPMAX:
+        type: float
+        description: |-
+          Maximum setpoint
+        default: 100
+      RRMAX:
+        type: float
+        description: |-
+          Maximum ramp rate
+        default: 1
+      SPCMD:
+        type: str
+        description: |-
+          Setpoint command, set to 'write' for floating point
+        default: writeint
+      PREC:
+        type: int
+        description: |-
+          Setpoint precision
+        default: 0
+      EGU:
+        type: str
+        description: |-
+          Engineering units for ramp rate, default is C/s
+        default: C/min
+    databases:
+      - file: eurotherm2k.template
+        args:
+          .*:
