@@ -1,0 +1,320 @@
+
+
+# ODPsu22DUpdate.template
+# substitutions
+# P - device name prefix (name will be $(P)$(Q))
+# Q - device name qualifier (name will be $(P)$(Q))
+# % macro, P, device name prefix (name will be $(P)$(Q))
+# % macro, Q, device name qualifier (name will be $(P)$(Q))
+#
+# template contents:
+# request demands for all channels
+# and reset status of demand request
+# activated by processing $(P)$(Q):VDREQ
+#
+# copy format demands
+# activated by processing $(P)$(Q):FMT:COPYBANK0
+# and $(P)$(Q):FMT:COPYBANK1
+# assumes bank0 is first 14 channels (0 to 13)
+# and bank 1 is the next 8 channels (14 to 21)
+record(fanout, "$(P)$(Q):VDREQ") {
+  field(LNK1, "$(P)$(Q):VDREQ0")
+  field(LNK2, "$(P)$(Q):VDSEV0")
+}
+
+# request demands for all channels
+# 22 channels
+record(seq, "$(P)$(Q):VDREQ0") {
+  field(LNK1, "$(P)$(Q):V0DR:GET.PROC")
+  field(LNK2, "$(P)$(Q):V1DR:GET.PROC")
+  field(LNK3, "$(P)$(Q):V2DR:GET.PROC")
+  field(LNK4, "$(P)$(Q):V3DR:GET.PROC")
+  field(LNK5, "$(P)$(Q):V4DR:GET.PROC")
+  field(LNK6, "$(P)$(Q):V5DR:GET.PROC")
+  field(LNK7, "$(P)$(Q):V6DR:GET.PROC")
+  field(LNK8, "$(P)$(Q):V7DR:GET.PROC")
+  field(LNK9, "$(P)$(Q):V8DR:GET.PROC")
+  field(LNKA, "$(P)$(Q):V9DR:GET.PROC")
+  field(DO1, "1")
+  field(DO2, "1")
+  field(DO3, "1")
+  field(DO4, "1")
+  field(DO5, "1")
+  field(DO6, "1")
+  field(DO7, "1")
+  field(DO8, "1")
+  field(DO9, "1")
+  field(DOA, "1")
+  field(FLNK, "$(P)$(Q):VDREQ1")
+}
+
+record(seq, "$(P)$(Q):VDREQ1") {
+  field(LNK1, "$(P)$(Q):V10DR:GET.PROC")
+  field(LNK2, "$(P)$(Q):V11DR:GET.PROC")
+  field(LNK3, "$(P)$(Q):V12DR:GET.PROC")
+  field(LNK4, "$(P)$(Q):V13DR:GET.PROC")
+  field(LNK5, "$(P)$(Q):V14DR:GET.PROC")
+  field(LNK6, "$(P)$(Q):V15DR:GET.PROC")
+  field(DO1, "1")
+  field(DO2, "1")
+  field(DO3, "1")
+  field(DO4, "1")
+  field(DO5, "1")
+  field(DO6, "1")
+  field(FLNK, "$(P)$(Q):VDREQ2")
+}
+
+record(seq, "$(P)$(Q):VDREQ2") {
+  field(LNK1, "$(P)$(Q):V16DR:GET.PROC")
+  field(LNK2, "$(P)$(Q):V17DR:GET.PROC")
+  field(LNK3, "$(P)$(Q):V18DR:GET.PROC")
+  field(LNK4, "$(P)$(Q):V19DR:GET.PROC")
+  field(LNK5, "$(P)$(Q):V20DR:GET.PROC")
+  field(LNK6, "$(P)$(Q):V21DR:GET.PROC")
+  field(DO1, "1")
+  field(DO2, "1")
+  field(DO3, "1")
+  field(DO4, "1")
+  field(DO5, "1")
+  field(DO6, "1")
+}
+
+# Reset severity for all channels
+# 22 channels
+record(seq, "$(P)$(Q):VDSEV0") {
+  field(LNK1, "$(P)$(Q):V0DSEV PP")
+  field(LNK2, "$(P)$(Q):V1DSEV PP")
+  field(LNK3, "$(P)$(Q):V2DSEV PP")
+  field(LNK4, "$(P)$(Q):V3DSEV PP")
+  field(LNK5, "$(P)$(Q):V4DSEV PP")
+  field(LNK6, "$(P)$(Q):V5DSEV PP")
+  field(LNK7, "$(P)$(Q):V6DSEV PP")
+  field(LNK8, "$(P)$(Q):V7DSEV PP")
+  field(LNK9, "$(P)$(Q):V8DSEV PP")
+  field(LNKA, "$(P)$(Q):V9DSEV PP")
+  field(DO1, "0")
+  field(DO2, "0")
+  field(DO3, "0")
+  field(DO4, "0")
+  field(DO5, "0")
+  field(DO6, "0")
+  field(DO7, "0")
+  field(DO8, "0")
+  field(DO9, "0")
+  field(DOA, "0")
+  field(FLNK, "$(P)$(Q):VDSEV1")
+}
+
+record(seq, "$(P)$(Q):VDSEV1") {
+  field(LNK1, "$(P)$(Q):V10DSEV PP")
+  field(LNK2, "$(P)$(Q):V11DSEV PP")
+  field(LNK3, "$(P)$(Q):V12DSEV PP")
+  field(LNK4, "$(P)$(Q):V13DSEV PP")
+  field(LNK5, "$(P)$(Q):V14DSEV PP")
+  field(LNK6, "$(P)$(Q):V15DSEV PP")
+  field(DO1, "0")
+  field(DO2, "0")
+  field(DO3, "0")
+  field(DO4, "0")
+  field(DO5, "0")
+  field(DO6, "0")
+  field(FLNK, "$(P)$(Q):VDSEV2")
+}
+
+record(seq, "$(P)$(Q):VDSEV2") {
+  field(LNK1, "$(P)$(Q):V16DSEV PP")
+  field(LNK2, "$(P)$(Q):V17DSEV PP")
+  field(LNK3, "$(P)$(Q):V18DSEV PP")
+  field(LNK4, "$(P)$(Q):V19DSEV PP")
+  field(LNK5, "$(P)$(Q):V20DSEV PP")
+  field(LNK6, "$(P)$(Q):V21DSEV PP")
+  field(DO1, "0")
+  field(DO2, "0")
+  field(DO3, "0")
+  field(DO4, "0")
+  field(DO5, "0")
+  field(DO6, "0")
+}
+
+record(bo, "$(P)$(Q):FMT:COPYBANK0") {
+  field(FLNK, "$(P)$(Q):FMT:CP0")
+}
+
+record(bo, "$(P)$(Q):FMT:COPYBANK1") {
+  field(FLNK, "$(P)$(Q):FMT:CP14")
+}
+
+record(longout, "$(P)$(Q):FMT:CP0") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V0D PP")
+  field(DOL, "$(P)$(Q):FMT:V0DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP1")
+}
+
+record(longout, "$(P)$(Q):FMT:CP1") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V1D PP")
+  field(DOL, "$(P)$(Q):FMT:V1DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP2")
+}
+
+record(longout, "$(P)$(Q):FMT:CP2") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V2D PP")
+  field(DOL, "$(P)$(Q):FMT:V2DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP3")
+}
+
+record(longout, "$(P)$(Q):FMT:CP3") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V3D PP")
+  field(DOL, "$(P)$(Q):FMT:V3DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP4")
+}
+
+record(longout, "$(P)$(Q):FMT:CP4") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V4D PP")
+  field(DOL, "$(P)$(Q):FMT:V4DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP5")
+}
+
+record(longout, "$(P)$(Q):FMT:CP5") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V5D PP")
+  field(DOL, "$(P)$(Q):FMT:V5DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP6")
+}
+
+record(longout, "$(P)$(Q):FMT:CP6") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V6D PP")
+  field(DOL, "$(P)$(Q):FMT:V6DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP7")
+}
+
+record(longout, "$(P)$(Q):FMT:CP7") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V7D PP")
+  field(DOL, "$(P)$(Q):FMT:V7DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP8")
+}
+
+record(longout, "$(P)$(Q):FMT:CP8") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V8D PP")
+  field(DOL, "$(P)$(Q):FMT:V8DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP9")
+}
+
+record(longout, "$(P)$(Q):FMT:CP9") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V9D PP")
+  field(DOL, "$(P)$(Q):FMT:V9DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP10")
+}
+
+record(longout, "$(P)$(Q):FMT:CP10") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V10D PP")
+  field(DOL, "$(P)$(Q):FMT:V10DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP11")
+}
+
+record(longout, "$(P)$(Q):FMT:CP11") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V11D PP")
+  field(DOL, "$(P)$(Q):FMT:V11DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP12")
+}
+
+record(longout, "$(P)$(Q):FMT:CP12") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V12D PP")
+  field(DOL, "$(P)$(Q):FMT:V12DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP13")
+}
+
+record(longout, "$(P)$(Q):FMT:CP13") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V13D PP")
+  field(DOL, "$(P)$(Q):FMT:V13DR")
+  field(OMSL, "closed_loop")
+}
+
+record(longout, "$(P)$(Q):FMT:CP14") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V14D PP")
+  field(DOL, "$(P)$(Q):FMT:V14DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP15")
+}
+
+record(longout, "$(P)$(Q):FMT:CP15") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V15D PP")
+  field(DOL, "$(P)$(Q):FMT:V15DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP16")
+}
+
+record(longout, "$(P)$(Q):FMT:CP16") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V16D PP")
+  field(DOL, "$(P)$(Q):FMT:V16DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP17")
+}
+
+record(longout, "$(P)$(Q):FMT:CP17") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V17D PP")
+  field(DOL, "$(P)$(Q):FMT:V17DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP18")
+}
+
+record(longout, "$(P)$(Q):FMT:CP18") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V18D PP")
+  field(DOL, "$(P)$(Q):FMT:V18DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP19")
+}
+
+record(longout, "$(P)$(Q):FMT:CP20") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V20D PP")
+  field(DOL, "$(P)$(Q):FMT:V20DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP21")
+}
+
+record(longout, "$(P)$(Q):FMT:CP21") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V21D PP")
+  field(DOL, "$(P)$(Q):FMT:V21DR")
+  field(OMSL, "closed_loop")
+}
+
+record(longout, "$(P)$(Q):FMT:CP19") {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(P)$(Q):FMT:V19D PP")
+  field(DOL, "$(P)$(Q):FMT:V19DR")
+  field(OMSL, "closed_loop")
+  field(FLNK, "$(P)$(Q):FMT:CP20")
+}
+
