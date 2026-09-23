@@ -1,0 +1,69 @@
+# % macro, P, Device Prefix
+# % macro, Q, Device Suffix
+# % macro, PORT, Asyn Port
+# % macro, VAR, P Variable to read/write
+# % macro, SCAN, Scan rate or readback
+record(ai, "$(P)$(Q):P$(VAR):X") {
+  field(EGU, "mm")
+  field(PREC, "3")
+  field(FLNK, "$(P)$(Q):P$(VAR):WRITE")
+}
+
+record(ai, "$(P)$(Q):P$(VAR):Y") {
+  field(EGU, "mm")
+  field(PREC, "3")  
+  field(FLNK, "$(P)$(Q):P$(VAR):WRITE")
+}
+
+record(ai, "$(P)$(Q):P$(VAR):Z") {
+  field(EGU, "mm")
+  field(PREC, "3")
+  field(FLNK, "$(P)$(Q):P$(VAR):WRITE")  
+}
+
+record(ai, "$(P)$(Q):P$(VAR):TX") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(FLNK, "$(P)$(Q):P$(VAR):WRITE")  
+}
+
+record(ai, "$(P)$(Q):P$(VAR):TY") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(FLNK, "$(P)$(Q):P$(VAR):WRITE")
+}
+
+record(ai, "$(P)$(Q):P$(VAR):TZ") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(FLNK, "$(P)$(Q):P$(VAR):WRITE")
+}
+
+record(longin, "$(P)$(Q):P$(VAR):TYPE") {
+  field(FLNK, "$(P)$(Q):P$(VAR):WRITE")
+}
+
+record(longin, "$(P)$(Q):P$(VAR):TOOL") {
+  field(FLNK, "$(P)$(Q):P$(VAR):WRITE")
+}
+
+record(stringin, "$(P)$(Q):P$(VAR):READ") {
+  field(DTYP, "stream")
+  field(INP, "@nx100.proto readp($(P)$(Q),$(VAR)) $(PORT)")
+}
+
+record(calcout, "$(P)$(Q):P$(VAR):INITREAD")
+{
+  field(INPA, "$(P)$(Q):P$(VAR):TOOL.SEVR")
+  field(CALC, "(A>0)?1:0")
+  field(SCAN, "$(SCAN)")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+  field(SDIS, "$(P)$(Q):P$(VAR):INITREAD")
+  field(OUT, "$(P)$(Q):P$(VAR):READ PP NMS")
+}
+
+record(stringin, "$(P)$(Q):P$(VAR):WRITE") {
+  field(DTYP, "stream")
+  field(INP, "@nx100.proto writep($(P)$(Q),$(VAR)) $(PORT)")
+}

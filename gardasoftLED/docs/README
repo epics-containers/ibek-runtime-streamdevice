@@ -1,0 +1,15 @@
+SCOPE
+=====
+
+This application currently supports only the 'continuous output'
+mode of operation, where the output is a continuous current
+specified by the user in milliAmps.
+
+
+EXAMPLE APPLICATION
+===================
+
+To build the example application, uncomment the specified
+lines in configure/RELEASE and the top level Makefile.
+This has been configured to boot a vxWorks IOC with a
+Hytec 8515 card in slot 5D.

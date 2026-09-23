@@ -1,0 +1,6 @@
+$(P)$(Q):ISET$(CHAN)
+$(P)$(Q):ON$(CHAN)
+$(P)$(Q):RDW$(CHAN)
+$(P)$(Q):RUP$(CHAN)
+$(P)$(Q):UPDATE$(CHAN).SCAN
+$(P)$(Q):VSET$(CHAN)

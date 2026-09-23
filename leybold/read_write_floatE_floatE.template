@@ -1,0 +1,65 @@
+# % macro, P, PV Prefix
+# % macro, PORT, Asyn port name
+# % macro, SCAN, Asyn port name
+# % macro, PARAM, Asyn port name
+# % macro, SUF1, Asyn port name
+# % macro, SUF2, Asyn port name
+# % macro, CMD, Asyn port name
+# % macro, DRVH, Asyn port name
+# % macro, DRVL, Asyn port name
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)_REQUEST") {
+  field(SCAN, "$(SCAN)")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto get_2floatE($(P):$(PARAM),$(CMD),$(SUF1),$(SUF2)) $(PORT)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P):$(PARAM)_$(SUF1)_RBV") {
+  field(PREC, "5")
+}
+
+record(ai, "$(P):$(PARAM)_$(SUF2)_RBV") {
+  field(PREC, "5")
+}
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)_$(SUF1)_SEND") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto set_2floatE($(P):$(PARAM),$(CMD),_$(SUF1),_$(SUF2)_RBV) $(PORT)")
+  field(PINI, "NO")
+  field(FLNK, "$(P):$(PARAM)_FORCE_READ")
+}
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)_$(SUF2)_SEND") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto set_2floatE($(P):$(PARAM),$(CMD),_$(SUF1)_RBV,_$(SUF2)) $(PORT)")
+  field(PINI, "NO")
+  field(FLNK, "$(P):$(PARAM)_FORCE_READ")
+}
+
+record(ao, "$(P):$(PARAM)_$(SUF1)") {
+  field(PREC, "5")
+  field(FLNK, "$(P):$(PARAM)_$(SUF1)_SEND")
+  field(DRVH, "$(DRVH)")
+  field(DRVL, "$(DRVL)")
+}
+
+record(ao, "$(P):$(PARAM)_$(SUF2)") {
+  field(PREC, "5")
+  field(FLNK, "$(P):$(PARAM)_$(SUF2)_SEND")
+  field(DRVH, "$(DRVH)")
+  field(DRVL, "$(DRVL)")
+}
+
+# Record to force $(P):$(PARAM)_REQUEST to process when a parameter is written to
+# to verify the controller has taken the new value.
+record(bo, "$(P):$(PARAM)_FORCE_READ") {
+  field(SCAN, "Passive")
+  field(OUT, "$(P):$(PARAM)_REQUEST.PROC PP")
+  field(VAL, "1")
+}

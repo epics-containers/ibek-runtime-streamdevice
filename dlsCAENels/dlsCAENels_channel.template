@@ -1,0 +1,97 @@
+# dlsCAENels_channel.template
+#
+# This is the bottom-level template representing a single channel on a CAENels
+# HV-Adaptos power supply. It defines those records that are instantiated once
+# per channel.
+#
+# 2015 - Nicoletta De Maio
+#
+
+# Parameters:
+# % macro,  P,       EPICS name prefix
+# % macro,  GR,      Channel group number
+# % macro,  CH,      Channel number
+# % macro,  PORT,    asyn port
+# % macro,  name,    object and gui association name
+# % gui, $(name=), edm, dlsCAENels_channel.edl, P=$(P),GR=$(GR),CH=$(CH)
+
+# A record to show the current status of a single channel: defined states are
+# 0 = "OFF", 1 = "ON", 2 = "Busy", and 4 = "Fault/Alarm"
+record(mbbi, "$(P):GROUP$(GR):CH$(CH):STATUS") {
+    field(DESC, "current status of the channel")
+    field(DTYP, "Soft Channel")
+    field(INP, "$(P):GROUP$(GR):CH$(CH):STATUSCALC")
+    field(ZRST, "OFF")
+    field(ONST, "ON")
+    field(TWST, "Busy")
+    field(FRST, "Fault/Alarm")
+}
+
+# A record to convert the raw status to something that fits into an mbbi selection
+record(calcout, "$(P):GROUP$(GR):CH$(CH):STATUSCALC") {
+    field(DESC, "converts raw channel status")
+    field(INPA, "$(P):GROUP$(GR):CH$(CH):GETSTATUS")
+    field(CALC, "A / 8")
+    field(FLNK, "$(P):GROUP$(GR):CH$(CH):STATUS PP")
+}
+
+# A record to retrieve the current raw status of a single channel: possible
+# responses are 0 = "OFF", 8 = "ON", 16 = "Busy" and 32 = "Fault/Alarm"
+record(ai, "$(P):GROUP$(GR):CH$(CH):GETSTATUS") {
+    field(DESC, "current raw status of the channel")
+    field(SCAN, "2 second")
+    field(DTYP, "stream")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto chGetSt($(P),$(GR),$(CH)) $(PORT)")
+    field(FLNK, "$(P):GROUP$(GR):CH$(CH):STATUSCALC PP")
+}
+
+# Sets the demand voltage for the channel (absolute value)
+#% archiver 10 Monitor
+record(ao, "$(P):GROUP$(GR):CH$(CH):VOUT") {
+    field(DESC, "demand voltage (absolute value)")
+    field(DTYP, "stream")
+    field(PREC, "1")
+    field(OUT, "@dlsCAENels.proto chSetV($(P),$(GR),VOUT,$(CH)) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# Reads back the current channel voltage
+#% archiver 10 Monitor
+record(ai, "$(P):GROUP$(GR):CH$(CH):VOUT_RBV") {
+    field(DESC, "voltage readback (absolute value)")
+    field(SCAN, "2 second")
+    field(DTYP, "stream")
+    field(PREC, "1")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto chGetV($(P),$(GR),VOUT,$(CH)) $(PORT)")
+}
+
+# Sets the target voltage for the channel (absolute value)
+record(ao, "$(P):GROUP$(GR):CH$(CH):VTRGT") {
+    field(DESC, "target voltage (absolute value)")
+    field(DTYP, "stream")
+    field(PREC, "1")
+    field(OUT, "@dlsCAENels.proto chSetV($(P),$(GR),VTRGT,$(CH)) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}
+
+# Reads back the current target voltage of the channel
+#% archiver 10 Monitor
+record(ai, "$(P):GROUP$(GR):CH$(CH):VTRGT_RBV") {
+    field(DESC, "target readback (absolute value)")
+    field(SCAN, "2 second")
+    field(DTYP, "stream")
+    field(PREC, "1")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto chGetV($(P),$(GR),VTRGT,$(CH)) $(PORT)")
+}
+
+# Shifts the demand voltage for the channel (relative value)
+record(ao, "$(P):GROUP$(GR):CH$(CH):SHIFT") {
+    field(DESC, "voltage shift (relative value)")
+    field(DTYP, "stream")
+    field(PREC, "1")
+    field(OUT, "@dlsCAENels.proto chSetV($(P),$(GR),SHIFT,$(CH)) $(PORT)")
+    field(FLNK, "$(P):SETBUSY PP")
+}

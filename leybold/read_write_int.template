@@ -1,0 +1,176 @@
+
+# % macro, P, PV Prefix
+# % macro, PORT, Asyn port name
+# % macro, SCAN, Asyn port name
+# % macro, PARAM, Asyn port name
+# % macro, CMD, Asyn port name
+# % macro, PINIR, Asyn port name
+# % macro, PINIW, Asyn port name
+# % macro, DEFAULT_VAL, Asyn port name
+# % macro, DRVH, Asyn port name
+# % macro, DRVL, Asyn port name
+# % macro, ZRSTI, Asyn port name
+# % macro, ONSTI, Asyn port name
+# % macro, TWSTI, Asyn port name
+# % macro, THSTI, Asyn port name
+# % macro, FRSTI, Asyn port name
+# % macro, FVSTI, Asyn port name
+# % macro, SXSTI, Asyn port name
+# % macro, SVSTI, Asyn port name
+# % macro, EISTI, Asyn port name
+# % macro, NISTI, Asyn port name
+# % macro, TESTI, Asyn port name
+# % macro, ELSTI, Asyn port name
+# % macro, TVSTI, Asyn port name
+# % macro, TTSTI, Asyn port name
+# % macro, FTSTI, Asyn port name
+# % macro, FFSTI, Asyn port name
+# % macro, ZRVLI, Asyn port name
+# % macro, ONVLI, Asyn port name
+# % macro, TWVLI, Asyn port name
+# % macro, THVLI, Asyn port name
+# % macro, FRVLI, Asyn port name
+# % macro, FVVLI, Asyn port name
+# % macro, SXVLI, Asyn port name
+# % macro, SVVLI, Asyn port name
+# % macro, EIVLI, Asyn port name
+# % macro, NIVLI, Asyn port name
+# % macro, TEVLI, Asyn port name
+# % macro, ELVLI, Asyn port name
+# % macro, TVVLI, Asyn port name
+# % macro, TTVLI, Asyn port name
+# % macro, FTVLI, Asyn port name
+# % macro, FFVLI, Asyn port name
+# % macro, ZRSTO, Asyn port name
+# % macro, ONSTO, Asyn port name
+# % macro, TWSTO, Asyn port name
+# % macro, THSTO, Asyn port name
+# % macro, FRSTO, Asyn port name
+# % macro, FVSTO, Asyn port name
+# % macro, SXSTO, Asyn port name
+# % macro, SVSTO, Asyn port name
+# % macro, EISTO, Asyn port name
+# % macro, NISTO, Asyn port name
+# % macro, TESTO, Asyn port name
+# % macro, ELSTO, Asyn port name
+# % macro, TVSTO, Asyn port name
+# % macro, TTSTO, Asyn port name
+# % macro, FTSTO, Asyn port name
+# % macro, FFSTO, Asyn port name
+# % macro, ZRVLO, Asyn port name
+# % macro, ONVLO, Asyn port name
+# % macro, TWVLO, Asyn port name
+# % macro, THVLO, Asyn port name
+# % macro, FRVLO, Asyn port name
+# % macro, FVVLO, Asyn port name
+# % macro, SXVLO, Asyn port name
+# % macro, SVVLO, Asyn port name
+# % macro, EIVLO, Asyn port name
+# % macro, NIVLO, Asyn port name
+# % macro, TEVLO, Asyn port name
+# % macro, ELVLO, Asyn port name
+# % macro, TVVLO, Asyn port name
+# % macro, TTVLO, Asyn port name
+# % macro, FTVLO, Asyn port name
+# % macro, FFVLO, Asyn port name
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)_REQUEST") {
+  field(SCAN, "$(SCAN)")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto get_int($(P):$(PARAM),$(CMD),_RBV) $(PORT)")
+  field(PINI, "$(PINIR)")
+}
+
+record(mbbi, "$(P):$(PARAM)_RBV") {
+  field(ZRST, "$(ZRSTI=)")
+  field(ONST, "$(ONSTI=)")
+  field(TWST, "$(TWSTI=)")
+  field(THST, "$(THSTI=)")
+  field(FRST, "$(FRSTI=)")
+  field(FVST, "$(FVSTI=)")
+  field(SXST, "$(SXSTI=)")
+  field(SVST, "$(SVSTI=)")
+  field(EIST, "$(EISTI=)")
+  field(NIST, "$(NISTI=)")
+  field(TEST, "$(TESTI=)")
+  field(ELST, "$(ELSTI=)")
+  field(TVST, "$(TVSTI=)")
+  field(TTST, "$(TTSTI=)")
+  field(FTST, "$(FTSTI=)")
+  field(FFST, "$(FFSTI=)")
+  field(ZRVL, "$(ZRVLI=0)")
+  field(ONVL, "$(ONVLI=1)")
+  field(TWVL, "$(TWVLI=2)")
+  field(THVL, "$(THVLI=3)")
+  field(FRVL, "$(FRVLI=4)")
+  field(FVVL, "$(FVVLI=5)")
+  field(SXVL, "$(SXVLI=6)")
+  field(SVVL, "$(SVVLI=7)")
+  field(EIVL, "$(EIVLI=8)")
+  field(NIVL, "$(NIVLI=9)")
+  field(TEVL, "$(TEVLI=10)")
+  field(ELVL, "$(ELVLI=11)")
+  field(TVVL, "$(TVVLI=12)")
+  field(TTVL, "$(TTVLI=13)")
+  field(FTVL, "$(FTVLI=14)")
+  field(FFVL, "$(FFVLI=15)")
+}
+
+# % autosave 1 VAL
+record(mbbo, "$(P):$(PARAM)") {
+  field(ZRST, "$(ZRSTO=$(ZRSTI=))")
+  field(ONST, "$(ONSTO=$(ONSTI=))")
+  field(TWST, "$(TWSTO=$(TWSTI=))")
+  field(THST, "$(THSTO=$(THSTI=))")
+  field(FRST, "$(FRSTO=$(FRSTI=))")
+  field(FVST, "$(FVSTO=$(FVSTI=))")
+  field(SXST, "$(SXSTO=$(SXSTI=))")
+  field(SVST, "$(SVSTO=$(SVSTI=))")
+  field(EIST, "$(EISTO=$(EISTI=))")
+  field(NIST, "$(NISTO=$(NISTI=))")
+  field(TEST, "$(TESTO=$(TESTI=))")
+  field(ELST, "$(ELSTO=$(ELSTI=))")
+  field(TVST, "$(TVSTO=$(TVSTI=))")
+  field(TTST, "$(TTSTO=$(TTSTI=))")
+  field(FTST, "$(FTSTO=$(FTSTI=))")
+  field(FFST, "$(FFSTO=$(FFSTI=))")
+  field(ZRVL, "$(ZRVLO=$(ZRVLI=0))")
+  field(ONVL, "$(ONVLO=$(ONVLI=1))")
+  field(TWVL, "$(TWVLO=$(TWVLI=2))")
+  field(THVL, "$(THVLO=$(THVLI=3))")
+  field(FRVL, "$(FRVLO=$(FRVLI=4))")
+  field(FVVL, "$(FVVLO=$(FVVLI=5))")
+  field(SXVL, "$(SXVLO=$(SXVLI=6))")
+  field(SVVL, "$(SVVLO=$(SVVLI=7))")
+  field(EIVL, "$(EIVLO=$(EIVLI=8))")
+  field(NIVL, "$(NIVLO=$(NIVLI=9))")
+  field(TEVL, "$(TEVLO=$(TEVLI=10))")
+  field(ELVL, "$(ELVLO=$(ELVLI=11))")
+  field(TVVL, "$(TVVLO=$(TVVLI=12))")
+  field(TTVL, "$(TTVLO=$(TTVLI=13))")
+  field(FTVL, "$(FTVLO=$(FTVLI=14))")
+  field(FFVL, "$(FFVLO=$(FFVLI=15))")
+  field(OUT, "$(P):$(PARAM)_SEND PP NMS")
+  field(PINI, "$(PINIW=YES)")
+  field(VAL, "$(DEFAULT_VAL=0)")
+}
+
+# Send query to the controller
+record(ao, "$(P):$(PARAM)_SEND") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto set_int($(CMD)) $(PORT)")
+  field(PINI, "NO")
+  field(FLNK, "$(P):$(PARAM)_FORCE_READ")
+  field(DRVH, "$(DRVH)")
+  field(DRVL, "$(DRVL)")
+}
+
+# Record to force $(P):$(PARAM)_REQUEST to process when a parameter is written to
+# to verify the controller has taken the new value.
+record(bo, "$(P):$(PARAM)_FORCE_READ") {
+  field(SCAN, "Passive")
+  field(OUT, "$(P):$(PARAM)_REQUEST.PROC PP")
+  field(VAL, "1")
+}

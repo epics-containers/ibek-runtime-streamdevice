@@ -86,10 +86,6 @@ entity_models:
         description: |-
           Optional macro for whether device is polled or not.
         default: 1
-      name:
-        type: id
-        description: |-
-          object and gui association name
       STR:
         type: str
         description: |-
@@ -196,5 +192,99 @@ entity_models:
         default: MB1.T1
     databases:
       - file: MercuryiTC-SCPI_tempSensor.template
+        args:
+          .*:
+
+  - name: ILM201
+    description: |-
+      Imported from DLS module OxInstCryojet (ILM201.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      PORT:
+        type: str
+        description: |-
+          asyn name for serial port connected to device
+      HIHI_LIMIT:
+        type: float
+        description: |-
+          Optional macro for HIHI value for LEVEL record. Defaults to 90
+        default: 90.0
+      HIGH_LIMIT:
+        type: float
+        description: |-
+          Optional macro for HIGH value for LEVEL record. Defaults to 81
+        default: 81.0
+      LOW_LIMIT:
+        type: float
+        description: |-
+          Optional macro for LOW value for LEVEL record. Defaults to 39
+        default: 39.0
+      LOLO_LIMIT:
+        type: float
+        description: |-
+          Optional macro for LOLO value for LEVEL record. Defaults to 20.5
+        default: 20.5
+      DISABLED:
+        type: int
+        description: |-
+          Optional macro for whether device is polled or not.
+        default: 1
+      LVLDESC:
+        type: str
+        description: |-
+          Optional macro for the label string for the level.  Used in EDM screens.
+        default: "Cryo fill level"
+    databases:
+      - file: ILM201.template
+        args:
+          .*:
+
+  - name: ITC4
+    description: |-
+      Imported from DLS module OxInstCryojet (ITC4.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      DISABLED:
+        type: int
+        description: |-
+          DISABLED
+        default: 1
+    databases:
+      - file: ITC4.template
+        args:
+          .*:
+
+  - name: MercuryiTC_SCPI
+    description: |-
+      Oxford Instruments Mercury iTC: system, one temperature sensor, one heater and one loop (the motherboard configuration)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Main PV address
+      Q:
+        type: str
+        description: |-
+          Device Identifier
+      PORT:
+        type: str
+        description: |-
+          AsynIP port to connect to
+    databases:
+      - file: MercuryiTC-SCPI.template
         args:
           .*:

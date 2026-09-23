@@ -1,0 +1,25 @@
+# % macro, P, PV Prefix
+# % macro, PORT, Asyn port name
+# % macro, SCAN, Asyn port name
+# % macro, PARAM, Asyn port name
+# % macro, CMD, Asyn port name
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)_REQUEST") {
+  field(SCAN, "$(SCAN)")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto get_3float($(P):$(PARAM),$(CMD)) $(PORT)")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P):$(PARAM)_1_RBV") {
+  field(PREC, "5")
+}
+
+record(ai, "$(P):$(PARAM)_2_RBV") {
+  field(PREC, "5")
+}
+
+record(ai, "$(P):$(PARAM)_3_RBV") {
+  field(PREC, "5")
+}

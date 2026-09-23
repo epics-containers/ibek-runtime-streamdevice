@@ -54,10 +54,6 @@ entity_models:
         description: |-
           Optional.  Longer description of the current signal.  Defaults to $(P)$(R) current signal.  The EPICS string record VAL field length limit is the restriction on the length of the string (of 39 characters under EPICS R3.14.12.7).
         default: $(P)$(R) current signal
-      name:
-        type: id
-        description: |-
-          Optional.  Name to export to gda as
     databases:
       - file: devKeithley6487.db
         args:

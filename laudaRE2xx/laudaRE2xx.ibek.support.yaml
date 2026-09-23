@@ -51,7 +51,7 @@ entity_models:
         description: |-
           DESC field value on the TEMP record (water temperature).
           Defaults to Chiller water temp
-        default: Chiller water temp
+        default: "Chiller water temp"
       RRDRVH:
         type: float
         description: |-
@@ -62,18 +62,12 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
-      name:
-        type: id
-        description: |-
-          object and gui association name
-      DESC:
-        type: str
-        description: |-
-          Description
     databases:
       - file: lRE2xx.template
         args:
           .*:
+          DESC: ""
+
   - name: lIntegralT
     description: |-
       Lauda Integral T process thermostat / recirculating chiller.
@@ -115,7 +109,7 @@ entity_models:
         description: |-
           DESC field value on the TEMP record (water temperature).
           Defaults to Chiller water temp
-        default: Chiller water temp
+        default: "Chiller water temp"
       RRDRVH:
         type: float
         description: |-
@@ -126,18 +120,11 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
-      name:
-        type: id
-        description: |-
-          object and gui association name
-      DESC:
-        type: str
-        description: |-
-          Description
     databases:
       - file: lIntegralT.template
         args:
           .*:
+
   - name: lVariocool
     description: |-
       Lauda Variocool recirculating chiller (uses the lREVariocool protocol).
@@ -184,18 +171,12 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
-      name:
-        type: id
-        description: |-
-          object and gui association name
-      DESC:
-        type: str
-        description: |-
-          Description
     databases:
       - file: lVariocool.template
         args:
           .*:
+          DESC: ""
+
   - name: lMCxxx
     description: |-
       Lauda Microcool recirculating chiller.
@@ -232,15 +213,53 @@ entity_models:
         type: float
         description: |-
           LOLO value for input temperature
-      name:
-        type: id
-        description: |-
-          object and gui association name
-      DESC:
-        type: str
-        description: |-
-          Description
     databases:
       - file: lMCxxx.template
+        args:
+          .*:
+          DESC: ""
+
+  - name: lRE2xx_RS485
+    description: |-
+      Imported from DLS module laudaRE2xx (lRE2xx_RS485.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      RSAD:
+        type: str
+        description: |-
+          RSAD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      ADDR:
+        type: int
+        description: |-
+          Device address
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      HIHI:
+        type: str
+        description: |-
+          HIHI
+      HIGH:
+        type: str
+        description: |-
+          HIGH
+      LOW:
+        type: str
+        description: |-
+          LOW
+      LOLO:
+        type: str
+        description: |-
+          LOLO
+    databases:
+      - file: lRE2xx_RS485.template
         args:
           .*:

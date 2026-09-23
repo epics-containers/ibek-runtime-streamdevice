@@ -29,11 +29,24 @@ entity_models:
         type: str
         description: |-
           Asyn port name
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: ETLdetector.template
+        args:
+          .*:
+
+  - name: ETLdetectorDebug
+    description: |-
+      Imported from DLS module ETLdetector (ETLdetectorDebug.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      port:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ETLdetectorDebug.template
         args:
           .*:

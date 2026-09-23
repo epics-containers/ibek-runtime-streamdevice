@@ -13,10 +13,6 @@ entity_models:
     description: |-
       Chillax cryocooler CSS screen association template
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-
@@ -57,10 +53,6 @@ entity_models:
     description: |-
       Chillax cryocooler controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Device object name
       P:
         type: str
         description: |-

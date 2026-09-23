@@ -13,10 +13,6 @@ entity_models:
     description: |-
       Controls a Valco Vici E2CA multiposition valve actuator controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       P:
         type: str
         description: |-
@@ -41,15 +37,12 @@ entity_models:
       - file: viciE2CA.template
         args:
           .*:
+          name: ""
 
   - name: viciEMT
     description: |-
       Controls a Valco Vici EMT multiposition valve actuator controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       P:
         type: str
         description: |-
@@ -66,22 +59,22 @@ entity_models:
         type: str
         description: |-
           Name for position 1
-        default: Pos 1
+        default: "Pos 1"
       POS2:
         type: str
         description: |-
           Name for position 2
-        default: Pos 2
+        default: "Pos 2"
       POS3:
         type: str
         description: |-
           Name for position 3
-        default: Pos 3
+        default: "Pos 3"
       POS4:
         type: str
         description: |-
           Name for position 4
-        default: Pos 4
+        default: "Pos 4"
       POS5:
         type: str
         description: |-
@@ -146,15 +139,12 @@ entity_models:
       - file: viciEMT.template
         args:
           .*:
+          name: ""
 
   - name: viciEUTA
     description: |-
       Controls a Valco Vici EUTA multiposition valve actuator controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       P:
         type: str
         description: |-
@@ -171,22 +161,22 @@ entity_models:
         type: str
         description: |-
           Name for position 1
-        default: Pos 1
+        default: "Pos 1"
       POS2:
         type: str
         description: |-
           Name for position 2
-        default: Pos 2
+        default: "Pos 2"
       POS3:
         type: str
         description: |-
           Name for position 3
-        default: Pos 3
+        default: "Pos 3"
       POS4:
         type: str
         description: |-
           Name for position 4
-        default: Pos 4
+        default: "Pos 4"
       POS5:
         type: str
         description: |-
@@ -251,15 +241,12 @@ entity_models:
       - file: viciEUTA.template
         args:
           .*:
+          name: ""
 
   - name: viciUM
     description: |-
       Controls a Valco Vici UMH/UMD/UMT modular universal valve actuator controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       P:
         type: str
         description: |-
@@ -350,5 +337,465 @@ entity_models:
         default: ""
     databases:
       - file: viciUM.template
+        args:
+          .*:
+          name: ""
+
+  - name: eightGasSelect
+    description: |-
+      Imported from DLS module vici (eightGasSelect.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      VALVE1:
+        type: str
+        description: |-
+          VALVE1
+      VALVE3:
+        type: str
+        description: |-
+          VALVE3
+      VALVE7:
+        type: str
+        description: |-
+          VALVE7
+      VALVE2:
+        type: str
+        description: |-
+          VALVE2
+      VALVE4:
+        type: str
+        description: |-
+          VALVE4
+      VALVE5:
+        type: str
+        description: |-
+          VALVE5
+      VALVE6:
+        type: str
+        description: |-
+          VALVE6
+    databases:
+      - file: eightGasSelect.template
+        args:
+          .*:
+
+  - name: fourGasSelect
+    description: |-
+      Imported from DLS module vici (fourGasSelect.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      VALVE1:
+        type: str
+        description: |-
+          VALVE1
+      VALVE3:
+        type: str
+        description: |-
+          VALVE3
+      VALVE2:
+        type: str
+        description: |-
+          VALVE2
+    databases:
+      - file: fourGasSelect.template
+        args:
+          .*:
+
+  - name: sixteenGasSelect_2EMT_1E2CA
+    description: |-
+      Imported from DLS module vici (sixteenGasSelect_2EMT_1E2CA.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      GAS1:
+        type: str
+        description: |-
+          GAS1
+        default: "Gas1"
+      GAS2:
+        type: str
+        description: |-
+          GAS2
+        default: "Gas2"
+      GAS3:
+        type: str
+        description: |-
+          GAS3
+        default: "Gas3"
+      GAS4:
+        type: str
+        description: |-
+          GAS4
+        default: "Gas4"
+      GAS5:
+        type: str
+        description: |-
+          GAS5
+        default: "Gas5"
+      GAS6:
+        type: str
+        description: |-
+          GAS6
+        default: "Gas6"
+      GAS7:
+        type: str
+        description: |-
+          GAS7
+        default: "Gas7"
+      GAS8:
+        type: str
+        description: |-
+          GAS8
+        default: "Gas8"
+      GAS9:
+        type: str
+        description: |-
+          GAS9
+        default: "Gas9"
+      GAS10:
+        type: str
+        description: |-
+          GAS10
+        default: "Gas10"
+      GAS11:
+        type: str
+        description: |-
+          GAS11
+        default: "Gas11"
+      GAS12:
+        type: str
+        description: |-
+          GAS12
+        default: "Gas12"
+      GAS13:
+        type: str
+        description: |-
+          GAS13
+        default: "Gas13"
+      GAS14:
+        type: str
+        description: |-
+          GAS14
+        default: "Gas14"
+      GAS15:
+        type: str
+        description: |-
+          GAS15
+        default: "Gas15"
+      GAS16:
+        type: str
+        description: |-
+          GAS16
+        default: "Gas16"
+      VALVE1:
+        type: str
+        description: |-
+          VALVE1
+      VALVE2:
+        type: str
+        description: |-
+          VALVE2
+      VALVE3:
+        type: str
+        description: |-
+          VALVE3
+      V3DMDA:
+        type: int
+        description: |-
+          V3DMDA
+        default: 0
+      V3DMDB:
+        type: int
+        description: |-
+          V3DMDB
+        default: 1
+      STR1:
+        type: str
+        description: |-
+          STR1
+        default: ""
+      STR2:
+        type: str
+        description: |-
+          STR2
+        default: ""
+      STR3:
+        type: str
+        description: |-
+          STR3
+        default: ""
+      STR4:
+        type: str
+        description: |-
+          STR4
+        default: ""
+    databases:
+      - file: sixteenGasSelect_2EMT_1E2CA.template
+        args:
+          .*:
+
+  - name: sixteenGasSelect_2EMT_1VALVE
+    description: |-
+      Imported from DLS module vici (sixteenGasSelect_2EMT_1VALVE.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      GAS1:
+        type: str
+        description: |-
+          GAS1
+        default: "Gas1"
+      GAS2:
+        type: str
+        description: |-
+          GAS2
+        default: "Gas2"
+      GAS3:
+        type: str
+        description: |-
+          GAS3
+        default: "Gas3"
+      GAS4:
+        type: str
+        description: |-
+          GAS4
+        default: "Gas4"
+      GAS5:
+        type: str
+        description: |-
+          GAS5
+        default: "Gas5"
+      GAS6:
+        type: str
+        description: |-
+          GAS6
+        default: "Gas6"
+      GAS7:
+        type: str
+        description: |-
+          GAS7
+        default: "Gas7"
+      GAS8:
+        type: str
+        description: |-
+          GAS8
+        default: "Gas8"
+      GAS9:
+        type: str
+        description: |-
+          GAS9
+        default: "Gas9"
+      GAS10:
+        type: str
+        description: |-
+          GAS10
+        default: "Gas10"
+      GAS11:
+        type: str
+        description: |-
+          GAS11
+        default: "Gas11"
+      GAS12:
+        type: str
+        description: |-
+          GAS12
+        default: "Gas12"
+      GAS13:
+        type: str
+        description: |-
+          GAS13
+        default: "Gas13"
+      GAS14:
+        type: str
+        description: |-
+          GAS14
+        default: "Gas14"
+      GAS15:
+        type: str
+        description: |-
+          GAS15
+        default: "Gas15"
+      GAS16:
+        type: str
+        description: |-
+          GAS16
+        default: "Gas16"
+      VALVE1:
+        type: str
+        description: |-
+          VALVE1
+      V3DMDA:
+        type: int
+        description: |-
+          V3DMDA
+        default: 0
+      VALVE3:
+        type: str
+        description: |-
+          VALVE3
+      VALVE2:
+        type: str
+        description: |-
+          VALVE2
+      V3DMDB:
+        type: int
+        description: |-
+          V3DMDB
+        default: 1
+      V3RBVA:
+        type: int
+        description: |-
+          V3RBVA
+        default: 1
+      V3RBVB:
+        type: int
+        description: |-
+          V3RBVB
+        default: 3
+      STR1:
+        type: str
+        description: |-
+          STR1
+        default: ""
+      STR2:
+        type: str
+        description: |-
+          STR2
+        default: ""
+      STR3:
+        type: str
+        description: |-
+          STR3
+        default: ""
+      STR4:
+        type: str
+        description: |-
+          STR4
+        default: ""
+    databases:
+      - file: sixteenGasSelect_2EMT_1VALVE.template
+        args:
+          .*:
+
+  - name: viciEMT_dummy
+    description: |-
+      Imported from DLS module vici (viciEMT_dummy.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      POS1:
+        type: str
+        description: |-
+          POS1
+        default: "Pos 1"
+      POS2:
+        type: str
+        description: |-
+          POS2
+        default: "Pos 2"
+      POS3:
+        type: str
+        description: |-
+          POS3
+        default: "Pos 3"
+      POS4:
+        type: str
+        description: |-
+          POS4
+        default: "Pos 4"
+      POS5:
+        type: str
+        description: |-
+          POS5
+        default: ""
+      POS6:
+        type: str
+        description: |-
+          POS6
+        default: ""
+      POS7:
+        type: str
+        description: |-
+          POS7
+        default: ""
+      POS8:
+        type: str
+        description: |-
+          POS8
+        default: ""
+      POS9:
+        type: str
+        description: |-
+          POS9
+        default: ""
+      POS10:
+        type: str
+        description: |-
+          POS10
+        default: ""
+      POS11:
+        type: str
+        description: |-
+          POS11
+        default: ""
+      POS12:
+        type: str
+        description: |-
+          POS12
+        default: ""
+      POS13:
+        type: str
+        description: |-
+          POS13
+        default: ""
+      POS14:
+        type: str
+        description: |-
+          POS14
+        default: ""
+      POS15:
+        type: str
+        description: |-
+          POS15
+        default: ""
+      POS16:
+        type: str
+        description: |-
+          POS16
+        default: ""
+    databases:
+      - file: viciEMT_dummy.template
         args:
           .*:

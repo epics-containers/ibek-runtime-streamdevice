@@ -1,0 +1,193 @@
+At the least, we will require one bi/o or ai/o record for each message we can
+send to the device.
+Perhaps use longin/longout for integer parameters?
+Probably use stringin/stringout for the device type messages, but might need
+to worry about 40 char limit. 
+
+We then need, for each record, to determine:
+ - Value ranges & input conversion
+ - Shouldn't need any input conversion since I think everything is already in 
+   correct units, but should use HOPR/LOPR to set ranges. 
+ - Process flow.
+ 
+ 
+RESET 
+  - $(prefix):RESET
+  - Possibly bo? Not found a comparable example yet (protocol with command with
+    no input or output arguments).
+  - Digitel MPC uses a bo record with both states set to "Reset" (and ignores 
+    the actual value in the protocol). 
+  
+GET
+  Status
+   - $(prefix):STATUS
+   - mbbi, 4 states
+  RemoteMode
+   - $(prefix):REM
+   - bi
+  DeviceType
+   - $(prefix):DEVT
+   - stringin
+  DeviceId
+   - $(prefix):DEVID
+   - stringin
+  Version
+   - $(prefix):VER
+   - stringin
+
+  PressureInterface
+   - $(prefix):P:INTR
+   - stringin
+  CurrentPressure
+   - $(prefix):P
+   - ai
+  PressureTolerance
+   - $(prefix):P:TOL
+   - longin
+  PressureTarget
+   - $(prefix):P:SP
+   - ai
+
+  CurrentValveVoltage
+   - $(prefix):V
+   - ai
+  CurrentValvePercentage
+   - $(prefix):V:PER
+   - ai
+  ValveVoltageMax
+   - $(prefix):V:MAX
+   - ai
+
+  Timer
+   - $(prefix):T:STA
+   - bi
+  TimerTarget
+   - $(prefix):T:TAR
+   - longin
+  CurrentTimer
+   - $(prefix):T
+   - longin
+  
+  Regulation
+   - $(prefix):REG:STA
+   - bi
+  RegulationTimeout
+   - $(prefix):REG:TIM
+   - longin
+  ValueKI
+   - $(prefix):REG:KI
+   - ai
+  ValueKP
+   - $(prefix):REG:KP
+   - ai
+  
+SET
+  RemoteMode %{Local|Remote}
+   - $(prefix):REM:SET
+   - bo
+  
+  PressureTarget
+   - $(prefix):P:SETSP
+   - ao
+  PressureTolerance
+   - $(prefix):P:SETTOL
+   - longout
+  
+  ValveVoltageMax 
+   - $(prefix):V:SETMAX
+   - ao
+  ValveVoltage 
+   - $(prefix):V:SET
+   - ao 
+  
+  Timer
+   - $(prefix):T:CON
+   - bo
+  TimerTarget
+   - $(prefix):T:SETTARG
+   - longout
+
+  Regulation
+   - $(prefix):REG:CON
+   - bo
+  RegulationTimeout
+   - $(prefix):REG:SETTIM 
+   - longout
+  ValueKP
+   - $(prefix):REG:SETKP
+   - ao
+  ValueKI
+   - $(prefix):REG:SETKI
+   - ao
+   
+Next:
+ - Naming convention. Constraints - records can be up to 60 characters. 
+   - Not sure what full component name of VCU1000 will be - prob will need to 
+     change this later to comply with what is actually assigned. 
+   - Convention for getter/setter pairs seems to be that the getter record is 
+     the variable name, while the setter is the getter name with ":SET" appended.
+     e.g.
+       $(device):P
+       $(device):P:SET
+     Do we prefer 
+       - :subsys:<param>:<action> (e.g. V:MAX:SET)
+       - :subsys:[<verb>]<param> (e.g. V:SETMAX)?
+     Nothing in convention to prevent 1st, but all examples I've seen seem to 
+     prefer the second, so will adopt this.
+     
+ - Determine process flow - which records will scan periodically, and which will
+   be passive? For the former, should some records process more/ less frequently?
+   For example, for fields that we don't expect to change (e.g. version), could
+   we process once at startup and then never again afterwards?
+-  Note pattern used in GP app (and elsewhere) - single heartbeat fanout record 
+   linked to all input records. Can then disable fanout to disable comms. As 
+   input records passive, we can also link to them from other places if we want 
+   to process without waiting for next periodic scan. 
+   
+-  Consider structure - does it make sense to decompose into more than one template?
+   Alternative is we could group records by subcomponent in vdb file. 
+   
+-  Consider internal logic of database - besides the basic setter/getters and the 
+   heartbeat, what other functions should the database perform? Do we want to 
+   have some internal interlocks to disable some records when they are not valid?
+   What records will we need to support this?
+-  One option is to intentionally perform no error checking - this will mean we 
+   are not suppressing log messages, and hopefully will result in the record 
+   alarm status being set to Invalid. 
+-  Need manual voltage setting to work sensibly. 2 issues to consider:
+    - Setting voltage will do nothing (but still appear to work) if Regulation is
+      Off. 
+    - We might want to provide some feedback to user that pressure is within 
+      prescribed tolerance in supervisory mode. In particular may be a bit odd
+      if the Status field reads "Standby" - could have a derived field such as
+      "Pressure correct" which operates independently of the status field. 
+-  Might want to implement our own regulation timeout countdown in the database,
+   since the device doesn't report this directly.
+-  Interlocks we would require:
+    - Remote mode -> Every SET message other than RemoteMode
+    - Timer + Regulation -> SET TimerTarget
+    - Regulation -> SET ValueKI, ValueKP, ValveVoltage
+-  Handling of out-of-range values - at present these generate an error message from
+   device. Is this sensible? Will result in the setter record being marked Invalid.
+   - Found solution to this problem - use the DRVH and DRVL fields of ao (and 
+   presumably longout). These will truncate out-of-range values for VAL to these
+   limits before writing to OVAL, so we should be able to effectively eliminate 
+   out-of-range errors this way. 
+-  May want a few records which rely on status/regulation value but don't report
+   directly - 
+    - A reset function for the Error state which send "SET Regulation Off".
+    - A toggle between "closed loop" and "supervisory" which controls whether 
+      you can input voltage directly, independent of actually engaging regulation.
+      
+      
+      
+I/O readback:
+ - would be nice if we could set up some means to have a text control in EDM 
+   display the RBV, not the setpoint - perhaps could have an FLINK and INLINK 
+   from the input record to the output, so that if for some reason the write fails
+   the GUI will reflect this. Trouble is I think we may have a race condition 
+   then - input could overwrite output with old value before new value has 
+   propagated through to input, and we end up writing old value back to device. 
+   Use an NPP link? Then output record should show right value for readback to 
+   GUI, but won't actually write to device (and then new value should propagate
+   back to the field once device reports it has changed). 

@@ -1,0 +1,16 @@
+# attenuator_cmd.template
+# Record to set some attenuator parameter (Calibrated, raw or offset)
+# Instantiated via iocbuilder.Xml in builder.py
+# % macro, P, Device prefix
+# % macro, Q, Device suffix
+# % macro, CMD, Protocol method to execute
+# % macro, ADDR, D2AFE RS485 address
+# % macro, CH, Attenuator channel
+# % macro, ATT, Attenuator number (1 or 2)
+# % macro, STREAMS_PORT, PTG streams port
+record(ao, "$(P)$(Q)")
+{
+  field(DTYP, "stream")
+  field(OUT,  "@d2afe.proto $(CMD)($(ADDR),$(CH),$(ATT),$(P):AFE:RESP) $(STREAMS_PORT)")
+  field(FLNK, "$(P):AFE:CAL:MON.PROC PP")
+}

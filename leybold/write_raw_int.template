@@ -1,0 +1,22 @@
+
+# % macro, P, PV Prefix
+# % macro, PORT, Asyn port name
+# % macro, SCAN, Asyn port name
+# % macro, PARAM, Asyn port name
+# % macro, CMD, Asyn port name
+# % macro, DEFAULT_VAL, Asyn port name
+# % macro, DRVH, Asyn port name
+# % macro, DRVL, Asyn port name
+
+
+# Send query to the controller
+record(ao, "$(P):$(PARAM)") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto set_int($(CMD)) $(PORT)")
+  field(PINI, "NO")
+  field(DRVH, "$(DRVH)")
+  field(DRVL, "$(DRVL)")
+  field(VAL, "$(DEFAULT_VAL=0)")
+}
+

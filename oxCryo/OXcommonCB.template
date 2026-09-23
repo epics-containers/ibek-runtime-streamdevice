@@ -1,0 +1,147 @@
+# % macro, __doc__, Control for Oxford Cryostream 800 series (Cobra)
+#
+# Macros:
+# % macro, P, Device Prefix
+# % macro, Q, Device suffix
+# % macro, PORT, Asyn port to connect to
+# % macro, gda_name, Name in gda interface file (Default = )
+# % macro, gda_desc, Description in gda interface file (Default = )
+# % macro, name, Object and gui association name
+# % macro, CTEMP_DRVL, macro to set CTEMP.DRVL
+# % macro, CTEMP_DRVH, mactro to set CTEMP.DRVH
+# % archiver 1 Monitor
+# %gdatag,mbbinary,ro,$(gda_name=),PHASE
+record(mbbi, "$(P)$(Q):PHASE") {
+  field(DESC, "Phase ID")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(NIVL, "9")
+  field(TEVL, "10")
+  field(ZRST, "Ramp")
+  field(ONST, "Cool")
+  field(TWST, "Plat")
+  field(THST, "Hold")
+  field(FRST, "End")
+  field(FVST, "Purge")
+  field(SXST, "Delete Phase")
+  field(SVST, "Load Program")
+  field(EIST, "Save Program")
+  field(NIST, "Soak")
+  field(TEST, "Wait")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):BACKPRESS") {
+  field(DESC, "Back Pressure")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(LINR, "LINEAR")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+  field(PREC, "2")
+  field(EGU, "bar")
+}
+
+
+include "OXcommon.template"
+
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):REFRTEMP") {
+  field(DESC, "Refrigerator Temperature")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(LINR, "LINEAR")
+  field(ESLO, "0.01")
+  field(EOFF, "0")
+  field(PREC, "2")
+  field(EGU, "K")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):REFRHEAT") {
+  field(DESC, "Refrigerator Heater")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(EGU, "%")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):VACGAUGE") {
+  field(DESC, "Vacuum gauge reading")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(LINR, "LINEAR")
+  field(ESLO, "0.001")
+  field(EOFF, "0")
+  field(PREC, "3")
+  field(EGU, "V")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):CRYOSTATUS") {
+  field(DESC, "Cryodrive status")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):CRYOADJUST") {
+  field(DESC, "Cryodrive Speed Boost")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(EGU, "rpm")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):CRYOSPEED") {
+  field(DESC, "Cryodrive Speed")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(EGU, "rpm")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):GASHEATAVG") {
+  field(DESC, "Average value of gas heater")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(EGU, "%")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):VACGAUGEPWR") {
+  field(DESC, "Power to vacuum gauage")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):SUSPENDED") {
+  field(DESC, "Device in temporary hold")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+}
+
+# % archiver 1 Monitor
+record(ai, "$(P)$(Q):HOURS") {
+  field(DESC, "Total number of hours device has run")
+  field(DTYP, "Raw Soft Channel")
+  field(PINI, "YES")
+  field(EGU, "hrs")
+}
+
+record(ai, "$(P)$(Q):CSTYPE") {
+  field(DESC, "Cryostream type")
+  field(PINI, "YES")
+  field(VAL, "0")
+}

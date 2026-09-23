@@ -25,10 +25,6 @@ entity_models:
         type: int
         description: |-
           device address
-      name:
-        type: id
-        description: |-
-          GUI name
     databases:
       - file: CBY-2206.template
         args:

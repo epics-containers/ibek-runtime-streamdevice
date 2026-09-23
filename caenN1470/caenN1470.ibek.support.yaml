@@ -37,6 +37,7 @@ entity_models:
       - file: caenN1470chan.template
         args:
           .*:
+          gda_name: ""
   - name: _caenN1470
     description: |-
       CAEN N1470 HV power supply (board-level template)
@@ -62,10 +63,6 @@ entity_models:
         description: |-
           Default disable mode for comms
         default: 1
-      name:
-        type: id
-        description: |-
-          Gui association name
       label0:
         type: str
         description: |-
@@ -86,3 +83,5 @@ entity_models:
       - file: caenN1470.template
         args:
           .*:
+          gda_desc: ""
+          gda_name: ""

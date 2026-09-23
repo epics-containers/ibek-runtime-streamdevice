@@ -1,0 +1,19 @@
+/**
+\mainpage caenN1470 EPICS Support Module
+\section intro_sec Introduction
+This module provides support for the <a href="http://www.caen.it/csite/CaenProd.jsp?parent=21&idmod=599">CAEN N1470 HV power supply</a>. Documentation for the unit is available <a href="http://www.caen.it/servlet/checkCaenManualFile?Id=8020">here</a>.
+
+\section bugs_sec Setup
+Default serial setup is:
+- baud rate 9600 (can be changed)
+- Data bits: 8
+- Parity: none
+- stop bit: 1
+- Flow control: Xon Xoff
+If you use the USB connection it will appear as /dev/ttyUSBx, otherwise set it up as a normal serial port.
+
+\section build_sec Build Instructions 
+- \subpage build_instructions_example
+
+IOCs build using these build instructions are available in iocs/
+*/

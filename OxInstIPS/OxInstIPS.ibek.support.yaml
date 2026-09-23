@@ -21,15 +21,6 @@ entity_models:
         type: str
         description: |-
           Asyn Port
-      name:
-        type: id
-        description: |-
-          Object name, also used for gda_name if gda
-      desc:
-        type: str
-        description: |-
-          Object description, also used for gda_desc if gda
-        default: ""
       DISABLED:
         type: int
         description: |-

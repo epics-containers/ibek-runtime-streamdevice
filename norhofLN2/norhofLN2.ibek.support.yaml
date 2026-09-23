@@ -21,10 +21,6 @@ entity_models:
         type: str
         description: |-
           Asyn Port
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: norhofLN2.template
         args:

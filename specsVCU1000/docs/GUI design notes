@@ -1,0 +1,198 @@
+VCU1000 GUI design notes
+
+Setup screen:
+
+  4 fields which are pure readback
+  3 data entry/feedback
+  1 button (reset)
+  - Should communicate that this might cause data loss - e.g. make red, put 
+    somewhere it won't be clicked accidentally.
+  - Maybe also change the name - reset sounds like it might simply restore
+    defaults (which actually the real command won't do). Perhaps "Power cycle" 
+    or something similar?
+  
+Main screen:
+
+  Status at top - most prominent piece of information
+  
+  Pressure grouped with voltage.
+  - Current pressure, with setpoint & tolerance.
+  - Current voltage, with setpoint & percentage.
+  - Reg. Timeout
+  
+  Timer control in separate visual group.
+  
+  2 main button toggles:
+  - Remote mode
+  - Regulation
+
+  2 window-level buttons:
+  - Configuration
+  - Exit
+  
+  
+Design 1 notes:
+
+- Remote mode readback is separated from control
+- Timeout is a headache - only means anything if reg. is on, but is not grouped
+  with reg. control. 
+- In Error mode, won't be obvious how to recover - either set regulation off
+  or use reset, but reset is on config panel and reg will already be reading as
+  off.
+  - Though actually, set regulation on will work fine as well - will restart reg.
+- Not very obvious that pressure SP is only meaningful if we want closed loop 
+  control, while voltage SP only does anything in open-loop.
+  
+Design 2:
+
+- Regroup controls - separate into groups:
+                      * Readback
+                      * Closed loop (or regulated/automatic)
+                      * Open loop   (or manual)
+                      
+                      
+                      
+Abstract away raw access to regulation On/Off. Instead have top level control:
+- Control mode <Manual|Regulated>
+
+- Readback just contains RBV for pressure, voltage and percentage.
+- Manual control just contains voltage SP.
+- Regulated control contains:
+  - Pressure SP
+  - Pressure tolerance
+  - Regulation Start/Stop toggle
+  - Reg timeout
+  - Time toggle On/Off
+  - Timer setting/readback
+  
+Use internal database logic to implement abstracted control mode and interlocks,
+and use Invalid alarm severity on disabled output records to communicate effects
+of toggle (DISV field should be used for this - shouldn't just be alarm, or else
+will find control turns white but writes to the field still work). 
+
+Should also abstract the Status field - if in Regulated mode, should just report
+raw GET Status value, but if in Manual mode should report either just "manual control"
+or else "Pressure on target" or "Pressure off target" depending on whether we want
+to pay any regard to the pressure setpoint/tolerance in manual mode. 
+
+Note with this grouping it would be very nice if we could implement our own 
+timeout counter in the DB, since the timeout field is confusingly grouped 
+together with the timer controls. An explicit readback of the timer countdown
+would make this distinction more intuitive. This does trade off correctness for
+usability - we open ourselves to possibility our timeout count could become 
+inaccurate as device state changes before we can update the database.
+
+Note in either case we abstract away the TimerTarget readback - should be OK 
+to only ever report the CurrentTimer value. Difference between values only 
+ever becomes relevant if RESET function is used. If user is setting it, it should
+always reset the current timer - which we want anyway. If reg ends because timer 
+expires, it may make sense to reset it to original value ready for next sample, 
+but this would need implementing in DB anyway since it is not what the device 
+does. 
+
+Testing notes/bug list:
+
+- Pressure displays with right mantissa but wrong exponent, i.e. shows 9.90000
+when true value is 9.9e-03. 
+  Fixed - set to use exp notation rather than default.
+- Voltage percentage is actually a ratio between 0 and 1, not 0 and 100.
+- Seems to be a lag in reporting of timer count - doesn't count down steadily.
+- Same effect for other fast monitored values i.e. voltage and pressure.
+- Text entry fields don't show current value of setpoint - default to e.g. 0.0
+for pressure, which is confusing since hitting "Regulation On" immediately will 
+not cause to home towards 0.0. Possibly this is a db error - db is initialised 
+with different setpoints from the device, and EDM reflects these defaults - text
+update fields do display current setpoint if e.g. it is changed by an external caput. 
+- Text entry fields permit setting variable to invalid values, and wrongly appear
+to report success - e.g. can set pressure setpoint to -1.0.
+  Fixed by setting the "Clip to HOPR/LOPR" checkbox. 
+- Remote mode definitely confusing - not obvious device needs setting to Remote 
+before changing values, as changing values seems to work immediately (error 
+messages are staying in the IOC, not being reported at top level).
+- Status record needs an alarms status. 
+- Remote button is too narrow, text truncated. 
+- Version string is truncated even further by configuration screen. Pertinent 
+info is still there but is ugly as sin.
+- Check precisions are sensible, and decide on a convention for units - either:
+Pressure (mbar)   [6.0e-04     ]
+or:
+Pressure          [6.0e-04 mbar] 
+- Try to fit full word "Tolerance" in PTOL field. 
+- Set KP and KI to use exp notation?
+
+- Voltage bug - sometimes manual voltage set won't work (field remains at zero).
+  No message sent to device, no change in DB. 
+  Only seems to occur if:
+   - Not connected to this IOC before from EDM
+  So can fix by:
+   - Setting Edit then back to Execute
+   - Closing EDM and reconnecting
+   - Closing the window and reopening.
+
+- Fix banner colour on setup window.
+  * Done
+  
+- RBVs for Timer & Regulation buttons (as can end up in error state).
+- Input range on TimerTarget (at least lower bound)
+- Alarm status on CurrentTimer RBV, to indicate will do odd things when restarted.
+  Options:
+   - Set alarm state when we read back negative value 
+   - Use database logic to try to anticipate the fault and set the alarm state 
+     beforehand.
+  Alarm case:
+   - reg is ON
+   - tim has been ON
+   - tim is OFF
+     
+- Readback timing - at present timer messages are being lost and updating at less
+  than 1 s/s.
+  Options:
+    - Reduce read frequency on some PVs to reduce congestion. 
+    - Try to find a way to set priority on stream protocol processing - set 
+      running timer to outrank most readback.
+    - Actually show a DB internal timer, which we then try to synchronise with 
+      the device timer whenever we get data back. 
+
+Possible extensions:
+- Alarm status in InProgress?
+- Timeout countdown
+- Pressure gauge
+- Interlocks to disable invalid controls:
+  - Remote mode - All
+  - Regulation - KI/KP, ValveVoltage
+  - Timer + Regulation - TimerTarget
+- Show valve voltage percentage as bar
+- Graphing of pressure over time
+- Add a "Time on target" counter - only records time spent within pressure 
+tolerance.
+
+How bad is the congestion?
+REM -    2s
+STATUS - 1s
+P      - 1s
+P:TOL  - 2s
+P:SP   - 2s
+V      - 1s
+V:PER  - 1s
+V:MAX  - 2s
+T:STA  - 1s
+T      - 1s
+T:TAR  - 1s
+REG:STA- 1s
+REG:TIM- 1s
+REG:KI - 2s
+REG:KP - 2s
+
+So 12 updates per second (counting each 2s update as 0.5Hz).
+Options:
+ - Could make V:PER pure in-database calculation. No real advantage to reading
+ direct from device, and eliminates a whole fast update record.
+ - Drop REG:TIM and T:TAR to 2s? Shaves off another update/s.
+ - Drop REG:KI & REG:KP to 5s? Gets us another 3/5 of an update/s.
+ 
+ So down to 9.4 updates/s.
+ 
+Still not enough to solve problem - going to try using PHAS field on records to 
+ensure fast-changing fields are read with higher priority.
+- That helped a bit - still a little laggy but no longer actually missing updates.
+

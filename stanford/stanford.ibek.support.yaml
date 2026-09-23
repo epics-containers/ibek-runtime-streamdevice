@@ -25,11 +25,25 @@ entity_models:
         type: str
         description: |-
           Asyn port for this device
-      DESC:
-        type: str
-        description: |-
-          Description for this device (displayed on EDM screen)
     databases:
       - file: sr570.template
+        args:
+          .*:
+          DESC: ""
+
+  - name: dummy_stanford_ai
+    description: |-
+      Imported from DLS module stanford (dummy_stanford_ai.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+    databases:
+      - file: dummy_stanford_ai.template
         args:
           .*:

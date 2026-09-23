@@ -1,0 +1,30 @@
+# File EdwardsScroll_SerialOnOffExtra.template
+#
+# Usually an Edwards Scroll pump is interlocked to a PLC, which has On/Off
+# control and attempting to control via serial is undesirable.  This template
+# adds records to allow serial on/off control.
+#
+# % macro, __doc__,          Template for Serial control of Edwards Scroll pumps On and Off via serial.
+#
+# % macro, P, 	 Mandatory.  Device prefix
+# % macro, port, Mandatory.  Asyn port name
+# % macro, name, Optional.   Name for gui element
+#
+# % gui, $(name=), edm , EdwardsOnOff.edl, device=$(P)
+#
+record(bo, "$(P):DO_START")
+{
+  field(DESC, "Start the pump")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT,  "@EdScroll.proto doPumpStart($(P)) $(port)")
+}
+
+record(bo, "$(P):DO_STOP")
+{
+  field(DESC, "Stop the pump")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT,  "@EdScroll.proto doPumpStop($(P)) $(port)")
+}
+

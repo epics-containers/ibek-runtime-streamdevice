@@ -1,0 +1,154 @@
+/**
+\mainpage microlab500 EPICS Support Module
+\section intro_sec Introduction
+This is an EPICS support module for the Hamilton Microlab 500 series syringe pumps. It currently supports a single controller on a serial line. Communication uses streamDevice, so an Asyn port is required.
+
+<a href="http://www.microlabtech.co.uk/documents/literature/ML%20500%20B-C%20Manual.pdf">The instrument user manual is available here. </a> 
+
+\section macros_sec Macros
+Macros used in the templates:
+
+- P: Device prefix
+- R: Device suffix
+- PORT: Name of the Asyn Port for communication with device
+- STROKESIZE: Number of steps per full syringe stroke. Default configuration is 1000 (half resolution mode) - please see manual Appendix F, p. F-19.
+- LEFTSYRINGEVOL: Volume in microliters of the left syringe
+- RIGHTSYRINGEVOL: Volume in microliters of the right syringe
+
+\section user_sec Interface 
+The instrument has two sides, each composed of a valve and a syringe drive.
+Each valve is represented by an mbbo record and each syringe drive is represented by a motor record. In the record names below, \$(SIDE) is either LEFT or RIGHT.
+
+<table>
+    <tr>
+        <td><b>\$(P)\$(R):\$(SIDE):SETVPOS</b> </td> 
+        <td>
+            An mbbo record to set the valve position. Choices:
+
+            - 0: Input
+            - 1: Wash
+            - 2: Output
+
+        </td>
+    </tr>
+    <tr>
+        <td><b>\$(P)\$(R):\$(SIDE):MOTOR</b> </td>
+        <td>
+            A motor record representing the syringve. Engineering units are microliters.
+            The motor resolution and soft limits are controlled by the LEFTSYRINGEVOL and RIGHTSYRINGEVOL macros.
+            Due to a limitation of the serial protocol, the STOP field of either motor record will stop all motion
+            on the controller, not only the chosen syringe.
+        </td>
+    </tr>
+</table>
+
+In addition certain functions can be accessed directly via their own records:
+
+<table>
+    <tr>
+        <td><b>\$(P)\$(R):\$(SIDE):GETVPOS</b> </td>
+        <td>
+            Read back valve position.
+            
+            - 0: Input
+            - 1: Wash
+            - 2: Output
+
+        </td>
+    </tr>
+    <tr>
+        <td><b>\$(P)\$(R):\$(SIDE):PICKUP</b> </td>
+        <td>
+            Cause the syringe to pick up by the number of steps stored in \$(P)\$(R):\$(SIDE):STEP
+
+        </td>
+    </tr>
+    <tr>
+        <td><b>\$(P)\$(R):\$(SIDE):DISPENSE</b> </td>
+        <td>
+            Cause the syringe to dispense by the number of steps stored in \$(P)\$(R):\$(SIDE):STEP
+
+        </td>
+    </tr>
+    <tr>
+        <td><b>\$(P)\$(R):\$(SIDE):SETSPEED</b> </td>
+        <td>
+            Set the syringe speed in the controller's raw units of seconds per full syringe stroke.
+
+        </td>
+    </tr>
+    <tr>
+        <td><b>\$(P)\$(R):\$(SIDE):SETRETURN</b> </td>
+        <td>
+            Set the number of backoff return steps.
+
+        </td>
+    </tr>
+    <tr>
+        <td><b>\$(P)\$(R):STOP</b> </td>
+        <td>
+            Stop all motion on this controller.
+
+        </td>
+    </tr>
+    <tr>
+        <td><b>\$(P)\$(R):STARTUP</b> </td>
+        <td>
+            Perform all actions required after pump is connected or after IOC is resterted. Executed once when IOC starts.
+
+        </td>
+    </tr>
+    <tr>
+        <td><b>\$(P)\$(R):INITIALISE</b> </td>
+        <td>
+            Perform pump initialisation routine. Required after pump is powered on. This includes homing the syringes so all parts of the pump will move. 
+
+        </td>
+    </tr>
+</table>
+
+\section starting_sec Getting started
+
+- Choose a terminal server port. Set up an AsynIP port to point to this terminal server port, and put the AsynIP port name in the PORT macro of the microlab500 template.
+- Power on the pump and connect its RS232 cable.
+- The pump's own control panel RS232 cable should not be connected, otherwise communication is not possible.
+- Start the IOC
+- Press Connect on the GUI - executes \$(P)\$(R):STARTUP
+- Press Initialise on GUI - executes \$(P)\$(R):INITIALISE.
+
+If RS232 connection is lost:
+    
+- Reconnect the RS232 cable
+- Press Connect on the GUI
+
+If the pump is powered off
+
+- Power the pump on
+- Press Connect on the GUI
+- Press Initialise on the GUI - caution, the pump will move
+
+If the IOC is restarted
+
+- Connect is executed automatically when the IOC starts, so if the pump is powered on and connected, communications will be re-established.
+
+\section build_sec Build Instructions 
+- \subpage build_instructions_example
+
+IOCs build using these build instructions are available in iocs/
+
+\section iocs_sec Example IOCs
+
+Two sample IOCs are provided, <i>example</i> and <i>example_s2</i>. Example runs with the hardware while example_s2 runs with a basic simulator. The simulator is located in etc/simulations/microlab500_sim.py. 
+
+Both IOCs have a sample EDM screen which gives access to all the basic commands and a standard motor record embedded screen for each side of the instrument. Build and run the <i>example</i> IOC, and start its GUI with the following commands:
+
+<pre>
+cd iocs/example
+make
+./bin/linux-x86_64/stexample.sh
+./bin/linux-x86_64/stexample-gui
+</pre>
+
+**/
+
+/* Build instructions page will be generated from the xml file given to dls-xml-iocbuilder.py --doc */

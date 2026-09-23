@@ -1,0 +1,15 @@
+The unit is made to ramp by changing the target level.
+This can be inhibited by having the pause button on.
+Thus it can also be made to ramp by turning the pause button off (if there has been a change in the other parameters).
+
+There will be a delay until the status records are updated.
+But then the STS:RAMP:MADE record will say whether the unit is ramping or not.
+Ramp Target Made
+or Ramping.
+However if the pause is on, the record will say made, not ramping.
+
+
+
+The target level button changes.
+The pause button is off.
+The state is ramping.

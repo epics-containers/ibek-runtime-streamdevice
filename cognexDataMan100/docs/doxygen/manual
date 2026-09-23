@@ -1,0 +1,33 @@
+/**
+\mainpage cognexDataMan100 EPICS Support Module
+\section intro_sec Introduction
+Support for cognex's data man 100 bar code reader.\n
+
+The DataMan 100 when configured to use its serial port and triggered outputs over the serial line the code read from the bar code.
+
+Documentation of the DataMan 100 at cognex's website: 
+http://www.cognex.com/products/barcode-readers-scanners/dataman-100-200-barcode-decoder/
+
+The device supports various types of bar codes.
+
+The intention is to use the device for data matrix codes placed on pins.
+QR codes and micro QR codes are also possible.
+
+The device is configured using its USB port connected to the DM100 IOBOX.
+Once configured, it can operate stand-alone.
+
+Possible triggering modes are:
+- manual using the button on the camera
+- external, using the trigger input (input 0). An 24 V pulse triggers the barcode scanning.
+- Self (internal)
+- Burst (gated).
+
+Serial parameters can be configured on the device as described in the manual.
+
+\section release_notes Release Notes
+Release 1 - Nov 2016
+Tested with Beamline I11's terminal server and using a serial line.
+
+**/
+
+/* Build instructions page will be generated from the xml file given to dls-xml-iocbuilder.py --doc */

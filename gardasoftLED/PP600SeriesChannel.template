@@ -17,7 +17,7 @@ record(ai, "$(P):CH$(N)SETOUTPUT") {
 record(stringout, "$(P):CH$(N)SETMODE") {
   field(DESC, "Set output mode")
   field(DTYP, "stream")
-  field(OUT, "@gardasoft.protocol setMode($(N)) $(PORT)")
+  field(OUT, "@PP600Series.protocol setMode($(N)) $(PORT)")
   field(PINI, "YES")
   field(PRIO, "HIGH")
   field(VAL, "0")
@@ -57,7 +57,7 @@ record(calcout, "$(P):CH$(N)SENDOUTPUT") {
   field(CALC, "B?A:B")
   field(INPA, "$(P):CH$(N)SETOUTPUT")
   field(INPB, "$(P):CH$(N)ON")
-  field(OUT, "@gardasoft.protocol setOutput($(N),$(P)) $(PORT)")
+  field(OUT, "@PP600Series.protocol setOutput($(N),$(P)) $(PORT)")
   field(OOPT, "Every Time")
   field(DOPT, "Use CALC")
   field(FLNK, "$(P):QUERYSETTINGS PP")

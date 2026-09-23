@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: ttiEX355P 2-0
+# Source: /dls_sw/prod/R3.14.12.7/support/ttiEX355P/2-0
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/ttiEX355P/ release.
+
+module: ttiEX355P
+
+entity_models:
+  - name: ttiEX355P
+    description: |-
+      Imported from DLS module ttiEX355P (ttiEX355P.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      MAXV:
+        type: float
+        description: |-
+          MAXV
+        default: 0.0
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      MAXI:
+        type: float
+        description: |-
+          MAXI
+        default: 0.0
+    databases:
+      - file: ttiEX355P.template
+        args:
+          .*:

@@ -25,10 +25,6 @@ entity_models:
         type: str
         description: |-
           asyn port
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: WS300.template
         args:

@@ -25,10 +25,6 @@ entity_models:
         type: str
         description: |-
           Asyn Port for communication with device
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: blueShadow40P.template
         args:
@@ -49,11 +45,26 @@ entity_models:
         type: str
         description: |-
           Asyn Port for communication with device
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: azuraV2-1S.template
+        args:
+          .*:
+          device: ""
+          valve: ""
+
+  - name: ConnectionManagement
+    description: |-
+      Monitors a connection to a Knauer device
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          Device suffix
+    databases:
+      - file: connectionManagement.template
         args:
           .*:

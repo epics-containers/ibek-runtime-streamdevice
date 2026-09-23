@@ -58,13 +58,15 @@ jobcur { out "HOSTCTRL_REQUEST RJSEQ 0";
 #	 in "%[_a-zA-Z0-9],%(\$1:JOBCURLINE.VAL)d,%(\$1:JOBCURSTEP.VAL)d";
          @mismatch{error;}; }
 
-# Servo on switch.  Previously had single switch for on/off with out "%1i".
-# Now separate push switches for on/off as most jobs now automatically switch
-# the servo off from the robot controller when finished.  This avoids asking users to
-# switch off manually.  Scientists, etc do still need manual control for the other jobs.
-# Am currently manually calling status to immediately update the servo status as used to
-# disable controls - am now moving to use a yaskawa network output so could remove this
-# extra manual call of status.
+# Servo on/off switches.  Previously had a single switch for on and off with out "%1i".
+# Now separate push switches to allow for jobs that automatically switch the servo off
+# when finished.  This avoids asking users to switch off manually every time a job finishes.
+# Advanced users do still need manual control.  This is now done using a push button to avoid
+# a toggle button being latched down after the robot controller has switched the servo off.
+#
+# After the servo is switched on, status is called to immediately update the servo status.
+# The servo status can then be used to disable editing of parameters from EPICS once a job has
+# started.  (If the controller sets a network output it may instead be preferable to use this.)
 svon { out "HOSTCTRL_REQUEST SVON 3";
        in "OK: SVON";
 	   out "1";
@@ -82,15 +84,6 @@ start { svon;
         in "OK: START";
 	    out "%(\$1:JOBTGT.VAL)s";
         in "0000"; @mismatch{error;}; }
-
-# A "user job" is hardcoded using USERJOB when the ioc is built.  A user button
-# can then call the following.  The above start that runs the job set by JOBTGT
-# can then be hidden from users to prevent them running jobs that could lead to a collision.
-startUserJob { svon;
-	           out "HOSTCTRL_REQUEST START %(\$1:USERJOBLEN.VAL)i";
-               in "OK: START";
-	           out "%(\$1:USERJOB.VAL)s";
-	           in "0000"; @mismatch{error;}; }
 
 # Hold switch now also separated as usually hold only used in an emergency, e.g.
 # to avoid a collision.  If the robot is then moved with the pendant hold would

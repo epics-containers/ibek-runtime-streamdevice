@@ -104,8 +104,6 @@ record(ao, "$(P)$(Q):REF_SPEED_SP")
 record(ai, "$(P)$(Q):REF_SPEED:TWV") 
 {
   field(VAL, "1")
-  field(DRVH, "10000")
-  field(DRVL, "0")
   field(PREC, "1")
   field(EGU, "rpm")
 }

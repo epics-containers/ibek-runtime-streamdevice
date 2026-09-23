@@ -1,0 +1,41 @@
+# Stream Device Protocol for a Canberra G64 gamma radiation monitor
+# The protocol requires features of Stream Device 2
+
+#terminator = 0x19;
+replytimeout = 1000;
+readtimeout = 1000;
+
+#Commands
+#Summary Report
+
+#Start = ASCII code 1.
+#Source ID = 4 chars, **** = any, ???? = unset default.
+#Dest ID = 4 chars, **** = any.
+#Message Number = 1 byte binary, sequential and echoed back.
+#Count = 1 byte binary, size of data field (0 for request, 10 for report).
+#Command Code = 0x15 for Report request, 0x7E for ACK response.
+#Data = None for Report request, 10 bytes as below for response.
+#CRC = 2 byte binary (terminator). crc-ccitt(XModem) not in streamDevice so fixed in request and ignored in response.
+#End = ASCII code 0x19 (terminator).
+
+#Summary report bytes:
+#1 = Equipment type = 0x0B = G64_HLP = G64 with ion chamber detector
+#2 = Measurement range = 0x01 = mSv/h - Sv/h
+#3-6 = Gamma dose rate (float)
+#7 = Alarm Status mask (see doc or records)
+#8-9 = Fault status mask (see doc or records)
+#10 = System status mask (see doc or records)
+
+# in message feeds 4 values into fields A,B,C,D of calling calcout record.
+#report { out 1 "EIOC" "****" 1 0 0x15 "%<ccitt16x>" 0x19;
+#         in 1 "****" "EIOC"  "\?" "\10" 0x7E 0x0B 1 "%(A)#4R"
+report { out 1 "EIOC" "****" "%(\$1.VAL)01r" 0 0x15 "%<ccitt16x>" 0x19;
+          in 1 "****" "EIOC" "%(\$1.VAL)01r" "\10" 0x7E 0x0B 1 "%(A)#4R"
+              "%(B)1r" "%(C)2r" "%(D)1r" "%<ccitt16x>" 0X19;
+}
+
+#reset { out 1 "EIOC" "****" 2 0 1 "%<ccitt16x>" 0x19;
+#        in 1 "****" "EIOC" 2 0 0x7E "%<ccitt16x>" 0x19;
+reset { out 1 "EIOC" "****" "%(\$1.VAL)01r" 0 1 "%<ccitt16x>" 0x19;
+        in 1 "****" "EIOC" "%(\$1.VAL)01r" 0 0x7E "%<ccitt16x>" 0x19;
+}

@@ -1,8 +1,14 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
 
-# Imported from DLS production support module: VatLeakValve590 1.1
-# Source: /dls_sw/prod/R3.14.12.7/support/VatLeakValve590/1.1
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# Imported from DLS production support module: VatLeakValve590 1-5
+# Source: /dls_sw/prod/R3.14.12.7/support/VatLeakValve590/1-5
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release,
+# except for these scripted changes:
+# - VATLeakValve590series.template: DTYP "soft channel" -> "Soft Channel" (12 records);
+#   DTYP "stream" dropped from the 2 calc records (calc has no device support);
+#   SCAN "1 seccond" -> "1 second" and "0.5 second" -> ".5 second"; PINI "yes" -> "YES";
+#   ZRSV/ONSV -> ZSV/OSV on 6 bi records (ZRSV/ONSV are mbbi fields).
+#   EPICS 7 rejects each of these, so the file does not load without them.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/VatLeakValve590/ release.
 
@@ -17,10 +23,6 @@ entity_models:
         type: str
         description: |-
           device name
-      name:
-        type: id
-        description: |-
-          Object name and gui association name
       port:
         type: str
         description: |-
@@ -34,15 +36,13 @@ entity_models:
       - file: VATLeakValve590series.template
         args:
           .*:
+          P: ""
+          R: ""
 
   - name: VatLeakValve590series
     description: |-
       VAT Variable Leak Valve 590 Series
     parameters:
-      name:
-        type: id
-        description: |-
-          Gui tag
       device:
         type: str
         description: |-
@@ -60,3 +60,5 @@ entity_models:
       - file: VATLeakValve590series.template
         args:
           .*:
+          P: ""
+          R: ""

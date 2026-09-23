@@ -1,0 +1,107 @@
+##########################################################
+# Protocol file for a Twickenham Helium Depth Indicator
+# Based on instruction manual release 4.9
+# Created on 29/07/09
+# Original author: Emma Shepherd
+##########################################################
+
+terminator = CR LF;
+timeout = 1000;
+
+# Request current foreground reading
+requestFG{ out "G"; }
+
+# Request current background reading
+requestBG{ out "F"; }
+
+# Reply can come in two forms, depending on whether the
+# front panel is currently displaying a message, so
+# use records processing on I/O interrupt to read it.
+
+# $1 is set to the device name.
+
+# Get display message
+getMsg{ in "%*c%(\$1:STATUS.VAL){ |*}-%{OPEN|HIGH|STBY}"; }
+
+# Get foreground level (channel A)
+getFG{ in "A%(\$1:STATUS.VAL){ |*}%4umm"; }
+
+# Get background level (channel B)
+getBG{ in "B%(\$1:STATUS.VAL){ |*}%4umm"; }
+
+# Turn pump off/on using relay output
+# RX0=off, RX1=on
+setPump{ out "RX%d"; }
+
+# Set the mode of operation
+# 0=Standby, 1=Slow, 2=Fast, 3=Continuous
+# Use status command to find out the current mode at initialisation
+setMode { 
+    out "M%d"; 
+    @init { out "S"; in "M%d%*s"; }
+}
+
+# Request current status
+requestS{ out "S"; }
+# Response to S command: MqPrHsItRXuRYvAwOnnnLnnn (where lower case are integer numbers)
+getS_P { in "M%*cP%1u%*s"; }
+getS_H { in "M%*3cH%1u%*s"; }
+getS_I { in "M%*5cI%1u%*s"; }
+getS_RX{ in "M%*7cRX%1u%*s"; }
+getS_RY{ in "M%*10cRY%1u%*s"; }
+getS_A { in "M%*13cA%1u%*s"; }
+getS_O { in "M%*15cO%3u%*s"; }
+getS_L { in "M%*19cL%3u"; }
+
+# Request alarm allocation B command
+requestB{ out "B"; }
+# Response to B comand: UnnnnVnnnnKn (where lower case are integer numbers)
+getB_U { in "U%4u%*s"; }
+getB_V { in "U%*4cV%4u%*s"; }
+getB_K { in "U%*4cV%*4cK%1u"; }
+
+# Request relay allocation C command
+requestC{ out "C"; }
+# Response to C command: WXnnnnXXnnnnWYnnnnXYnnnnQn (where lower case are integer numbers)
+getC_WX { in "WX%4u%*s"; }
+getC_XX { in "WX%*4cXX%4u%*s"; }
+getC_WY { in "WX%*10cWY%4u%*s"; }
+getC_XY { in "WX%*16cXY%4u%*s"; }
+getC_Q  { in "WX%*22cQ%1u"; }
+
+# Set the relay allocation
+setQ { 
+        out "Q%d";
+#        @init { out "C"; in "WX%*22cQ%1u"; }
+}
+
+# Set the alarm allocation
+setK { 
+        out "K%d";
+#        @init { out "B"; in "U%*4cV%*4cK%1u"; }
+}
+
+# set relay X or Y mode (NB setPump is also RX cmd)
+setRX{ out "RX%d"; }
+setRY{ out "RY%d"; }
+
+# set alarm mode
+setA{ out "A%d"; }
+
+# set probe mode
+setP{ out "P%d"; }
+
+# set relay x on point
+setWX{ out "WX%4d"; }
+# set relay x off point
+setXX{ out "XX%4d"; }
+# set relay y on point
+setWY{ out "WY%4d"; }
+# set relay y off point
+setXY{ out "XY%4d"; }
+
+# set alarm on point
+setU{ out "U%4d"; }
+# set alarm off point
+setV{ out "V%4d"; }
+

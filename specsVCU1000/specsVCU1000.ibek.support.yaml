@@ -13,10 +13,6 @@ entity_models:
     description: |-
       SPECS VCU1000 controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-
@@ -33,3 +29,4 @@ entity_models:
       - file: specsVCU1000.template
         args:
           .*:
+          name: ""

@@ -1,8 +1,36 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
 
-# Imported from DLS production support module: yaskawaBARTRobot 0-1
-# Source: /dls_sw/prod/R3.14.12.7/support/yaskawaBARTRobot/0-1
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# Imported from DLS production support module: yaskawaBARTRobot 0-1-I22-ONLY
+# Source: /dls_sw/prod/R3.14.12.7/support/yaskawaBARTRobot/0-1-I22-ONLY
+# Pristine copy of the StreamDevice protocol + EPICS db/templates from that release,
+# with one scripted change in BARTRobot.db: its two genSub records
+# ($(P):GET_BARCODE SNAM DecToAsc, $(P):GET_GRIPPER_STATE SNAM GripperState) are
+# converted to aSub records (record type only; every field kept, all FTx/FTVx are
+# explicit so no type default changes). genSub is not in EPICS 7 base; aSub is.
+#
+# Templates needing a generic IOC built with this module (not the plain
+# generic image):
+# - `BARTRobot.db` needs a generic IOC built with `yaskawaBARTRobot` (compiled support), not the plain generic image.
+#   Its aSub records call DecToAsc and GripperState, compiled C in the module's
+#   yaskawaBARTRobotApp/src/genSubRoutines.c; that IOC must register them ported to
+#   aSub (aSubRecord *, same a..e/vala fields). An aSub skips its OUTx puts when the
+#   routine returns non-zero (genSub always writes them); both routines always
+#   return 0, so this changes nothing here. GripperState reads its SHORT inputs
+#   (FTA..FTC) through int pointers - as in the DLS module.
+#   Its dlsPLC records (DM0XX..DM7XX, GRIPPER_OPEN/CLOSE, ERROR_RESET) are asyn
+#   records on the FINS port PORT, which needs the compiled FINS driver.
+#   BARTRobot.db is the DLS build's msi expansion of
+#   yaskawaBARTRobotApp/Db/BARTRobot.substitutions (dlsPLC, VisionSystem,
+#   BarcodeData, yaskawa, ControllerState, yaskawaLongReadOnly, yaskawaLongNoSync,
+#   SamplePositions templates); the build left $(STREAMS_PORT,undefined) and
+#   $(NEXT_SLOT_VAR_NUM,undefined) in 9 record links, which expand to the
+#   STREAMS_PORT / NEXT_SLOT_VAR_NUM parameter values.
+#
+# Beamline-specific content: the only BL13J reference is the VisualDCT header
+# comment `#! DBD("../../../BL13J-BUILDER/iocs/BL13J-MO-IOC-10/dbd/...")` in
+# yaskawa.template, yaskawaReal.template and BARTRobot.db; no record uses a
+# hard-coded prefix (every PV name is built from $(P)), so nothing needed a macro.
+#
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/yaskawaBARTRobot/ release.
 
@@ -339,5 +367,307 @@ entity_models:
         default: ""
     databases:
       - file: yaskawaOutput.template
+        args:
+          .*:
+
+  - name: yaskawa
+    description: |-
+      Yaskawa robot controller: status, position, servo and job control
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Asyn Port
+      TYPE:
+        type: str
+        description: |-
+          Robot type: NX, FS, DX or YR
+      COORDSYS:
+        type: str
+        description: |-
+          Coordinate system to use for displaying the robot position
+        default: "1"
+      JOB1:
+        type: str
+        description: |-
+          Job 1 name
+        default: "NOP"
+      JOB2:
+        type: str
+        description: |-
+          Job 2 name
+        default: ""
+      JOB3:
+        type: str
+        description: |-
+          Job 3 name
+        default: ""
+      JOB4:
+        type: str
+        description: |-
+          Job 4 name
+        default: ""
+      JOB5:
+        type: str
+        description: |-
+          Job 5 name
+        default: ""
+      JOB6:
+        type: str
+        description: |-
+          Job 6 name
+        default: ""
+      JOB7:
+        type: str
+        description: |-
+          Job 7 name
+        default: ""
+      JOB8:
+        type: str
+        description: |-
+          Job 8 name
+        default: ""
+      JOB9:
+        type: str
+        description: |-
+          Job 9 name
+        default: ""
+      JOB10:
+        type: str
+        description: |-
+          Job 10 name
+        default: ""
+      JOB11:
+        type: str
+        description: |-
+          Job 11 name
+        default: ""
+      JOB12:
+        type: str
+        description: |-
+          Job 12 name
+        default: ""
+      JOB13:
+        type: str
+        description: |-
+          Job 13 name
+        default: ""
+      JOB14:
+        type: str
+        description: |-
+          Job 14 name
+        default: ""
+      JOB15:
+        type: str
+        description: |-
+          Job 15 name
+        default: ""
+      JOB16:
+        type: str
+        description: |-
+          Job 16 name
+        default: ""
+    databases:
+      - file: yaskawa.template
+        args:
+          .*:
+
+  - name: yaskawaReal
+    description: |-
+      Define yaskawa robot controller Real (float) variables that can be set and read in EPICS
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV prefix
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Stream port
+      VAR:
+        type: str
+        description: |-
+          Real variable number to read/write.  Must be 3 digits - prefix with zeroes, e.g. 001.
+      DISWRITE:
+        type: str
+        description: |-
+          When the given PV is equal to DISV this variable cannot be written to. Default can't just be set to the prefix otherwise record will not be processed. STA2=64 is used as this prevents this variable being changed when the robot servo is on.
+        default: "STA2"
+      DISV:
+        type: str
+        description: |-
+          Value that DISWRITE is compared to
+        default: "64"
+      SCAN:
+        type: str
+        description: |-
+          Scan rate (0.2s is too fast)
+      DRVL:
+        type: str
+        description: |-
+          Low limit
+      DRVH:
+        type: str
+        description: |-
+          High limit
+      DESC:
+        type: str
+        description: |-
+          Variable's description
+        default: ""
+    databases:
+      - file: yaskawaReal.template
+        args:
+          .*:
+
+  - name: BARTRobot
+    description: |-
+      Yaskawa controller type and jobs run from EPICS, plus: Yaskawa variable numbers used by
+      the sample exchange jobs for Carrier Column, Row and Slot (jobs can be prevented from
+      running if these variables have not been received by the controller within 1 second),
+      and a PLC port for reading the gripper and barcode reader.
+      NOTE: needs a generic IOC built with yaskawaBARTRobot (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Fins port
+      STREAMS_PORT:
+        type: str
+        description: |-
+          Stream port
+      TYPE:
+        type: str
+        description: |-
+          Type of Yaskawa robot controller: DX, FS, NX or YR
+      CUR_COLUMN_VAR_NUM:
+        type: str
+        description: |-
+          The Yaskawa variable number to use for the current column. Must be 3 digits - prefix with zeroes, e.g. 081. (Note that the Yaskawa variable type is called a double (D in epics) but this is actually a long int.)
+      CUR_ROW_VAR_NUM:
+        type: str
+        description: |-
+          The Yaskawa variable number to use for the current row. Must be 3 digits - prefix with zeroes, e.g. 081. (Note that the Yaskawa variable type is called a double (D in epics) but this is actually a long int.)
+      CUR_SLOT_VAR_NUM:
+        type: str
+        description: |-
+          The Yaskawa variable number to use for the current slot within carrier. Must be 3 digits - prefix with zeroes, e.g. 081. (Note that the Yaskawa variable type is called a double (D in epics) but this is actually a long int.)
+      NEXT_COLUMN_VAR_NUM:
+        type: str
+        description: |-
+          The Yaskawa variable number to use for the next column. Must be 3 digits - prefix with zeroes, e.g. 081. (Note that the Yaskawa variable type is called a double (D in epics) but this is actually a long int.)
+      NEXT_ROW_VAR_NUM:
+        type: str
+        description: |-
+          The Yaskawa variable number to use for the next row. Must be 3 digits - prefix with zeroes, e.g. 081. (Note that the Yaskawa variable type is called a double (D in epics) but this is actually a long int.)
+      NEXT_SLOT_VAR_NUM:
+        type: str
+        description: |-
+          The Yaskawa variable number to use for the next slot within carrier. Must be 3 digits - prefix with zeroes, e.g. 081. (Note that the Yaskawa variable type is called a double (D in epics) but this is actually a long int.)
+      COORDSYS:
+        type: str
+        description: |-
+          Coordinate system to use for displaying the robot position
+        default: "1"
+      DISWRITE:
+        type: str
+        description: |-
+          When the given PV is equal to DISV, internal variables cannot be written to
+        default: "STA2"
+      DISV:
+        type: str
+        description: |-
+          Value that DISWRITE is compared to
+        default: "64"
+      JOB1:
+        type: str
+        description: |-
+          Job 1 name
+        default: "NOP"
+      JOB2:
+        type: str
+        description: |-
+          Job 2 name
+        default: ""
+      JOB3:
+        type: str
+        description: |-
+          Job 3 name
+        default: ""
+      JOB4:
+        type: str
+        description: |-
+          Job 4 name
+        default: ""
+      JOB5:
+        type: str
+        description: |-
+          Job 5 name
+        default: ""
+      JOB6:
+        type: str
+        description: |-
+          Job 6 name
+        default: ""
+      JOB7:
+        type: str
+        description: |-
+          Job 7 name
+        default: ""
+      JOB8:
+        type: str
+        description: |-
+          Job 8 name
+        default: ""
+      JOB9:
+        type: str
+        description: |-
+          Job 9 name
+        default: ""
+      JOB10:
+        type: str
+        description: |-
+          Job 10 name
+        default: ""
+      JOB11:
+        type: str
+        description: |-
+          Job 11 name
+        default: ""
+      JOB12:
+        type: str
+        description: |-
+          Job 12 name
+        default: ""
+      JOB13:
+        type: str
+        description: |-
+          Job 13 name
+        default: ""
+      JOB14:
+        type: str
+        description: |-
+          Job 14 name
+        default: ""
+      JOB15:
+        type: str
+        description: |-
+          Job 15 name
+        default: ""
+      JOB16:
+        type: str
+        description: |-
+          Job 16 name
+        default: ""
+    databases:
+      - file: BARTRobot.db
         args:
           .*:

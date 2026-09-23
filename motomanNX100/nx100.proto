@@ -1,0 +1,71 @@
+ReadTimeout = 100;
+PollPeriod = 100;
+ReplyTimeout = 2000;
+OutTerminator = "\r\n";
+InTerminator = "\r";
+ExtraInput = Ignore;
+
+connectFS { out "CONNECT Robot_access Keep-Alive:-1";
+          in "OK: FS Information Server( %4s) Keep-Alive:-1."; }
+
+connectNX { out "CONNECT Robot_access Keep-Alive:-1";
+          in "OK: NX Information Server( %4s) Keep-Alive:-1."; }
+
+error { in "ERROR: %(\$1:ERRCMD.VAL)s is not successful(%(\$1:ERR.VAL)04d)."; }
+
+status { out "HOSTCTRL_REQUEST RSTATS 0";
+         in "OK: RSTATS";
+         in "%(\$1:STA1.VAL)d,%(\$1:STA2.VAL)d";
+         out "HOSTCTRL_REQUEST RPOSJ 0";
+         in "OK: RPOSJ";        
+         in "%(\$1:S.VAL)d,%(\$1:L.VAL)d,%(\$1:U.VAL)d,%(\$1:R.VAL)d,%(\$1:B.VAL)d,%(\$1:T.VAL)d,%*d,%*d,%*d,%*d,%*d,%*d";
+         out "HOSTCTRL_REQUEST RPOSC 6";
+         in "OK: RPOSC";
+         out "1, 0";
+         in "%(\$1:X.VAL)f,%(\$1:Y.VAL)f,%(\$1:Z.VAL)f,%(\$1:TX.VAL)f,%(\$1:TY.VAL)f,%(\$1:TZ.VAL)f,%*f,%*f";
+         @mismatch{error;}; }
+
+svon { out "HOSTCTRL_REQUEST SVON 3";
+       in "OK: SVON";
+	   out "%1i";
+	   in "0000"; @mismatch{error;}; }
+	   
+hold { out "HOSTCTRL_REQUEST HOLD 3";
+       in "OK: HOLD";
+	   out "%1i";
+	   in "0000"; @mismatch{error;}; }
+	   
+start { out "HOSTCTRL_REQUEST START 18";
+        in "OK: START";
+	    out "%(\$1:JOB.VAL)16s";
+	    in "0000"; @mismatch{error;}; }
+
+readp { out "HOSTCTRL_REQUEST SAVEV 8";
+        in "OK: SAVEV";
+        out "4, \$2";
+        in "1,%*d,%(\$1:P\$2:X.VAL)f,%(\$1:P\$2:Y.VAL)f,%(\$1:P\$2:Z.VAL)f,%(\$1:P\$2:TX.VAL)f,"
+           "%(\$1:P\$2:TY.VAL)f,%(\$1:P\$2:TZ.VAL)f,%(\$1:P\$2:TYPE.VAL)i,%(\$1:P\$2:TOOL.VAL)i";
+        @mismatch{error;}; }
+
+writep { out "HOSTCTRL_REQUEST LOADV 87";
+        in "OK: LOADV";
+        out "4, \$2, 1, 1, %(\$1:P\$2:X.VAL) 09.3f, %(\$1:P\$2:Y.VAL) 09.3f, %(\$1:P\$2:Z.VAL) 09.3f, %(\$1:P\$2:TX.VAL) 08.2f, "
+           "%(\$1:P\$2:TY.VAL) 08.2f, %(\$1:P\$2:TZ.VAL) 08.2f, %(\$1:P\$2:TYPE.VAL)03i, %(\$1:P\$2:TOOL.VAL)03i";
+   	    in "0000"; @mismatch{error;}; }
+
+readio { out "HOSTCTRL_REQUEST IOREAD 9";
+        in "OK: IOREAD";
+        out "\$2, 8";
+        in "%i";
+        @mismatch{error;}; }
+
+readd { out "HOSTCTRL_REQUEST SAVEV 8";
+        in "OK: SAVEV";
+        out "2, \$2";
+        in "%f";
+        @mismatch{error;}; }
+
+writed { out "HOSTCTRL_REQUEST LOADV 19";
+        in "OK: LOADV";
+        out "2, \$2, % 09i";
+   	    in "0000"; @mismatch{error;}; }

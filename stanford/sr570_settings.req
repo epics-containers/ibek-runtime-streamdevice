@@ -1,0 +1,17 @@
+$(P)$(Q):BSLV
+$(P)$(Q):BSON
+$(P)$(Q):FLTT
+$(P)$(Q):GNMD
+$(P)$(Q):HFRQ
+$(P)$(Q):INVT
+$(P)$(Q):IOLV:SEL1
+$(P)$(Q):IOLV:SEL2
+$(P)$(Q):IOON
+$(P)$(Q):IOSN
+$(P)$(Q):IOUC
+$(P)$(Q):IOUV
+$(P)$(Q):LFRQ
+$(P)$(Q):SENS:SEL1
+$(P)$(Q):SENS:SEL2
+$(P)$(Q):SUCM
+$(P)$(Q):SUCV

@@ -1,0 +1,256 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: d2afe 0-1
+# Source: /dls_sw/prod/R3.14.12.7/support/d2afe/0-1
+# The built db/ output has $(X,undefined) baked into record names for some
+# templates; those are shipped from the module's App/Db msi source instead.
+# Everything else is a pristine copy of that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/d2afe/ release.
+#
+# Templates needing a generic IOC built with this module (not the plain
+# generic image):
+# - `fwVersionCheck.template` needs a generic IOC built with `d2afe` (compiled aSub routine `checkFW`), not the plain generic image.
+
+module: d2afe
+
+entity_models:
+  - name: attenuator_cmd
+    description: |-
+      Imported from DLS module d2afe (attenuator_cmd.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      CMD:
+        type: str
+        description: |-
+          CMD
+      ADDR:
+        type: int
+        description: |-
+          Device address
+      CH:
+        type: str
+        description: |-
+          CH
+      ATT:
+        type: str
+        description: |-
+          ATT
+      STREAMS_PORT:
+        type: str
+        description: |-
+          STREAMS_PORT
+    databases:
+      - file: attenuator_cmd.template
+        args:
+          .*:
+
+  - name: attenuators_set_fan
+    description: |-
+      Imported from DLS module d2afe (attenuators_set_fan.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      Q1:
+        type: str
+        description: |-
+          Q1
+      Q2:
+        type: str
+        description: |-
+          Q2
+      Q3:
+        type: str
+        description: |-
+          Q3
+      Q4:
+        type: str
+        description: |-
+          Q4
+    databases:
+      - file: attenuators_set_fan.template
+        args:
+          .*:
+
+  - name: cal_table
+    description: |-
+      Imported from DLS module d2afe (cal_table.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      ADDR:
+        type: int
+        description: |-
+          Device address
+      STREAMS_PORT:
+        type: str
+        description: |-
+          STREAMS_PORT
+      NEXT:
+        type: str
+        description: |-
+          NEXT
+    databases:
+      - file: cal_table.template
+        args:
+          .*:
+
+  - name: d2afeStatus
+    description: |-
+      Imported from DLS module d2afe (d2afeStatus.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      ADDR:
+        type: int
+        description: |-
+          Device address
+      STREAMS_PORT:
+        type: str
+        description: |-
+          STREAMS_PORT
+      NEXT:
+        type: str
+        description: |-
+          NEXT
+    databases:
+      - file: d2afeStatus.template
+        args:
+          .*:
+          name: ""
+
+  - name: d2ptg
+    description: |-
+      Imported from DLS module d2afe (d2ptg.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      D2AFE_MASK:
+        type: int
+        description: |-
+          D2AFE_MASK
+    databases:
+      - file: d2ptg.template
+        args:
+          .*:
+
+  - name: d2ptg_cal_scan_list
+    description: |-
+      Imported from DLS module d2afe (d2ptg_cal_scan_list.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      NEXT:
+        type: str
+        description: |-
+          NEXT
+    databases:
+      - file: d2ptg_cal_scan_list.template
+        args:
+          .*:
+
+  - name: d2ptg_mon_scan_list
+    description: |-
+      Imported from DLS module d2afe (d2ptg_mon_scan_list.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      NEXT:
+        type: str
+        description: |-
+          NEXT
+    databases:
+      - file: d2ptg_mon_scan_list.template
+        args:
+          .*:
+
+  - name: d2ptg_scan
+    description: |-
+      Imported from DLS module d2afe (d2ptg_scan.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      MON_SCAN:
+        type: str
+        description: |-
+          MON_SCAN
+      CELL:
+        type: int
+        description: |-
+          CELL
+      CAL_SCAN:
+        type: str
+        description: |-
+          CAL_SCAN
+    databases:
+      - file: d2ptg_scan.template
+        args:
+          .*:
+
+  - name: fwVersionCheck
+    description: |-
+      Imported from DLS module d2afe (fwVersionCheck.template)
+      NOTE: needs a generic IOC built with d2afe (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+    databases:
+      - file: fwVersionCheck.template
+        args:
+          .*:
+
+  - name: generic_cmd
+    description: |-
+      Imported from DLS module d2afe (generic_cmd.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      CMD:
+        type: str
+        description: |-
+          CMD
+      ADDR:
+        type: int
+        description: |-
+          Device address
+      STREAMS_PORT:
+        type: str
+        description: |-
+          STREAMS_PORT
+    databases:
+      - file: generic_cmd.template
+        args:
+          .*:

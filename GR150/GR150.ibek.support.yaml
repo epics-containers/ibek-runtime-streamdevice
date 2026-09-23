@@ -30,11 +30,7 @@ entity_models:
         type: str
         description: |-
           Optional.  Description in TEMPERATURE record DESC field.  Defaults to "Chiller water temp"
-        default: Chiller water temperature
-      name:
-        type: id
-        description: |-
-          Object and GUI association name
+        default: "Chiller water temperature"
     databases:
       - file: gr150.template
         args:

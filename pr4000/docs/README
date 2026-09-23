@@ -1,0 +1,62 @@
+INTRODUCTION
+------------
+This is the EPICS support module for the
+MKS PR4000 Gauge Controller.
+
+The PR4000 is able to drive two 628B gauges, each assigned to channels 1 or 2 of the controller.
+The conroller utilises a RS232 interface for serial communications. The default framing is:
+
+9600 baud
+7 data bits
+1 stop bits
+Odd parity
+
+The specification is based on MKS document:
+PR 4000B-F  Edition 2010-11-23
+
+
+USAGE
+-----
+
+Two templates are provided here:
+
+1) pr4000.template
+This instatiates all the records associated with the controller's common settings. i.e. not channel dependent.
+
+2) pr4000chan.template
+This instatiates all the records associated with a channel. There are two channels on the PR4000, so only two
+instances will be required per controller.
+
+example:
+
+file pr4000.template
+    {
+    pattern { device               ,  port   }
+            { ${domain}-VA-GCTLR-10, "ts1_18"}
+    }
+    
+file pr4000chan.template
+    {
+    pattern { device               ,  port   , channel }
+            { ${domain}-VA-GAUGE-01, "ts1_18", 1       }
+            { ${domain}-VA-GAUGE-02, "ts1_18", 2       }
+    }
+
+    
+The user interface is presently available via EDM screens. 
+Starting with the root screen: 
+
+pr4000.edl                : Summary of pressure, range and relay status for all channels.
+
+pr4ksetupchannel.edl      : Configure channel setpoints and relay settings for each channel.
+
+pr4ksetupcontroller.edl   : Controller ID and remote mode setting.
+
+
+MAINTAINERS
+-----------
+
+Current maintainers:
+* Ian Gillingham (Diamond Light Source) - ian.gillingham@diamond.ac.uk
+
+First created December 2014.

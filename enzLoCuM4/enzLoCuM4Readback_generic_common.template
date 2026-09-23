@@ -1,0 +1,149 @@
+record(transform, "$(device):UPDATE") {
+  field(DESC, "Update values based on range")
+  field(INPA, "$(device):CALMR CP")
+  field(CMTB, "Current value for 10V input")
+  field(CLCB, "10^INT((LOG(A)/LOG(2))-9.5)")
+  field(OUTB, "$(device):FANEGUF PP")
+  field(CMTC, "Current value for -10V input")
+  field(CLCC, "-B")
+  field(OUTC, "$(device):FANEGUL PP")
+# factor of 0.98 comes from default value for maximum on autorange
+  field(CMTD, "Upper limit")
+  field(CLCD, "0.98*B")
+  field(OUTD, "$(device):FANHIGH PP")
+# factor of 0.08 comes from default value for minimum on autorange
+  field(CMTE, "Lower limit")
+  field(CLCE, "0.08*B")
+  field(OUTE, "$(device):FANLOW PP")
+  field(CMTF, "Archive deadband")
+  field(CLCF, "$(adel=0.002*B)")
+  field(OUTF, "$(device):FANadel PP")
+}
+
+record(dfanout, "$(device):FANEGUF") {
+  field(DESC, "Set EGUF of inputs")
+  field(OUTA, "$(device):BLADE1.EGUF")
+  field(OUTB, "$(device):BLADE2.EGUF")
+  field(OUTC, "$(device):BLADE3.EGUF")
+  field(OUTD, "$(device):BLADE4.EGUF")
+  field(OUTE, "$(device):BLADE1.HOPR")
+  field(OUTF, "$(device):BLADE2.HOPR")
+  field(OUTG, "$(device):BLADE3.HOPR")
+  field(OUTH, "$(device):BLADE4.HOPR")
+}
+
+record(dfanout, "$(device):FANEGUL") {
+  field(DESC, "Set EGUL of inputs")
+  field(OUTA, "$(device):BLADE1.EGUL")
+  field(OUTB, "$(device):BLADE2.EGUL")
+  field(OUTC, "$(device):BLADE3.EGUL")
+  field(OUTD, "$(device):BLADE4.EGUL")
+  field(OUTE, "$(device):BLADE1.LOPR")
+  field(OUTF, "$(device):BLADE2.LOPR")
+  field(OUTG, "$(device):BLADE3.LOPR")
+  field(OUTH, "$(device):BLADE4.LOPR")
+}
+
+record(dfanout, "$(device):FANHIGH") {
+  field(DESC, "Set HIGH of inputs")
+  field(OUTA, "$(device):BLADE1.HIGH")
+  field(OUTB, "$(device):BLADE2.HIGH")
+  field(OUTC, "$(device):BLADE3.HIGH")
+  field(OUTD, "$(device):BLADE4.HIGH")
+}
+
+record(dfanout, "$(device):FANLOW") {
+  field(DESC, "Set LOW of inputs")
+  field(OUTA, "$(device):BLADE1.LOW")
+  field(OUTB, "$(device):BLADE2.LOW")
+  field(OUTC, "$(device):BLADE3.LOW")
+  field(OUTD, "$(device):BLADE4.LOW")
+}
+
+record(dfanout, "$(device):FANadel") {
+  field(DESC, "Set adel of inputs")
+  field(OUTA, "$(device):BLADE1.adel")
+  field(OUTB, "$(device):BLADE2.adel")
+  field(OUTC, "$(device):BLADE3.adel")
+  field(OUTD, "$(device):BLADE4.adel")
+}
+
+record(ai, "$(device):KX") {
+  field(DESC, "Beam X pos calc constant")
+  field(DTYP, "Soft Channel")
+  field(INP, "1.0")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+record(ai, "$(device):KY") {
+  field(DESC, "Beam Y pos calc constant")
+  field(DTYP, "Soft Channel")
+  field(INP, "1.0")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+record(ai, "$(device):OFFSETX") {
+  field(DESC, "Beam X pos calc offset")
+  field(DTYP, "Soft Channel")
+  field(INP, "0.0")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+record(ai, "$(device):OFFSETY") {
+  field(DESC, "Beam Y pos calc offset")
+  field(DTYP, "Soft Channel")
+  field(INP, "0.0")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+#% archiver 1 Monitor
+record(calc, "$(device):INTENSITY") {
+  field(INPA, "$(device):BLADE1 NPP")
+  field(INPB, "$(device):BLADE2 NPP")
+  field(INPC, "$(device):BLADE3 NPP")
+  field(INPD, "$(device):BLADE4 NPP")
+  field(CALC, "(A+B+C+D)")
+  field(FLNK, "$(device):BEAMX")
+  field(PREC, "5")
+  field(EGU, "A")
+}
+
+record(calc, "$(device):BLADE1uA") {
+  field(DESC, "BLADE1*1e6")
+  field(CALC, "A*1000000")
+  field(INPA, "$(device):BLADE1 CP")
+  field(EGU, "uA")
+  field(PREC, "5")
+}
+
+record(calc, "$(device):BLADE2uA") {
+  field(DESC, "BLADE2*1e6")
+  field(CALC, "A*1000000")
+  field(INPA, "$(device):BLADE2 CP")
+  field(EGU, "uA")
+  field(PREC, "5")
+}
+
+record(calc, "$(device):BLADE3uA") {
+  field(DESC, "BLADE3*1e6")
+  field(CALC, "A*1000000")
+  field(INPA, "$(device):BLADE3 CP")
+  field(EGU, "uA")
+  field(PREC, "5")
+}
+
+record(calc, "$(device):BLADE4uA") {
+  field(DESC, "BLADE4*1e6")
+  field(CALC, "A*1000000")
+  field(INPA, "$(device):BLADE4 CP")
+  field(EGU, "uA")
+  field(PREC, "5")
+}

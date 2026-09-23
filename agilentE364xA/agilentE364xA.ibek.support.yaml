@@ -34,3 +34,48 @@ entity_models:
       - file: E364xA.template
         args:
           .*:
+
+  - name: caputcallback
+    description: |-
+      Imported from DLS module agilentE364xA (caputcallback.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      M:
+        type: str
+        description: |-
+          M
+      TWSIZE:
+        type: float
+        description: |-
+          TWSIZE
+        default: 0.1
+      PREC:
+        type: int
+        description: |-
+          Precision (number of decimal places)
+        default: 3
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+        default: "V"
+      CPCB_RBV:
+        type: str
+        description: |-
+          CPCB_RBV
+      DEADBAND:
+        type: float
+        description: |-
+          DEADBAND
+        default: 0.01
+      CPCB_SET:
+        type: str
+        description: |-
+          CPCB_SET
+    databases:
+      - file: caputcallback.template
+        args:
+          .*:

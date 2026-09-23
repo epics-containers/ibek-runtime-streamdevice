@@ -528,7 +528,7 @@ record(mbbi, "$(P)$(Q):CALIBRATION:RBV") {
 }
 
 record(calc, "$(P)$(Q):IRATEMATCHES") {
-  field(DESC, "True if readback for infuse rate matches setpoint")
+  field(DESC, "True if infuse rate matches setpoint")
   field(INPA, "$(P)$(Q):IRATE")
   field(INPB, "$(P)$(Q):IRATE:RBV PP")
   field(INPC, "$(P)$(Q):IRATEUNITS")
@@ -546,7 +546,7 @@ record(calc, "$(P)$(Q):INFUSEDISABLE") {
 }
 
 record(calc, "$(P)$(Q):WRATEMATCHES") {
-  field(DESC, "True if readback for withdraw rate matches setpoint")
+  field(DESC, "True if withdraw rate matches setpoint")
   field(INPA, "$(P)$(Q):WRATE")
   field(INPB, "$(P)$(Q):WRATE:RBV PP")
   field(INPC, "$(P)$(Q):WRATEUNITS")

@@ -33,15 +33,19 @@
 # % gui, $(name=), readback, Sensor Exponent Value,     $(device):EXP
 # % gui, $(name=), readback, Sensor Exponent Sign,      $(device):SIGN
 # % gui, $(name=), readback, Target Pressure,           $(device):TARGETPRESSURE
-# % gui, $(name=), readback, Pressure Reading Range     $(device):PRESSRANGE
-# % gui, $(name=), readback, Position Movement Range    $(device):POSITIONRANGE
+# % gui, $(name=), readback, Pressure Reading Range,    $(device):PRESSRANGE
+# % gui, $(name=), readback, Position Movement Range,   $(device):POSITIONRANGE
+# % gui, $(name=), readback, Pressure Soft Interlock,   $(device):PRESSURESILK
+# % gui, $(name=), readback, Pressure Limit,            $(device):PRESSURELIMIT
+# % gui, $(name=), readback, Position Limit,            $(device):POSITIONLIMIT
 #
-#
+
 # Control:
 # % gui, $(name=), demand,  Pressure,               $(device):SETPRESSURE
 # % gui, $(name=), demand,  Position,               $(device):SETPOSITION
 # % gui, $(name=), enum,    Pressure Controller,    $(device):SETPRESSCTRLR
 # % gui, $(name=), command, Close valve,            $(device):CLOSE
+# % gui, $(name=), command, Hold valve,             $(device):HOLD
 # % gui, $(name=), enum,    Clear Warings,          $(device):CLEAR
 # % gui, $(name=), demand,  Fixed 2 P-gain,         $(device):SETF2PGAIN
 # % gui, $(name=), demand,  Fixed 2 I-gain,         $(device):SETF2IGAIN
@@ -87,6 +91,16 @@ record(bo, "$(device):CLOSE")
     field(ZNAM, "Close Valve")
     field(ONAM, "Close Valve")
     field(PINI, "YES")
+}
+
+record(bo, "$(device):HOLD")
+{
+    field(DESC, "Hold Valve")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=V590.proto) hold_state $(port)")
+    field(ZNAM, "Hold Valve")
+    field(ONAM, "Hold Valve")
+    field(DOL,  "0")
 }
 
 record(mbbo, "$(device):SETACCESSMODE")
@@ -155,30 +169,97 @@ record(mbbi, "$(device):CTRLMODE")
     field(FLNK, "$(device):ACCESSMODE")
 }
 
-# TO BE PERCENTAGE
+record(ai, "$(device):POSITIONLIMIT")
+{
+    field(DESC, "Read position limit")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=V590.proto) read_pos_limit $(port)")
+    field(HOPR, "100")
+    field(LOPR, "0.001")
+    field(LINR, "LINEAR")
+    field(ESLO, "0.001")
+    #field(EGUL, "0.0001")
+    field(EGUF, "100")
+    field(PREC, "4")
+    field(PINI, "YES")
+    field(EGU,  "units")
+}
+
+#% autosave 1 VAL
 record(ao, "$(device):SETPOSITIONLIMIT")
 {
     field(DESC, "Set position limit")
     field(DTYP, "stream")
     field(OUT,  "@$(proto=V590.proto) set_pos_limit($(device):SETPOSITIONLIMIT.RVAL) $(port)")
     field(DRVL, "1")
-    field(LOPR, "1")
+    field(LOPR, "0.001")
     field(HOPR, "100")
     field(DRVH, "100")
     field(LINR, "LINEAR")
     field(ESLO, "0.001")
     field(EOFF, "0")
     field(EGUF, "100")
-    field(DOL,  "80")
+    field(VAL,  "50")
     field(PINI, "YES")
+    field(PREC, "4")
     field(EGU,  "%")
     field(FLNK, "$(device):POSITIONLIMIT")
+}
+
+record(calcout, "$(device):PRESSURESILKCALC")
+{
+    field(DESC, "If pressure exceeds limit")
+    field(CALC, "A > B")
+    field(INPA, "$(device):PRESSURE")
+    field(INPB, "$(device):SETPRESSURELIMIT")
+    field(OUT,  "$(device):CLOSE PP")
+    field(OOPT, "When Non-zero")
+    field(DOPT, "Use CALC")
+    field(PINI, "YES")
+    field(SCAN, "1 second")
+}
+
+record(bi, "$(device):PRESSURESILK")
+{
+    field(DESC, "Pressure Limit Ilk.")
+    field(DTYP, "Soft Channel")
+    field(INP,  "$(device):PRESSURESILKCALC.VAL")
+    field(ZNAM, "UNLOCKED")
+    field(ONAM, "LOCKED")
+    field(ZSV, "NO_ALARM")
+    field(OSV, "MINOR")
+    field(PINI, "YES")
+}
+
+record(ai, "$(device):PRESSURELIMIT")
+{
+    field(DESC, "Read pressure limit")
+    field(DTYP, "Soft Channel")
+    field(INP,  "$(device):SETPRESSURELIMIT")
+    field(PINI, "YES")
+    field(EGU,  "mbar")
+    field(PREC, "4")
+}
+
+#% autosave 1 VAL
+record(ao, "$(device):SETPRESSURELIMIT")
+{
+    field(DESC, "Set pressure limit")
+    field(DTYP, "Soft Channel")
+    field(DRVL, "1e-12")
+    field(DRVH, "1e10")
+    field(LOPR, "1e-12")
+    field(HOPR, "1e10")
+    field(PINI, "YES")
+    field(VAL,  "1e-5")
+    field(EGU,  "$(device):UNIT.VAL")
+    field(FLNK, "$(device):PRESSURESILK")
 }
 
 record(bo, "$(device):BUTTONINCPOS")
 {
     field(DESC, "Command Increment Pos.")
-    field(DTYP, "soft channel")
+    field(DTYP, "Soft Channel")
     field(ZNAM, "INC")
     field(ONAM, "INC")
     field(DOL,  "1")
@@ -188,7 +269,7 @@ record(bo, "$(device):BUTTONINCPOS")
 record(bo, "$(device):BUTTONDECPOS")
 {
     field(DESC, "Command Decrement Pos.")
-    field(DTYP, "soft channel")
+    field(DTYP, "Soft Channel")
     field(ZNAM, "DEC")
     field(ONAM, "DEC")
     field(DOL,  "0")
@@ -198,7 +279,7 @@ record(bo, "$(device):BUTTONDECPOS")
 record(ao, "$(device):SETINCDECVAL")
 {
     field(DESC, "Inc/dec Value")
-    field(DTYP, "soft channel")
+    field(DTYP, "Soft Channel")
     field(DRVL, "0.01")
     field(LOPR, "0.01")
     field(HOPR, "5")
@@ -212,13 +293,13 @@ record(ao, "$(device):SETINCDECVAL")
 record(calcout, "$(device):SETINCPOSITION")
 {
     field(DESC, "Increment Position by 1")
-    field(DTYP, "soft channel")
+    field(DTYP, "Soft Channel")
     field(HOPR, "100")
     field(LOPR, "0")
     field(CALC, "A+B") # Plus B
     field(EGU,  "%")
-    field(INPA, "$(device):SETPOSITION MS") # READ Position into Input A
-    field(INPB, "$(device):SETINCDECVAL MS") # Read increment value into Input B
+    field(INPA, "$(device):SETPOSITION") # READ Position into Input A
+    field(INPB, "$(device):SETINCDECVAL") # Read increment value into Input B
     field(FLNK, "$(device):SETPOSITION")
     field(OUT,  "$(device):SETPOSITION.VAL PP")
 }
@@ -226,13 +307,13 @@ record(calcout, "$(device):SETINCPOSITION")
 record(calcout, "$(device):SETDECPOSITION")
 {
     field(DESC, "Decrement Position by 1")
-    field(DTYP, "soft channel")
+    field(DTYP, "Soft Channel")
     field(HOPR, "100")
     field(LOPR, "0")
     field(CALC, "A-B") # Minus B
     field(EGU,  "%")
-    field(INPA, "$(device):SETPOSITION MS") # READ Position into Input A
-    field(INPB, "$(device):SETINCDECVAL MS") # Read increment value into Input B
+    field(INPA, "$(device):SETPOSITION") # READ Position into Input A
+    field(INPB, "$(device):SETINCDECVAL") # Read increment value into Input B
     field(FLNK, "$(device):SETPOSITION")
     field(OUT,  "$(device):SETPOSITION.VAL PP")
 }
@@ -251,6 +332,7 @@ record(ao, "$(device):SETPOSITION")
     field(EOFF, "0")
     field(EGUF, "100")
     field(EGUL, "0")
+    field(PREC, "3")
 }
 
 record(mbbi, "$(device):PRESSCTRLR")
@@ -259,7 +341,6 @@ record(mbbi, "$(device):PRESSCTRLR")
     field(PINI, "YES")
     field(DTYP, "stream")
     field(INP,  "@$(proto=V590.proto) read_pr_ctlr $(port)")
-    field(ZRST, "Adaptive downstream")
     field(ONST, "Fixed 1 upstream")
     field(TWST, "Fixed 2 (dwn/up)-stream")
     field(THST, "Soft pump")
@@ -307,6 +388,7 @@ record(bi, "$(device):F2CTLRDIR")
     field(FLNK, "$(device):F2PGAIN")
 }
 
+#% autosave 1 VAL
 record(ao, "$(device):SETF2PGAIN")
 {
     field(DESC, "Set P-gain for F2 ctlr")
@@ -317,8 +399,8 @@ record(ao, "$(device):SETF2PGAIN")
     field(DRVH, "100")
     field(LOPR, "0.001")
     field(HOPR, "100")
-    field(DOL,  "0.4")
-    field(PREC, "3")
+    field(VAL,  "0.4")
+    field(PREC, "4")
     field(FLNK, "$(device):F2PGAIN")
 }
 
@@ -332,6 +414,7 @@ record(ai, "$(device):F2PGAIN")
     field(PREC, "3")
 }
 
+#% autosave 1 VAL
 record(ao, "$(device):SETF2IGAIN")
 {
     field(DESC, "Set I-gain for F2 ctlr")
@@ -342,8 +425,8 @@ record(ao, "$(device):SETF2IGAIN")
     field(DRVH, "100")
     field(LOPR, "0")
     field(HOPR, "100")
-    field(DOL,  "0.1")
-    field(PREC, "2")
+    field(VAL,  "0.1")
+    field(PREC, "4")
     field(FLNK, "$(device):F2IGAIN")
 }
 
@@ -353,7 +436,7 @@ record(ai, "$(device):F2IGAIN")
     field(DTYP, "stream")
     field(INP,  "@$(proto=V590.proto) read_F2_igain $(port)")
     field(EGU,  "units")
-    field(PREC, "1")
+    field(PREC, "3")
 }
 
 record (bi, "$(device):WARNINGS")
@@ -367,7 +450,7 @@ record (bi, "$(device):WARNINGS")
     field(ZSV,  "NO_ALARM")
     field(OSV,  "MAJOR")
     field(FLNK, "$(device):SERVICEWARN")
-    field(SCAN, "1 seccond")
+    field(SCAN, "1 second")
 }
 
 record (bi, "$(device):SERVICEWARN")
@@ -378,8 +461,8 @@ record (bi, "$(device):SERVICEWARN")
     field(INP,  "@$(proto=V590.proto) W_service_sta $(port)")
     field(ZNAM, "No Warnings")
     field(ONAM, "Warning Alarm!")
-    field(ZRSV, "NO_ALARM")
-    field(ONSV, "MAJOR")
+    field(ZSV, "NO_ALARM")
+    field(OSV, "MAJOR")
     field(FLNK, "$(device):POWERFAIL")
 }
 
@@ -391,8 +474,8 @@ record (bi, "$(device):POWERFAIL")
     field(INP,  "@$(proto=V590.proto) W_powerfail_sta $(port)")
     field(ZNAM, "Backup Battery Ready")
     field(ONAM, "Backup Battery FAIL")
-    field(ZRSV, "NO_ALARM")
-    field(ONSV, "MAJOR")
+    field(ZSV, "NO_ALARM")
+    field(OSV, "MAJOR")
     field(FLNK, "$(device):COMPAIR")
 }
 
@@ -404,8 +487,8 @@ record (bi, "$(device):COMPAIR")
     field(INP,  "@$(proto=V590.proto) W_comp_air_sta $(port)")
     field(ZNAM, "Comp. Air Supply OK")
     field(ONAM, "Comp. Air FAIL")
-    field(ZRSV, "NO_ALARM")
-    field(ONSV, "MAJOR")
+    field(ZSV, "NO_ALARM")
+    field(OSV, "MAJOR")
     field(FLNK, "$(device):SIMULATION")
 }
 
@@ -417,8 +500,8 @@ record (bi, "$(device):SIMULATION")
     field(INP,  "@$(proto=V590.proto) DS_simulation $(port)")
     field(ZNAM, "normal operation")
     field(ONAM, "simulation running")
-    field(ZRSV, "NO_ALARM")
-    field(ONSV, "NO_ALARM")
+    field(ZSV, "NO_ALARM")
+    field(OSV, "NO_ALARM")
     field(SCAN, "1 second")
 }
 
@@ -512,21 +595,6 @@ record(ai, "$(device):SCALE")
     field(FLNK, "$(device):UNIT")
 }
 
-#record(longout, "$(device):SETSCALE")
-#{
-#    field(DESC, "set sensor scale")
-#    field(DTYP, "stream")
-#    field(OUT,  "@$(proto=V590.proto) Scale_write($(device)) $(port)")
-#    field(DRVL, "00001")
-#    field(DRVH, "99999")
-#    field(LOPR, "00001")
-#    field(HOPR, "99999")
-#    field(SEVR, "NO_ALARM")
-#    field(STAT, "NO_ALARM")
-#    field(DOL,  "10000")
-#    #field(PINI, "YES")
-#}
-
 record(mbbo, "$(device):SETUNIT")
 {
     field(DESC, "set pressure unit")
@@ -584,20 +652,19 @@ record(mbbi, "$(device):UNIT")
 record(ai, "$(device):TARGETPRESSURE")
 {
     field(DESC, "Get the target pressure")
-    field(DTYP, "soft channel")
+    field(DTYP, "Soft Channel")
     field(INP,  "$(device):SETPRESSURE.VAL")
     field(EGU,  "mbar")
-    field(PREC, "5")
-    field(SCAN, "1 second")
-    field(PREC, "3")
-    field(PINI,  "yes")
+    field(SCAN, ".5 second")
+    field(PREC, "4")
+    field(PINI, "YES")
+    field(FLNK, "$(device):PRESSURELIMIT")
 }
 
 record(ao, "$(device):SETPRESSURE")
 {
     field(DESC, "set target pressure")
-    field(DTYP, "soft channel")
-    field(OUT,  "")
+    field(DTYP, "Soft Channel")
     field(EGU,  "mbar")
     field(DRVL, "1e-11")
     field(DRVH, "10000")
@@ -624,7 +691,6 @@ record(calcout, "$(device):CALCRAWPRESS")
 record(calc, "$(device):PRESSURE") # This is a readback/display record!
 {
     field(DESC, "Convert Pressure")
-    field(DTYP, "stream")
     field(CALC, "(10**(((A/100000)/0.6)-12))/0.750062")
     field(EGU,  "mbar")
     field(INPA, "$(device):RAWPRESSURE MS")
@@ -642,14 +708,36 @@ record(ai, "$(device):RAWPRESSURE") # This is a readback record but NOT for disp
     field(FLNK, "$(device):PRESSURE")
 }
 
+record(bi, "$(device):POSSTATUS")
+{
+    field(DESC, "Is valve open?")
+    field(DTYP, "Soft Channel")
+    field(PINI, "YES")
+    field(INP,  "$(device):CHECKPOSSTATUS")
+    field(ZNAM, "CLOSED")
+    field(ONAM, "OPEN")
+    field(ZSV, "NO_ALARM")
+    field(OSV, "NO_ALARM")
+    field(FLNK, "$(device):PRESSURESILK")
+}
+
+record(calcout, "$(device):CHECKPOSSTATUS")
+{
+    field(DESC, "Set position state")
+    field(DTYP, "Soft Channel")
+    field(CALC, "(A > 0 && (A != 999999)) ? 1 : 0")
+    field(EGU,  "raw units")
+    field(INPA, "$(device):RAWPOSITION") # What to read as INPA?
+    field(FLNK, "$(device):POSSTATUS")
+}
+
 # Read current position and output in %
 record(calc, "$(device):POSITION")
 {
     field(DESC, "Convert read-in Pos to %")
-    field(DTYP, "stream")
     field(CALC, "A/1000")
     field(EGU,  "%")
-    field(INPA, "$(device):RAWPOSITION MS")
+    field(INPA, "$(device):RAWPOSITION")
     field(SCAN, "1 second")
     field(FLNK, "$(device):PRESSSURE")
 }
@@ -659,6 +747,10 @@ record(longin, "$(device):RAWPOSITION")
     field(DESC, "read current position")
     field(DTYP, "stream")
     field(INP,  "@$(proto=V590.proto) get_position $(port)")
+    field(LOPR, "0")
+    field(HOPR, "100000")
+    field(HHSV, "MINOR")
+    field(LLSV, "NO_ALARM")
     field(SCAN, "1 second")
     field(EGU,  "steps")
     field(FLNK, "$(device):POSITION")
@@ -670,9 +762,12 @@ record(longin, "$(device):VALVESPEED")
     field(DTYP, "stream")
     field(INP,  "@$(proto=V590.proto) Vlve_speed_read $(port)")
     field(FLNK, "$(device):PRESSRANGE")
-    #field(SCAN, "1 second")
+    field(HOPR, "1000")
+    field(LOPR, "1")
+    field(FLNK, "$(device):CHECKPOSSTATUS")
 }
 
+#% autosave 1 VAL
 record(longout, "$(device):SETVALVESPEED")
 {
     field(DESC, "set valve speed")
@@ -682,7 +777,7 @@ record(longout, "$(device):SETVALVESPEED")
     field(LOPR, "1")
     field(HOPR, "900")
     field(DRVH, "1000")
-    field(DOL,  "1")
+    field(VAL,  "5")
     field(PINI, "YES")
     field(FLNK, "$(device):VALVESPEED")
 }
@@ -698,7 +793,6 @@ record(longout, "$(device):SETPRESSRANGE")
     field(DRVH, "1000000")
     field(DOL,  "1000000")
     field(PINI, "YES")
-    #field(EGU,  "")
     field(FLNK, "$(device):PRESSRANGE")
 }
 

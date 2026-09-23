@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: ttiMX 1-4
+# Source: /dls_sw/prod/R3.14.12.7/support/ttiMX/1-4
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/ttiMX/ release.
+
+module: ttiMX
+
+entity_models:
+  - name: ttiMX_channel
+    description: |-
+      Imported from DLS module ttiMX (ttiMX_channel.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      CHAN:
+        type: str
+        description: |-
+          CHAN
+      PREC:
+        type: int
+        description: |-
+          Precision (number of decimal places)
+        default: 4
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      RANGE1:
+        type: str
+        description: |-
+          RANGE1
+        default: "35V/3A"
+      RANGE2:
+        type: str
+        description: |-
+          RANGE2
+        default: "16V/6A"
+      RANGE3:
+        type: str
+        description: |-
+          RANGE3
+        default: "35V/6A"
+    databases:
+      - file: ttiMX_channel.template
+        args:
+          .*:
+
+  - name: ttiMX_general
+    description: |-
+      Imported from DLS module ttiMX (ttiMX_general.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: ttiMX_general.template
+        args:
+          .*:
+          name: ""

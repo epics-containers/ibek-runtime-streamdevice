@@ -680,12 +680,11 @@ record(calc, "$(device):ALARM")
 {
 	field(DESC, "Alarm state")
 	field(SCAN, "1 second")
-	field(CALC, "(A+B+C+D+E)#0")
+	field(CALC, "(A+B+C+D)#0")
 	field(INPA, "$(device):STATUS.SEVR")
 	field(INPB, "$(device):PSUSTAT.SEVR")
 	field(INPC, "$(device):STA:PSU.SEVR")
-	field(INPD, "$(device):STA:TEMP.SEVR")
-	field(INPE, "$(device):STA:FAN.SEVR")
+	field(INPD, "$(device):STATUS6.SEVR")
 }
 
 ### Elma 4U PSU status #####################################

@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: ip 4-5
+# Source: /dls_sw/prod/R3.14.12.7/support/ip/4-5
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/ip/ release.
+
+module: ip
+
+entity_models:
+  - name: SR830
+    description: |-
+      Imported from DLS module ip (SR830.db)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      N:
+        type: str
+        description: |-
+          N
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: SR830.db
+        args:
+          .*:

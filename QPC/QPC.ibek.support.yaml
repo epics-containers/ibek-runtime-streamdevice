@@ -30,3 +30,61 @@ entity_models:
       - file: digitelQPCController.template
         args:
           .*:
+          PMP: ""
+          SYSTEM: ""
+
+  - name: digitelQpcIonp
+    description: |-
+      Template database for digitel QPC - Ion Pump
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      text:
+        type: str
+        description: |-
+          Text to display in the ion pump controller window (max 15 chars).
+        default: "$(device)"
+      unit:
+        type: str
+        description: |-
+          unit number for multi-drop serial (2 hex digits - 01 by default)
+        default: "01"
+      SPLY:
+        type: int
+        description: |-
+          pump supply number (rendered as 2 digits, e.g. 1 -> 01)
+      port:
+        type: str
+        description: |-
+          asyn serial port number
+      HV:
+        type: int
+        description: |-
+          Target voltage
+        default: 3000
+      SIZE:
+        type: int
+        description: |-
+          pump size (l/s)
+        default: 500
+      SPT:
+        type: int
+        description: |-
+          set point number for this pump (rendered as 2 digits, e.g. 1 -> 01)
+      spon:
+        type: str
+        description: |-
+          setpoint on
+      spoff:
+        type: str
+        description: |-
+          setpoint off
+    databases:
+      - file: digitelQpcIonp.template
+        args:
+          .*:
+          SPLY: "{{ '%02d' | format(SPLY) }}"
+          SPT: "{{ '%02d' | format(SPT) }}"
+          controller: ""

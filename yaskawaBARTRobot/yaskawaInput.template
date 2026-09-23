@@ -1,4 +1,4 @@
-#% archiver 1 Monitor
+
 # % macro, P, Device Prefix
 # % macro, STREAMS_PORT, Asyn Port
 # % macro, VAR, Network Input to read/write (e.g. I27010)
@@ -13,6 +13,8 @@
 # % macro, DESC6, Input bit 6 description
 # % macro, DESC7, Input bit 7 description
 
+
+#% archiver 1 Monitor
 record(mbboDirect, "$(P):I$(VAR)") {
   field(DESC, "$(DESC=)")
   field(OUT, "$(P):I$(VAR):WRITE PP")
@@ -26,7 +28,7 @@ record(mbboDirect, "$(P):I$(VAR):WRITE") {
   field(OUT, "@yaskawa.proto writei($(P),$(VAR)) $(STREAMS_PORT)")
 }
 
-#% archiver 10 Monitor
+#% archiver 1 Monitor
 record(mbbiDirect, "$(P):I$(VAR)_RBV") {
   field(DESC, "$(DESC=)")
   field(DISP, "1")

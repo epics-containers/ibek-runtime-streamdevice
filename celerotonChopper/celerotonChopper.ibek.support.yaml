@@ -2,7 +2,10 @@
 
 # Imported from DLS production support module: celerotonChopper 1-1
 # Source: /dls_sw/prod/R3.14.12.7/support/celerotonChopper/1-1
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release,
+# except for these scripted changes:
+# - celerotonChopper.template: DRVH/DRVL dropped from one ai record (not ai
+#   fields; EPICS 7 rejects the file with them).
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/celerotonChopper/ release.
 

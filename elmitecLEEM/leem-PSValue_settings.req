@@ -1,0 +1,7 @@
+$(P)$(Q):TGL:FREQ
+$(P)$(Q):TGL:HI
+$(P)$(Q):TGL:LO
+$(P)$(Q):TWV
+$(P)$(Q):TWVH
+$(P)$(Q):TWVL
+$(P)$(Q):TWVM

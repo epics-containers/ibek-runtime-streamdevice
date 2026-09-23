@@ -1,4 +1,4 @@
-#% archiver 1 Monitor
+
 # % macro, P, Device Prefix
 # % macro, STREAMS_PORT, Asyn Port
 # % macro, VAR, B Variable (Byte) to read/write (e.g. B001)
@@ -7,6 +7,8 @@
 # % macro, DRVH, High limit
 # % macro, DESC, Variable's description
 
+
+#% archiver 1 Monitor
 record(ao, "$(P):B$(VAR)") {
     field(DESC, "$(DESC=)")
     field(OUT, "$(P):B$(VAR):WRITE PP")
@@ -23,7 +25,7 @@ record(ao, "$(P):B$(VAR):WRITE") {
     field(DRVH, "$(DRVH)")
 }
 
-#% archiver 10 Monitor
+#% archiver 1 Monitor
 record(ai, "$(P):B$(VAR)_RBV") {
     field(DESC, "$(DESC=)")
     field(DISP, "1")

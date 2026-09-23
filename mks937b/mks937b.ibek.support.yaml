@@ -1,10 +1,15 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
 
-# Imported from DLS production support module: mks937b 2-97
-# Source: /dls_sw/prod/R3.14.12.7/support/mks937b/2-97
+# Imported from DLS production support module: mks937b 2-98
+# Source: /dls_sw/prod/R3.14.12.7/support/mks937b/2-98
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/mks937b/ release.
+#
+# Templates needing a generic IOC built with this module (not the plain
+# generic image):
+# - `mks937bHy8401.template` needs a generic IOC built with `mks937b` (compiled support), not the plain generic image.
+# - `mks937bImgMean.template` needs a generic IOC built with `mks937b` (compiled support), not the plain generic image.
 
 module: mks937b
 
@@ -26,11 +31,1057 @@ entity_models:
         type: int
         description: |-
           Controller address (001 .. 253)
+    databases:
+      - file: mks937b.template
+        args:
+          .*:
+
+  - name: mks937bCap
+    description: |-
+      Imported from DLS module mks937b (mks937bCap.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      address:
+        type: str
+        description: |-
+          address
+      channel:
+        type: str
+        description: |-
+          channel
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      ctlsp_hopr:
+        type: float
+        description: |-
+          ctlsp_hopr
+        default: 10000.0
+      ctlsp_lopr:
+        type: float
+        description: |-
+          ctlsp_lopr
+        default: 0.01
+      ctlsp_drvh:
+        type: float
+        description: |-
+          ctlsp_drvh
+        default: 10000.0
+      ctlsp_drvl:
+        type: float
+        description: |-
+          ctlsp_drvl
+        default: 0.01
+      ctlsp_level:
+        type: str
+        description: |-
+          ctlsp_level
+        default: "1.0e-2"
+      offwarn:
+        type: str
+        description: |-
+          offwarn
+        default: "0"
+    databases:
+      - file: mks937bCap.template
+        args:
+          .*:
+
+  - name: mks937bFastRelay
+    description: |-
+      Imported from DLS module mks937b (mks937bFastRelay.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      frcsp_desc:
+        type: str
+        description: |-
+          frcsp_desc
+        default: "Fast Relay Trigger level"
+      address:
+        type: str
+        description: |-
+          address
+      channel:
+        type: str
+        description: |-
+          channel
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      frcsp_hopr:
+        type: float
+        description: |-
+          frcsp_hopr
+        default: 0.01
+      frcsp_lopr:
+        type: float
+        description: |-
+          frcsp_lopr
+        default: 1.3e-05
+      frcsp_drvh:
+        type: float
+        description: |-
+          frcsp_drvh
+        default: 0.012
+      frcsp_drvl:
+        type: float
+        description: |-
+          frcsp_drvl
+        default: 2.7e-10
+      frcsp_level:
+        type: str
+        description: |-
+          frcsp_level
+        default: "1.0e-6"
+      ilk_write_access_pv:
+        type: str
+        description: |-
+          ilk_write_access_pv
+        default: "$(device):FRLY:CONSTZERO"
+    databases:
+      - file: mks937bFastRelay.template
+        args:
+          .*:
+
+  - name: mks937bGauge
+    description: |-
+      Imported from DLS module mks937b (mks937bGauge.template)
+    parameters:
+      dom:
+        type: str
+        description: |-
+          dom
+      id:
+        type: str
+        description: |-
+          id
+      plog_adc_pv:
+        type: str
+        description: |-
+          plog_adc_pv
+      plog_calc:
+        type: str
+        description: |-
+          plog_calc
+        default: "10.0*A/32767.0/0.6 - 12.0"
+      ctlsp_desc:
+        type: str
+        description: |-
+          ctlsp_desc
+        default: "IMG Enable"
+      ctlsp_hopr:
+        type: float
+        description: |-
+          ctlsp_hopr
+        default: 0.95
+      ctlsp_lopr:
+        type: float
+        description: |-
+          ctlsp_lopr
+        default: 0.0027
+      ctlsp_drvh:
+        type: float
+        description: |-
+          ctlsp_drvh
+        default: 0.95
+      ctlsp_drvl:
+        type: float
+        description: |-
+          ctlsp_drvl
+        default: 0.0027
+      ctlsp_level:
+        type: str
+        description: |-
+          ctlsp_level
+        default: "1.0e-2"
+      ctlspoff_desc:
+        type: str
+        description: |-
+          ctlspoff_desc
+        default: "IMG Enable Off"
+    databases:
+      - file: mks937bGauge.template
+        args:
+          .*:
+
+  - name: mks937bGaugeGroup
+    description: |-
+      Imported from DLS module mks937b (mks937bGaugeGroup.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      gauge1:
+        type: str
+        description: |-
+          gauge1
+      gauge2:
+        type: str
+        description: |-
+          gauge2
+      gauge3:
+        type: str
+        description: |-
+          gauge3
+      gauge4:
+        type: str
+        description: |-
+          gauge4
+      gauge5:
+        type: str
+        description: |-
+          gauge5
+      gauge6:
+        type: str
+        description: |-
+          gauge6
+      gauge7:
+        type: str
+        description: |-
+          gauge7
+      gauge8:
+        type: str
+        description: |-
+          gauge8
+      SELM:
+        type: str
+        description: |-
+          SELM
+        default: "1"
+      SELN:
+        type: int
+        description: |-
+          SELN
+        default: 0
+    databases:
+      - file: mks937bGaugeGroup.template
+        args:
+          .*:
+
+  - name: mks937bHcg
+    description: |-
+      Imported from DLS module mks937b (mks937bHcg.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      address:
+        type: str
+        description: |-
+          address
+      channel:
+        type: str
+        description: |-
+          channel
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      ctlsp_desc:
+        type: str
+        description: |-
+          ctlsp_desc
+        default: "HCG Enable"
+      ctlsp_hopr:
+        type: float
+        description: |-
+          ctlsp_hopr
+        default: 0.95
+      ctlsp_lopr:
+        type: float
+        description: |-
+          ctlsp_lopr
+        default: 0.0027
+      ctlsp_drvh:
+        type: float
+        description: |-
+          ctlsp_drvh
+        default: 0.95
+      ctlsp_drvl:
+        type: float
+        description: |-
+          ctlsp_drvl
+        default: 0.0027
+      ctlsp_level:
+        type: str
+        description: |-
+          ctlsp_level
+        default: "1.0e-2"
+      ctlsp_hihi:
+        type: float
+        description: |-
+          ctlsp_hihi
+        default: 0.96
+      ctlsp_lolo:
+        type: float
+        description: |-
+          ctlsp_lolo
+        default: 0.0026
+      ctlsp_high:
+        type: float
+        description: |-
+          ctlsp_high
+        default: 0.011
+      ctlsp_low:
+        type: float
+        description: |-
+          ctlsp_low
+        default: 0.009
+      ctlhyst_hopr:
+        type: float
+        description: |-
+          ctlhyst_hopr
+        default: 0.012
+      ctlhyst_lopr:
+        type: float
+        description: |-
+          ctlhyst_lopr
+        default: 2.7e-10
+      ctl_channel:
+        type: str
+        description: |-
+          ctl_channel
+        default: "0"
+      prosp_desc:
+        type: str
+        description: |-
+          prosp_desc
+        default: "HCG Overpressure"
+      prosp_hopr:
+        type: float
+        description: |-
+          prosp_hopr
+        default: 0.01
+      prosp_lopr:
+        type: float
+        description: |-
+          prosp_lopr
+        default: 1.3e-05
+      prosp_drvh:
+        type: float
+        description: |-
+          prosp_drvh
+        default: 0.01
+      prosp_drvl:
+        type: float
+        description: |-
+          prosp_drvl
+        default: 1.3e-05
+      prosp_level:
+        type: str
+        description: |-
+          prosp_level
+        default: "5.0e-4"
+      prosp_hihi:
+        type: float
+        description: |-
+          prosp_hihi
+        default: 0.011
+      prosp_lolo:
+        type: float
+        description: |-
+          prosp_lolo
+        default: 1.2e-05
+      prosp_high:
+        type: float
+        description: |-
+          prosp_high
+        default: 0.00051
+      prosp_low:
+        type: float
+        description: |-
+          prosp_low
+        default: 0.00049
+      offwarn:
+        type: str
+        description: |-
+          offwarn
+        default: "0"
+      ilk_write_access_pv:
+        type: str
+        description: |-
+          ilk_write_access_pv
+        default: "$(device):PRO:CONSTZERO"
+    databases:
+      - file: mks937bHcg.template
+        args:
+          .*:
+
+  - name: mks937bHcgGroup
+    description: |-
+      Imported from DLS module mks937b (mks937bHcgGroup.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      delay:
+        type: str
+        description: |-
+          delay
+      hcg1:
+        type: str
+        description: |-
+          hcg1
+      hcg2:
+        type: str
+        description: |-
+          hcg2
+      hcg3:
+        type: str
+        description: |-
+          hcg3
+      hcg4:
+        type: str
+        description: |-
+          hcg4
+      hcg5:
+        type: str
+        description: |-
+          hcg5
+      hcg6:
+        type: str
+        description: |-
+          hcg6
+      hcg7:
+        type: str
+        description: |-
+          hcg7
+      hcg8:
+        type: str
+        description: |-
+          hcg8
+      valveIlRelay:
+        type: str
+        description: |-
+          valveIlRelay
+        default: "1"
+      mpsIlRelay1:
+        type: str
+        description: |-
+          mpsIlRelay1
+        default: "2"
+      mpsIlRelay2:
+        type: str
+        description: |-
+          mpsIlRelay2
+        default: "3"
+      rgaIlRelay:
+        type: str
+        description: |-
+          rgaIlRelay
+        default: "4"
+    databases:
+      - file: mks937bHcgGroup.template
+        args:
+          .*:
+
+  - name: mks937bHy8401
+    description: |-
+      Imported from DLS module mks937b (mks937bHy8401.template)
+      NOTE: needs a generic IOC built with mks937b (not the plain generic image).
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      c:
+        type: str
+        description: |-
+          c
+      s:
+        type: str
+        description: |-
+          s
+    databases:
+      - file: mks937bHy8401.template
+        args:
+          .*:
+
+  - name: mks937bImg
+    description: |-
+      Imported from DLS module mks937b (mks937bImg.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      address:
+        type: str
+        description: |-
+          address
+      channel:
+        type: str
+        description: |-
+          channel
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      ctlsp_desc:
+        type: str
+        description: |-
+          ctlsp_desc
+        default: "IMG Enable"
+      ctlsp_hopr:
+        type: float
+        description: |-
+          ctlsp_hopr
+        default: 0.95
+      ctlsp_lopr:
+        type: float
+        description: |-
+          ctlsp_lopr
+        default: 0.0027
+      ctlsp_drvh:
+        type: float
+        description: |-
+          ctlsp_drvh
+        default: 0.95
+      ctlsp_drvl:
+        type: float
+        description: |-
+          ctlsp_drvl
+        default: 0.0027
+      ctlsp_level:
+        type: str
+        description: |-
+          ctlsp_level
+        default: "1.0e-2"
+      ctlsp_hihi:
+        type: float
+        description: |-
+          ctlsp_hihi
+        default: 0.96
+      ctlsp_lolo:
+        type: float
+        description: |-
+          ctlsp_lolo
+        default: 0.0026
+      ctlsp_high:
+        type: float
+        description: |-
+          ctlsp_high
+        default: 0.011
+      ctlsp_low:
+        type: float
+        description: |-
+          ctlsp_low
+        default: 0.009
+      ctlhyst_hopr:
+        type: float
+        description: |-
+          ctlhyst_hopr
+        default: 0.012
+      ctlhyst_lopr:
+        type: float
+        description: |-
+          ctlhyst_lopr
+        default: 2.7e-10
+      img_ctl_setmode:
+        type: str
+        description: |-
+          img_ctl_setmode
+        default: "1"
+      ctl_channel:
+        type: str
+        description: |-
+          ctl_channel
+        default: "0"
+      prosp_desc:
+        type: str
+        description: |-
+          prosp_desc
+        default: "IMG Overpressure"
+      prosp_hopr:
+        type: float
+        description: |-
+          prosp_hopr
+        default: 0.01
+      prosp_lopr:
+        type: float
+        description: |-
+          prosp_lopr
+        default: 1.3e-05
+      prosp_drvh:
+        type: float
+        description: |-
+          prosp_drvh
+        default: 0.01
+      prosp_drvl:
+        type: float
+        description: |-
+          prosp_drvl
+        default: 1.3e-05
+      prosp_level:
+        type: str
+        description: |-
+          prosp_level
+        default: "5.0e-4"
+      prosp_hihi:
+        type: float
+        description: |-
+          prosp_hihi
+        default: 0.011
+      prosp_lolo:
+        type: float
+        description: |-
+          prosp_lolo
+        default: 1.2e-05
+      prosp_high:
+        type: float
+        description: |-
+          prosp_high
+        default: 0.00051
+      prosp_low:
+        type: float
+        description: |-
+          prosp_low
+        default: 0.00049
+      offwarn:
+        type: str
+        description: |-
+          offwarn
+        default: "0"
+      ilk_write_access_pv:
+        type: str
+        description: |-
+          ilk_write_access_pv
+        default: "$(device):PRO:CONSTZERO"
+    databases:
+      - file: mks937bImg.template
+        args:
+          .*:
+
+  - name: mks937bImgDummy
+    description: |-
+      Imported from DLS module mks937b (mks937bImgDummy.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      ctlsp_desc:
+        type: str
+        description: |-
+          ctlsp_desc
+        default: "IMG Enable"
+      ctlsp_hopr:
+        type: float
+        description: |-
+          ctlsp_hopr
+        default: 0.95
+      ctlsp_lopr:
+        type: float
+        description: |-
+          ctlsp_lopr
+        default: 0.0027
+      ctlsp_drvh:
+        type: float
+        description: |-
+          ctlsp_drvh
+        default: 0.95
+      ctlsp_drvl:
+        type: float
+        description: |-
+          ctlsp_drvl
+        default: 0.0027
+      ctlsp_level:
+        type: str
+        description: |-
+          ctlsp_level
+        default: "1.0e-2"
+      ctlsp_hihi:
+        type: float
+        description: |-
+          ctlsp_hihi
+        default: 0.96
+      ctlsp_lolo:
+        type: float
+        description: |-
+          ctlsp_lolo
+        default: 0.0026
+      ctlsp_high:
+        type: float
+        description: |-
+          ctlsp_high
+        default: 0.011
+      ctlsp_low:
+        type: float
+        description: |-
+          ctlsp_low
+        default: 0.009
+    databases:
+      - file: mks937bImgDummy.template
+        args:
+          .*:
+
+  - name: mks937bImgGroup
+    description: |-
+      Imported from DLS module mks937b (mks937bImgGroup.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      delay:
+        type: str
+        description: |-
+          delay
+      img1:
+        type: str
+        description: |-
+          img1
+      img2:
+        type: str
+        description: |-
+          img2
+      img3:
+        type: str
+        description: |-
+          img3
+      img4:
+        type: str
+        description: |-
+          img4
+      img5:
+        type: str
+        description: |-
+          img5
+      img6:
+        type: str
+        description: |-
+          img6
+      img7:
+        type: str
+        description: |-
+          img7
+      img8:
+        type: str
+        description: |-
+          img8
+      valveIlRelay:
+        type: str
+        description: |-
+          valveIlRelay
+        default: "1"
+      mpsIlRelay1:
+        type: str
+        description: |-
+          mpsIlRelay1
+        default: "2"
+      mpsIlRelay2:
+        type: str
+        description: |-
+          mpsIlRelay2
+        default: "3"
+      rgaIlRelay:
+        type: str
+        description: |-
+          rgaIlRelay
+        default: "4"
+    databases:
+      - file: mks937bImgGroup.template
+        args:
+          .*:
+
+  - name: mks937bImgMean
+    description: |-
+      Imported from DLS module mks937b (mks937bImgMean.template)
+      NOTE: needs a generic IOC built with mks937b (not the plain generic image).
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      nimgs:
+        type: str
+        description: |-
+          nimgs
+      img1:
+        type: str
+        description: |-
+          img1
+      img2:
+        type: str
+        description: |-
+          img2
+      img3:
+        type: str
+        description: |-
+          img3
+      img4:
+        type: str
+        description: |-
+          img4
+      img5:
+        type: str
+        description: |-
+          img5
+      img6:
+        type: str
+        description: |-
+          img6
+      img7:
+        type: str
+        description: |-
+          img7
+      img8:
+        type: str
+        description: |-
+          img8
+      img9:
+        type: str
+        description: |-
+          img9
+      img10:
+        type: str
+        description: |-
+          img10
+      current:
+        type: str
+        description: |-
+          current
+    databases:
+      - file: mks937bImgMean.template
+        args:
+          .*:
+
+  - name: mks937bInterlock
+    description: |-
+      Imported from DLS module mks937b (mks937bInterlock.template)
+    parameters:
+      interlock:
+        type: str
+        description: |-
+          interlock
       name:
         type: id
         description: |-
-          Object and gui association name
+          Object name
+      high:
+        type: str
+        description: |-
+          high
+      low:
+        type: str
+        description: |-
+          low
+      level:
+        type: str
+        description: |-
+          level
     databases:
-      - file: mks937b.template
+      - file: mks937bInterlock.template
+        args:
+          .*:
+
+  - name: mks937bPirg
+    description: |-
+      Imported from DLS module mks937b (mks937bPirg.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      address:
+        type: str
+        description: |-
+          address
+      channel:
+        type: str
+        description: |-
+          channel
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      offwarn:
+        type: str
+        description: |-
+          offwarn
+        default: "0"
+    databases:
+      - file: mks937bPirg.template
+        args:
+          .*:
+
+  - name: mks937bPirgDummy
+    description: |-
+      Imported from DLS module mks937b (mks937bPirgDummy.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+    databases:
+      - file: mks937bPirgDummy.template
+        args:
+          .*:
+
+  - name: mks937bPirgGroup
+    description: |-
+      Imported from DLS module mks937b (mks937bPirgGroup.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      pirg1:
+        type: str
+        description: |-
+          pirg1
+      pirg2:
+        type: str
+        description: |-
+          pirg2
+      pirg3:
+        type: str
+        description: |-
+          pirg3
+      pirg4:
+        type: str
+        description: |-
+          pirg4
+      pirg5:
+        type: str
+        description: |-
+          pirg5
+      pirg6:
+        type: str
+        description: |-
+          pirg6
+      pirg7:
+        type: str
+        description: |-
+          pirg7
+      pirg8:
+        type: str
+        description: |-
+          pirg8
+      ionPumpIlRelay:
+        type: str
+        description: |-
+          ionPumpIlRelay
+        default: "1"
+    databases:
+      - file: mks937bPirgGroup.template
+        args:
+          .*:
+
+  - name: mks937bPlogEGU
+    description: |-
+      Imported from DLS module mks937b (mks937bPlogEGU.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      p_egu_pv:
+        type: str
+        description: |-
+          p_egu_pv
+    databases:
+      - file: mks937bPlogEGU.template
+        args:
+          .*:
+
+  - name: mks937bRelays
+    description: |-
+      Imported from DLS module mks937b (mks937bRelays.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      address:
+        type: str
+        description: |-
+          address
+      relay_number:
+        type: str
+        description: |-
+          relay_number
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      relay_desc:
+        type: str
+        description: |-
+          relay_desc
+        default: "Valve Interlock"
+      relay_hopr:
+        type: float
+        description: |-
+          relay_hopr
+        default: 0.012
+      relay_lopr:
+        type: float
+        description: |-
+          relay_lopr
+        default: 2.7e-10
+      relay_hihi:
+        type: float
+        description: |-
+          relay_hihi
+        default: 0.013
+      relay_lolo:
+        type: float
+        description: |-
+          relay_lolo
+        default: 2.6e-10
+      relay_high:
+        type: float
+        description: |-
+          relay_high
+        default: 1.1e-06
+      relay_low:
+        type: float
+        description: |-
+          relay_low
+        default: 9.0e-07
+      relay_drvh:
+        type: float
+        description: |-
+          relay_drvh
+        default: 0.012
+      relay_drvl:
+        type: float
+        description: |-
+          relay_drvl
+        default: 2.7e-10
+      relay_level:
+        type: str
+        description: |-
+          relay_level
+        default: "1.0e-6"
+      relay_off_desc:
+        type: str
+        description: |-
+          relay_off_desc
+        default: "Relay OFF setpoint"
+      relay_off_level:
+        type: str
+        description: |-
+          relay_off_level
+        default: "0.0"
+      ilk_write_access_pv:
+        type: str
+        description: |-
+          ilk_write_access_pv
+        default: "$(device):CONSTZERO"
+    databases:
+      - file: mks937bRelays.template
         args:
           .*:

@@ -74,16 +74,17 @@ entity_models:
         type: str
         description: |-
           Unit for I MAX
-        default: mA
+        default: "mA"
       ITRIPUNIT:
         type: str
         description: |-
           Unit for I TRIP
-        default: uA
+        default: "uA"
     databases:
       - file: isegNHQ223M.template
         args:
           .*:
+
   - name: isegHVPSU
     description: |-
       ISEG HV PSU template file.
@@ -149,13 +150,30 @@ entity_models:
         type: str
         description: |-
           Unit for I MAX
-        default: mA
+        default: "mA"
       ITRIPUNIT:
         type: str
         description: |-
           Unit for I TRIP
-        default: uA
+        default: "uA"
     databases:
       - file: isegHVPSU.template
+        args:
+          .*:
+
+  - name: trigger_process
+    description: |-
+      Imported from DLS module isegHVPSU (trigger_process.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      R:
+        type: str
+        description: |-
+          R
+    databases:
+      - file: trigger_process.template
         args:
           .*:

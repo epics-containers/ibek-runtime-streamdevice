@@ -33,6 +33,7 @@ entity_models:
       - file: mks647cChan.template
         args:
           .*:
+
   - name: mks647c8ChanCtrl
     description: |-
       MKS 647C 8 channel mass flow controller
@@ -53,6 +54,7 @@ entity_models:
       - file: mks647c8ChanCtrl.template
         args:
           .*:
+
   - name: mks647c4ChanCtrl
     description: |-
       MKS 647C 4 channel mass flow controller

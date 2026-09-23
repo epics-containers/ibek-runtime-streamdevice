@@ -1,0 +1,390 @@
+# ########################################################
+# Increment message number
+record(calc, "$(device):MSGNUM") {
+  field(DESC, "Incremental message number")
+  field(INPA, "$(device):MSGNUM.VAL")
+  field(CALC, "A=255?0:A+1")
+}
+
+# Retrieve report and trigger processing of other records
+#record(fanout, "$(device):REPORT") {
+#  field(SCAN, "2 second")
+#  field(DISA, "1")
+#  field(SDIS, "$(device):RESET.PACT")
+#  field(LNK1, "$(device):MSGNUM)")
+#  field(FLNK, "$(device):REPORTSEND")
+#}
+
+#record(calcout, "$(device):REPORTSEND") {
+record(calcout, "$(device):REPORT") {
+  field(DESC, "Retrieves summary report")
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(CALC, "1")
+  field(OUT, "@CanberraG64.protocol report($(device):MSGNUM) $(port) 0")
+  field(FLNK, "$(device):RATE")
+}
+
+# Dose rate
+#% archiver 2 Monitor
+#% controldesk Dose Rate readback
+record(ai, "$(device):RATE") {
+  field(DESC, "Dose Rate")
+  field(DTYP, "Soft Channel")
+  field(SCAN, "Passive")
+  field(INP,  "$(device):REPORT.A")
+  field(EGU, "mSv/h")
+  field(PREC, "3")
+#  field(HOPR, "10000")
+  field(LOPR, "0")
+  field(HIGH, "400")
+  field(HIHI, "10000")
+  field(LOLO, "0.005")
+  field(HSV, "MINOR")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(ADEL, "$(adel)")
+  field(FLNK, "$(device):DOSE")
+}
+
+# Accumulated dose
+#% archiver 2 Monitor
+#% controldesk Acuumulated Dose readback
+record(calc, "$(device):DOSE") {
+  field(DESC, "Accumulated Dose")
+  field(INPA, "$(device):RATE MS")
+  field(INPB, "$(device):DOSE")
+  field(CALC, "B+(A/1800)")
+  field(EGU, "mSv")
+  field(PREC, "3")
+  field(ADEL, "$(adel)")
+  field(FLNK, "$(device):RATELOG")
+}
+
+# Alternative rate value
+record(calc, "$(device):RATELOG") {
+  field(DESC, "log RATE")
+  field(EGU, "log")
+  field(CALC, "LOG(A)")
+  field(INPA, "$(device):RATE MS")
+  field(HOPR, "2")
+  field(LOPR, "-2")
+  field(HIGH, "0.87506")
+  field(HIHI, "4.0")
+  field(LOLO, "-2.30103")
+  field(HSV, "MINOR")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(SCAN, "Passive")
+  field(FLNK, "$(device):ALMSTA")
+}
+
+########################################
+record(mbbiDirect, "$(device):ALMSTA") {
+  field(DESC, "Alarm Status")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(device):REPORT.B MS")
+  field(FLNK, "$(device):ALMSTASEVR")
+}
+
+record(mbbi, "$(device):ALMSTASEVR") {
+  field(DESC, "Alarm Status")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(device):ALMSTA NPP MS")
+  field(ZRST, "Normal")
+  field(ONST, "Low Alarm")
+  field(TWST, "Alert Alarm")
+  field(THST, "High Alarm")
+  field(FRST, "AC Fail")
+  field(FVST, "Fault")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "MINOR")
+  field(TWSV, "MINOR")
+  field(THSV, "MAJOR")
+  field(FRSV, "MAJOR")
+  field(FVSV, "MAJOR")
+  field(FLNK, "$(device):LOWALM")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):LOWALM") {
+  field(DESC, "Low Alarm")
+  field(INP,  "$(device):ALMSTA.B0 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Low Alarm")
+  field(FLNK, "$(device):ALTALM")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):ALTALM") {
+  field(DESC, "Alert Alarm")
+  field(INP,  "$(device):ALMSTA.B1 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Alert Alarm")
+  field(FLNK, "$(device):HIGHALM")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):HIGHALM") {
+  field(DESC, "High Alarm")
+  field(INP,  "$(device):ALMSTA.B2 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "High Alarm")
+  field(FLNK, "$(device):ACFAIL")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):ACFAIL") {
+  field(DESC, "AC Fail")
+  field(INP, "$(device):ALMSTA.B3 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "AC Fail")
+  field(FLNK, "$(device):FAULT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):FAULT") {
+  field(DESC, "Fault")
+  field(INP,  "$(device):ALMSTA.B4 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):EQPSTA")
+}
+
+########################################
+record(mbbiDirect, "$(device):EQPSTA") {
+  field(DESC, "Equipment Status")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(device):REPORT.C MS")
+  field(FLNK, "$(device):EQPSTASEVR")
+}
+
+record(mbbi, "$(device):EQPSTASEVR") {
+  field(DESC, "Equipment Status")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(device):EQPSTA NPP MS")
+  field(ZRST, "Normal")
+  field(ONST, "Grn Lamp Fault")
+  field(TWST, "Red Lamp Fault")
+  field(THST, "12V Line Fault")
+  field(FRST, "Battery Fault")
+  field(FVST, "24V Line Fault")
+  field(SXST, "5V Line Fault")
+  field(SVST, "Detector Fault")
+  field(EIST, "Mains Fault")
+  field(NIST, "EEPROM Fault")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "MINOR")
+  field(TWSV, "MINOR")
+  field(THSV, "MAJOR")
+  field(FRSV, "MINOR")
+  field(FVSV, "MAJOR")
+  field(SXSV, "MAJOR")
+  field(SVSV, "MAJOR")
+  field(EISV, "MAJOR")
+  field(NISV, "MAJOR")
+  field(FLNK, "$(device):GRNLMPFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):GRNLMPFLT") {
+  field(DESC, "Green Lamp Fault")
+  field(INP,  "$(device):EQPSTA.B0 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):REDLMPFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):REDLMPFLT") {
+  field(DESC, "Red Lamp Fault")
+  field(INP,  "$(device):EQPSTA.B1 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):12VFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):12VFLT") {
+  field(DESC, "12V Line Fault")
+  field(INP,  "$(device):EQPSTA.B2 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):BATTFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):BATTFLT") {
+  field(DESC, "Battery Fault")
+  field(INP,  "$(device):EQPSTA.B3 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):24VFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):24VFLT") {
+  field(DESC, "24V Line Fault")
+  field(INP,  "$(device):EQPSTA.B4 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):5VFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):5VFLT") {
+  field(DESC, "5V Line Fault")
+  field(INP,  "$(device):EQPSTA.B5 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):DETCTRFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):DETCTRFLT") {
+  field(DESC, "Detector Fault")
+  field(INP,  "$(device):EQPSTA.B6 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):MAINSFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):MAINSFLT") {
+  field(DESC, "Mains Failure")
+  field(INP,  "$(device):EQPSTA.B7 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):EEPROMFLT")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):EEPROMFLT") {
+  field(DESC, "EEPROM Fault")
+  field(INP,  "$(device):EQPSTA.B8 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault")
+  field(FLNK, "$(device):MODE")
+}
+
+######################################
+record(mbbiDirect, "$(device):MODE") {
+  field(DESC, "Mode")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(device):REPORT.D MS")
+  field(FLNK, "$(device):MODESEVR")
+}
+
+record(mbbi, "$(device):MODESEVR") {
+  field(DESC, "Mode")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(device):MODE NPP MS")
+  field(ZRST, "Normal")
+  field(ONST, "Alarm")
+  field(TWST, "Fault")
+  field(THST, "Parameter")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "MAJOR")
+  field(TWSV, "MAJOR")
+  field(THSV, "NO_ALARM")
+  field(FLNK, "$(device):ALMMODE")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):ALMMODE") {
+  field(DESC, "Alarm Mode")
+  field(INP,  "$(device):MODE.B0 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Alarm Mode")
+  field(FLNK, "$(device):FLTMODE")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):FLTMODE") {
+  field(DESC, "Fault Mode")
+  field(INP,  "$(device):MODE.B1 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Fault Mode")
+  field(FLNK, "$(device):PARAMMODE")
+}
+
+#% archiver 10 Monitor
+record(bi, "$(device):PARAMMODE") {
+  field(DESC, "Parameter Mode")
+  field(INP,  "$(device):MODE.B2 MS")
+  field(ZNAM, "OK")
+  field(ONAM, "Parameter Mode")
+  field(OSV, "MINOR")
+  field(FLNK, "$(device):STA")
+}
+
+################
+# Overall Status
+# % archiver 10 Monitor
+record(calc, "$(device):STA") {
+  field(DESC, "Calculate Status")
+  field(CALC, "A<<12 + B<<4 + C<<2")
+  field(INPA, "$(device):ALMSTASEVR NPP MS")
+  field(INPB, "$(device):EQPSTASEVR NPP MS")
+  field(INPC, "$(device):PARAMMODE NPP MS")
+  field(SCAN, "Passive")
+  field(FLNK, "$(device):MSGNUM")
+}
+
+#record(fanout, "$(device):RESET") {
+#  field(LNK1, "$(device):MSGNUM)")
+#  field(FLNK, "$(device):RESETSEND")
+#}
+
+#% archiver 10 Monitor
+#record(bo, "$(device):RESETSEND") {
+record(bo, "$(device):RESET") {
+  field(DESC, "Reset Alarms")
+  field(DTYP, "stream")
+  field(OUT, "@CanberraG64.protocol reset($(device):MSGNUM) $(port) 0")
+  field(ZNAM, "Off")
+  field(ONAM, "Reset")
+  field(FLNK, "$(device):MSGNUM")
+}
+
+#################
+# Dose reset mechanism
+# Allow visibility of reset button in EDM.
+# Does not actually disable reset record.
+record(bo, "$(device):RESETENA") {
+  field(DESC, "Visibility of Reset")
+  field(HIGH, "2.0")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(VAL, "0")
+}
+
+# Reset accumulated dose
+record(bo, "$(device):DOSERESET") {
+  field(DESC, "Reset Accumulated Dose")
+  field(OUT, "$(device):DOSE")
+  field(FLNK, "$(device):RESETTIME:AS")
+}
+
+# Autosave time of reset
+record(stringin, "$(device):RESETTIME:AS")
+{
+  field(DESC, "Autosaved reset time")
+  field(DTYP, "Soft Timestamp")
+  field(INP, "@%Y/%m/%d %H:%M:%S")
+  field(FLNK, "$(device):RESETTIME")
+}
+
+# Store new reset time or readback reset time from autosaved value.
+record(stringin, "$(device):RESETTIME")
+{
+  field(DESC, "Time and date of reset")
+  field(PINI, "YES")
+  field(INP, "$(device):RESETTIME:AS")
+}

@@ -1,0 +1,71 @@
+
+
+
+Terminator = CR, LF;
+ReplyTimeout = 1000;
+ReadTimeout = 1000;
+ExtraInput = Ignore;
+
+get_string{
+  out '\$2';
+  in 0x06;
+  out 0x05;
+  in  "%(\$1\$3)20c";
+}
+
+get_int_floatE{
+  out '\$4';
+  in 0x06;
+  out 0x05;
+  in  "%(\$1\$2_RBV)d, %(\$1\$3_RBV)E";
+}
+
+set_int_floatE{
+  out "\$2,%(\$1\$3)d,%(\$1\$4)E,";
+  in 0x06;
+}
+
+get_2floatE{
+  out '\$2';
+  in 0x06;
+  out 0x05;
+  in  "%(\$1_\$3_RBV)E,%(\$1_\$4_RBV)E";
+}
+
+get_3float{
+  out '\$2';
+  in 0x06;
+  out 0x05;
+  in  "%(\$1_1_RBV)f,%(\$1_2_RBV)f,%(\$1_3_RBV)f";
+}
+
+
+get_float{
+  out '\$2';
+  in 0x06;
+  out 0x05;
+  in  "%(\$1\$3)f";
+}
+
+set_float{
+  out "\$2,%(\$1)f";
+  in 0x06;
+}
+
+set_2floatE{
+  out "\$2,%(\$1\$3)f,%(\$1\$4)f";
+  in 0x06;
+}
+
+get_int{
+  out '\$2';
+  in 0x06;
+  out 0x05;
+  in  "%(\$1\$3)d";
+}
+
+
+set_int{
+  out'\$1,%d';
+  in 0x06;
+}

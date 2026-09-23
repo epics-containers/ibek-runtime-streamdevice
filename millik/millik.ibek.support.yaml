@@ -30,6 +30,11 @@ entity_models:
         description: |-
           Precision. Default is 4
         default: 4
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+        default: "C"
     databases:
       - file: millik.template
         args:

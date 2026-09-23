@@ -30,9 +30,8 @@ set_pos_limit   { out "a:101A%06d";
                   in  "a:101A";
                 }
 
-# This command return an error on VAT valve device
-read_pos_limit  { out "a:101A";
-                  in  "a:101A%06d";
+read_pos_limit  { out "b:101A";
+                  in  "b:101A%06d";
                 }
 
 get_position    { out "A:";

@@ -17,10 +17,6 @@ entity_models:
         type: str
         description: |-
           device name
-      name:
-        type: id
-        description: |-
-          Object name and gui association name
       port:
         type: str
         description: |-
@@ -41,10 +37,6 @@ entity_models:
         type: str
         description: |-
           device name
-      name:
-        type: id
-        description: |-
-          Object name and gui association name
       port:
         type: str
         description: |-
@@ -61,10 +53,6 @@ entity_models:
     description: |-
       Agilent 4UHV Ion Pump Controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Gui tag
       device:
         type: str
         description: |-
@@ -89,10 +77,6 @@ entity_models:
         type: str
         description: |-
           device name
-      name:
-        type: id
-        description: |-
-          Object name and gui association name
       pump:
         type: int
         description: |-

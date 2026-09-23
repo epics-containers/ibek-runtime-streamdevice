@@ -1,0 +1,49 @@
+# % macro, P, PV Prefix
+# % macro, PORT, Asyn port name
+# % macro, SCAN, Asyn port name
+# % macro, PARAM, Asyn port name
+# % macro, CMD, Asyn port name
+# % macro, PINIR, Asyn port name
+# % macro, PINIW, Asyn port name
+# % macro, DEFAULT_VAL, Asyn port name
+# % macro, DRVH, Asyn port name
+# % macro, DRVL, Asyn port name
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)_REQUEST") {
+  field(SCAN, "$(SCAN)")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto get_float($(P):$(PARAM),$(CMD),_RBV) $(PORT)")
+  field(PINI, "$(PINIR)")
+}
+
+record(ai, "$(P):$(PARAM)_RBV") {
+  field(PREC, "5")
+}
+
+
+# Send query to the controller
+record(stringout, "$(P):$(PARAM)_SEND") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto set_float($(P):$(PARAM),$(CMD)) $(PORT)")
+  field(PINI, "$(PINIW)")
+  field(FLNK, "$(P):$(PARAM)_FORCE_READ")
+}
+
+
+record(ao, "$(P):$(PARAM)") {
+  field(PREC, "5")
+  field(FLNK, "$(P):$(PARAM)_SEND")
+  field(VAL, "$(DEFAULT_VAL=0)")
+  field(DRVH, "$(DRVH)")
+  field(DRVL, "$(DRVL)")
+}
+
+# Record to force $(P):$(PARAM)_REQUEST to process when a parameter is written to
+# to verify the controller has taken the new value.
+record(bo, "$(P):$(PARAM)_FORCE_READ") {
+  field(SCAN, "Passive")
+  field(OUT, "$(P):$(PARAM)_REQUEST.PROC PP")
+  field(VAL, "1")
+}

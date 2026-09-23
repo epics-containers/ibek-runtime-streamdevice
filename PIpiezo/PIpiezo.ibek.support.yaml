@@ -5,6 +5,11 @@
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/PIpiezo/ release.
+#
+# Templates needing a generic IOC built with this module (not the plain
+# generic image):
+# - `E871-absGrp.template` needs a generic IOC built with `PIpiezo` (compiled support), not the plain generic image.
+# - `PI-E516.template` needs a generic IOC built with `PIpiezo` (compiled support), not the plain generic image.
 
 module: PIpiezo
 
@@ -33,12 +38,12 @@ entity_models:
         type: str
         description: |-
           Engineering units
-        default: mm
+        default: "mm"
       TWSIZE:
         type: float
         description: |-
           Default tweak size
-        default: 1.0
+        default: 1
       PREC:
         type: int
         description: |-
@@ -53,14 +58,11 @@ entity_models:
         type: str
         description: |-
           Asyn port for I/O with controller
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: E725.template
         args:
           .*:
+          R: ""
 
   - name: E871
     description: |-
@@ -91,16 +93,12 @@ entity_models:
         type: str
         description: |-
           engineering units for value of move commands to controller, defaults to mm
-        default: mm
+        default: "mm"
       MODE:
         type: int
         description: |-
           Mode to select between 'Demand'(1) position and 'Readback'(0) position values in the tweak demand calculation, default is 1
         default: 1
-      name:
-        type: id
-        description: |-
-          name for gui element
     databases:
       - file: E871.template
         args:
@@ -130,18 +128,11 @@ entity_models:
         type: str
         description: |-
           Asyn port for I/O with controller
-      DESC:
-        type: str
-        description: |-
-          Description
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: E816.template
         args:
           .*:
+          DESC: ""
 
   - name: C877
     description: |-
@@ -172,8 +163,207 @@ entity_models:
         type: str
         description: |-
           engineering units for value of move commands to controller, defaults to mm
-        default: mm
+        default: "mm"
     databases:
       - file: C877.template
+        args:
+          .*:
+
+  - name: E871-absGrp
+    description: |-
+      Imported from DLS module PIpiezo (E871-absGrp.template)
+      NOTE: needs a generic IOC built with PIpiezo (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      GRP:
+        type: str
+        description: |-
+          GRP
+      DESC:
+        type: str
+        description: |-
+          Object description
+      MRES:
+        type: float
+        description: |-
+          MRES
+        default: 1.0e-06
+      RDBD:
+        type: float
+        description: |-
+          RDBD
+        default: 1.0e-06
+      RRES:
+        type: float
+        description: |-
+          RRES
+        default: 1.0
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+        default: "mm"
+      C1:
+        type: str
+        description: |-
+          C1
+      C2:
+        type: str
+        description: |-
+          C2
+      C3:
+        type: str
+        description: |-
+          C3
+      STARTDLY:
+        type: float
+        description: |-
+          STARTDLY
+        default: 0.6
+      AXES:
+        type: float
+        description: |-
+          AXES
+        default: 3.0
+      HILIM:
+        type: str
+        description: |-
+          HILIM
+      LOLIM:
+        type: str
+        description: |-
+          LOLIM
+    databases:
+      - file: E871-absGrp.template
+        args:
+          .*:
+
+  - name: E871-relGrp
+    description: |-
+      Imported from DLS module PIpiezo (E871-relGrp.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      GRP:
+        type: str
+        description: |-
+          GRP
+      DESC:
+        type: str
+        description: |-
+          Object description
+      AXES:
+        type: float
+        description: |-
+          AXES
+        default: 3.0
+      C2:
+        type: str
+        description: |-
+          C2
+      SC2:
+        type: str
+        description: |-
+          SC2
+        default: "1"
+      C3:
+        type: str
+        description: |-
+          C3
+        default: "spare"
+      SC3:
+        type: str
+        description: |-
+          SC3
+        default: "1"
+      C1:
+        type: str
+        description: |-
+          C1
+      SC1:
+        type: str
+        description: |-
+          SC1
+        default: "1"
+    databases:
+      - file: E871-relGrp.template
+        args:
+          .*:
+
+  - name: PI-E516
+    description: |-
+      Imported from DLS module PIpiezo (PI-E516.template)
+      NOTE: needs a generic IOC built with PIpiezo (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: PI-E516.template
+        args:
+          .*:
+          gda_desc: ""
+          gda_name: ""
+
+  - name: actuatorcallback
+    description: |-
+      Imported from DLS module PIpiezo (actuatorcallback.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      M:
+        type: str
+        description: |-
+          M
+      TWSIZE:
+        type: float
+        description: |-
+          TWSIZE
+        default: 1.0
+      PREC:
+        type: int
+        description: |-
+          Precision (number of decimal places)
+        default: 3
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+        default: "mm"
+      ACT_RBV:
+        type: str
+        description: |-
+          ACT_RBV
+      DEADBAND:
+        type: float
+        description: |-
+          DEADBAND
+        default: 0.1
+      ACT_SET:
+        type: str
+        description: |-
+          ACT_SET
+    databases:
+      - file: actuatorcallback.template
         args:
           .*:

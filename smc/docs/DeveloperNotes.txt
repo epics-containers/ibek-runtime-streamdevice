@@ -1,0 +1,48 @@
+SMC support module.
+
+The smc support module was written for the Twickenham 120-10 power supply control devices on the I06 superconducting magnet.
+
+SMC template.
+
+The smc template when viewed in VDCT has been layed out in blocks indicated by coloured dashed line boxes.  Each box has a textbox in the same colour somewhere  near one edge explaining what it is for.
+
+There is a block of records with SET in the name for all the protocol commands that are used and a block for each of the replies from the protocol commands, the records have STS in the name. These have bright green dashed lines.
+
+The template is closely coupled to the protocol definition.  The information from a single reply message is written to several STS records defined from within the protocol file.  Then there are  GET and fanout records to ensure the updated status records are processed.  The unit does not reply when you give it a command to set something (from a SET record).  It only replies to commands to report its status.  It takes a while to reply.  There are records with SCN in the PV name that control how often the GET record is processed.  The default scan rates in the record have been set quite low, 5 or 10 seconds.  To alleviate this when a SET record processes, it forward links to an appropriate GET record to request a status update A.S.A.P.
+
+One key status record is the calibration, especially at startup.  The smc unit basically operates controlling current.  The conversion to field units depends on the calibration value, which must be obtained from the unit, so all the field records depend on this.
+
+Another key status record is the units, which acts like a mode and controls whether current or field units are active in several of the protocol commands.  Some of the EPICS records change their units with the units mode of the unit.  There is a group of records not belonging to any block that handle this.  EDM cannot cope with the engineering units of a record it is monitoring changing after the screen has started.  Therefore, such records need two EDM widgets, one for each units mode, with visibility controlled by the mode.
+
+To allow the user to set ramp rates in field units, which the smc unit will not, EPICS does the conversion.  There is block of records to handle this.  There is another set of records to impose a limit on the ramp rate.  The initial value is a macro.  No support is provided to change this on the fly at present.  There is a sequence limit to control the initialisation of this to introduce a delay to allow the unit to populate the calibration status record before it is used in the calculations.  These blocks both have khaki dashed lines.
+
+There is a blue dashed line block of records to apply limits to the set points, ie to stop the user asking for a value outside the current limit.  I believe the suppliers have also set the units so that there is an appropriate overall limit to the current that each unit can supply but this has no relation to the magnet operation mode.  Also the unit will not allow you to set a lower setpoint that is higher than the upper set point.  When in Reverse, the lower limit still has to be the smaller number.  There is no concept of -ve current or field values.  The current must be zero to go into or out of Reverse.  It will generate an error state otherwise.  There is no way to directly reset the errors.  Successfully changing into or out of reverse seems to reset the Reverse Error.
+
+There is a brown dashed line block of records to handle the operation mode of the magnet, ie how the three coils operate together.  This is done by manipulating field and current limits on the current instance.  It has a magnet mode status record and it has the concept of what the limits are in different magnet modes and the limit to impose now.  
+
+Finally there is a pale green block of records to implement a BUSY record.
+It is basically munging together the RAMP:MADE and RAMP:PAUSE status records, but because the unit is slow to respond, it has to wait to give time for the status records have been updated since the last, so a sequence trigger record is needed.  Any command that is likely to change the busy status forward links to this trigger record.
+
+There are links all round this template which made everything far too messy, so in VDCT many links have been truncated with colour coding to the links and comments on the link stubs added in an attempt to keep things meaningful.  VDCT labels both link stubs with the PV too.
+
+Triple axis template
+
+The actual changing of the magnet operation mode is done from the triple axis template.  The currents must all be at zero to allow the magnet mode to change.  This is because otherwise the current in one coil could be outside one of the new limits for the new operation mode and increasing the current in another coil could damage the magnet.
+
+The template is relatively simple, but it has many implied assumptions about the nature of the operation modes built into it.  There is one transform to convert from a demand magnet operation mode for the magnet to an operation mode demand for all three coils.  Then there is another set of transforms to work out what magnet mode is in place by looking at the operation mode of all three coils.
+
+The streams protocol.
+
+As already mentioned, the protocol file refers to records in the smc template.
+The template passes the protocol the prefix as an argument, $1, but the remainder of the record name is hard coded.
+
+Some experimentation with the timeouts was done in conjuction with understanding the software flow control of the unit.  Formats to handle flow control characters remain commented out and are not needed.  Attempts to capture non-matching text did not work well.
+
+All the commands to request status report information consist of a single upper case letter.  This includes upper case O unfortunately.
+
+The reply typically writes to several different EPICS records.  The reply consists of a series of single letters followed usually by a numeric value, occasionally a character value.
+
+All the commands to set a value consist of a single upper case letter followed by a value.  There is usally some correspondance between the set command and the reply that is received in the relevant status request commands.
+
+The complete set of status commands includes some duplicate status information.
+The EPICS database only uses one to update its records.

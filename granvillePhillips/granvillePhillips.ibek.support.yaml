@@ -25,6 +25,7 @@ entity_models:
       - file: gp350.template
         args:
           .*:
+
   - name: gp307
     description: |-
       Support for a Granville Phillips GP307 gauge controller, typically used on End Stations for Hot Cathode Gauges.
@@ -39,5 +40,389 @@ entity_models:
           Mandatory.  Serial port (stream device code)
     databases:
       - file: gp307.template
+        args:
+          .*:
+
+  - name: gp307Gauge
+    description: |-
+      Imported from DLS module granvillePhillips (gp307Gauge.template)
+    parameters:
+      dom:
+        type: str
+        description: |-
+          dom
+      id:
+        type: str
+        description: |-
+          id
+    databases:
+      - file: gp307Gauge.template
+        args:
+          .*:
+          gctrl: ""
+
+  - name: gp307Hcg
+    description: |-
+      Imported from DLS module granvillePhillips (gp307Hcg.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      channel:
+        type: str
+        description: |-
+          channel
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      gctrl:
+        type: str
+        description: |-
+          gctrl
+    databases:
+      - file: gp307Hcg.template
+        args:
+          .*:
+
+  - name: gp307HcgDummy
+    description: |-
+      Imported from DLS module granvillePhillips (gp307HcgDummy.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+    databases:
+      - file: gp307HcgDummy.template
+        args:
+          .*:
+
+  - name: gp307Pirg
+    description: |-
+      Imported from DLS module granvillePhillips (gp307Pirg.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      channel:
+        type: str
+        description: |-
+          channel
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      gctrl:
+        type: str
+        description: |-
+          gctrl
+      sta_zrst:
+        type: str
+        description: |-
+          sta_zrst
+        default: "OK"
+      sta_onst:
+        type: str
+        description: |-
+          sta_onst
+        default: "Above Range"
+      sta_twst:
+        type: str
+        description: |-
+          sta_twst
+        default: "Below Range"
+      sta_thst:
+        type: str
+        description: |-
+          sta_thst
+        default: "Not Connected"
+      sta_frst:
+        type: str
+        description: |-
+          sta_frst
+        default: "Off"
+      sta_zrsv:
+        type: str
+        description: |-
+          sta_zrsv
+        default: "NO_ALARM"
+      sta_onsv:
+        type: str
+        description: |-
+          sta_onsv
+        default: "MINOR"
+      sta_twsv:
+        type: str
+        description: |-
+          sta_twsv
+        default: "NO_ALARM"
+      sta_thsv:
+        type: str
+        description: |-
+          sta_thsv
+        default: "MAJOR"
+      sta_frsv:
+        type: str
+        description: |-
+          sta_frsv
+        default: "MAJOR"
+    databases:
+      - file: gp307Pirg.template
+        args:
+          .*:
+
+  - name: gp307PirgDummy
+    description: |-
+      Imported from DLS module granvillePhillips (gp307PirgDummy.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      sta_zrst:
+        type: str
+        description: |-
+          sta_zrst
+        default: "OK"
+      sta_onst:
+        type: str
+        description: |-
+          sta_onst
+        default: "Above Range"
+      sta_twst:
+        type: str
+        description: |-
+          sta_twst
+        default: "Below Range"
+      sta_thst:
+        type: str
+        description: |-
+          sta_thst
+        default: "Not Connected"
+      sta_frst:
+        type: str
+        description: |-
+          sta_frst
+        default: "Off"
+      sta_zrsv:
+        type: str
+        description: |-
+          sta_zrsv
+        default: "NO_ALARM"
+      sta_onsv:
+        type: str
+        description: |-
+          sta_onsv
+        default: "MINOR"
+      sta_twsv:
+        type: str
+        description: |-
+          sta_twsv
+        default: "NO_ALARM"
+      sta_thsv:
+        type: str
+        description: |-
+          sta_thsv
+        default: "MAJOR"
+      sta_frsv:
+        type: str
+        description: |-
+          sta_frsv
+        default: "MAJOR"
+    databases:
+      - file: gp307PirgDummy.template
+        args:
+          .*:
+
+  - name: gp350Gauge
+    description: |-
+      Imported from DLS module granvillePhillips (gp350Gauge.template)
+    parameters:
+      dom:
+        type: str
+        description: |-
+          dom
+      id:
+        type: str
+        description: |-
+          id
+    databases:
+      - file: gp350Gauge.template
+        args:
+          .*:
+          gctrl: ""
+
+  - name: gp350Hcg
+    description: |-
+      Imported from DLS module granvillePhillips (gp350Hcg.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      gctrl:
+        type: str
+        description: |-
+          gctrl
+    databases:
+      - file: gp350Hcg.template
+        args:
+          .*:
+
+  - name: gp350HcgDummy
+    description: |-
+      Imported from DLS module granvillePhillips (gp350HcgDummy.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+    databases:
+      - file: gp350HcgDummy.template
+        args:
+          .*:
+
+  - name: gp350Pirg
+    description: |-
+      Imported from DLS module granvillePhillips (gp350Pirg.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      channel:
+        type: str
+        description: |-
+          channel
+      port:
+        type: str
+        description: |-
+          Asyn port name
+      gctrl:
+        type: str
+        description: |-
+          gctrl
+      sta_zrst:
+        type: str
+        description: |-
+          sta_zrst
+        default: "OK"
+      sta_onst:
+        type: str
+        description: |-
+          sta_onst
+        default: "Above Range"
+      sta_twst:
+        type: str
+        description: |-
+          sta_twst
+        default: "Below Range"
+      sta_thst:
+        type: str
+        description: |-
+          sta_thst
+        default: "Not Connected"
+      sta_frst:
+        type: str
+        description: |-
+          sta_frst
+        default: "Off"
+      sta_zrsv:
+        type: str
+        description: |-
+          sta_zrsv
+        default: "NO_ALARM"
+      sta_onsv:
+        type: str
+        description: |-
+          sta_onsv
+        default: "MINOR"
+      sta_twsv:
+        type: str
+        description: |-
+          sta_twsv
+        default: "NO_ALARM"
+      sta_thsv:
+        type: str
+        description: |-
+          sta_thsv
+        default: "MAJOR"
+      sta_frsv:
+        type: str
+        description: |-
+          sta_frsv
+        default: "MAJOR"
+    databases:
+      - file: gp350Pirg.template
+        args:
+          .*:
+
+  - name: gp350PirgDummy
+    description: |-
+      Imported from DLS module granvillePhillips (gp350PirgDummy.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      sta_zrst:
+        type: str
+        description: |-
+          sta_zrst
+        default: "OK"
+      sta_onst:
+        type: str
+        description: |-
+          sta_onst
+        default: "Above Range"
+      sta_twst:
+        type: str
+        description: |-
+          sta_twst
+        default: "Below Range"
+      sta_thst:
+        type: str
+        description: |-
+          sta_thst
+        default: "Not Connected"
+      sta_frst:
+        type: str
+        description: |-
+          sta_frst
+        default: "Off"
+      sta_zrsv:
+        type: str
+        description: |-
+          sta_zrsv
+        default: "NO_ALARM"
+      sta_onsv:
+        type: str
+        description: |-
+          sta_onsv
+        default: "MINOR"
+      sta_twsv:
+        type: str
+        description: |-
+          sta_twsv
+        default: "NO_ALARM"
+      sta_thsv:
+        type: str
+        description: |-
+          sta_thsv
+        default: "MAJOR"
+      sta_frsv:
+        type: str
+        description: |-
+          sta_frsv
+        default: "MAJOR"
+    databases:
+      - file: gp350PirgDummy.template
         args:
           .*:

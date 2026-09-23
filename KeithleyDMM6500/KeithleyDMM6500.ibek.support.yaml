@@ -13,10 +13,6 @@ entity_models:
     description: |-
       Device to control Keithley DMM6500 Multimeter
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-
@@ -33,3 +29,4 @@ entity_models:
       - file: dmm6500.template
         args:
           .*:
+          name: ""

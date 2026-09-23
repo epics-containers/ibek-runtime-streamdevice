@@ -1,0 +1,66 @@
+ao, ai, bi and bo records for each protocol command with appropriate limits.
+
+Possible: Interlocks to prevent sending of messages that will result in errors, 
+e.g. disable SETTIMER if Regulation is On. 
+
+Need to figure out what we are going to do about TimerTarget on RESET; I think 
+this should be satisfied by having readbacks simply poll current vals after RESET
+- thus persistance of TimerTarget original value on RESET (rather than current value
+after timer has begun counting down) is simply an oddity of the device which we 
+don't attempt to mask.
+
+Regulation Timeout - Is it possible we can access the current timeout value?
+If not, should we try to replicate this with a timer in the database?
+
+Handling of error state - At present, resending a SET Regulation message has an
+effect (so SET Regulation On when already regulating resets the timeout, for 
+example). Should we allow this behaviour, and if so how can we make it intuitive
+that this is how it works? In particular, how do we handle the Error state? 
+SET Regulation Off would fix it, but we could instead rely on RESET. 
+
+I think this depends upon how bo records behave - if they process but their
+value does not change, do they write the unchanged value again? If so we should
+be able to support sending Regulation Off in Error, although in this case we 
+will also need to be careful about processing flow, to make sure Regulation's 
+ao is only triggered by user action. 
+
+Result of test on this - bo record writes to output every time it is processed,
+whether value has changed or not. 
+
+Use of set ValveVoltage - this only does anything if Regulating is Off, so might
+be sensible to disable this in the database even though sending it would not 
+cause an error - I can't think of a good reason to make it appear that the 
+voltage can be manually set when this isn't actually the case.
+
+Error handling - I think taking a redundant approach (using interlocks to
+control record processing and also catching and processing error messages from 
+the device) may be best. This way if another process has accessed the device and 
+switched it to an unexpected state we can handle it, but our own interface should
+still reflect our understanding of the internal state.
+
+Processing - we have a tradeoff to consider between performance and usability.
+We will have many input records who need to be processed regularly in order to 
+keep the UI up to date. We therefore need to decide on an appropriate processing
+rate for these records, and establish whether running all of them at the fastest
+scan rate will have a significant performance impact. 
+
+Also should check whether I/O is done asynchronously - I'm guessing yes, but 
+should check this. 
+
+Unknowns:
+ - User of support module. Manual control from EDM interface only, or driven
+ by automated commands from another module?
+ - Actual exact purpose and usage of hardware device. Would help with interface
+ design. 
+   - My current mental model of device/system is that it is used to control a
+     vacuum valve which is intended to release Ar ions into vacuum chamber to 
+     perform vacuum surface deposition (sputtering). Hence we need to be able
+     regulate valve to get to required pressure of Ar for the process to take 
+     place, and we want to be able to time the deposition so that we can control
+     the thickness of the deposited layer. We also have a regulation timeout, 
+     since presumably failing to reach the target pressure in time indicates a 
+     leak in the vacuum vessel or a fault with the valve.
+     I note that the maximum resolution on both the timer and reg timeout is 1s
+     - so presumably precise timing is not vitally important, esp. since range of
+     timeout is only 20-500s. (range of timer itself is much larger however - up 
+     to 2^32s). 

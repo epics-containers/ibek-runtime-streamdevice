@@ -1,0 +1,104 @@
+# % macro, P, PV Prefix
+# % macro, PORT, Asyn port name
+# % macro, SCAN, Asyn port name
+# % macro, IPARAM, Asyn port name
+# % macro, FPARAM, Asyn port name
+# % macro, CMD, Asyn port name
+# % macro, HIGH, Minor alarm high threshold
+# % macro, LOW, Minor alarm low threshold
+# % macro, HIHI, Major alarm high threshold
+# % macro, HIHI,Major alarm low threshold
+# % macro, ZRSTI, Asyn port name
+# % macro, ONSTI, Asyn port name
+# % macro, TWSTI, Asyn port name
+# % macro, THSTI, Asyn port name
+# % macro, FRSTI, Asyn port name
+# % macro, FVSTI, Asyn port name
+# % macro, SXSTI, Asyn port name
+# % macro, SVSTI, Asyn port name
+# % macro, EISTI, Asyn port name
+# % macro, NISTI, Asyn port name
+# % macro, TESTI, Asyn port name
+# % macro, ELSTI, Asyn port name
+# % macro, TVSTI, Asyn port name
+# % macro, TTSTI, Asyn port name
+# % macro, FTSTI, Asyn port name
+# % macro, FFSTI, Asyn port name
+# % macro, ZRVLI, Asyn port name
+# % macro, ONVLI, Asyn port name
+# % macro, TWVLI, Asyn port name
+# % macro, THVLI, Asyn port name
+# % macro, FRVLI, Asyn port name
+# % macro, FVVLI, Asyn port name
+# % macro, SXVLI, Asyn port name
+# % macro, SVVLI, Asyn port name
+# % macro, EIVLI, Asyn port name
+# % macro, NIVLI, Asyn port name
+# % macro, TEVLI, Asyn port name
+# % macro, ELVLI, Asyn port name
+# % macro, TVVLI, Asyn port name
+# % macro, TTVLI, Asyn port name
+# % macro, FTVLI, Asyn port name
+# % macro, FFVLI, Asyn port name
+
+
+# Send query to the controller
+record(stringout, "$(P):$(FPARAM)_REQUEST") {
+  field(SCAN, "$(SCAN)")
+  field(DTYP, "stream")
+  field(OUT, "@leybold.proto get_int_floatE($(P):,$(IPARAM),$(FPARAM),$(CMD)) $(PORT)")
+  field(PINI, "YES")
+}
+
+
+# % archiver 10
+#% autosave 1 HIHI
+#% autosave 1 LOLO
+#% autosave 1 HIGH
+#% autosave 1 LOW
+record(ai, "$(P):$(FPARAM)_RBV") {
+  field(PREC, "5")
+  field(HIGH, "$(HIGH)")
+  field(LOW, "$(LOW)")
+  field(HIHI, "$(HIHI)")
+  field(LOLO, "$(LOLO)")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+}
+
+record(mbbi, "$(P):$(IPARAM)_RBV") {
+  field(ZRST, "$(ZRSTI=)")
+  field(ONST, "$(ONSTI=)")
+  field(TWST, "$(TWSTI=)")
+  field(THST, "$(THSTI=)")
+  field(FRST, "$(FRSTI=)")
+  field(FVST, "$(FVSTI=)")
+  field(SXST, "$(SXSTI=)")
+  field(SVST, "$(SVSTI=)")
+  field(EIST, "$(EISTI=)")
+  field(NIST, "$(NISTI=)")
+  field(TEST, "$(TESTI=)")
+  field(ELST, "$(ELSTI=)")
+  field(TVST, "$(TVSTI=)")
+  field(TTST, "$(TTSTI=)")
+  field(FTST, "$(FTSTI=)")
+  field(FFST, "$(FFSTI=)")
+  field(ZRVL, "$(ZRVLI=0)")
+  field(ONVL, "$(ONVLI=1)")
+  field(TWVL, "$(TWVLI=2)")
+  field(THVL, "$(THVLI=3)")
+  field(FRVL, "$(FRVLI=4)")
+  field(FVVL, "$(FVVLI=5)")
+  field(SXVL, "$(SXVLI=6)")
+  field(SVVL, "$(SVVLI=7)")
+  field(EIVL, "$(EIVLI=8)")
+  field(NIVL, "$(NIVLI=9)")
+  field(TEVL, "$(TEVLI=10)")
+  field(ELVL, "$(ELVLI=11)")
+  field(TVVL, "$(TVVLI=12)")
+  field(TTVL, "$(TTVLI=13)")
+  field(FTVL, "$(FTVLI=14)")
+  field(FFVL, "$(FFVLI=15)")
+}

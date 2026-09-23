@@ -1,0 +1,243 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: motomanNX100 1-17-1
+# Source: /dls_sw/prod/R3.14.12.7/support/motomanNX100/1-17-1
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/motomanNX100/ release.
+
+module: motomanNX100
+
+entity_models:
+  - name: nx100
+    description: |-
+      Imported from DLS module motomanNX100 (nx100.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      TYPE:
+        type: str
+        description: |-
+          TYPE
+        default: "NX"
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      ZRST:
+        type: str
+        description: |-
+          ZRST
+        default: ""
+      ONST:
+        type: str
+        description: |-
+          ONST
+        default: ""
+      TWST:
+        type: str
+        description: |-
+          TWST
+        default: ""
+      THST:
+        type: str
+        description: |-
+          THST
+        default: ""
+      FRST:
+        type: str
+        description: |-
+          FRST
+        default: ""
+      FVST:
+        type: str
+        description: |-
+          FVST
+        default: ""
+      SXST:
+        type: str
+        description: |-
+          SXST
+        default: ""
+      SVST:
+        type: str
+        description: |-
+          SVST
+        default: ""
+      EIST:
+        type: str
+        description: |-
+          EIST
+        default: ""
+      NIST:
+        type: str
+        description: |-
+          NIST
+        default: ""
+      TEST:
+        type: str
+        description: |-
+          TEST
+        default: ""
+      ELST:
+        type: str
+        description: |-
+          ELST
+        default: ""
+      TVST:
+        type: str
+        description: |-
+          TVST
+        default: ""
+      TTST:
+        type: str
+        description: |-
+          TTST
+        default: ""
+      FTST:
+        type: str
+        description: |-
+          FTST
+        default: ""
+      FFST:
+        type: str
+        description: |-
+          FFST
+        default: ""
+    databases:
+      - file: nx100.template
+        args:
+          .*:
+
+  - name: nx100dvar
+    description: |-
+      Imported from DLS module motomanNX100 (nx100dvar.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      VAR:
+        type: str
+        description: |-
+          VAR
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+    databases:
+      - file: nx100dvar.template
+        args:
+          .*:
+
+  - name: nx100io
+    description: |-
+      Imported from DLS module motomanNX100 (nx100io.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      VAR:
+        type: str
+        description: |-
+          VAR
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      DESC0:
+        type: str
+        description: |-
+          DESC0
+        default: ""
+      DESC1:
+        type: str
+        description: |-
+          DESC1
+        default: ""
+      DESC2:
+        type: str
+        description: |-
+          DESC2
+        default: ""
+      DESC3:
+        type: str
+        description: |-
+          DESC3
+        default: ""
+      DESC4:
+        type: str
+        description: |-
+          DESC4
+        default: ""
+      DESC5:
+        type: str
+        description: |-
+          DESC5
+        default: ""
+      DESC6:
+        type: str
+        description: |-
+          DESC6
+        default: ""
+      DESC7:
+        type: str
+        description: |-
+          DESC7
+        default: ""
+    databases:
+      - file: nx100io.template
+        args:
+          .*:
+
+  - name: nx100pvar
+    description: |-
+      Imported from DLS module motomanNX100 (nx100pvar.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Q
+      VAR:
+        type: str
+        description: |-
+          VAR
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+    databases:
+      - file: nx100pvar.template
+        args:
+          .*:

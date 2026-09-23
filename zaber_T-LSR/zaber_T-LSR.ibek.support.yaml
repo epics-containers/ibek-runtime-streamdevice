@@ -34,10 +34,6 @@ entity_models:
         type: int
         description: |-
           The number of the device used for communication
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: zaber_T-LSR.template
         args:

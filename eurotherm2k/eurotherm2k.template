@@ -587,4 +587,3 @@ record(seq, "$(P)$(Q):CONF:DLY") {
 #! Link("$(P)$(Q):SP:HIGH:FAN.OUTA","$(P)$(Q):SP:HIGH:RBV.PROC")
 #! Field("$(P)$(Q):SP:HIGH:FAN.OUTB",16777215,0,"$(P)$(Q):SP:HIGH:FAN.OUTB")
 #! Link("$(P)$(Q):SP:HIGH:FAN.OUTB","$(P)$(Q):SP.DRVH")
-

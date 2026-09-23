@@ -1,0 +1,2 @@
+$(P):PR$(PROFILE):MODE
+$(P):PR$(PROFILE):NAME

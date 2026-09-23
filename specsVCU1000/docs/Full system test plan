@@ -1,0 +1,103 @@
+Test plan for VCU1000
+
+Requirements tests:
+- Check it copes with max voltage being set to 0.0 (sim goes bang here)
+  * Returns nan for valve percentage, but keeps working.
+- Check it truncates voltage if max is set lower than current (sim does not)
+  * It doesn't.
+- Check it allows voltage to be adjusted manually while in Error state as well
+  as in Standby.
+  * It does.
+- Check voltage percentage is in fact reported as 0.0-100.0 rather than 0.0-1.0.
+  * It is.
+- Check behaviour if TimerTarget is zero and Timer is set to On:
+   - When regulation is started.
+   - During a run.
+   * In both cases, immediate return to standby mode. 
+* Note real device continues adjusting voltage even in Regulating mode - makes 
+sense as otherwise would drop out of tolerance on every pressure fluctuation. 
+This way in ordinary use will keep close to target and use Regulating band to note
+only large deviations. 
+* Weird timer behaviour I hadn't noticed before - 
+  - Start timer 
+  - Stop after N seconds.
+  - Adjust timer target
+  - Start timer
+  - Current timer will be deducted by N seconds - so if new setting is less than
+    N, we will wind up with a negative time on the clock, which will continue 
+    counting downwards. 
+  - Basically seems like timer is continuing to tick - possibly working relative
+    to some fixed time, presumably 1st timer activation during run.
+  - Timer keeps ticking whether timer on or off - but will only hit zero if timer 
+    is on!
+    
+Timer implementation:
+  - Keep a count from first timer activation (reg ON when tim is ON or tim ON 
+    when reg is ON).
+  - Displayed CurrentTimer is TimerTarget - count seconds. 
+  - Changing TimerTarget will change CurrentTimer display but not internal count.
+  - Timer expiry test is passed when tim is ON, reg is ON and CurrentTimer == 0. 
+    If reg is ON but tim is OFF at this time, test will not run and CurrentTimer
+    will count down below zero. 
+
+Design / Implementation tests:
+- Check basic message send/receive works (to confirm I have implemented the 
+semantics of the communication protocol correctly and used the correct terminators)
+  - this should simply be a matter of firing up the IOC and seeing whether we get
+    dozens of error messages.
+   * Works OK, but error message about surplus input for device type.
+
+- Check each input/output pair:
+  - DeviceType, Id, Version, P Interface
+   * All fine except for device type (see above).
+  - Status (all 4 states)
+    S
+    I
+    R
+    E
+    * All working
+  - Remote control
+   * Working
+  - Pressure
+   * Working
+  - Pressure setpoint
+   * Working
+  - Pressure tolerance
+   * Working
+  - Voltage
+   * Working
+  - Voltage percentage
+   * Working
+  - Timer
+   * Working
+  - Timer target
+   * Working
+  - Current timer
+   * Working
+  - Regulation 
+   * Working
+  - Regulation timeout
+   * Working
+  - Max voltage
+   * Working
+  - KP
+   * Working
+  - KI
+   * Working
+
+- Check GUI/IOC behaves sensibly during RESET command - device may not respond 
+  to messages, check IOC copes with timeouts
+   * We get a storm of IOC error messages due to message timeouts, and various
+     controls on GUI become invalid during reset, but GUI and DB recover fully
+     and work correctly following reset.
+
+- Check stability against unexpected changes of device state - should be possible 
+  to use nc to connect via UDP and send out-of-band messages. Check IOC behaves 
+  reasonably in this case. 
+   * Generally this seems to be handled OK - GUI will update to display modified
+     values. Will get some error messages if we try to change anything while in 
+     a state where we shouldn't, but system should keep running regardless.
+  
+- Check voltage capping logic works correctly (i.e. setting voltage max results 
+  in feedback which will limit the top value we can set the voltage to manually).
+   * Works correctly.

@@ -25,10 +25,6 @@ entity_models:
         type: str
         description: |-
           Asyn port name for connection with device
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: SierraInstMassFlowMeters.template
         args:

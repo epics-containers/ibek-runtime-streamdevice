@@ -2,9 +2,52 @@
 
 # Imported from DLS production support module: OXCryo 1-4
 # Source: /dls_sw/prod/R3.14.12.7/support/OXCryo/1-4
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
-# To check for updates: diff this pattern's files against that path, or against the
-# newest /dls_sw/prod/*/support/OXCryo/ release.
+#
+# The .proto files are pristine copies of that release's OXCryoApp/protocol.
+#
+# The .template files are DERIVED, not pristine: they come from that release's
+# OXCryoApp/Db VDCT sources, converted to msi-native include/substitute by
+# vdct2template (VDCT does not exist in the EPICS 7 base epics-containers uses).
+#
+# OXcommon.template and OXcommonCB.template are msi `include` targets, not
+# entities. The chain is two levels deep: OXCB700/OXCB800/OXNH700 include
+# OXcommonCB, which in turn includes OXcommon; OXCS700/OXPH700 include OXcommon
+# directly. Their macros carry a _ prefix because msi will not apply a default
+# when substituting a macro with its own name. CTEMP_DRVL/CTEMP_DRVH are
+# internal to that chain (fed from CTEMP_MIN/CTEMP_MAX) and are not parameters.
+#
+# Scripted change on top of the derivation, in OXcommon.template only: the DLS
+# module looks alarm numbers up with a genSub record ($(P)$(Q):ALARM, SNAM
+# alarmlookupProcess, compiled C in OXCryoApp/src/alarmlookup.c). Neither genSub
+# nor that routine is in the generic image, so the record is replaced by
+# database-only records that compute the same thing:
+#   $(P)$(Q):ALARM_INDEX  calcout: :ALARMI truncated toward zero; 0..56 kept,
+#                         anything else -> 57; written to :ALARM.INDX
+#   $(P)$(Q):ALARM_SEVR   calc: 1 for 5..45 and 48..56 (the numbers for which
+#                         the routine returns -1), HIHI 1 / HHSV MAJOR
+#   $(P)$(Q):ALARM_TABLE  aai: the routine's 57 messages, in order, read from
+#                         alarmlookup.c, plus "Illegal Alarm" at index 57
+#   $(P)$(Q):ALARM        subArray: one message from the table at INDX; takes
+#                         MAJOR from :ALARM_SEVR through its MS SDIS link
+#                         (DISV -1, never read, so never disabled)
+# The message moves from :ALARM.VALA to :ALARM (VAL): :COPY_STRING and the
+# #%gdatag annotation read :ALARM, and a client reading :ALARM.VALA must read
+# :ALARM instead. :ALARM.SEVR is the same as the routine's; :ALARM.STAT is
+# LINK where the genSub raised SOFT. Verified in an EPICS 7.0.9 IOC against the
+# C routine (built as an aSub) for alarm numbers -5..255, 1000, 65535 and
+# 2147483647: message, severity, ALARM_MSG.DESC and ALARM_MSG.SEVR all equal.
+#
+# An OPI (or any other client) that reads :ALARM.VALA needs the released
+# generic IOC github.com/epics-containers/ioc-oxcryo instead of
+# this pattern: it is built with the oxCryo support module and runs the
+# compiled alarmlookupProcess routine as an aSub, so it keeps :ALARM.VALA.
+#
+# Verified: all five entity templates expand under msi to the same record and
+# field set as that release's VDCT-built db/ copies, apart from the alarm
+# records above.
+#
+# To check for updates: diff the .proto files against that path, and re-run the
+# conversion on the newest /dls_sw/prod/*/support/OXCryo/ release.
 
 module: oxCryo
 

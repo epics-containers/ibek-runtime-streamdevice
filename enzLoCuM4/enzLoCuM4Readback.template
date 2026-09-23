@@ -1,0 +1,333 @@
+################################################################################
+# enzLoCuM4Readback.template
+# Hy8401ip specific readback analogue signals from the enzLoCuM4 current amplifier.
+# Use enzLoCuM4Readback_generic.template for other input types
+# M. Walters 2007-01-22
+# based on original template by Ian Gillingham 9/March/2006
+#
+# Blade A +ve X +ve Y
+# Blade B -ve X +ve Y
+# Blade C -ve X -ve Y
+# Blade D +ve X -ve Y
+#
+# substitutions:
+#% macro, device, device name
+#% macro, egu, units for positions
+#% macro, blade_a_card, BLADE A logical card number
+#% macro, blade_a_chan, BLADE A ADC channel number
+#% macro, blade_b_card, BLADE B logical card number
+#% macro, blade_b_chan, BLADE B ADC channel number
+#% macro, blade_c_card, BLADE C logical card number
+#% macro, blade_c_chan, BLADE C ADC channel number
+#% macro, blade_d_card, BLADE D logical card number
+#% macro, blade_d_chan, BLADE D ADC channel number
+#% macro, desc_prefix, Prefix for descriptions. Used by screens. E.g. 'PBPM Blade'
+#% macro, archiver_method, Optional macro defining the external archiver type
+# Default is Monitor.  Leave blank for Sampled
+#% macro, adel, Optional macro defining the archive deadband calculation.
+# Default is 0.002 x Current value for 10V input
+################################################################################
+#% gdatag,template,bpm,$(gda_name=),$(gda_desc=)
+record(transform, "$(device):UPDATE") {
+  field(DESC, "Update values based on range")
+  field(INPA, "$(device):CALMR CP")
+  field(CMTB, "Current value for 10V input")
+  field(CLCB, "10^INT((LOG(A)/LOG(2))-9.5)")
+  field(OUTB, "$(device):FANEGUF PP")
+  field(CMTC, "Current value for -10V input")
+  field(CLCC, "-B")
+  field(OUTC, "$(device):FANEGUL PP")
+# factor of 0.98 comes from default value for maximum on autorange
+  field(CMTD, "Upper limit")
+  field(CLCD, "0.98*B")
+  field(OUTD, "$(device):FANHIGH PP")
+# factor of 0.08 comes from default value for minimum on autorange
+  field(CMTE, "Lower limit")
+  field(CLCE, "0.08*B")
+  field(OUTE, "$(device):FANLOW PP")
+  field(CMTF, "Archive deadband")
+  field(CLCF, "$(adel=0.002*B)")
+  field(OUTF, "$(device):FANADEL PP")
+}
+
+record(dfanout, "$(device):FANEGUF") {
+  field(DESC, "Set EGUF of inputs")
+  field(OUTA, "$(device):BLADEA.EGUF")
+  field(OUTB, "$(device):BLADEB.EGUF")
+  field(OUTC, "$(device):BLADEC.EGUF")
+  field(OUTD, "$(device):BLADED.EGUF")
+  field(OUTE, "$(device):BLADEA.HOPR")
+  field(OUTF, "$(device):BLADEB.HOPR")
+  field(OUTG, "$(device):BLADEC.HOPR")
+  field(OUTH, "$(device):BLADED.HOPR")
+}
+
+record(dfanout, "$(device):FANEGUL") {
+  field(DESC, "Set EGUL of inputs")
+  field(OUTA, "$(device):BLADEA.EGUL")
+  field(OUTB, "$(device):BLADEB.EGUL")
+  field(OUTC, "$(device):BLADEC.EGUL")
+  field(OUTD, "$(device):BLADED.EGUL")
+  field(OUTE, "$(device):BLADEA.LOPR")
+  field(OUTF, "$(device):BLADEB.LOPR")
+  field(OUTG, "$(device):BLADEC.LOPR")
+  field(OUTH, "$(device):BLADED.LOPR")
+}
+
+record(dfanout, "$(device):FANHIGH") {
+  field(DESC, "Set HIGH of inputs")
+  field(OUTA, "$(device):BLADEA.HIGH")
+  field(OUTB, "$(device):BLADEB.HIGH")
+  field(OUTC, "$(device):BLADEC.HIGH")
+  field(OUTD, "$(device):BLADED.HIGH")
+}
+
+record(dfanout, "$(device):FANLOW") {
+  field(DESC, "Set LOW of inputs")
+  field(OUTA, "$(device):BLADEA.LOW")
+  field(OUTB, "$(device):BLADEB.LOW")
+  field(OUTC, "$(device):BLADEC.LOW")
+  field(OUTD, "$(device):BLADED.LOW")
+}
+
+record(dfanout, "$(device):FANADEL") {
+  field(DESC, "Set ADEL of inputs")
+  field(OUTA, "$(device):BLADEA.ADEL")
+  field(OUTB, "$(device):BLADEB.ADEL")
+  field(OUTC, "$(device):BLADEC.ADEL")
+  field(OUTD, "$(device):BLADED.ADEL")
+}
+
+#% gdatag,pv,ro,$(gda_curr_name),I1,Channel 1 Current
+#% archiver 1 $(archiver_method=Monitor)
+record(ai, "$(device):BLADEA") {
+  field(DESC, "$(desc_prefix) A")
+  field(DTYP, "Hy8401ip")
+  field(SCAN, ".1 second")
+  field(INP, "#C$(blade_a_card) S$(blade_a_chan) @MEAN=500")
+  field(EGU, "A")
+  field(LINR, "LINEAR")
+  field(EGUF, "1e-10")
+  field(EGUL, "-1e-10")
+  field(HOPR, "1e-10")
+  field(LOPR, "-1e-10")
+  field(HIGH, "0.9e-10")
+  field(LOW, "-0.9e-10")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(MDEL, "-1")
+  field(PREC, "5")
+  field(FLNK, "$(device):BLADEB")
+}
+
+#% gdatag,pv,ro,$(gda_curr_name),I2,Channel 2 Current
+#% archiver 1 $(archiver_method=Monitor)
+record(ai, "$(device):BLADEB") {
+  field(DESC, "$(desc_prefix) B")
+  field(DTYP, "Hy8401ip")
+  field(INP, "#C$(blade_b_card) S$(blade_b_chan) @MEAN=500")
+  field(EGU, "A")
+  field(LINR, "LINEAR")
+  field(EGUF, "1e-10")
+  field(EGUL, "-1e-10")
+  field(HOPR, "1e-10")
+  field(LOPR, "-1e-10")
+  field(HIGH, "0.9e-10")
+  field(LOW, "-0.9e-10")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(MDEL, "-1")
+  field(PREC, "5")
+  field(FLNK, "$(device):BLADEC")
+}
+
+#% gdatag,pv,ro,$(gda_curr_name),I3,Channel 3 Current
+#% archiver 1 $(archiver_method=Monitor)
+record(ai, "$(device):BLADEC") {
+  field(DESC, "$(desc_prefix) C")
+  field(DTYP, "Hy8401ip")
+  field(INP, "#C$(blade_c_card) S$(blade_c_chan) @MEAN=500")
+  field(EGU, "A")
+  field(LINR, "LINEAR")
+  field(EGUF, "1e-10")
+  field(EGUL, "-1e-10")
+  field(HOPR, "1e-10")
+  field(LOPR, "-1e-10")
+  field(HIGH, "0.9e-10")
+  field(LOW, "-0.9e-10")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(MDEL, "-1")
+  field(PREC, "5")
+  field(FLNK, "$(device):BLADED")
+}
+
+#% gdatag,pv,ro,$(gda_curr_name),I4,Channel 4 Current
+#% archiver 1 $(archiver_method=Monitor)
+record(ai, "$(device):BLADED") {
+  field(DESC, "$(desc_prefix) D")
+  field(DTYP, "Hy8401ip")
+  field(INP, "#C$(blade_d_card) S$(blade_d_chan) @MEAN=500")
+  field(EGU, "A")
+  field(LINR, "LINEAR")
+  field(EGUF, "1e-10")
+  field(EGUL, "-1e-10")
+  field(HOPR, "1e-10")
+  field(LOPR, "-1e-10")
+  field(HIGH, "0.9e-10")
+  field(LOW, "-0.9e-10")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(MDEL, "-1")
+  field(PREC, "5")
+  field(FLNK, "$(device):INTENSITY")
+}
+
+record(ai, "$(device):KX") {
+  field(DESC, "Beam X pos calc constant")
+  field(DTYP, "Soft Channel")
+  field(INP, "1.0")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+record(ai, "$(device):KY") {
+  field(DESC, "Beam Y pos calc constant")
+  field(DTYP, "Soft Channel")
+  field(INP, "1.0")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+record(ai, "$(device):OFFSETX") {
+  field(DESC, "Beam X pos calc offset")
+  field(DTYP, "Soft Channel")
+  field(INP, "0.0")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+record(ai, "$(device):OFFSETY") {
+  field(DESC, "Beam Y pos calc offset")
+  field(DTYP, "Soft Channel")
+  field(INP, "0.0")
+  field(PINI, "YES")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+#% gdatag,pv,ro,$(gda_name=),INTENSITY,Summed intensity value
+#% archiver 1 $(archiver_method=Monitor)
+record(calc, "$(device):INTENSITY") {
+  field(INPA, "$(device):BLADEA NPP")
+  field(INPB, "$(device):BLADEB NPP")
+  field(INPC, "$(device):BLADEC NPP")
+  field(INPD, "$(device):BLADED NPP")
+  field(CALC, "(A+B+C+D)")
+  field(FLNK, "$(device):BEAMX")
+  field(PREC, "5")
+  field(EGU, "A")
+}
+
+#% gdatag,pv,ro,$(gda_name=),XPOS,X Position
+#% archiver 1 $(archiver_method=Monitor)
+record(calc, "$(device):BEAMX") {
+  field(INPA, "$(device):BLADEA NPP")
+  field(INPB, "$(device):BLADEB NPP")
+  field(INPC, "$(device):BLADEC NPP")
+  field(INPD, "$(device):BLADED NPP")
+  field(INPE, "$(device):KX NPP")
+  field(INPF, "$(device):OFFSETX NPP")
+  field(CALC, "(E*(A+D-B-C)/(A+B+C+D))+F")
+  field(FLNK, "$(device):BEAMY")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+#% gdatag,pv,ro,$(gda_name=),YPOS,Y Position
+#% archiver 1 $(archiver_method=Monitor)
+record(calc, "$(device):BEAMY") {
+  field(INPA, "$(device):BLADEA NPP")
+  field(INPB, "$(device):BLADEB NPP")
+  field(INPC, "$(device):BLADEC NPP")
+  field(INPD, "$(device):BLADED NPP")
+  field(INPE, "$(device):KY NPP")
+  field(INPF, "$(device):OFFSETY NPP")
+  field(CALC, "(E*(A+B-C-D)/(A+B+C+D))+F")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+record(waveform, "$(device):BLADEAWF") {
+  field(DESC, "Blade A waveform")
+  field(SCAN, "1 second")
+  field(DTYP, "Hy8401ip")
+  field(INP, "#C$(blade_a_card) S$(blade_a_chan) @")
+  field(FTVL, "FLOAT")
+  field(NELM, "5000")
+#  field(FLNK, "$(device):BLADEBWF")
+}
+
+record(waveform, "$(device):BLADEBWF") {
+  field(DESC, "Blade B waveform")
+  field(SCAN, "1 second")
+  field(DTYP, "Hy8401ip")
+  field(INP, "#C$(blade_b_card) S$(blade_b_chan) @")
+  field(FTVL, "FLOAT")
+  field(NELM, "5000")
+#  field(FLNK, "$(device):BLADECWF")
+}
+
+record(waveform, "$(device):BLADECWF") {
+  field(DESC, "Blade C waveform")
+  field(SCAN, "1 second")
+  field(DTYP, "Hy8401ip")
+  field(INP, "#C$(blade_c_card) S$(blade_c_chan) @")
+  field(FTVL, "FLOAT")
+  field(NELM, "5000")
+#  field(FLNK, "$(device):BLADEDWF")
+}
+
+record(waveform, "$(device):BLADEDWF") {
+  field(DESC, "Blade D waveform")
+  field(SCAN, "1 second")
+  field(DTYP, "Hy8401ip")
+  field(INP, "#C$(blade_d_card) S$(blade_d_chan) @")
+  field(FTVL, "FLOAT")
+  field(NELM, "5000")
+}
+
+record(calc, "$(device):BLADEAuA") {
+  field(DESC, "BLADEA*1e6")
+  field(CALC, "A*1000000")
+  field(INPA, "$(device):BLADEA CP")
+  field(EGU, "uA")
+  field(PREC, "5")
+}
+
+record(calc, "$(device):BLADEBuA") {
+  field(DESC, "BLADEB*1e6")
+  field(CALC, "A*1000000")
+  field(INPA, "$(device):BLADEB CP")
+  field(EGU, "uA")
+  field(PREC, "5")
+}
+
+record(calc, "$(device):BLADECuA") {
+  field(DESC, "BLADEC*1e6")
+  field(CALC, "A*1000000")
+  field(INPA, "$(device):BLADEC CP")
+  field(EGU, "uA")
+  field(PREC, "5")
+}
+
+record(calc, "$(device):BLADEDuA") {
+  field(DESC, "BLADED*1e6")
+  field(CALC, "A*1000000")
+  field(INPA, "$(device):BLADED CP")
+  field(EGU, "uA")
+  field(PREC, "5")
+}

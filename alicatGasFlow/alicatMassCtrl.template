@@ -83,6 +83,7 @@
 # % macro, GASNAME34, Name of gas34 default ""
 # % macro, GASNUM35, Number of gas35 default 35
 # % macro, GASNAME35, Name of gas35 default ""
+# % macro, GASNAMEPROTOCOL, Protocol to use for gas name. Use getGas by default. Units with a totalizer have an extra data field, so getGasLong should be used instead.  
 # This associates the template with an edm screen
 # % gui, $(name), edm, alicatMassCtrl.edl, P=$(P), Q=$(Q)
 # This associates the template with OPI screens
@@ -212,7 +213,7 @@ record(longout, "$(P)$(Q):GAS:WR") {
 #% archiver 10 Monitor
 record(stringin, "$(P)$(Q):GAS:STR:RD") {
   field(DTYP, "stream")
-  field(INP, "@alicatMC.proto getGas(A) $(PORT)")
+  field(INP, "@alicatMC.proto $(GASNAMEPROTOCOL=getGas)(A) $(PORT)")
   field(DESC, "read gas type")
 }
 

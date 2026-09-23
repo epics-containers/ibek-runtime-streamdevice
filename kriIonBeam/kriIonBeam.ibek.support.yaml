@@ -22,10 +22,6 @@ entity_models:
         type: str
         description: |-
           asyn port
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: autocontroller.template
         args:
@@ -44,10 +40,6 @@ entity_models:
         type: str
         description: |-
           asyn port
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: kaufmanSourceController.template
         args:
@@ -70,10 +62,6 @@ entity_models:
         type: int
         description: |-
           program number
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: programParameters.template
         args:

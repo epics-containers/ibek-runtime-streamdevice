@@ -1,0 +1,34 @@
+# attenuator_set_fan.template
+# Records to set attenuators to a single value and verify the value has been propagated.
+# Instantiated for IN and OUT via iocbuilder.Xml in builder.py
+# % macro, P, Device prefix
+# % macro, Q, Device suffix
+# % macro, CMD, Protocol method to execute
+# % macro, ADDR, D2AFE RS485 address
+# % macro, CH, Attenuator channel
+# % macro, ATT, Attenuator number (1 or 2)
+# % macro, STREAMS_PORT, PTG streams port
+
+record(ao, "$(P)$(Q)")
+{
+    field(PINI, "NO")
+    field(OUT, "$(P)$(Q)_FAN PP")
+}
+
+record(dfanout, "$(P)$(Q)_FAN") {
+    field(OUTA, "$(P)$(Q1) PP")
+    field(OUTB, "$(P)$(Q2) PP")
+    field(OUTC, "$(P)$(Q3) PP")
+    field(OUTD, "$(P)$(Q4) PP")
+    field(OMSL, "supervisory")
+}
+
+record(calc, "$(P)$(Q)_VALID") {
+    field(DESC, "description")
+    field(CALC, "(A=E)&(B=E)&(C=E)&(D=E)")
+    field(INPA, "$(P)$(Q1)_RBV CP")
+    field(INPB, "$(P)$(Q2)_RBV CP")
+    field(INPC, "$(P)$(Q3)_RBV CP")
+    field(INPD, "$(P)$(Q4)_RBV CP")
+    field(INPE, "$(P)$(Q) CP")
+}

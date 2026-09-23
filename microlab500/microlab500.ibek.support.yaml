@@ -24,6 +24,12 @@
 #
 # To check for updates: diff microlab500.proto against that path, and re-run the
 # conversion on the newest /dls_sw/prod/*/support/microlab500/ release.
+#
+# Templates needing a generic IOC built with more than the plain generic image:
+# - `microlab500whole.template` needs a generic IOC built with `motor` (the motor record), not the plain generic image.
+#   Each microlab500half.template include holds a Soft Channel `motor` record
+#   ($(P)$(R):LEFT:MOTOR, $(P)$(R):RIGHT:MOTOR) as the syringe's user interface; the
+#   motor record type is not in the generic image, so the file does not load there.
 
 module: microlab500
 
@@ -31,6 +37,7 @@ entity_models:
   - name: microlab500
     description: |-
       Controls a Hamilton Microlab 500 series syringe pump
+      NOTE: needs a generic IOC built with motor (not the plain generic image).
     parameters:
       P:
         type: str
@@ -56,10 +63,6 @@ entity_models:
         type: int
         description: |-
           Number of steps per full syringe stroke
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: microlab500whole.template
         args:

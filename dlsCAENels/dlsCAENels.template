@@ -1,0 +1,223 @@
+# dlsCAENels.template
+#
+# This is the top-level template representing a CAENels HV-Adaptos power supply.
+# It defines those records that are instantiated once per device.
+#
+# 2015 - Nicoletta De Maio
+#
+
+# Parameters:
+# % macro,  P,       EPICS name prefix
+# % macro,  PORT,    asyn port
+# % macro,  name,    object and gui association name
+# % gui, $(name=), edm, dlsCAENels.edl, P=$(P)
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boydetail, dlsCAENelsApp_opi/dlsCAENels_detail.opi, P=$(P),desc=Bimorph Power Supply
+# % gui, $(name=), boyembed,  dlsCAENelsApp_opi/dlsCAENels_embed_box.opi, P=$(P),desc=Bimorph Power Supply
+# % gui, $(name=), boyembed,  dlsCAENelsApp_opi/dlsCAENels_embed.opi, P=$(P),desc=Bimorph Power Supply
+# These define what PVs the detail screen should contain
+# % gui, $(name=), enum, Mode,   $(P):GROUP0:MODE
+# % gui, $(name=), readback, Mode,   $(P):GROUP0:MODE_RBV
+# % gui, $(name=), enum, All On,   $(P):GROUP0:ALLON
+# % gui, $(name=), enum, All Off,   $(P):GROUP0:ALLOFF
+# % gui, $(name=), enum, Set Target Voltages,   $(P):GROUP0:TARGET
+# % gui, $(name=), demand, Set All,   $(P):GROUP0:VOUT
+# % gui, $(name=), demand, Shift All,   $(P):GROUP0:SHIFT
+# % gui, $(name=), readback, Channels,   $(P):GROUP0:CHANNELS
+# % gui, $(name=), readback, Status,   $(P):GROUP0:STATUS
+# % gui, $(name=), readback, Board Temperatures,   $(P):GROUP0:TEMPS
+# % gui, $(name=), readback, Last Error,   $(P):GROUP0:LASTERROR
+# % gui, $(name=), enum, Reset Error,   $(P):GROUP0:RESETERROR
+# % gui, $(name=), readback, Response,   $(P):RESPONSE
+# % gui, $(name=), readback, Busy,   $(P):BUSY
+# % gui, $(name=), readback, Groups,   $(P):GROUPS
+
+# % gui, $(name=), demand,   Chan0 Output V, $(P):GROUP0:CH0:VOUT
+# % gui, $(name=), readback, Chan0 Output V, $(P):GROUP0:CH0:VOUT_RBV
+# % gui, $(name=), demand,   Chan0 ShiftBy,  $(P):GROUP0:CH0:SHIFT
+# % gui, $(name=), demand,   Chan0 Target V, $(P):GROUP0:CH0:VTRGT
+# % gui, $(name=), readback, Chan0 Target V, $(P):GROUP0:CH0:VTRGT_RBV
+# % gui, $(name=), readback, Chan0 Status,   $(P):GROUP0:CH0:STATUS
+
+# % gui, $(name=), demand,   Chan1 Output V, $(P):GROUP0:CH1:VOUT
+# % gui, $(name=), readback, Chan1 Output V, $(P):GROUP0:CH1:VOUT_RBV
+# % gui, $(name=), demand,   Chan1 ShiftBy,  $(P):GROUP0:CH1:SHIFT
+# % gui, $(name=), demand,   Chan1 Target V, $(P):GROUP0:CH1:VTRGT
+# % gui, $(name=), readback, Chan1 Target V, $(P):GROUP0:CH1:VTRGT_RBV
+# % gui, $(name=), readback, Chan1 Status,   $(P):GROUP0:CH1:STATUS
+
+# % gui, $(name=), demand,   Chan2 Output V, $(P):GROUP0:CH2:VOUT
+# % gui, $(name=), readback, Chan2 Output V, $(P):GROUP0:CH2:VOUT_RBV
+# % gui, $(name=), demand,   Chan2 ShiftBy,  $(P):GROUP0:CH2:SHIFT
+# % gui, $(name=), demand,   Chan2 Target V, $(P):GROUP0:CH2:VTRGT
+# % gui, $(name=), readback, Chan2 Target V, $(P):GROUP0:CH2:VTRGT_RBV
+# % gui, $(name=), readback, Chan2 Status,   $(P):GROUP0:CH2:STATUS
+
+# % gui, $(name=), demand,   Chan3 Output V, $(P):GROUP0:CH3:VOUT
+# % gui, $(name=), readback, Chan3 Output V, $(P):GROUP0:CH3:VOUT_RBV
+# % gui, $(name=), demand,   Chan3 ShiftBy,  $(P):GROUP0:CH3:SHIFT
+# % gui, $(name=), demand,   Chan3 Target V, $(P):GROUP0:CH3:VTRGT
+# % gui, $(name=), readback, Chan3 Target V, $(P):GROUP0:CH3:VTRGT_RBV
+# % gui, $(name=), readback, Chan3 Status,   $(P):GROUP0:CH3:STATUS
+
+# % gui, $(name=), demand,   Chan4 Output V, $(P):GROUP0:CH4:VOUT
+# % gui, $(name=), readback, Chan4 Output V, $(P):GROUP0:CH4:VOUT_RBV
+# % gui, $(name=), demand,   Chan4 ShiftBy,  $(P):GROUP0:CH4:SHIFT
+# % gui, $(name=), demand,   Chan4 Target V, $(P):GROUP0:CH4:VTRGT
+# % gui, $(name=), readback, Chan4 Target V, $(P):GROUP0:CH4:VTRGT_RBV
+# % gui, $(name=), readback, Chan4 Status,   $(P):GROUP0:CH4:STATUS
+
+# % gui, $(name=), demand,   Chan5 Output V, $(P):GROUP0:CH5:VOUT
+# % gui, $(name=), readback, Chan5 Output V, $(P):GROUP0:CH5:VOUT_RBV
+# % gui, $(name=), demand,   Chan5 ShiftBy,  $(P):GROUP0:CH5:SHIFT
+# % gui, $(name=), demand,   Chan5 Target V, $(P):GROUP0:CH5:VTRGT
+# % gui, $(name=), readback, Chan5 Target V, $(P):GROUP0:CH5:VTRGT_RBV
+# % gui, $(name=), readback, Chan5 Status,   $(P):GROUP0:CH5:STATUS
+
+# % gui, $(name=), demand,   Chan6 Output V, $(P):GROUP0:CH6:VOUT
+# % gui, $(name=), readback, Chan6 Output V, $(P):GROUP0:CH6:VOUT_RBV
+# % gui, $(name=), demand,   Chan6 ShiftBy,  $(P):GROUP0:CH6:SHIFT
+# % gui, $(name=), demand,   Chan6 Target V, $(P):GROUP0:CH6:VTRGT
+# % gui, $(name=), readback, Chan6 Target V, $(P):GROUP0:CH6:VTRGT_RBV
+# % gui, $(name=), readback, Chan6 Status,   $(P):GROUP0:CH6:STATUS
+
+# % gui, $(name=), demand,   Chan7 Output V, $(P):GROUP0:CH7:VOUT
+# % gui, $(name=), readback, Chan7 Output V, $(P):GROUP0:CH7:VOUT_RBV
+# % gui, $(name=), demand,   Chan7 ShiftBy,  $(P):GROUP0:CH7:SHIFT
+# % gui, $(name=), demand,   Chan7 Target V, $(P):GROUP0:CH7:VTRGT
+# % gui, $(name=), readback, Chan7 Target V, $(P):GROUP0:CH7:VTRGT_RBV
+# % gui, $(name=), readback, Chan7 Status,   $(P):GROUP0:CH7:STATUS
+
+# % gui, $(name=), demand,   Chan8 Output V, $(P):GROUP0:CH8:VOUT
+# % gui, $(name=), readback, Chan8 Output V, $(P):GROUP0:CH8:VOUT_RBV
+# % gui, $(name=), demand,   Chan8 ShiftBy,  $(P):GROUP0:CH8:SHIFT
+# % gui, $(name=), demand,   Chan8 Target V, $(P):GROUP0:CH8:VTRGT
+# % gui, $(name=), readback, Chan8 Target V, $(P):GROUP0:CH8:VTRGT_RBV
+# % gui, $(name=), readback, Chan8 Status,   $(P):GROUP0:CH8:STATUS
+
+# % gui, $(name=), demand,   Chan9 Output V, $(P):GROUP0:CH9:VOUT
+# % gui, $(name=), readback, Chan9 Output V, $(P):GROUP0:CH9:VOUT_RBV
+# % gui, $(name=), demand,   Chan9 ShiftBy,  $(P):GROUP0:CH9:SHIFT
+# % gui, $(name=), demand,   Chan9 Target V, $(P):GROUP0:CH9:VTRGT
+# % gui, $(name=), readback, Chan9 Target V, $(P):GROUP0:CH9:VTRGT_RBV
+# % gui, $(name=), readback, Chan9 Status,   $(P):GROUP0:CH9:STATUS
+
+# % gui, $(name=), demand,   Chan10 Output V, $(P):GROUP0:CH10:VOUT
+# % gui, $(name=), readback, Chan10 Output V, $(P):GROUP0:CH10:VOUT_RBV
+# % gui, $(name=), demand,   Chan10 ShiftBy,  $(P):GROUP0:CH10:SHIFT
+# % gui, $(name=), demand,   Chan10 Target V, $(P):GROUP0:CH10:VTRGT
+# % gui, $(name=), readback, Chan10 Target V, $(P):GROUP0:CH10:VTRGT_RBV
+# % gui, $(name=), readback, Chan10 Status,   $(P):GROUP0:CH10:STATUS
+
+# % gui, $(name=), demand,   Chan11 Output V, $(P):GROUP0:CH11:VOUT
+# % gui, $(name=), readback, Chan11 Output V, $(P):GROUP0:CH11:VOUT_RBV
+# % gui, $(name=), demand,   Chan11 ShiftBy,  $(P):GROUP0:CH11:SHIFT
+# % gui, $(name=), demand,   Chan11 Target V, $(P):GROUP0:CH11:VTRGT
+# % gui, $(name=), readback, Chan11 Target V, $(P):GROUP0:CH11:VTRGT_RBV
+# % gui, $(name=), readback, Chan11 Status,   $(P):GROUP0:CH11:STATUS
+
+# % gui, $(name=), demand,   Chan12 Output V, $(P):GROUP0:CH12:VOUT
+# % gui, $(name=), readback, Chan12 Output V, $(P):GROUP0:CH12:VOUT_RBV
+# % gui, $(name=), demand,   Chan12 ShiftBy,  $(P):GROUP0:CH12:SHIFT
+# % gui, $(name=), demand,   Chan12 Target V, $(P):GROUP0:CH12:VTRGT
+# % gui, $(name=), readback, Chan12 Target V, $(P):GROUP0:CH12:VTRGT_RBV
+# % gui, $(name=), readback, Chan12 Status,   $(P):GROUP0:CH12:STATUS
+
+# % gui, $(name=), demand,   Chan13 Output V, $(P):GROUP0:CH13:VOUT
+# % gui, $(name=), readback, Chan13 Output V, $(P):GROUP0:CH13:VOUT_RBV
+# % gui, $(name=), demand,   Chan13 ShiftBy,  $(P):GROUP0:CH13:SHIFT
+# % gui, $(name=), demand,   Chan13 Target V, $(P):GROUP0:CH13:VTRGT
+# % gui, $(name=), readback, Chan13 Target V, $(P):GROUP0:CH13:VTRGT_RBV
+# % gui, $(name=), readback, Chan13 Status,   $(P):GROUP0:CH13:STATUS
+
+# % gui, $(name=), demand,   Chan14 Output V, $(P):GROUP0:CH14:VOUT
+# % gui, $(name=), readback, Chan14 Output V, $(P):GROUP0:CH14:VOUT_RBV
+# % gui, $(name=), demand,   Chan14 ShiftBy,  $(P):GROUP0:CH14:SHIFT
+# % gui, $(name=), demand,   Chan14 Target V, $(P):GROUP0:CH14:VTRGT
+# % gui, $(name=), readback, Chan14 Target V, $(P):GROUP0:CH14:VTRGT_RBV
+# % gui, $(name=), readback, Chan14 Status,   $(P):GROUP0:CH14:STATUS
+
+# % gui, $(name=), demand,   Chan15 Output V, $(P):GROUP0:CH15:VOUT
+# % gui, $(name=), readback, Chan15 Output V, $(P):GROUP0:CH15:VOUT_RBV
+# % gui, $(name=), demand,   Chan15 ShiftBy,  $(P):GROUP0:CH15:SHIFT
+# % gui, $(name=), demand,   Chan15 Target V, $(P):GROUP0:CH15:VTRGT
+# % gui, $(name=), readback, Chan15 Target V, $(P):GROUP0:CH15:VTRGT_RBV
+# % gui, $(name=), readback, Chan15 Status,   $(P):GROUP0:CH15:STATUS
+
+
+# A record to display the number of groups defined on the controller
+record(ai, "$(P):GROUPS") {
+    field(DESC, "number of channel groups")
+    field(INP, "$(P):GRSTRING")
+}
+
+# This record extracts the last group number from the string-valued list and
+# adds 1 to return the number of groups that are defined on the controller
+#
+# NB: This is a hack. It only works for groups in the single digits. Although
+#     single digits are probably found almost 100% of the time in practice.
+record(scalcout, "$(P):GRSTRING") {
+    field(DESC, "extracts number of groups")
+    field(INAA, "$(P):GETGRSTRING")
+    field(CALC, "LEN(AA)==0?0:AA[-2,-1]+1")
+    field(FLNK, "$(P):GROUPS PP")
+}
+
+# An interpose record because Diamond, in its infinite wisdom, doesn't build
+# the CALC dependency into its version of streamDevice. So the documentation
+# web page at PSI stating that streamDevice supports records of type scalcout
+# is wrong. For us. (Not that this is a rant or anything.)
+record(stringin, "$(P):GETGRSTRING") {
+    field(DESC, "list of channel groups")
+    field(DTYP, "stream")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto groupsList($(P)) $(PORT)")
+    field(FLNK, "$(P):GRSTRING PP")
+}
+
+# A catch-all, generic response field
+record(stringin, "$(P):RESPONSE") {
+    field(DESC, "response from device")
+}
+
+# An output record that sets the busy record
+record(bo, "$(P):SETBUSY") {
+    field(DESC, "set the busy record explicitly")
+    field(OUT, "$(P):BUSY.VAL PP")
+    field(VAL, "1")
+}
+
+# This record calculates the state of the busy record. The inputs are expected to
+# come from the status flags of the individual groups.
+record(calc, "$(P):BUSYCALC") {
+    field(DESC, "calculate the state of the busy record")
+    field(CALC, "A | B | C | D | E | F | G | H | I | J | K | L")
+    field(FLNK, "$(P):BUSYLNK PP")
+}
+
+# A re-direction record from calc to busy
+record(bo, "$(P):BUSYLNK") {
+    field(DESC, "redirect the calculated busy state")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(P):BUSYCALC")
+    field(OUT, "$(P):BUSY.VAL CA")
+}
+
+# A busy record to indicate to GDA if it's sane to send commands
+record(busy, "$(P):BUSY") {
+    field(DESC, "on if the device is busy")
+    field(OMSL, "supervisory")
+}
+
+# Direct access to the communication channel; useful for monitoring and debugging
+record(asyn, "$(P):ASYN") {
+    field(DESC, "direct line for monitoring and debugging")
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"0")
+    field(OMAX,"80")
+    field(IMAX,"80")
+    field(OEOS,"\r\n")
+    field(IEOS,"\r\n")
+}

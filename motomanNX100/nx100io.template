@@ -1,0 +1,51 @@
+#% archiver 10 Monitor
+# % macro, P, Device Prefix
+# % macro, Q, Device Suffix
+# % macro, PORT, Asyn Port
+# % macro, VAR, D Variable to read/write
+# % macro, SCAN, Scan rate
+record(mbbiDirect, "$(P)$(Q):IO$(VAR)") {
+  field(DTYP, "stream")
+  field(INP, "@nx100.proto readio($(P)$(Q),$(VAR)) $(PORT)")
+  field(SCAN, "$(SCAN)")
+}
+
+record(stringout, "$(P)$(Q):IO$(VAR):DESC0") {
+  field(VAL, "$(DESC0=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P)$(Q):IO$(VAR):DESC1") {
+  field(VAL, "$(DESC1=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P)$(Q):IO$(VAR):DESC2") {
+  field(VAL, "$(DESC2=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P)$(Q):IO$(VAR):DESC3") {
+  field(VAL, "$(DESC3=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P)$(Q):IO$(VAR):DESC4") {
+  field(VAL, "$(DESC4=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P)$(Q):IO$(VAR):DESC5") {
+  field(VAL, "$(DESC5=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P)$(Q):IO$(VAR):DESC6") {
+  field(VAL, "$(DESC6=)")
+  field(PINI, "YES")
+}
+
+record(stringout, "$(P)$(Q):IO$(VAR):DESC7") {
+  field(VAL, "$(DESC7=)")
+  field(PINI, "YES")
+}

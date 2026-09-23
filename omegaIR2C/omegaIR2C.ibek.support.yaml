@@ -13,10 +13,6 @@ entity_models:
     description: |-
       Controls an Omega iR2C Pyrometer
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-
@@ -33,3 +29,4 @@ entity_models:
       - file: omegaIR2C.template
         args:
           .*:
+          name: ""

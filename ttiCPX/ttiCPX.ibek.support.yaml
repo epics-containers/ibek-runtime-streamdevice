@@ -29,3 +29,35 @@ entity_models:
       - file: ttiCPX_general.template
         args:
           .*:
+
+  - name: ttiCPXChannel
+    description: |-
+      TTi CPX Power Supply channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      CHAN:
+        type: str
+        description: |-
+          CHAN
+      MAXV:
+        type: float
+        description: |-
+          MAXV
+        default: 0.0
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      MAXI:
+        type: float
+        description: |-
+          MAXI
+        default: 0.0
+    databases:
+      - file: ttiCPX_channel.template
+        args:
+          .*:
+          name: ""

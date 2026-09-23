@@ -25,10 +25,6 @@ entity_models:
         type: str
         description: |-
           Asyn port name
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: 323Du.template
         args:

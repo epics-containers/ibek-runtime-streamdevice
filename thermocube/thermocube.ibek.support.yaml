@@ -25,10 +25,6 @@ entity_models:
         type: str
         description: |-
           asyn port
-      name:
-        type: id
-        description: |-
-          module name
     databases:
       - file: thermocube.template
         args:

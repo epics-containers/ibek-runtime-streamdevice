@@ -21,14 +21,6 @@ entity_models:
         type: str
         description: |-
           Bus/Port Address (eg. ASYN Port).
-      SCAN:
-        type: int
-        description: |-
-          SCAN rate for read parameters.
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: explorir.template
         args:

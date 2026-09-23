@@ -21,11 +21,24 @@ entity_models:
         type: str
         description: |-
           Mandatory. Asyn port name
-      name:
-        type: id
-        description: |-
-          Optional.  Name for gui element
     databases:
       - file: EdwardsScroll.template
+        args:
+          .*:
+
+  - name: EdwardsScroll_SerialOnOffExtra
+    description: |-
+      Imported from DLS module EdwardsScroll (EdwardsScroll_SerialOnOffExtra.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      port:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: EdwardsScroll_SerialOnOffExtra.template
         args:
           .*:

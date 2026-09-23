@@ -25,10 +25,6 @@ entity_models:
         type: str
         description: |-
           asyn port
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: apd-ace.template
         args:
