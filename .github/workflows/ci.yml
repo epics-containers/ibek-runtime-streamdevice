@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  # The published generic IOC whose dbd and IOC binary the templates load in.
+  # Keep in step with IMAGE in ci/check_pattern_add.py.
+  IMAGE: ghcr.io/epics-containers/ioc-streamdevice-runtime:2.8.26ec4@sha256:20be92d1944733482373a4b1a0ca26f6234d9a39f93c5052362bac008a5f9cc3
+  UV_RUN: uv run --no-project --with-requirements ci/requirements.txt
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.9"
+
+      - name: Schema of ibek.support.yaml and ibek.manifest.yaml
+        run: $UV_RUN ci/check_schema.py
+
+      - name: Autosave .req files against templates
+        if: ${{ !cancelled() }}
+        run: $UV_RUN ci/check_autosave.py
+
+      - name: Content scan
+        if: ${{ !cancelled() }}
+        run: $UV_RUN ci/check_content.py
+
+      - name: ibek pattern add
+        if: ${{ !cancelled() }}
+        run: $UV_RUN ci/check_pattern_add.py
+
+  template-load:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.9"
+
+      - name: Generate the test cases
+        run: $UV_RUN ci/template_load.py prepare build/load
+
+      - name: Load the templates in the generic IOC
+        run: >-
+          docker run --rm --network none
+          -v "$PWD:$PWD" -w "$PWD" "$IMAGE"
+          python ci/template_load.py run build/load
+
+      - name: Upload the IOC logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: template-load
+          path: build/load/cases
