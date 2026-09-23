@@ -9,8 +9,6 @@
 # % macro, P, Device prefix
 # % macro, R, Device suffix
 # % macro, PORT, Asyn Port for communication with device
-# % macro, name, object and gui association name
-# # gui, $(name=), edm, blueShadow40P.edl, device=$(P)$(R), valve=$(P):AZ21S
 
 ####################################################
 ## \name Interface for connectionManagement.template

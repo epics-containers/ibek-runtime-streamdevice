@@ -29,4 +29,3 @@ entity_models:
       - file: omegaIR2C.template
         args:
           .*:
-          name: ""

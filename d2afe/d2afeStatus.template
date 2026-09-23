@@ -5,7 +5,6 @@
 # % macro, ADDR, D2AFE RS485 address
 # % macro, STREAMS_PORT, PTG streams port
 # % macro, NEXT, PV of CAL:MON for next D2AFE.
-# % gui, $(name).TOP, edm, d2afe_top.edl, P=$(P)
 
 record(ao, "$(P):AFE:MON")
 {

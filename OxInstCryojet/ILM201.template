@@ -20,9 +20,6 @@
 # % macro, HIGH_LIMIT, Optional macro for HIGH value for LEVEL record. Defaults to 81
 # % macro, LOW_LIMIT, Optional macro for LOW value for LEVEL record. Defaults to 39
 # % macro, LOLO_LIMIT, Optional macro for LOLO value for LEVEL record. Defaults to 20.5
-# % macro, name, object and gui association name.  Optional.  No default.
-# % macro, gda_name, gda name.  Optional.  No default.
-# % macro, gda_desc, gda description.  Optional.  No default.
 # % macro, alh, Optional macro for alarm handler command. Defaults to alh.
 #
 #  User notes:
@@ -30,9 +27,6 @@
 #    returns an error response, the previous good response will be used
 #    instead. This will be done 3 times. After the 3rd time, the level will be
 #    reported as -1% indicating an error.
-# %gdatag,template,simplePv,$(gda_name=),$(gda_desc=)
-# % gui, $(name=), edmembed, OXILM_embed.edl, CS=$(P)
-# % gui, $(name=), edm, OXILM.edl, CS=$(P)
 record(asyn, "$(P):RAWLEVEL") {
   field(PORT, "$(PORT)")
   field(AOUT, "R1")
@@ -66,7 +60,6 @@ record(scalcout, "$(P):RAWLEVELBUF") {
 }
 
 # %archiver 10 Monitor
-# %gdatag,pv,ro,$(gda_name=),RECORD,Fill level
 #% $(alh=alh) $SEVRCOMMAND UP_ANY dls-sendsms-alarm.py $(P):LEVEL
 #% $(alh=alh) $SEVRCOMMAND UP_ANY dls-alh-handler.py $(P):LEVEL
 record(scalcout, "$(P):LEVEL") {

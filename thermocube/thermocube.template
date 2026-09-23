@@ -1,9 +1,7 @@
 # % macro, P,      PV name prefix
 # % macro, R,      PV name suffix
 # % macro, PORT,   asyn port
-# % macro, name,   module name
 
-# % gui, $(name=), edm, thermocube.edl, P=$(P),R=$(R)
 
 
 ################################################################

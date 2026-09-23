@@ -1,7 +1,6 @@
 # % macro, P,          PV name prefix
 # % macro, R,          PV name suffix
 # % macro, PORT,       asyn port
-# % macro, name,       module name
 # % macro, FILTER1,    Material in filter slot 1
 # % macro, FILTER2,    Material in filter slot 2
 # % macro, FILTER3,    Material in filter slot 3
@@ -9,7 +8,6 @@
 # % macro, FILTER5,    Material in filter slot 5
 # % macro, FILTER6,    Material in filter slot 6
 
-# % gui, $(name=), edm, fw102.edl, P=$(P),R=$(R)
 
 record(stringin, "$(P)$(R):ID") {
     field(DESC, "Model Number and Firmware Version")

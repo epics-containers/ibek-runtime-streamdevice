@@ -8,8 +8,7 @@
 # The .template files are DERIVED, not pristine: they come from that release's
 # currAmpApp/Db VDCT sources, converted to msi-native include/substitute by
 # vdct2template (VDCT does not exist in the EPICS 7 base epics-containers uses).
-# Annotation-only macros driving DLS EDM/GDA tooling (name, gda_bpm_name,
-# gda_bpm_desc, gda_curr_name) carry empty defaults rather than parameters.
+# DLS EDM/GDA annotation comments are stripped (see strip-dls-annotations.py).
 #
 # currAmpRange.template and currAmpRangeADC.template are msi `include` targets
 # pulled in six times each by currAmpOffsets / currAmpADC. They have no entity

@@ -60,4 +60,3 @@ entity_models:
       - file: ttiCPX_channel.template
         args:
           .*:
-          name: ""

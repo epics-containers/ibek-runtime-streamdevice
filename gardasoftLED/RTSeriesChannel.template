@@ -7,8 +7,6 @@
 # % macro, DESCRIPTION, Channel description label.
 # % macro, MAXCURRENT, The maximum current to allow for the channel current limits (milliamp).
 # % macro, MAXVOLTAGE, The maximum voltage to allow for the channel voltage limits (volts).
-# % macro, gda_name, The name for GDA.
-# % macro, gda_desc, The description for GDA.
 # %autosave 2 VAL
 record(ao, "$(P):CH$(N):SETMAXVOLTAGE") {
   field(DESC, "Set max voltage rating")
@@ -61,7 +59,6 @@ record(calcout, "$(P):CH$(N):SENDOUTPUT") {
   field(INPB, "$(P):CH$(N):ON.VAL")
 }
 
-# %gdatag,pv,ro,$(gda_name=).CH$(N):READBACK,RECORD,Current readback
 # 
 # Set by protocol in rbv
 record(ai, "$(P):CH$(N):BRIGHTNESS") {
@@ -70,10 +67,6 @@ record(ai, "$(P):CH$(N):BRIGHTNESS") {
   field(EGU, "%")
 }
 
-# %gdatag,template,simplePv,$(gda_name=).CH$(N):SETPOINT,$(gda_desc=) channel $(N) brightness setpoint
-# %gdatag,template,simplePv,$(gda_name=).CH$(N):READBACK,$(gda_desc=) channel $(N) brightness readback
-# %gdatag,template,simpleBinary,$(gda_name=).CH$(N):SWITCH,$(gda_desc=) channel $(N) on/off switch
-# %gdatag,pv,rw,$(gda_name=).CH$(N):SETPOINT,RECORD,Brightness setpoint
 # %autosave 2 VAL
 record(ao, "$(P):CH$(N):SETOUTPUT") {
   field(DESC, "Set brightness")
@@ -88,7 +81,6 @@ record(ao, "$(P):CH$(N):SETOUTPUT") {
 }
 
 # %autosave 2 VAL
-# %gdatag,binary,rw,$(gda_name=).CH$(N):SWITCH,RECORD,On/Off switch
 record(bo, "$(P):CH$(N):ON") {
   field(DESC, "Turns LED On/Off")
   field(ZNAM, "LED OFF")

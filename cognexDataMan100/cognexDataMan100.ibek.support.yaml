@@ -29,4 +29,3 @@ entity_models:
       - file: dataman100.template
         args:
           .*:
-          name: ""

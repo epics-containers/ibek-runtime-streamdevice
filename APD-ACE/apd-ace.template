@@ -9,9 +9,7 @@
 # P - device name
 # PORT - asyn port
 #####################################################################
-# % gui, $(name=), edm, ace.edl, P=$(P),Q=$(Q)
 # This associates a BOY screen with the template
-# % gui, $(name=), boydetail, APD-ACEApp_opi/ace.opi, P=$(P),Q=$(Q)
 record(ao, "$(P):MAXCURR:DMD") {
   field(DESC, "Max current demand")
   field(FLNK, "$(P):MAXCURR:RBV")

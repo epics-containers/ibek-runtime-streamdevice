@@ -72,18 +72,11 @@ epics-containers, so these are always exact copies.
 
 Many DLS modules author their databases in **VisualDCT**, which does not exist in the
 vanilla EPICS 7 base the generic IOC images build against. A verbatim VDCT template
-cannot load at runtime, so `.template`/`.db` from those modules are **derived**, via two
-mechanical steps:
-
-1. **VDCT → msi.** `expand()` blocks become native msi `substitute`/`include`
-   directives, `#!` layout lines and `template() { }` blocks are dropped, and macros
-   passed into an included template gain a `_` prefix. Done by
-   [vdct2template](https://github.com/epics-containers/vdct2template).
-2. **Annotation-only macro defaults.** Macros appearing only inside `#%` annotation
-   comments — DLS EDM/GDA tooling such as `name` and `gda_*` — get an empty default
-   (`$(name)` → `$(name=)`), so they are not mistaken for required entity parameters.
-   This already matches DLS practice: `$(gda_name=)` and `$(gda_desc=)` ship defaulted
-   upstream.
+cannot load at runtime, so `.template`/`.db` from those modules are **derived**:
+`expand()` blocks become native msi `substitute`/`include` directives, `#!` layout
+lines and `template() { }` blocks are dropped, and macros passed into an included
+template gain a `_` prefix. Done by
+[vdct2template](https://github.com/epics-containers/vdct2template).
 
 A derived pattern **must** say so in its `*.ibek.support.yaml` header, naming the source
 module, version and `/dls_sw/prod/...` path, and which files are derived versus
@@ -92,10 +85,34 @@ pristine. See `currAmp/` for the worked example.
 The procedure and its helper scripts live in the `vdct-conversion` skill in
 [builder2ibek](https://github.com/epics-containers/builder2ibek).
 
+### Derived — DLS annotation comments stripped
+
+DLS databases carry comment lines for DLS screen and GDA tooling:
+
+```
+# % gui, $(name=), edm, device.edl, P=$(P)
+#% gdatag,pv,ro,$(gda_name=),RANGE,Range Selection
+# %gda,subsystem,ODCurrAmp,monitor,channel1,Channel 1 value
+```
+
+epics-containers has no consumer for them (screens come from PVI), yet msi and
+`dbLoadRecords` expand macros on every line, comments included, so each macro they name
+would need a value or the IOC logs `macLib: macro ... is undefined` at boot. They are
+removed from every `.template`/`.db` by
+[`strip-dls-annotations.py`](strip-dls-annotations.py), which also drops the
+`# % macro` documentation lines and empty `databases` args left pointing at macros
+nothing references any more. Record content is untouched. `# % macro` lines for live
+macros, and `# % autosave`, `# % archiver`, `# % alh` and `# % controldesk` lines, stay.
+
+Run it after importing templates from a DLS release; `--check` exits non-zero if any
+file still needs it.
+
 ### Checking a pattern against a newer DLS release
 
 - **Pristine files** — diff directly against `/dls_sw/prod/*/support/<module>/`.
 - **Derived files** — re-run the conversion on the new release and diff the outputs.
+- **Databases** — every `.template`/`.db` has had its annotation comments stripped, so
+  run `strip-dls-annotations.py` over the imported release too before diffing.
 
 For a stronger check than text diffing, expand both the pattern's template and the DLS
 module's built `db/` copy with `msi` using the same macros, then compare canonical

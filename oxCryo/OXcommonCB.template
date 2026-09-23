@@ -4,13 +4,9 @@
 # % macro, P, Device Prefix
 # % macro, Q, Device suffix
 # % macro, PORT, Asyn port to connect to
-# % macro, gda_name, Name in gda interface file (Default = )
-# % macro, gda_desc, Description in gda interface file (Default = )
-# % macro, name, Object and gui association name
 # % macro, CTEMP_DRVL, macro to set CTEMP.DRVL
 # % macro, CTEMP_DRVH, mactro to set CTEMP.DRVH
 # % archiver 1 Monitor
-# %gdatag,mbbinary,ro,$(gda_name=),PHASE
 record(mbbi, "$(P)$(Q):PHASE") {
   field(DESC, "Phase ID")
   field(DTYP, "Raw Soft Channel")

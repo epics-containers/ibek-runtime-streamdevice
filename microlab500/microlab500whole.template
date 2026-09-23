@@ -12,8 +12,6 @@
 # % macro, LEFTSYRINGEVOL, Left syringe volume (uL)
 # % macro, RIGHTSYRINGEVOL, Right syringe volume (uL)
 # % macro, STROKESIZE, Number of steps per full syringe stroke
-# % macro, name, object and gui association name
-# % gui, $(name=), edm, microlab500.edl, device=$(P)$(R), LEFTSYRINGEVOL=$(LEFTSYRINGEVOL), RIGHTSYRINGEVOL=$(RIGHTSYRINGEVOL)
 
 ##
 ##   \name Initialisation

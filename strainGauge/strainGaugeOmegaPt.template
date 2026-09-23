@@ -8,9 +8,6 @@
 #% macro, port, Asyn port to connect to
 #% macro, HL_NAL, The OmegaPt alarm for high limit, 1 or 2 (default is 2)
 #% macro, LL_NAL, The OmegaPt alarm for low limit, 1 or 2 (default is 1)
-#% macro, name, Object and gui association name
-# % macro, name, Name to export to gda as
-# % gui, $(name=), edm, strainGaugeOmegaPt.edl, P=$(P),gauge=''
 record(stringin, "$(P):FIRMWARE") {
   field(DTYP, "stream")
   field(INP, "@omegaPt.protocol getstring(F20) $(port)")
@@ -41,7 +38,6 @@ record(dfanout, "$(P):HIGHFANOUT") {
 # Request the current value from the strain gauge once a second.
 # High and low limits are read from the gauges every ten seconds, but set
 # to constants at startup so as not to appear in error state.
-#% gdatag,pv,ro,$(name=),RECORD,Strain Gauge
 record(ai, "$(P):POLLVALUE") {
   field(SCAN, "1 second")
   field(DTYP, "stream")

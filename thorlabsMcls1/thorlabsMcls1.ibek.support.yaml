@@ -45,4 +45,3 @@ entity_models:
       - file: thorlabsMcls1.template
         args:
           .*:
-          desc: ""

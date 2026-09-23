@@ -1,14 +1,9 @@
 
 #% macro, P, Device name
 #% macro, R, Heater name
-#% macro, DESC, Description
 #% macro, PORT, Device asyn port
-#% macro, name, Device object name
 
 # This associates a BOY screen with the template
-# % gui, $(name=), boydetail, m10App_opi/m10.opi, P=$(P),R=$(R),DESC=$(DESC)
-# % gui, $(name=), boyembed, m10App_opi/m10_embed_box.opi, P=$(P),R=$(R),DESC=$(DESC)
-# % gui, $(name=), boyembed, m10App_opi/m10_embed.opi, P=$(P),R=$(R),DESC=$(DESC)
 
 # % archiver 10 Monitor
 record (ai,"$(P):$(R):T"){

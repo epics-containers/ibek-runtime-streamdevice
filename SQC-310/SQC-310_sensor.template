@@ -1,7 +1,6 @@
 # SQC-310 Sensor $(R)
 
 # Macros:
-# % macro, name, Device name
 # % macro, P, Device Prefix
 # % macro, R, Device Prefix
 # % macro, PORT, Asyn Port name

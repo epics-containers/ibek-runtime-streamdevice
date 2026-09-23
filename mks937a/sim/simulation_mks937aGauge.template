@@ -35,7 +35,6 @@
 #		(appears as a label on the Pirg EDM screen).
 #
 # GCTLR used for the controller button
-# % gui, $(name=), edm, mks937aGauge.edl, dom=$(dom), id=$(id), GCTLR=$(GCTLR=)
 ################################################################################
 # Select Active Gauge (IMG or PIRG)
 #

@@ -10,9 +10,6 @@
 # % macro, PORT, Asyn port for I/O with controller
 # % macro, EGU,  engineering units for value of move commands to controller, defaults to mm
 # % macro, MODE,  Mode to select between 'Demand'(1) position and 'Readback'(0) position values in the tweak demand calculation, default is 1
-# % macro, name, name for gui element
-# % gui, $(name=), edm, PI-E871.edl, P=$(P), Q=$(Q), C=$(C), AXIS=$(AXIS=1), PORT=$(PORT), EGU=$(EGU=mm)
-# % gui, $(name=), edmembed, PI-E871-embed.edl,P=$(P),Q=$(Q),C=$(C),AXIS=$(AXIS=1),PORT=$(PORT),EGU=$(EGU=mm)
 ######################################################################
 # controller status
 record(stringin, "$(P)$(Q):IDN:RD") {

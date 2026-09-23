@@ -4,9 +4,7 @@
 #
 # % macro, P,    Mandatory. Device prefix
 # % macro, port, Mandatory. Asyn port name
-# % macro, name, Optional.  Name for gui element
 #
-# % gui, $(name=), edm , EdwardsPressure.edl, device=$(P)
 
 # % archiver 10 monitor
 record(longin, "$(P):MultiDrop_RBV")

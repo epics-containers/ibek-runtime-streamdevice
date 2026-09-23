@@ -9,8 +9,7 @@
 # The .template files are DERIVED, not pristine: they come from that release's
 # gardasoftLEDApp/Db VDCT sources, converted to msi-native include/substitute by
 # vdct2template (VDCT does not exist in the EPICS 7 base epics-containers uses).
-# Annotation-only macros driving DLS EDM/GDA tooling carry empty defaults rather
-# than parameters.
+# DLS EDM/GDA annotation comments are stripped (see strip-dls-annotations.py).
 #
 # PP600SeriesChannel.template has two roles: DLS installs it standalone (the
 # gardasoftLEDChannel entity below) and PP612LED expands it twice, once per

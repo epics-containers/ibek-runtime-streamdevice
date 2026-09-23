@@ -3,9 +3,8 @@
 # Imported from DLS production support module: ODPsu 3-2
 # Source: /dls_sw/prod/R3.14.12.7/support/ODPsu/3-2
 # The templates are VisualDCT sources -- derived, not pristine byte-copies: VDCT
-# header/footer junk ("#!" lines) has been stripped, and the GDA/EDM-only macros
-# $(gda_name)/$(gda_desc) (no counterpart in epics-containers) have been given an
-# empty default so msi does not treat them as required parameters.
+# header/footer junk ("#!" lines) has been stripped, and so have the DLS EDM/GDA
+# annotation comments (see strip-dls-annotations.py).
 # This release's etc/builder.py declares 25 entity classes; only 8 were
 # originally vendored here. The 14 ODPsugda* classes and the 3 ODPsu*DUpdate
 # classes were added from the same release (ODPsu22DUpdate is used by real IOCs,

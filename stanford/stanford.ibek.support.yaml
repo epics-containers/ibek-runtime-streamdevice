@@ -29,7 +29,6 @@ entity_models:
       - file: sr570.template
         args:
           .*:
-          DESC: ""
 
   - name: dummy_stanford_ai
     description: |-

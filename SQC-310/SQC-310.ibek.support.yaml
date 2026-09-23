@@ -25,4 +25,3 @@ entity_models:
       - file: SQC-310.template
         args:
           .*:
-          name: ""

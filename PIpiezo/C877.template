@@ -4,7 +4,6 @@
 # % macro, AXIS, Axis number for daisy chained stages (1-16), default is 1
 # % macro, PORT, Asyn port for I/O with controller
 # % macro, EGU,  engineering units for value of move commands to controller, defaults to mm
-# % gui, $(name=), edm, PI-C877.edl, P=$(P), Q=$(Q), C=$(C), AXIS=$(AXIS), PORT=$(PORT), EGU=$(EGU)
 
 ######################################################################
 # controller status

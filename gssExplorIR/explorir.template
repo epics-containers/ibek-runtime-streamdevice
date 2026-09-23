@@ -5,9 +5,7 @@
 # % macro,  P,    Prefix for PV name
 # % macro,  PORT, Bus/Port Address (eg. ASYN Port).
 # % macro,  SCAN, SCAN rate for read parameters.
-# % macro,  name, object and gui association name
 
-# % gui, $(name=), edm, explorir.edl, P=$(P)
 
 ###########################################################
 

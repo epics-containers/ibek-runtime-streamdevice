@@ -7,12 +7,9 @@
 # % macro, P,     device name
 # % macro, PORT,  asyn port
 # % macro, ADDR,  device address
-# % macro, name,  GUI name
 
 # This associates an edm screen with the template
-# % gui, $(name=), edm, CBY-2206.edl, P=$(P)
 # This associates a BOY screen with the template
-# % gui, $(name=), boydetail, cyberstarApp_opi/CBY-2206.opi, P=$(P)
 
 record(bo, "$(P):RESET") {
   field(DESC, "Reset the device")

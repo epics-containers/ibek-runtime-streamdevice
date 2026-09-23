@@ -1,7 +1,3 @@
-# %gdatag,template,simplePv,$(gda_name=).CH$(N)SETPOINT,$(gda_desc=) channel $(N) brightness setpoint
-# %gdatag,template,simplePv,$(gda_name=).CH$(N)READBACK,$(gda_desc=) channel $(N) brightness readback
-# %gdatag,template,simpleBinary,$(gda_name=).CH$(N)SWITCH,$(gda_desc=) channel $(N) on/off switch
-# %gdatag,pv,rw,$(gda_name=).CH$(N)SETPOINT,RECORD,Brightness setpoint
 record(ai, "$(P):CH$(N)SETOUTPUT") {
   field(DESC, "Set current output")
   field(FLNK, "$(P):CH$(N)CAPOUTPUT")
@@ -41,7 +37,6 @@ record(ai, "$(P):CH$(N)MAXCURRENT") {
   field(EGU, "mA")
 }
 
-# %gdatag,binary,rw,$(gda_name=).CH$(N)SWITCH,RECORD,On/Off switch
 record(bo, "$(P):CH$(N)ON") {
   field(DESC, "Turns LED On/Off")
   field(FLNK, "$(P):CH$(N)SENDOUTPUT")
@@ -115,7 +110,6 @@ record(calcout, "$(P):ONOFFCHECK") {
   field(DOPT, "Use CALC")
 }
 
-# %gdatag,pv,ro,$(gda_name=).CH$(N)READBACK,RECORD,Brightness readback
 record(ai, "$(P):CH$(N)BRIGHTNESS") {
   field(DESC, "Output current")
   field(PREC, "2")

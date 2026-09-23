@@ -101,7 +101,6 @@ entity_models:
       - file: enzLoCuM4Readback.template
         args:
           .*:
-          gda_curr_name: ""
 
   - name: enzLoCuM4Readback_generic_diagonal
     description: |-

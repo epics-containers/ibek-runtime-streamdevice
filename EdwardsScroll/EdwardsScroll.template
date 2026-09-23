@@ -4,9 +4,7 @@
 #
 # % macro, P,    Mandatory. Device prefix
 # % macro, port, Mandatory. Asyn port name
-# % macro, name, Optional.  Name for gui element
 #
-# % gui, $(name=), edm , EdwardsScroll.edl, device=$(P)
 #
 # % archiver 10 monitor
 # Units in 0.1W so using ASLO to scale the readback

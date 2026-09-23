@@ -1,10 +1,6 @@
 # % macro, P, Device prefix
 # % macro, Q, Device suffix
 # % macro, PORT, Asyn port name
-# % macro, name, Name to export to gda as
-# % macro, gda_desc, Description for gda
-# % gdatag,template,agilent33220A,$(name=),$(gda_desc=)
-# % gui, $(name=), edm, agilent33220A.edl, agilent=$(P)$(Q)
 # % autosave 2 SCAN
 record(seq, "$(P)$(Q):UPDATE") {
   field(DESC, "Update Params")
@@ -48,7 +44,6 @@ record(seq, "$(P)$(Q):UPDATEREC2") {
   field(LNK4, "$(P)$(Q):BURST:RBV.PROC")
 }
 
-# % gdatag,binary,rw,$(name=),DISABLE
 record(bo, "$(P)$(Q):DISABLE") {
   field(DESC, "Disable comms")
   field(VAL, "0")
@@ -57,7 +52,6 @@ record(bo, "$(P)$(Q):DISABLE") {
   field(ONAM, "Disabled")
 }
 
-#% gdatag,mbbinary,rw,$(name=),FUNC
 record(mbbo, "$(P)$(Q):FUNC") {
   field(DESC, "Function")
   field(DTYP, "stream")
@@ -80,7 +74,6 @@ record(mbbo, "$(P)$(Q):FUNC") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,ro,$(name=),FUNCRBV
 # % archiver 10 Monitor
 record(mbbi, "$(P)$(Q):FUNC:RBV") {
   field(DESC, "Function Readback")
@@ -103,7 +96,6 @@ record(mbbi, "$(P)$(Q):FUNC:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,mbbinary,rw,$(name=),TRIGSRC
 record(mbbo, "$(P)$(Q):TRIGSRC") {
   field(DESC, "Trigger Source")
   field(DTYP, "stream")
@@ -118,7 +110,6 @@ record(mbbo, "$(P)$(Q):TRIGSRC") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,ro,$(name=),TRIGSRCRBV
 # % archiver 10 Monitor
 record(mbbi, "$(P)$(Q):TRIGSRC:RBV") {
   field(DESC, "Trigger Source Readback")
@@ -133,7 +124,6 @@ record(mbbi, "$(P)$(Q):TRIGSRC:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,binary,rw,$(name=),TRIG
 record(bo, "$(P)$(Q):TRIG") {
   field(DESC, "Manual Trigger")
   field(DTYP, "stream")
@@ -142,7 +132,6 @@ record(bo, "$(P)$(Q):TRIG") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,mbbinary,rw,$(name=),BURSTMODE
 record(mbbo, "$(P)$(Q):BURSTMODE") {
   field(DESC, "Burst Mode")
   field(DTYP, "stream")
@@ -155,7 +144,6 @@ record(mbbo, "$(P)$(Q):BURSTMODE") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,ro,$(name=),BURSTMODERBV
 # % archiver 10 Monitor
 record(mbbi, "$(P)$(Q):BURSTMODE:RBV") {
   field(DESC, "Burst Mode Readback")
@@ -192,7 +180,6 @@ record(mbbi, "$(P)$(Q):TRIGEDGE:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),BURSTNCYC
 record(longout, "$(P)$(Q):BURSTNCYC") {
   field(DESC, "Burst Number of Cycles")
   field(DTYP, "stream")
@@ -201,7 +188,6 @@ record(longout, "$(P)$(Q):BURSTNCYC") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),BURSTNCYCINF,Set Burst Number of Cycles to Infinite,<pv>.PROC
 record(stringout, "$(P)$(Q):BURSTNCYC:INF") {
   field(VAL, "INF")
   field(DTYP, "stream")
@@ -209,7 +195,6 @@ record(stringout, "$(P)$(Q):BURSTNCYC:INF") {
   field(FLNK, "$(P)$(Q):BURSTNCYC:RBV")    
 }
 
-# % gdatag,pv,ro,$(name=),BURSTNCYCRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):BURSTNCYC:RBV") {
   field(DESC, "Burst Number of Cycles Readback")
@@ -218,7 +203,6 @@ record(ai, "$(P)$(Q):BURSTNCYC:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,binary,rw,$(name=),BURST
 record(bo, "$(P)$(Q):BURST") {
   field(DESC, "Burst State")
   field(DTYP, "stream")
@@ -229,7 +213,6 @@ record(bo, "$(P)$(Q):BURST") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,binary,ro,$(name=),BURSTRBV
 # % archiver 10 Monitor
 record(bi, "$(P)$(Q):BURST:RBV") {
   field(DESC, "Burst State Readback")
@@ -240,7 +223,6 @@ record(bi, "$(P)$(Q):BURST:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),FREQ
 record(ao, "$(P)$(Q):FREQ") {
   field(DESC, "Frequency")
   field(DTYP, "stream")
@@ -251,7 +233,6 @@ record(ao, "$(P)$(Q):FREQ") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),FREQRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):FREQ:RBV") {
   field(DESC, "Frequency Readback")
@@ -262,7 +243,6 @@ record(ai, "$(P)$(Q):FREQ:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),AMP
 record(ao, "$(P)$(Q):AMP") {
   field(DESC, "Amplitude")
   field(DTYP, "stream")
@@ -273,7 +253,6 @@ record(ao, "$(P)$(Q):AMP") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),AMPRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):AMP:RBV") {
   field(DESC, "Amplitude Readback")
@@ -284,7 +263,6 @@ record(ai, "$(P)$(Q):AMP:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),OFF
 record(ao, "$(P)$(Q):OFF") {
   field(DESC, "Offset")
   field(DTYP, "stream")
@@ -295,7 +273,6 @@ record(ao, "$(P)$(Q):OFF") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),OFFRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):OFF:RBV") {
   field(DESC, "Offset Readback")
@@ -346,7 +323,6 @@ record(ai, "$(P)$(Q):PULSEW:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,binary,rw,$(name=),OUT
 record(bo, "$(P)$(Q):OUT") {
   field(DESC, "Output")
   field(DTYP, "stream")
@@ -357,7 +333,6 @@ record(bo, "$(P)$(Q):OUT") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,binary,ro,$(name=),OUTRBV
 # % archiver 10 Monitor
 record(bi, "$(P)$(Q):OUT:RBV") {
   field(DESC, "Output Readback")
@@ -368,7 +343,6 @@ record(bi, "$(P)$(Q):OUT:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),DCYC
 record(ao, "$(P)$(Q):DCYC") {
   field(DESC, "Duty Cycle")
   field(DTYP, "stream")
@@ -379,7 +353,6 @@ record(ao, "$(P)$(Q):DCYC") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),DCYCRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):DCYC:RBV") {
   field(DESC, "Duty Cycle Readback")
@@ -390,7 +363,6 @@ record(ai, "$(P)$(Q):DCYC:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),SYMM
 record(ao, "$(P)$(Q):SYMM") {
   field(DESC, "Ramp Symmetry")
   field(DTYP, "stream")
@@ -401,7 +373,6 @@ record(ao, "$(P)$(Q):SYMM") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),SYMMRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):SYMM:RBV") {
   field(DESC, "Ramp Symmetry Readback")
@@ -412,7 +383,6 @@ record(ai, "$(P)$(Q):SYMM:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),WIDT
 record(ao, "$(P)$(Q):WIDT") {
   field(DESC, "Pulse Width")
   field(DTYP, "stream")
@@ -423,7 +393,6 @@ record(ao, "$(P)$(Q):WIDT") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),WIDTRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):WIDT:RBV") {
   field(DESC, "Pulse Width Readback")
@@ -434,7 +403,6 @@ record(ai, "$(P)$(Q):WIDT:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(name=),TRAN
 record(ao, "$(P)$(Q):TRAN") {
   field(DESC, "Pulse Edge Transition")
   field(DTYP, "stream")
@@ -445,7 +413,6 @@ record(ao, "$(P)$(Q):TRAN") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),TRANRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):TRAN:RBV") {
   field(DESC, "Pulse Edge Transition Readback")

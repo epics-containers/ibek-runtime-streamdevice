@@ -1,4 +1,3 @@
-# % gui, $(name=), edmembed, MassFlowController.edl, P=$(P),Q=$(Q),STR=$(STR=$(name=))
 record(ai,$(P)$(Q):FLOW){
     field(DESC, "Current mesured flow.")
     field (SCAN, "1 second")

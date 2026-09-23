@@ -12,8 +12,6 @@
 # % macro, P, Device prefix
 # % macro, N, Device suffix
 # % macro, PORT, Asyn port name
-# % macro, name, Name to export to gda as
-# % gui, $(name=), edm, SR830.edl, P=$(P), N=$(N)
 record(calc, "$(P)SR830:$(N):SensCalc") {
   field(DESC, "Calc Time Const.")
   field(CALC, "A+B*3+C*9-1")

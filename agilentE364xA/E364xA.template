@@ -4,7 +4,6 @@
 # % macro, R, Device suffix
 # % macro, PORT, Asyn port name
 # % macro, PREC, decimal precision to use. Default=3
-# % gui, $(name=), edm, E364xA.edl, P=$(P),R=$(R)
 record(mbbo, "$(P)$(R):REMOTE") {
   field(DTYP, "stream")
   field(OUT, "@E364xA.proto ctrlMode $(PORT)")

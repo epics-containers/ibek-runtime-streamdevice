@@ -13,9 +13,7 @@
 #			0  Enabled (use if device known to be always connected).
 
 # NOTE: No idea what the ADEL fields should be - guessing completely.
-#% gdatag,template,OxInstIPS,$(gda_name=),$(gda_desc=)
 
-# % gdatag,binary,rw,$(gda_name=),DISABLE
 # % autosave 1 VAL
 #
 # This record needed to stop various records scanning and generating lots
@@ -123,7 +121,6 @@ record(ai, "$(P):RBV:CURRENTSWEEPRATE") {
 }
 
 #% archiver 10 Monitor
-#% gdatag,pv,ro,$(gda_name=),RBV_DEMANDFIELD
 # The field the unit is attempting to create.
 record(ai, "$(P):RBV:DEMANDFIELD") {
   field(DESC, "Demand Field Readback")
@@ -136,7 +133,6 @@ record(ai, "$(P):RBV:DEMANDFIELD") {
 }
 
 #% archiver 10 Monitor
-#% gdatag,pv,ro,$(gda_name=),RBV_SETPOINTFIELD
 # The present field setpoint.  The target field the unit will aim for when
 # told to go to the setpoint.
 record(ai, "$(P):RBV:SETPOINTFIELD") {
@@ -150,7 +146,6 @@ record(ai, "$(P):RBV:SETPOINTFIELD") {
 }
 
 #% archiver 10 Monitor
-#% gdatag,pv,ro,$(gda_name=),RBV_FIELDSWEEPRATE
 # The present sweeprate (a.k.a. ramprate) for adjusting the field.
 record(ai, "$(P):RBV:FIELDSWEEPRATE") {
   field(DESC, "Field Sweep Rate Readback")
@@ -416,7 +411,6 @@ record(mbbi, "$(P):STS:SYSTEM:LIMIT") {
 }
 
 #% archiver 10 Monitor
-#% gdatag,mbbinary,ro,$(gda_name=),STS_ACTIVITY
 # # Readback from An part of Examine command return.
 # # Hold means maintaining present current.
 # # Clamped means you cannot adjust it - powers up in this 
@@ -506,7 +500,6 @@ record(mbbi, "$(P):STS:SWEEPMODE:PARAMS") {
 }
 
 #% archiver 10 Monitor
-#% gdatag,mbbinary,ro,$(gda_name=),STS_SWEEPMODESWEEP
 # # Readback from n of Mmn part of Examine command return.
 # # (Ignore the Pmn part of the Examine command return - no records for this.)
 # 0 output constant, 1, 2, 3 output changing
@@ -602,7 +595,6 @@ record(bi, "$(P):STS:SWEEPMODE:UNITS") {
   field(ONAM, "Tesla")
 }
 
-#% gdatag,binary,ro,$(gda_name=),STS_SWEEPMODETYPE
 # # Readback from m of Mmn part of Examine command return.
 # The Display is in Amps or Tesla.  The Magnet Sweep is fast or slow.
 record(bi, "$(P):STS:SWEEPMODE:TYPE") {
@@ -674,7 +666,6 @@ record(ao, "$(P):SET:WAITINTERVAL") {
 }
 
 #% autosave 1 VAL
-#% gdatag,mbbinary,rw,$(gda_name=),SET_ACTIVITY
 # # Hold means maintaining present current.
 # # Clamped means you cannot adjust it - powers up in this 
 # # state.  Only the set activity hold command can get out
@@ -709,7 +700,6 @@ record(ao, "$(P):SET:SETPOINTCURRENT") {
 }
 
 #% autosave 1 VAL
-#% gdatag,pv,rw,$(gda_name=),SET_SETPOINTFIELD
 # Set the Field Setpoint (i.e. the field the unit will go to and hold for the
 # magnet.)
 # The controller will automaticllay adjust the current setpoint.
@@ -735,7 +725,6 @@ record(ao, "$(P):SET:CURRENTSWEEPRATE") {
 }
 
 #% autosave 1 VAL
-#% gdatag,pv,rw,$(gda_name=),SET_FIELDSWEEPRATE
 record(ao, "$(P):SET:FIELDSWEEPRATE") {
   field(DESC, "Set Field Sweep Rate")
   field(DTYP, "stream")
@@ -802,7 +791,6 @@ record(calcout, "$(P):CLC:SWEEPMODE:UNITSTOGGLE") {
 }
 
 #% autosave 1 VAL
-#% gdatag,binary,rw,$(gda_name=),SET_SWEEPMODETYPE
 # The Display is in Amps or Tesla.  The Magnet Sweep is fast or slow.
 record(bo, "$(P):SET:SWEEPMODE:TYPE") {
   field(DESC, "Fast/Slow Sweep")

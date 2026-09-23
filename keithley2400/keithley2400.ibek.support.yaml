@@ -48,8 +48,6 @@ entity_models:
       - file: k2400.template
         args:
           .*:
-          R: ""
-          name: ""
   - name: Keithley2461
     description: |-
       Keithley 2461 SourceMeter
@@ -90,5 +88,3 @@ entity_models:
       - file: k2461.template
         args:
           .*:
-          R: ""
-          name: ""

@@ -89,7 +89,6 @@
 ################################################################################
 
 # This associates an edm screen with the template
-# % gui, $(name=), edm, mks937bHcg.edl, device=$(device)
 
 # Hot Cathode Enable
 #

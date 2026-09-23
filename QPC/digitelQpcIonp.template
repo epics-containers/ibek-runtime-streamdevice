@@ -4,7 +4,6 @@
 #
 # substitutions:
 #% macro, device, device name
-#% macro, name, Object name and gui association name
 #% macro, port, asyn serial port number
 #% macro, unit, unit number for multi-drop serial (2 hex digits - 01 by default)
 #% macro, SIZE, pump size (l/s)
@@ -18,28 +17,10 @@
 ################################################################################
 
 # This associates an edm screen with the template
-# % gui, $(name=), edm, digitelQpcIonpControl.edl, device=$(device)
 
 # This associates BOY screens with the template
-# % gui, $(name=), boydetail, digitelQpcApp_opi/QPCionp_detail.opi, device=$(device)
-# % gui, $(name=), boyembed, digitelQpcApp_opi/QPCionp_embed_box.opi, device=$(device), desc=$(device)
-# % gui, $(name=), boyembed, digitelQpcApp_opi/QPCionp_embed.opi, device=$(device)
 
 # These define what PVs a valve detail screen should contain
-# % gui, $(name=), readback, Status,   $(device):QPCSTA
-# % gui, $(name=), readback, Error Code,  $(device):ERR
-# % gui, $(name=), readback, Voltage,  $(device):V
-# % gui, $(name=), readback, Current,  $(device):I
-# % gui, $(name=), readback, Pressure,  $(device):P
-# % gui, $(name=), enum, Start,  $(device):SETHV
-# % gui, $(name=), readback, Pump Size,  $(device):PUMPSIZE
-# % gui, $(name=), demand, Pump Size,  $(device):SETPUMPSIZE
-# % gui, $(name=), readback, Calibration,  $(device):CAL
-# % gui, $(name=), demand, Calibration,  $(device):SETCAL
-# % gui, $(name=), readback, Setpoint On,  $(device):SPON
-# % gui, $(name=), demand, Setpoint On,  $(device):SETSPON
-# % gui, $(name=), readback, Setpoint Off,  $(device):SPOFF
-# % gui, $(name=), demand, Setpoint Off,  $(device):SETSPOFF
 
 ######
 # device        - full ion pump device name (PV base)

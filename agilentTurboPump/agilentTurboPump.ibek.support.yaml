@@ -44,7 +44,6 @@ entity_models:
       - file: agilentTwisTorr305-IC.template
         args:
           .*:
-          name: ""
   - name: twisTorr305FS
     description: |-
       Agilent TwisTorr 305 turbo pump with free-standing controller (FS)
@@ -85,4 +84,3 @@ entity_models:
       - file: agilentTwisTorr305-FS.template
         args:
           .*:
-          name: ""

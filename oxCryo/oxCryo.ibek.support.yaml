@@ -30,9 +30,9 @@
 #   $(P)$(Q):ALARM        subArray: one message from the table at INDX; takes
 #                         MAJOR from :ALARM_SEVR through its MS SDIS link
 #                         (DISV -1, never read, so never disabled)
-# The message moves from :ALARM.VALA to :ALARM (VAL): :COPY_STRING and the
-# #%gdatag annotation read :ALARM, and a client reading :ALARM.VALA must read
-# :ALARM instead. :ALARM.SEVR is the same as the routine's; :ALARM.STAT is
+# The message moves from :ALARM.VALA to :ALARM (VAL): :COPY_STRING reads
+# :ALARM, and a client reading :ALARM.VALA must read :ALARM instead.
+# :ALARM.SEVR is the same as the routine's; :ALARM.STAT is
 # LINK where the genSub raised SOFT. Verified in an EPICS 7.0.9 IOC against the
 # C routine (built as an aSub) for alarm numbers -5..255, 1000, 65535 and
 # 2147483647: message, severity, ALARM_MSG.DESC and ALARM_MSG.SEVR all equal.

@@ -4,7 +4,6 @@
 #
 # substitutions:
 #% macro, device, device name
-#% macro, name, Object name and gui association name
 #% macro, port, asyn serial port number
 #% macro, unit, unit number for multi-drop serial (2 hex digits - 05 by default)
 #% macro, pump, ion pump number (1 or 2)
@@ -19,32 +18,10 @@
 ################################################################################
 
 # This associates an edm screen with the template
-# % gui, $(name=), edm, digitelMpcIonp2sp.edl, device=$(device)
 
 # This associates BOY screens with the template
-# % gui, $(name=), boydetail, digitelMpcApp_opi/ionp_detail.opi, device=$(device), desc=$(device), name=$(name=)
-# % gui, $(name=), boyembed, digitelMpcApp_opi/ionp_embed_box.opi, device=$(device), desc=$(device), name=$(name=)
-# % gui, $(name=), boyembed, digitelMpcApp_opi/ionp_embed.opi, device=$(device), desc=$(device), name=$(name=)
 
 # These define what PVs a valve detail screen should contain
-# % gui, $(name=), readback, Status,   $(device):STA
-# % gui, $(name=), readback, Error Code,  $(device):ERR
-# % gui, $(name=), readback, Voltage,  $(device):V
-# % gui, $(name=), readback, Current,  $(device):I
-# % gui, $(name=), readback, Strapping,  $(device):HV
-# % gui, $(name=), enum, Start,  $(device):START
-# % gui, $(name=), readback, Pump Size,  $(device):SIZE
-# % gui, $(name=), demand, Pump Size,  $(device):SETSIZE
-# % gui, $(name=), readback, Calibration,  $(device):CAL
-# % gui, $(name=), demand, Calibration,  $(device):SETCAL
-# % gui, $(name=), readback, Setpoint 1 On,  $(device):SP1ON
-# % gui, $(name=), demand, Setpoint 1 On,  $(device):SETSP1ON
-# % gui, $(name=), readback, Setpoint 1 Off,  $(device):SP1OFF
-# % gui, $(name=), demand, Setpoint 1 Off,  $(device):SETSP1OFF
-# % gui, $(name=), readback, Setpoint 2 On,  $(device):SP2ON
-# % gui, $(name=), demand, Setpoint 2 On,  $(device):SETSP2ON
-# % gui, $(name=), readback, Setpoint 2 Off,  $(device):SP2OFF
-# % gui, $(name=), demand, Setpoint 2 Off,  $(device):SETSP2OFF
 
 # Read pump current
 #

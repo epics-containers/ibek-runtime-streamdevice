@@ -10,11 +10,9 @@
 #
 
 #% macro, device, device name
-#% macro, name, Object name and gui association name
 #% macro, port, asyn serial port number
 #% macro, pump, Controller pumpnel
 
-# % gui, $(name=), edm, agilent4UHVIonp.edl, device=$(device)
 ################################################################################
 # Refresh the values of setup parameters
 #

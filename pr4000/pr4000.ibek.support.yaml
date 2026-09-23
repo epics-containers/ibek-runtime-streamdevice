@@ -47,5 +47,3 @@ entity_models:
       - file: pr4000.template
         args:
           .*:
-          ch1pv: ""
-          ch2pv: ""

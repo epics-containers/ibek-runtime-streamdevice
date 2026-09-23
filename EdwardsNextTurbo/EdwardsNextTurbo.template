@@ -19,9 +19,7 @@
 # % macro, CTLRTEMPHIGH, Optional.  Internal temperature of the controller high limit at which alarm should be raised in degrees Celsius.                        Defaults to 70 - the range is given in the manual as 0-100.
 # % macro, VVENTENABLE,	 Optional.  Whether the pump has a vent valve on it.  Enables display of vent valve widgets on GUI. 0 - Disable, 1 - Enable.             Defaults to 0, Disable
 #
-# % macro, name,         Optional.  Name for gui tag definitions.  Defaults to empty string.
 #
-# % gui, $(name=), edm , EdwardsNextTurbo.edl, device=$(P)
 #
 #########################################################
 # START OF RECORDS FOR SCANNING CONTROL

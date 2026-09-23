@@ -8,8 +8,6 @@
 # % macro, PREC, Precision
 # % macro, DEADBAND, Default Deadband
 # % macro, PORT, Asyn port for I/O with controller
-# % macro, name, object and gui association name
-# % gui, $(name=), edm, PI-E725.edl, P=$(P),Q=$(Q)
 include "e725Z_detail.template"
 
 #Records are ordered following Driver Requirements order proposed

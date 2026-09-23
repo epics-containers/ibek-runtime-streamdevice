@@ -12,8 +12,6 @@
 # % macro,  GR,      Channel group number
 # % macro,  PORT,    asyn port
 # % macro,  BUSYIN,  letter indicating the input link on a calc record
-# % macro,  name,    object and gui association name
-# % gui, $(name=), edm, dlsCAENels.edl, P=$(P),GR=$(GR)
 
 # A record to show the current status of the group: states are 0 = "Idle" and
 # 1 = "Busy"

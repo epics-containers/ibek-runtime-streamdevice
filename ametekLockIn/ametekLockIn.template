@@ -2,7 +2,6 @@
 # % macro, Q,      PV name suffix
 # % macro, PORT,   asyn port
 
-# % gui, $(name=), edm, ametekLockIn.edl, P=$(P),Q=$(Q)
 
 record(fanout, "$(P)$(Q):POLL")
 {

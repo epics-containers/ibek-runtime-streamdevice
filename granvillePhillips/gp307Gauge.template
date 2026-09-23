@@ -6,10 +6,8 @@
 # % macro, id,       Mandatory.  ID number as 2 digit string (e.g. 01)
 # % macro, gctrl,    Mandatory.  The gauge's GP307 controller (e.g.BLnnX-VA-GCTLR-nn).
 # 
-# % macro, name,     Optional.   Object and gui association name.  Defaults to empty.
 # 
 # This associates an edm screen with the template
-# % gui, $(name=), edm, gp307Gauge.edl, dom=$(dom), id=$(id), gctrl=$(gctrl)
 record(calc, "$(dom)-VA-GAUGE-$(id):SEL") {
   field(DESC, "Select Pressure")
   field(SCAN, "1 second")

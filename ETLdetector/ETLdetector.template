@@ -7,18 +7,11 @@
 # % macro, Q, Device suffix
 # % macro, addr, Address on the bus in decimal (or hex with a 0x prefix)
 # % macro, port, Asyn port name
-# % macro, gda_name, Name in gda xml file (Default = )
-# % macro, gda_desc, Description in gda xml file (Default = )
-# % macro, name, Object and gui association name
-# % gui, $(name=), edm, ETLdetector-config.edl, etl=$(P)$(Q)
-# % gui, $(name=), edmembed, ETLdetector-embed.edl, etl=$(P)$(Q)
 record(longin, "$(P)$(Q):ADDR") {
   field(VAL, "$(addr)")
   field(PINI, "YES")
 }
 
-# % gdatag,template,ETLdetector,$(gda_name=),$(gda_desc=)
-# % gui, $(name=), sevr
 record(ai, "$(P)$(Q):CTRLADC") {
   field(DESC, "Read HV Control ADC value")
   field(DTYP, "stream")
@@ -35,7 +28,6 @@ record(longin, "$(P)$(Q):GENADC") {
   field(EGU, "mA")
 }
 
-# % gdatag,pv,ro,$(gda_name=),HVADC
 record(ai, "$(P)$(Q):HVADC") {
   field(DESC, "Read the HV output voltage")
   field(DTYP, "stream")
@@ -45,7 +37,6 @@ record(ai, "$(P)$(Q):HVADC") {
   field(ASLO, "0.5")
 }
 
-# % gdatag,pv,ro,$(gda_name=),HVRBV
 record(ai, "$(P)$(Q):CTRL:RBV") {
   field(DESC, "Gets HV control voltage")
   field(PINI, "YES")
@@ -56,7 +47,6 @@ record(ai, "$(P)$(Q):CTRL:RBV") {
   field(ASLO, "0.5")
 }
 
-# % gdatag,pv,rw,$(gda_name=),HV
 record(ao, "$(P)$(Q):CTRL") {
   field(DESC, "Sets HV control voltage")
   field(DTYP, "stream")
@@ -75,7 +65,6 @@ record(longout, "$(P)$(Q):REFV") {
   field(EGU, "mV")
 }
 
-# % gdatag,pv,rw,$(gda_name=),ULIM
 record(longout, "$(P)$(Q):ULIM") {
   field(DESC, "Sets upper threshold")
   field(DTYP, "stream")
@@ -84,7 +73,6 @@ record(longout, "$(P)$(Q):ULIM") {
   field(FLNK, "$(P)$(Q):ULIM:RBV")
 }
 
-# % gdatag,pv,rw,$(gda_name=),LLIM
 record(longout, "$(P)$(Q):LLIM") {
   field(DESC, "sets lower threshold")
   field(DTYP, "stream")
@@ -121,7 +109,6 @@ record(longin, "$(P)$(Q):REFV:RBV") {
   field(PINI, "YES")
 }
 
-# % gdatag,pv,rw,$(gda_name=),ULIMRBV
 record(longin, "$(P)$(Q):ULIM:RBV") {
   field(DESC, "Gets upper threshold")
   field(DTYP, "stream")
@@ -130,7 +117,6 @@ record(longin, "$(P)$(Q):ULIM:RBV") {
   field(PINI, "YES")
 }
 
-# % gdatag,pv,rw,$(gda_name=),LLIMRBV
 record(longin, "$(P)$(Q):LLIM:RBV") {
   field(DESC, "Gets lower threshold")
   field(DTYP, "stream")

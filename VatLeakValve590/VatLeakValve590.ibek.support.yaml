@@ -36,8 +36,6 @@ entity_models:
       - file: VATLeakValve590series.template
         args:
           .*:
-          P: ""
-          R: ""
 
   - name: VatLeakValve590series
     description: |-
@@ -60,5 +58,3 @@ entity_models:
       - file: VATLeakValve590series.template
         args:
           .*:
-          P: ""
-          R: ""

@@ -8,9 +8,7 @@
 #
 # % macro, P, 	 Mandatory.  Device prefix
 # % macro, port, Mandatory.  Asyn port name
-# % macro, name, Optional.   Name for gui element
 #
-# % gui, $(name=), edm , EdwardsOnOff.edl, device=$(P)
 #
 record(bo, "$(P):DO_START")
 {

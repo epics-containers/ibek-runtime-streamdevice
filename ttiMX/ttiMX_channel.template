@@ -5,7 +5,6 @@
 
 
 # Macros:
-# % macro, name, Object name
 # % macro, P, The prefix name
 # % macro, PORT, The asyn port
 # % macro, CHAN, The channel (1,2,3 or 4)

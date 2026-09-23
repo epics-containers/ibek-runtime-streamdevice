@@ -94,6 +94,3 @@ entity_models:
       - file: ids3010.template
         args:
           .*:
-          label1: ""
-          label2: ""
-          label3: ""

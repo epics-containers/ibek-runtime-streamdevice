@@ -9,7 +9,6 @@
 # % macro,  ADDR, Address on the bus (optional)
 # % macro,  SCAN, SCAN rate for read parameters
 ################################################################
-# % gui, keysightLCR, edm, keysightLCR.edl, P=$(P)$(Q)
 ################################################################
 # Read records
 ################################################################
@@ -30,7 +29,6 @@ record(fanout, "$(P)$(Q):UPDATEREC") {
   #field(LNK4, "$(P)$(Q):AC:CURR:RBV.PROC")
 }
 
-# % gdatag,binary,rw,$(name=),DISABLE
 record(bo, "$(P)$(Q):DISABLE") {
   field(DESC, "Disable comms")
   field(VAL, "0")
@@ -73,7 +71,6 @@ record(ao, "$(P)$(Q):MEAS:STATUS") {
   field(DESC, "Measurement status")
 }
 
-#% gdatag,pv,rw,$(name=),AMP
 record(ao, "$(P)$(Q):AMP") {
   field(DESC, "Amplitude")
   field(DTYP, "stream")
@@ -85,7 +82,6 @@ record(ao, "$(P)$(Q):AMP") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),AMPRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):AMP:RBV") {
   field(DESC, "Amplitude Readback")
@@ -96,7 +92,6 @@ record(ai, "$(P)$(Q):AMP:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# #% gdatag,pv,rw,$(name=),AMP
 # record(ao, "$(P)$(Q):AC:CURR") {
 #   field(DESC, "AC Current")
 #   field(DTYP, "stream")
@@ -107,7 +102,6 @@ record(ai, "$(P)$(Q):AMP:RBV") {
 #   field(SDIS, "$(P)$(Q):DISABLE")
 #}
 
-# % gdatag,pv,ro,$(name=),AMPRBV
 # % archiver 10 Monitor
 # record(ai, "$(P)$(Q):AC:CURR:RBV") {
 #   field(DESC, "Amplitude Readback")

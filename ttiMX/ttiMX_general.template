@@ -7,7 +7,6 @@
 # Macros:
 # % macro, P, The prefix name
 # % macro, PORT, The asyn port
-# %gui, $(name), edm, ttiMX_4channel.edl, P=$(P)
 #
 # The error register
 # %archiver 1 Monitor VAL

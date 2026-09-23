@@ -24,18 +24,14 @@
 # % macro, ISCALESET, Default  - trip current SET scale factor (transmission value = current displayed / ISCALESET)
 # % macro, VSCALE, Default 1 - voltage set point READBACK scale factor (voltage displayed = transmission values * VSCALE)
 # % macro, VSCALESET, Default 1 - voltage set point SET scale factor (transmission value = voltage displayed / VSCALE)
-# % macro, gda_name, Name for GDA
-# % macro, gda_desc, Description for GDA
 # % macro, IMAXUNIT, Unit for I MAX
 # % macro, ITRIPUNIT, Unit for I TRIP
 # 
 # 
 # #############################################################
-# % gdatag,template,isegHVPSU,$(gda_name=),$(gda_desc=)
 # #############################################################
 # Disable Comms record
 # #############################################################
-# % gdatag,binary,rw,$(gda_name=),DISABLE
 # % autosave 1 VAL
 record(bo, "$(P):DISABLE") {
   field(DESC, "Disable comms")
@@ -69,7 +65,6 @@ record(bo, "$(P):DISABLE:POLL") {
 # /// Read the voltage on channel 1 in V.
 # /// This is archived every 10 seconds.
 # ///
-#% gdatag,pv,ro,$(gda_name=),V1_ACTUAL
 #% archiver 10 Monitor
 #% alh
 record(ai, "$(P):V1_ACTUAL") {
@@ -86,7 +81,6 @@ record(ai, "$(P):V1_ACTUAL") {
 # /// Read the voltage on channel 2 in V.
 # /// This is archived every 10 seconds.
 # ///
-#% gdatag,pv,ro,$(gda_name=),V2_ACTUAL
 #% archiver 10 Monitor
 #% alh
 record(ai, "$(P):V2_ACTUAL") {
@@ -103,7 +97,6 @@ record(ai, "$(P):V2_ACTUAL") {
 # /// Read the current on channel 1 in A.
 # /// This is archived every 10 seconds.
 # ///
-#% gdatag,pv,ro,$(gda_name=),I1_ACTUAL
 #% archiver 10 Monitor
 #% alh
 record(ai, "$(P):I1_ACTUAL") {
@@ -119,7 +112,6 @@ record(ai, "$(P):I1_ACTUAL") {
 # /// Read the current on channel 2 in A.
 # /// This is archived every 10 seconds.
 # ///
-#% gdatag,pv,ro,$(gda_name=),I2_ACTUAL
 #% archiver 10 Monitor
 #% alh
 record(ai, "$(P):I2_ACTUAL") {
@@ -535,7 +527,6 @@ record(stringin, "$(P):SYNC") {
 # ///
 # /// Generic commands. This hold the response from a write to COMMAND.
 # ///
-#% gdatag,pv,rw,$(gda_name=),RESPONSE
 record(stringin, "$(P):RESPONSE") {
   field(DTYP, "stream")
   field(DESC, "Holds response.")
@@ -546,7 +537,6 @@ record(stringin, "$(P):RESPONSE") {
 # ///
 # /// Generic command. This holds the command and stores it. Do a caput on this, and do a subsequent caget on RESPONSE to get the response. Max 39 chars.
 # ///
-#% gdatag,pv,rw,$(gda_name=),COMMAND
 record(stringout, "$(P):COMMAND") {
   field(DESC, "Holds command string.")
   field(OUT, "$(P):RESPONSE")
