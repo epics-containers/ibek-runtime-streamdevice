@@ -20,6 +20,8 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           version: "0.9.9"
+          # ibek 4.8 requires Python >= 3.13
+          python-version: "3.13"
 
       - name: Schema of ibek.support.yaml and ibek.manifest.yaml
         run: $UV_RUN ci/check_schema.py
@@ -44,6 +46,8 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           version: "0.9.9"
+          # ibek 4.8 requires Python >= 3.13
+          python-version: "3.13"
 
       - name: Generate the test cases
         run: $UV_RUN ci/template_load.py prepare build/load
