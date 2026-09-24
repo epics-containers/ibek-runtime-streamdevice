@@ -106,16 +106,3 @@ known_errors:
   - pattern: ODPsu
     template: ODPsuV2.template
     error: '11:FMT:GET: Protocol parse error'
-
-# generate_together_xfail: patterns whose entity models, one of each in a
-# single instance, fail `ibek runtime generate2`.
-generate_together_xfail:
-  # Two entity models load the same template with different parameters
-  # (_digitelMpcIonpTemplate and digitelMpcIonp: digitelMpcIonp.template;
-  # _agilent4UHVIonpTemplate and agilent4UHVIonp: agilent4UHVIonp.template).
-  # ibek writes one substitution-file column set per template, so an instance
-  # using both models fails with IndexError in RenderDb.align_columns.
-  - pattern: digitelMpc
-    reason: two entity models load digitelMpcIonp.template with different parameters
-  - pattern: agilent4UHV
-    reason: two entity models load agilent4UHVIonp.template with different parameters

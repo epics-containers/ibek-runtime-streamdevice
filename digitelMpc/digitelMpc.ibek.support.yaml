@@ -11,6 +11,11 @@
 # registered in the generic image - loading it is fine, but iocInit fails.
 # `simulation_digitelMpc.template` and `simulation_digitelMpcTsp.template` have no
 # such routine and are imported into sim/.
+#
+# `digitelMpcIonp`'s `databases.args` excludes its `MPC` parameter by name (see the
+# comment there): `_digitelMpcIonpTemplate` loads the same digitelMpcIonp.template
+# with `.*`, and an instance holding one of each entity needs both to pass identical
+# args so ibek writes one ioc.subst block for the file.
 
 module: digitelMpc
 
@@ -271,8 +276,14 @@ entity_models:
         default: $(device)
     databases:
       - file: digitelMpcIonp.template
+        # MPC is a parameter of this entity (the digitelMpc controller object
+        # reference) but is not a digitelMpcIonp.template macro. Excluding it
+        # by name, rather than matching every parameter with `.*`, keeps this
+        # entity's arg set identical to _digitelMpcIonpTemplate's, which
+        # shares the same template file and does use `.*` - both entities
+        # then land in the same ioc.subst block.
         args:
-          .*:
+          (?!MPC$).*:
   - name: digitelMpcIonpGroup
     description: |-
       Template database for a group of up to 8 digitel MPC Ion Pumps
