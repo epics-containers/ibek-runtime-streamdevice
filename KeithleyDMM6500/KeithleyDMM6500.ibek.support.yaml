@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.8.0-beta.2/ibek.support.schema.json
 
 # Imported from DLS production support module: KeithleyDMM6500 1-1
 # Source: /dls_sw/prod/R3.14.12.7/support/KeithleyDMM6500/1-1

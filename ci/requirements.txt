@@ -1,4 +1,4 @@
 # The ibek release the CI checks run against. Move the pin deliberately, when
 # the library adopts a new ibek.
-ibek==4.8.0b1
+ibek>=4.8.0b1
 jsonschema

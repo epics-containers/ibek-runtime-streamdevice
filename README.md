@@ -194,9 +194,12 @@ the library, the pinned tag and every vendored file's hash.
 
 ## Versioning
 
-Releases are cut as **repo-wide semantic-version git tags** (`v0.1.0`, `v0.2.0`, …). A
-tag is an **immutable point** covering every pattern in the repo at that revision, so
-`name@<tag>` always resolves to the same bytes.
+Releases are cut as **repo-wide semantic-version git tags**, unprefixed (`0.1.1`,
+`0.1.2-beta.3`, …). A tag is an **immutable point** covering every pattern in the repo
+at that revision, so `name@<tag>` always resolves to the same bytes.
+
+`ibek pattern` resolves `@<tag>` as a literal git ref: `@0.1.1` works, `@v0.1.1` fails
+because no such ref exists.
 
 There is intentionally **no per-pattern version**: a single tag versions the whole
 library. Bump the tag when any pattern changes; consumers opt in to the new content by
@@ -218,12 +221,12 @@ in a services repo). `ibek pattern` writes the vendored files into the instance'
 Qualified name `<library>:<pattern>@<tag>` selects the library, pattern and version:
 
 ```bash
-ibek pattern add ibek-runtime-streamdevice:lakeshore340@v0.1.0 services/bl01t-ea-lake-01
+ibek pattern add ibek-runtime-streamdevice:lakeshore340@0.1.1 services/bl01t-ea-lake-01
 ```
 
 This:
 
-1. fetches the pattern's file-set at tag `v0.1.0`,
+1. fetches the pattern's file-set at tag `0.1.1`,
 2. writes each runtime file the pattern's `ibek.manifest.yaml` selects into
    `services/bl01t-ea-lake-01/config/`, byte-for-byte,
 3. records `version`, `source` and a per-file `sha256` in
@@ -245,7 +248,6 @@ entities:
     LOOP: 2
     SCAN: 5
     TEMPSCAN: 2
-    name: lakeshore
 ```
 
 The resulting `runtime-lock.yaml` looks like:
@@ -254,7 +256,7 @@ The resulting `runtime-lock.yaml` looks like:
 version: 1
 patterns:
   lakeshore340:
-    version: v0.1.0
+    version: 0.1.1
     source: github.com/epics-containers/ibek-runtime-streamdevice
     files:
       config/lakeshore340.ibek.support.yaml: sha256:…
@@ -271,7 +273,7 @@ vendored.
 ### Update a pin
 
 ```bash
-ibek pattern update services/bl01t-ea-lake-01 --name lakeshore340 --version v0.2.0
+ibek pattern update services/bl01t-ea-lake-01 --name lakeshore340 --version 0.5.0
 # or re-vendor every pinned pattern at its recorded version:
 ibek pattern update services/bl01t-ea-lake-01
 ```

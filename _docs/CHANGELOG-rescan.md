@@ -1,15 +1,17 @@
-# Streamdevice rescan: changes against `main`
+# Streamdevice rescan: changes since the `0.1.2-beta.3` release
 
-This branch refreshes every pattern from its DLS source module's latest
+The rescan refreshes every pattern from its DLS source module's latest
 `/dls_sw/prod/R3.14.12.7` release, adds the StreamDevice modules that pass the runtime
-gate and are not on `main`, and removes the three patterns that fail it. Hand-shaped
-patterns (`currAmp`, `eurotherm2k`, `fw102`, `gardasoftLED`, `microlab500`, `ODPsu`,
-`oxCryo`) keep their hand work, with the release's other files merged in.
+gate and were not in the `0.1.2-beta.3` release, and removes the three patterns that
+fail it. Hand-shaped patterns (`currAmp`, `eurotherm2k`, `fw102`, `gardasoftLED`,
+`microlab500`, `ODPsu`, `oxCryo`) keep their hand work, with the release's other files
+merged in.
 
-The table has one row per pattern folder that differs from `main`: 11 new,
-90 changed, 3 removed (104 rows). Folders not listed are byte-identical to `main`
-apart from the annotation strip described below. **Source** is the DLS module and
-release the folder is imported from. **What changed** is relative to `main`; **Why** names the rule or
+The table has one row per pattern folder that differs from the `0.1.2-beta.3` release:
+11 new, 90 changed, 3 removed (104 rows). Folders not listed are byte-identical to
+`0.1.2-beta.3` apart from the annotation strip described below. **Source** is the DLS
+module and release the folder is imported from. **What changed** is relative to
+`0.1.2-beta.3`; **Why** names the rule or
 decision behind it; **Flag** is what to look at: a template marked as needing more
 than the generic image, an upstream defect carried as-is, a patch or trim of an
 upstream file, or a change that breaks an existing `ioc.yaml`.
@@ -59,7 +61,7 @@ An instance picks these up only when it moves its pin to a release containing th
 
 ## Pattern changes
 
-| Module | Status | Source | What changed vs main | Why | Flag |
+| Module | Status | Source | What changed vs `0.1.2-beta.3` | Why | Flag |
 |---|---|---|---|---|---|
 | `agilent33220A` | CHANGED | agilent33220A 1-7 | docs/ (2 files); sim/ (1 file); +1 .req; `name` param removed (`agilent33220A`) | publishable upstream extras, kept out of vendoring by `ibek.manifest.yaml`; autosave tags in the templates; no template uses `name` (hard rule) | consumer break: `name` |
 | `agilent4UHV` | CHANGED | agilent4UHV 0-1 | `name` param removed (`_agilent4UHVIonpTemplate`, `_agilent4UHVTemplate`, `agilent4UHV`, `agilent4UHVIonp`) | no template uses `name` (hard rule) | consumer break: `name` |

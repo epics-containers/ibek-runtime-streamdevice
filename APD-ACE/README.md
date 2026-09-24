@@ -27,3 +27,7 @@ instance's `config/`:
 Everything else in this folder stays in the library and is never vendored:
 
 - `README.md` - this file
+
+## Upstream defects carried as-is
+
+- `ERRORSTATUS` has a stream INP but a bare `SIOL "@"` (`apd-ace.template:281`)
