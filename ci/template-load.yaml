@@ -15,7 +15,7 @@ values:
     read_write_int_floatE: {FPARAM: F, IPARAM: I}
 
 # xfail: templates that need more than the generic ioc-streamdevice image, as
-# listed in BUILD-TIME-ONLY.md "Runtime patterns with marked templates". They
+# listed in _docs/BUILD-TIME-ONLY.md "Runtime patterns with marked templates". They
 # must fail to load; one that loads fails the check until it is removed here.
 xfail:
   - pattern: PIpiezo

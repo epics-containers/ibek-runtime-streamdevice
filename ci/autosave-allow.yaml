@@ -4,7 +4,7 @@
 # list only ever shrinks as the library is fixed.
 
 currAmp:
-  # CHANGELOG-rescan.md: no existing currAmp file is touched, to keep the
+  # _docs/CHANGELOG-rescan.md: no existing currAmp file is touched, to keep the
   # unmerged I03-1110 branch's edits to this pattern mergeable. Its templates
   # carry autosave tags but no .req files are shipped yet.
   - problem: "YMCS0009_settings.req: missing; YMCS0009.template tags 8 PV(s)"

@@ -49,7 +49,7 @@ Everything else in this folder stays in the library and is never vendored:
 
 These templates load only in a generic IOC built with the support they
 need; the others run in the generic `ioc-streamdevice` image. See
-[BUILD-TIME-ONLY.md](../BUILD-TIME-ONLY.md).
+[_docs/BUILD-TIME-ONLY.md](../_docs/BUILD-TIME-ONLY.md).
 
 | Template(s) | Needs |
 |---|---|
