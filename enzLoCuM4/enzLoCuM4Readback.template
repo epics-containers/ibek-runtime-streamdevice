@@ -27,7 +27,6 @@
 #% macro, adel, Optional macro defining the archive deadband calculation.
 # Default is 0.002 x Current value for 10V input
 ################################################################################
-#% gdatag,template,bpm,$(gda_name=),$(gda_desc=)
 record(transform, "$(device):UPDATE") {
   field(DESC, "Update values based on range")
   field(INPA, "$(device):CALMR CP")
@@ -98,7 +97,6 @@ record(dfanout, "$(device):FANADEL") {
   field(OUTD, "$(device):BLADED.ADEL")
 }
 
-#% gdatag,pv,ro,$(gda_curr_name),I1,Channel 1 Current
 #% archiver 1 $(archiver_method=Monitor)
 record(ai, "$(device):BLADEA") {
   field(DESC, "$(desc_prefix) A")
@@ -120,7 +118,6 @@ record(ai, "$(device):BLADEA") {
   field(FLNK, "$(device):BLADEB")
 }
 
-#% gdatag,pv,ro,$(gda_curr_name),I2,Channel 2 Current
 #% archiver 1 $(archiver_method=Monitor)
 record(ai, "$(device):BLADEB") {
   field(DESC, "$(desc_prefix) B")
@@ -141,7 +138,6 @@ record(ai, "$(device):BLADEB") {
   field(FLNK, "$(device):BLADEC")
 }
 
-#% gdatag,pv,ro,$(gda_curr_name),I3,Channel 3 Current
 #% archiver 1 $(archiver_method=Monitor)
 record(ai, "$(device):BLADEC") {
   field(DESC, "$(desc_prefix) C")
@@ -162,7 +158,6 @@ record(ai, "$(device):BLADEC") {
   field(FLNK, "$(device):BLADED")
 }
 
-#% gdatag,pv,ro,$(gda_curr_name),I4,Channel 4 Current
 #% archiver 1 $(archiver_method=Monitor)
 record(ai, "$(device):BLADED") {
   field(DESC, "$(desc_prefix) D")
@@ -219,7 +214,6 @@ record(ai, "$(device):OFFSETY") {
   field(EGU, "$(egu)")
 }
 
-#% gdatag,pv,ro,$(gda_name=),INTENSITY,Summed intensity value
 #% archiver 1 $(archiver_method=Monitor)
 record(calc, "$(device):INTENSITY") {
   field(INPA, "$(device):BLADEA NPP")
@@ -232,7 +226,6 @@ record(calc, "$(device):INTENSITY") {
   field(EGU, "A")
 }
 
-#% gdatag,pv,ro,$(gda_name=),XPOS,X Position
 #% archiver 1 $(archiver_method=Monitor)
 record(calc, "$(device):BEAMX") {
   field(INPA, "$(device):BLADEA NPP")
@@ -247,7 +240,6 @@ record(calc, "$(device):BEAMX") {
   field(EGU, "$(egu)")
 }
 
-#% gdatag,pv,ro,$(gda_name=),YPOS,Y Position
 #% archiver 1 $(archiver_method=Monitor)
 record(calc, "$(device):BEAMY") {
   field(INPA, "$(device):BLADEA NPP")

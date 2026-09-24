@@ -14,34 +14,10 @@
 # % macro, SPCMD, Setpoint command, set to 'write' for floating point
 # % macro, PREC, Setpoint precision
 # % macro, EGU, Engineering units for ramp rate, default is C/s
-# % macro, gda_name, Name to export to gda as
-# % macro, gda_desc, Description for gda
 
 # This associates a BOY screen with the template
-# % gui, $(name=), boydetail, eurotherm903App_opi/eurotherm903_detail.opi, P=$(P),Q=$(Q),desc=Eurotherm 903
-# % gui, $(name=), boyembed, eurotherm903App_opi/eurotherm903_embed_box.opi, P=$(P),Q=$(Q),desc=Eurotherm 903
-# % gui, $(name=), boyembed, eurotherm903App_opi/eurotherm903_embed.opi, P=$(P),Q=$(Q),desc=Eurotherm 903
 # These define what PVs the detail screen should contain
-# % gui, $(name=), enum, Enable,   $(P)$(Q):DISABLE
-# % gui, $(name=), demand, Set Point,   $(P)$(Q):SL
-# % gui, $(name=), readback, Set Point,   $(P)$(Q):SL:RBV
-# % gui, $(name=), demand, Ramp Rate,   $(P)$(Q):RR
-# % gui, $(name=), readback, Ramp Rate,   $(P)$(Q):RR:RBV
-# % gui, $(name=), readback, Actual Temperature,   $(P)$(Q):PV:RBV
-# % gui, $(name=), readback, Working Set Point,   $(P)$(Q):SP:RBV
-# % gui, $(name=), readback, Temperature Error,   $(P)$(Q):ER:RBV
-# % gui, $(name=), readback, Output Power,   $(P)$(Q):OP:RBV
-# % gui, $(name=), demand, Max Output Power,   $(P)$(Q):HO
-# % gui, $(name=), readback, Max Output Power,   $(P)$(Q):HO:RBV
-# % gui, $(name=), readback, Proportional Gain,   $(P)$(Q):XP:RBV
-# % gui, $(name=), readback, Integral Gain,   $(P)$(Q):TI:RBV
-# % gui, $(name=), readback, Differential Gain,   $(P)$(Q):TD:RBV
-# % gui, $(name=), demand, Max Set Point,   $(P)$(Q):SL.DRVH
-# % gui, $(name=), demand, Max Ramp Rate,   $(P)$(Q):RR.DRVH
-# % gui, $(name=), readback, Error,   $(P)$(Q):EE
-# % gui, $(name=), command, Clear Error,   $(P)$(Q):EE
 
-# % gdatag,template,eurotherm903,$(gda_name=),$(gda_desc=)
 # % autosave 2 SCAN
 record(seq, "$(P)$(Q):UPDATE") {
   field(DESC, "Update Temp Params")
@@ -81,7 +57,6 @@ record(seq, "$(P)$(Q):PID") {
 ##
 ## Set temperature setpoint 1 (SL)
 ##
-#% gdatag,pv,rw,$(gda_name=),SL
 #% autosave 2 DRVH
 record(ao, "$(P)$(Q):SL") {
   field(DESC, "Setpoint")
@@ -99,7 +74,6 @@ record(ao, "$(P)$(Q):SL") {
 ##
 ## Setpoint 1 readback (SL)
 ##
-# % gdatag,pv,ro,$(gda_name=),SLRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):SL:RBV") {
   field(DESC, "Setpoint Readback")
@@ -113,7 +87,6 @@ record(ai, "$(P)$(Q):SL:RBV") {
 ##
 ## Working Setpoint 1 readback (SP)
 ##
-# % gdatag,pv,ro,$(gda_name=),SPRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):SP:RBV") {
   field(DESC, "Working Setpoint Readback")
@@ -127,7 +100,6 @@ record(ai, "$(P)$(Q):SP:RBV") {
 ##
 ## Calculate difference between actual temperature and working set point.
 ##
-# % gdatag,pv,ro,$(gda_name=),ERRBV
 # % archiver 10 Monitor
 record(calc, "$(P)$(Q):ER:RBV") {
   field(DESC, "Temp Error Readback")
@@ -141,7 +113,6 @@ record(calc, "$(P)$(Q):ER:RBV") {
 ##
 ## Output power readback (OP)
 ##
-# % gdatag,pv,ro,$(gda_name=),OPRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):OP:RBV") {
   field(DESC, "Output Power Readback")
@@ -155,7 +126,6 @@ record(ai, "$(P)$(Q):OP:RBV") {
 ##
 ## Max Output power readback (HO)
 ##
-# % gdatag,pv,ro,$(gda_name=),HORBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):HO:RBV") {
   field(DESC, "Max Output Power RBV")
@@ -170,7 +140,6 @@ record(ai, "$(P)$(Q):HO:RBV") {
 ##
 ## Set the max output power (HO)
 ##
-#% gdatag,pv,rw,$(gda_name=),HO
 record(ao, "$(P)$(Q):HO") {
   field(DESC, "Max Output Power")
   field(DTYP, "stream")
@@ -184,7 +153,6 @@ record(ao, "$(P)$(Q):HO") {
 ##
 ## Set the ramp rate (RR)
 ##
-#% gdatag,pv,rw,$(gda_name=),RR
 #% autosave 2 DRVH
 record(ao, "$(P)$(Q):RR") {
   field(DESC, "Ramprate")
@@ -202,7 +170,6 @@ record(ao, "$(P)$(Q):RR") {
 ##
 ## Read the ramp rate (RR)
 ##
-# % gdatag,pv,ro,$(gda_name=),RRRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):RR:RBV") {
   field(DESC, "Ramprate Readback")
@@ -217,7 +184,6 @@ record(ai, "$(P)$(Q):RR:RBV") {
 ##
 ## Temperature readback (PV, measured value)
 ##
-# % gdatag,pv,ro,$(gda_name=),PVRBV
 # % archiver 1 Monitor
 record(ai, "$(P)$(Q):PV:RBV") {
   field(DESC, "Temperature Readback")
@@ -228,7 +194,6 @@ record(ai, "$(P)$(Q):PV:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-##% gdatag,pv,rw,$(gda_name=),XP
 #record(ao, "$(P)$(Q):XP") {
 #  field(DESC, "XP Param")
 #  field(DTYP, "stream")
@@ -243,7 +208,6 @@ record(ai, "$(P)$(Q):PV:RBV") {
 ## 
 ## Readback of proportional gain
 ##
-# % gdatag,pv,ro,$(gda_name=),XPRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):XP:RBV") {
   field(DESC, "XP Param Readback")
@@ -253,7 +217,6 @@ record(ai, "$(P)$(Q):XP:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-##% gdatag,pv,rw,$(gda_name=),TI
 #record(ao, "$(P)$(Q):TI") {
 #  field(DESC, "TI Param")
 #  field(DTYP, "stream")
@@ -268,7 +231,6 @@ record(ai, "$(P)$(Q):XP:RBV") {
 ## 
 ## Readback of integral gain
 ##
-# % gdatag,pv,ro,$(gda_name=),TIRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):TI:RBV") {
   field(DESC, "TI Param Readback")
@@ -278,7 +240,6 @@ record(ai, "$(P)$(Q):TI:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-##% gdatag,pv,rw,$(gda_name=),TD
 #record(ao, "$(P)$(Q):TD") {
 #  field(DESC, "TD Param")
 #  field(DTYP, "stream")
@@ -293,7 +254,6 @@ record(ai, "$(P)$(Q):TI:RBV") {
 ## 
 ## Readback of differential gain
 ##
-# % gdatag,pv,ro,$(gda_name=),TDRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):TD:RBV") {
   field(DESC, "TD Param Readback")
@@ -306,7 +266,6 @@ record(ai, "$(P)$(Q):TD:RBV") {
 ## 
 ## Error code from the Eurotherm when setting parameters.
 ##
-# % gdatag,pv,rw,$(gda_name=),EE
 record(mbbi, "$(P)$(Q):EE") {
   field(DESC, "Last message status")
   field(DTYP, "stream")
@@ -329,7 +288,6 @@ record(mbbi, "$(P)$(Q):EE") {
 ## Disable EPICS PVs.
 ## Can be used if the device is not connected.
 ##
-# % gdatag,binary,rw,$(gda_name=),DISABLE
 record(bo, "$(P)$(Q):DISABLE") {
   field(DESC, "Disable comms")
   field(PINI, "YES")

@@ -7,11 +7,9 @@
 # port    - asyn port
 #
 #% macro, device, device name
-#% macro, name, Object name and gui association name
 #% macro, port, asyn serial port number
 
 
-# % gui, $(name=), edm, agilent4UHV.edl, device=$(device)
 ################################################################################
 # Controller Model
 #

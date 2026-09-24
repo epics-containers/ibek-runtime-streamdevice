@@ -83,4 +83,3 @@ entity_models:
       - file: lakeshore218.template
         args:
           .*:
-          lakeshore218Path: ""

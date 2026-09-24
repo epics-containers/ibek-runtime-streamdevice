@@ -18,15 +18,11 @@
 # % macro,  HIGH, HIGH value for input temperature
 # % macro,  LOW,  LOW value for input temperature
 # % macro,  LOLO, LOLO value for input temperature
-# % macro,  name, object and gui association name
-# % macro,  EDM_FILE, EDM file: can be lRE2xx.edl or lIntegralT.edl
 #
 # Notes:
 #   Temperature reading is handled by the alarm handler
 #
 ################################################################
-# % gui, $(name=), edmembed, lRE2xx_embed.edl, P=$(P),EDM_FILE=$(EDM_FILE=lRE2xx.edl)
-# % gui, $(name=), edm, $(EDM_FILE=lRE2xx.edl), P=$(P)
 ################################################################
 # Read records
 ################################################################

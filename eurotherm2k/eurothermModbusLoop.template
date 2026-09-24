@@ -20,14 +20,9 @@
 # % macro, PREC, Setpoint precision, must match controller setup
 # % macro, EGUT, Engineering units for SP & RBV, etc, default is C
 # % macro, EGU, Engineering units for ramp rate, default is C/s
-# % macro, gda_name, Name to export to gda as
-# % macro, gda_desc, Description for gda
-# % macro, name, Object and gui association name
 
 # This associates an edm screen with the template
-# % gui, $(name=), edm, eurotherm2k_modbus.edl, P=$(P),Q=$(Q)
 
-# % gdatag,template,eurotherm2k,$(gda_name=),$(gda_desc=)
 
 # should get this from eurothermModbus, but just in case define it here too...
 record(bo, "$(P)$(Q):DISABLE") {
@@ -47,7 +42,6 @@ record(ai, "$(P)$(Q):PV:RBV_RAW") {
   field(FLNK, "$(P)$(Q):PV:RBV")
 }
 
-# % gdatag,pv,ro,$(gda_name=),PVRBV
 # % archiver 1 Monitor
 # Handle negative temperature readback
 record(calc, "$(P)$(Q):PV:RBV") {
@@ -59,7 +53,6 @@ record(calc, "$(P)$(Q):PV:RBV") {
 }
 
 # Target setpoint: address 2
-#% gdatag,pv,rw,$(gda_name=),SP
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):SP") {
   field(DESC, "Setpoint")
@@ -71,7 +64,6 @@ record(ao, "$(P)$(Q):SP") {
   field(ASLO, "0.1")
 }
 
-# % gdatag,pv,ro,$(gda_name=),SPRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):SP:RBV") {
   field(DESC, "Setpoint Readback")
@@ -83,7 +75,6 @@ record(ai, "$(P)$(Q):SP:RBV") {
 }
 
 # Target output power (manual mode): address 3
-#% gdatag,pv,rw,$(gda_name=),O
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):O") {
   field(DESC, "Output")
@@ -96,7 +87,6 @@ record(ao, "$(P)$(Q):O") {
   field(PREC, "1")
 }
 
-# % gdatag,pv,ro,$(gda_name=),ORBV
 # % archiver 1 Monitor
 record(ai, "$(P)$(Q):O:RBV_RAW") {
   field(DESC, "Output Readback")
@@ -119,7 +109,6 @@ record(calc, "$(P)$(Q):O:RBV") {
 }
 
 # Ramp rate: address 37
-#% gdatag,pv,rw,$(gda_name=),RR
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):RR") {
   field(DESC, "Ramprate")
@@ -132,7 +121,6 @@ record(ao, "$(P)$(Q):RR") {
   field(PREC, "1")
 }
 
-# % gdatag,pv,ro,$(gda_name=),RRRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):RR:RBV") {
   field(DESC, "Ramprate Readback")
@@ -167,7 +155,6 @@ record(bi, "$(P)$(Q):MAN:RBV") {
 # Proportional gain term: address 351
 # Note this must be set to operate engineering units (not %) for the precision to be correct
 # otherwise it is a fixed precision of 1 decimal place
-#% gdatag,pv,rw,$(gda_name=),P
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):P") {
   field(DESC, "P Param")
@@ -178,7 +165,6 @@ record(ao, "$(P)$(Q):P") {
   field(PREC, "1")
 }
 
-# % gdatag,pv,ro,$(gda_name=),PRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):P:RBV") {
   field(DESC, "P Param Readback")
@@ -190,7 +176,6 @@ record(ai, "$(P)$(Q):P:RBV") {
 }
 
 # Integral gain term: address 352
-#% gdatag,pv,rw,$(gda_name=),I
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):I") {
   field(DESC, "I Param")
@@ -201,7 +186,6 @@ record(ao, "$(P)$(Q):I") {
   field(ASLO, "1")
 }
 
-# % gdatag,pv,ro,$(gda_name=),IRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):I:RBV") {
   field(DESC, "I Param Readback")
@@ -213,7 +197,6 @@ record(ai, "$(P)$(Q):I:RBV") {
 }
 
 # Derivative gain term: address 353
-#% gdatag,pv,rw,$(gda_name=),D
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):D") {
   field(DESC, "D Param")
@@ -224,7 +207,6 @@ record(ao, "$(P)$(Q):D") {
   field(ASLO, "1")
 }
 
-# % gdatag,pv,ro,$(gda_name=),DRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):D:RBV") {
   field(DESC, "D Param Readback")

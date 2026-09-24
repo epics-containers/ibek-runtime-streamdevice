@@ -19,10 +19,6 @@
 #% macro, RDBD   , Retry deadband (EGU)
 #% macro, STARTDLY, Time to allow ONT readback to indicate moving (seconds)
 #% macro, EGU    , Engineering Units
-#% macro, name   , Object name and gui association name
-#% macro, name, name for gui element
-# % gui, $(name=), edm, motor.edl, motor=$(P)$(Q)$(GRP)
-# % gui, $(name=), edmembed, motor-embed-small.edl, motor=$(P)$(Q)$(GRP),filename=motor.edl,box-label=$(DESC)
 # AUTOSAVE: level 0 = before record init, level 1 = before AND after record init
 #% autosave 0 DVAL OFF
 #% autosave 1 DIR DHLM DLLM TWV SREV MRES ERES RRES VBAS VELO ACCL BDST BVEL BACC RDBD EGU RTRY UEIP URIP DLY PREC DISA DISP FOFF OFF FRAC OMSL JVEL JAR

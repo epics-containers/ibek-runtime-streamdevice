@@ -15,9 +15,7 @@
 # % macro, DESCSHORT, Optional.  Short description of current signal for use on packed GUI screens (but only EPICS VAL default actually limits the length of the string).  Defaults to $(P)$(R).
 # % macro, DESCLONG, Optional.  Longer description of the current signal.  Defaults to $(P)$(R) current signal.  The EPICS string record VAL field length limit is the restriction on the length of the string (of 39 characters under EPICS R3.14.12.7).
 #
-# % macro, name, Optional.  Name to export to gda as
 #
-# % gui, $(name=), edm, Keithley6487.edl, P=$(P), R=$(R)
 #
 # Basic SCPI (IEEE488.2) commands
 #

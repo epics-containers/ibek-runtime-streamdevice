@@ -19,12 +19,8 @@
 # % macro,  TEMPDESC, DESC field value on the TEMP record (water temperature).  Defaults to Chiller water temp
 # % macro,  RRDRVH,	Ramp rate upper clipping point [C/min]
 # % macro,  RRDRVL, Ramp rate lower clipping point [C/min]
-# % macro,  name, object and gui association name
-# % macro,  DESC, Description
 #
 ################################################################
-# % gui, $(name=), edmembed, lRE2xx_embed.edl, P=$(P),EDM_FILE=lIntegralT.edl
-# % gui, $(name=), edm, EDM_FILE=lIntegralT.edl, P=$(P)
 ################################################################
 # Read records
 ################################################################

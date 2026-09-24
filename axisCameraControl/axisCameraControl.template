@@ -6,47 +6,10 @@
 # % macro, P, PV prefix
 # % macro, PORT, Asyn http port
 # % macro, IPADDR, IP address of the camera
-# % macro, name, Object and gui association name
 ################################################################################
 
 # This associates a BOY screen with the template
-# % gui, $(name=), boydetail, axisCameraControlApp_opi/axisCameraControl_detail.opi, P=$(P),desc=Pan/Tilt/Zoom Control
-# % gui, $(name=), boyembed, axisCameraControlApp_opi/axisCameraControl_embed_box.opi, P=$(P),desc=Pan/Tilt/Zoom Control
-# % gui, $(name=), boyembed, axisCameraControlApp_opi/axisCameraControl_embed.opi, P=$(P),desc=Pan/Tilt/Zoom Control
 # These define what PVs the detail screen should contain
-# % gui, $(name=), demand, Pan,   $(P):PAN
-# % gui, $(name=), demand, Pan Tweak,   $(P):PANTWEAK
-# % gui, $(name=), command, Pan Down,   $(P):PANMINUS.PROC
-# % gui, $(name=), command, Pan Up,   $(P):PANPLUS.PROC
-# % gui, $(name=), command, Pan Tweak Double,   $(P):PANTWEAKMUL.PROC
-# % gui, $(name=), command, Pan Tweak Halve,   $(P):PANTWEAKDIV.PROC
-# % gui, $(name=), demand, Tilt,   $(P):TILT
-# % gui, $(name=), demand, Tilt Tweak,   $(P):TILTTWEAK
-# % gui, $(name=), command, Tilt Down,   $(P):TILTMINUS.PROC
-# % gui, $(name=), command, Tilt Up,   $(P):TILTPLUS.PROC
-# % gui, $(name=), command, Tilt Tweak Double,   $(P):TILTTWEAKMUL.PROC
-# % gui, $(name=), command, Tilt Tweak Halve,   $(P):TILTTWEAKDIV.PROC
-# % gui, $(name=), demand, Zoom,   $(P):ZOOM
-# % gui, $(name=), demand, Zoom Tweak,   $(P):ZOOMTWEAK
-# % gui, $(name=), command, Zoom Down,   $(P):ZOOMMINUS.PROC
-# % gui, $(name=), command, Zoom Up,   $(P):ZOOMPLUS.PROC
-# % gui, $(name=), command, Zoom Tweak Double,   $(P):ZOOMTWEAKMUL.PROC
-# % gui, $(name=), command, Zoom Tweak Halve,   $(P):ZOOMTWEAKDIV.PROC
-# % gui, $(name=), demand, Focus,   $(P):FOCUS
-# % gui, $(name=), demand, Focus Tweak,   $(P):FOCUSTWEAK
-# % gui, $(name=), command, Focus Down,   $(P):FOCUSMINUS.PROC
-# % gui, $(name=), command, Focus Up,   $(P):FOCUSPLUS.PROC
-# % gui, $(name=), command, Focus Tweak Double,   $(P):FOCUSTWEAKMUL.PROC
-# % gui, $(name=), command, Focus Tweak Halve,   $(P):FOCUSTWEAKDIV.PROC
-# % gui, $(name=), enum, Auto Focus,   $(P):AUTOFOCUS
-# % gui, $(name=), demand, Iris,   $(P):IRIS
-# % gui, $(name=), demand, Iris Tweak,   $(P):IRISTWEAK
-# % gui, $(name=), command, Iris Down,   $(P):IRISMINUS.PROC
-# % gui, $(name=), command, Iris Up,   $(P):IRISPLUS.PROC
-# % gui, $(name=), command, Iris Tweak Double,   $(P):IRISTWEAKMUL.PROC
-# % gui, $(name=), command, Iris Tweak Halve,   $(P):IRISTWEAKDIV.PROC
-# % gui, $(name=), enum, Auto Iris,   $(P):AUTOIRIS
-# % gui, $(name=), edmembed, ptz.edl, P=$(P)
 
 # Pan control
 record(ao, "$(P):PAN")

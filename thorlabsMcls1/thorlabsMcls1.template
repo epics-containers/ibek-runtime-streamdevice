@@ -1,4 +1,3 @@
-# % macro, name,   Name
 # % macro, P,      PV name prefix
 # % macro, Q,      PV name suffix
 # % macro, BLUE,  Blue channel name
@@ -6,9 +5,7 @@
 # % macro, VRED,  Very red channel name
 # % macro, IRED,  (Near) infrared channel name
 # % macro, PORT,   asyn port
-# % macro, desc,   Description
 
-# % gui, $(name=), edm, thorlabsMcls1.edl, P=$(P),Q=$(Q),desc=$(desc)
 
 # System-Wide
 

@@ -117,9 +117,7 @@ record(waveform, "$(P):DM7XX") {
 # % macro, name, Object name and gui association name
 # 
 # This associates an edm screen with the template
-# % gui, , edmembed, dlsPLC_writeSingle.edl, P=$(P),Q=:GRIPPER_OPEN
 # This makes the component icon reflect the severity
-# % gui, , sevr
 # % archiver 10 Monitor
 record(ao, "$(P):GRIPPER_OPEN") {
   field(DESC, "Control")
@@ -138,9 +136,7 @@ record(ao, "$(P):GRIPPER_OPEN") {
 # % macro, name, Object name and gui association name
 # 
 # This associates an edm screen with the template
-# % gui, , edmembed, dlsPLC_writeSingle.edl, P=$(P),Q=:GRIPPER_CLOSE
 # This makes the component icon reflect the severity
-# % gui, , sevr
 # % archiver 10 Monitor
 record(ao, "$(P):GRIPPER_CLOSE") {
   field(DESC, "Control")
@@ -159,9 +155,7 @@ record(ao, "$(P):GRIPPER_CLOSE") {
 # % macro, name, Object name and gui association name
 # 
 # This associates an edm screen with the template
-# % gui, , edmembed, dlsPLC_writeSingle.edl, P=$(P),Q=:ERROR_RESET
 # This makes the component icon reflect the severity
-# % gui, , sevr
 # % archiver 10 Monitor
 record(ao, "$(P):ERROR_RESET") {
   field(DESC, "Control")
@@ -761,7 +755,6 @@ record(ai, "$(P):BARCODE_WORD_4")
 # % macro, name, Object and gui association name
 
 # Associate edm screen with template
-# % gui, Yaskawa-MainAdv, edm, yaskawaBARTRobot-MainAdv.edl, robot=$(P)
 
 record(stringin, "$(P):VER") {
   field(DTYP, "stream")
@@ -1272,7 +1265,6 @@ record(stringin, "$(P):TESTSTRIN") {
 
 
 # Associate edm screen with template (lots of macros required)
-# % gui, Yaskawa-MainUser, edm, yaskawaBARTRobot-MainUser.edl, P=$(P), CUR_COLUMN_VAR_NUM=$(CUR_COLUMN_VAR_NUM), CUR_ROW_VAR_NUM=$(CUR_ROW_VAR_NUM), CUR_SLOT_VAR_NUM=$(CUR_SLOT_VAR_NUM), NEXT_COLUMN_VAR_NUM=$(NEXT_COLUMN_VAR_NUM), NEXT_ROW_VAR_NUM=$(NEXT_ROW_VAR_NUM), NEXT_SLOT_VAR_NUM=$(NEXT_SLOT_VAR_NUM,undefined)
 
 
 #######################################################

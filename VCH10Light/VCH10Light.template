@@ -6,12 +6,8 @@
 # % macro, port,        Mandatory.  Asyn serial port
 #
 # % macro, description, Optional.   Defaults to ES Chamber Lights.  Description of the controller for use on GUI - e.g. chambers illuminated.
-# % macro, shortdesc,   Optional.   Defaults to Lights.             Short description to appear in GUI text.
 #
-# % macro, name,        Optional.   Defaults to VCH-10.             Object name and associated gui name.
 
-# % gui, $(name=VCH-10), edm, VCH10Light.edl, P=$(P)
-# % gui, $(name=VCH-10), edmembed, VCH10Light-embed.edl, P=$(P), shortdesc=$(shortdesc=Lights)
 
 ################################################################################
 record(stringin, "$(P):MESSAGE") {

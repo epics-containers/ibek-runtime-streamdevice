@@ -13,8 +13,6 @@
 # % macro, NELM, Max number of Sweep Pulses (default 10000)
 # % macro, V_HLIMIT, Highest voltage value settable on the device 
 # % macro, I_HLIMIT, Highest current value settable on the device 
-# % macro, name, Name to export to gda as
-# % gui, $(name=), edm, keithley2600.edl, P=$(P), Q=$(Q), CHAN=$(CHAN), SMU=$(SMU)
 #
 #Enable Remote or local
 record(bo, "$(P)$(Q):CH$(CHAN):Disable") {

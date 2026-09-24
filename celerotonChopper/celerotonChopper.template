@@ -2,7 +2,6 @@
 # % macro, Q,      PV name suffix
 # % macro, PORT,   asyn port
 
-# % gui, $(name=), edm, celerotonChopper.edl, P=$(P),Q=$(Q)
 
 
 # ==========================================================

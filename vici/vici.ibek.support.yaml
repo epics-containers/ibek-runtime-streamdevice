@@ -37,7 +37,6 @@ entity_models:
       - file: viciE2CA.template
         args:
           .*:
-          name: ""
 
   - name: viciEMT
     description: |-
@@ -139,7 +138,6 @@ entity_models:
       - file: viciEMT.template
         args:
           .*:
-          name: ""
 
   - name: viciEUTA
     description: |-
@@ -241,7 +239,6 @@ entity_models:
       - file: viciEUTA.template
         args:
           .*:
-          name: ""
 
   - name: viciUM
     description: |-
@@ -339,7 +336,6 @@ entity_models:
       - file: viciUM.template
         args:
           .*:
-          name: ""
 
   - name: eightGasSelect
     description: |-

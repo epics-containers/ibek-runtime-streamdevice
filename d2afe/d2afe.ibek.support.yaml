@@ -134,7 +134,6 @@ entity_models:
       - file: d2afeStatus.template
         args:
           .*:
-          name: ""
 
   - name: d2ptg
     description: |-

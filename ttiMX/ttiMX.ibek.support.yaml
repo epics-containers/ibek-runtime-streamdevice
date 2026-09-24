@@ -66,4 +66,3 @@ entity_models:
       - file: ttiMX_general.template
         args:
           .*:
-          name: ""

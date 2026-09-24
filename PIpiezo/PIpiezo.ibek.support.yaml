@@ -62,7 +62,6 @@ entity_models:
       - file: E725.template
         args:
           .*:
-          R: ""
 
   - name: E871
     description: |-
@@ -132,7 +131,6 @@ entity_models:
       - file: E816.template
         args:
           .*:
-          DESC: ""
 
   - name: C877
     description: |-
@@ -320,8 +318,6 @@ entity_models:
       - file: PI-E516.template
         args:
           .*:
-          gda_desc: ""
-          gda_name: ""
 
   - name: actuatorcallback
     description: |-

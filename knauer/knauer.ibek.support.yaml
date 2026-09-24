@@ -49,8 +49,6 @@ entity_models:
       - file: azuraV2-1S.template
         args:
           .*:
-          device: ""
-          valve: ""
 
   - name: ConnectionManagement
     description: |-

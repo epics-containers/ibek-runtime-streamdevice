@@ -8,11 +8,7 @@
 # Macros:
 # P - device name
 # PORT - asyn serial port name
-# %gdatag,template,simplePv,$(gda_name=).LEVELA,$(gda_desc=) current level (mm)
-# %gdatag,template,simplePv,$(gda_name=).LEVELB,$(gda_desc=) current level (mm)
-# %gdatag,template,simpleBinary,$(gda_name=).PUMP,$(gda_desc=) pump control
 # Turn pump off or on
-# %gdatag,binary,rw,$(gda_name=).PUMP,RECORD,Pump on/off control
 record(bo, "$(P):PUMP") {
   field(DTYP, "stream")
   field(OUT, "@hdi.protocol setPump() $(PORT) 0")
@@ -82,7 +78,6 @@ record(bo, "$(P):REQUESTBG") {
 }
 
 # Current foreground reading (channel A)
-# %gdatag,pv,ro,$(gda_name=).LEVELA,RECORD,Helium level A
 record(longin, "$(P):LEVELA") {
   field(SCAN, "I/O Intr")
   field(DTYP, "stream")
@@ -92,7 +87,6 @@ record(longin, "$(P):LEVELA") {
 }
 
 # Current background reading (channel B)
-# %gdatag,pv,ro,$(gda_name=).LEVELB,RECORD,Helium level B
 record(longin, "$(P):LEVELB") {
   field(DTYP, "stream")
   field(SCAN, "I/O Intr")

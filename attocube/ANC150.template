@@ -7,8 +7,6 @@
 # % macro, M, Motor suffix
 # % macro, PORT, Asyn port name
 # % macro, AXIS, Motor axis number
-# % macro, name, object and gui association name
-# % gui, $(name=), edmembed, ANC150-embed.edl, motor=$(P)$(M)
 
 record(longout, "$(P)$(M):V") {
   field(DESC, "Step voltage accross piezo")

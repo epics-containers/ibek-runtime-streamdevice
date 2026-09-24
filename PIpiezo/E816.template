@@ -6,31 +6,6 @@
 # % macro, EGU, Engineering units
 # % macro, PORT, Asyn port for I/O with controller
 # % macro, DESC, Description
-# % macro, name, Object and gui association name
-# % gui, $(name=), edmembed, E816-axis-embed.edl, P=$(P), Q=$(Q), DESC=$(DESC)
-# % gui, $(name=), boydetail,PIpiezoApp_opi/e816_detail.opi, P=$(P), Q=$(Q), DESC=$(DESC)
-# % gui, $(name=), boyembed, PIpiezoApp_opi/e816_embed_box.opi, P=$(P), Q=$(Q), DESC=$(DESC)
-# % gui, $(name=), boyembed, PIpiezoApp_opi/e816_embed.opi, P=$(P), Q=$(Q), DESC=$(DESC)
-# % gui, $(name=), readback, Error Code,   $(P)$(Q):ERR:RD
-# % gui, $(name=), enum, Servo Mode,   $(P)$(Q):SVO:WR
-# % gui, $(name=), readback, Servo Mode,   $(P)$(Q):SVO:RD
-# % gui, $(name=), enum, Drift Compensation,   $(P)$(Q):DCO:WR
-# % gui, $(name=), readback, Drift Compensation,   $(P)$(Q):DCO:RD
-# % gui, $(name=), command, Tweak Forward,   $(P)$(Q):MOV:TWF.PROC
-# % gui, $(name=), demand, Demand Position,   $(P)$(Q):MOV:WR
-# % gui, $(name=), command, Tweak Reverse,   $(P)$(Q):MOV:TWF.PROC
-# % gui, $(name=), demand, Tweak Step,   $(P)$(Q):MOV:TWV
-# % gui, $(name=), readback, Demand Position,   $(P)$(Q):MOV:RD
-# % gui, $(name=), readback, Current Position,   $(P)$(Q):POS:RD
-# % gui, $(name=), readback, On Target Status,   $(P)$(Q):ONT:RD
-# % gui, $(name=), command, Abs Tweak Forward,     $(P)$(Q):SVA:TWF.PROC
-# % gui, $(name=), demand, Absolute Voltage,   $(P)$(Q):SVA:WR
-# % gui, $(name=), command, Abs Tweak Reverse,     $(P)$(Q):SVA:TWR.PROC
-# % gui, $(name=), demand, Abs Tweak Step,         $(P)$(Q):SVA:TWV
-# % gui, $(name=), readback, Absolute Voltage,   $(P)$(Q):SVA:RD
-# % gui, $(name=), readback, Voltage,   $(P)$(Q):VOL:RD
-# % gui, $(name=), readback, Overfow Status,   $(P)$(Q):OVF:RD
-# % gui, $(name=), enum, Polling,   $(P)$(Q):DISABLEPOLL
 #Records are ordered following Driver Requirements order proposed
 record(stringin, "$(P)$(Q):IDN:RD") {
   field(DESC, "Read device identity and firmware number")

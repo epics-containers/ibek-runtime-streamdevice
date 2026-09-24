@@ -1,5 +1,4 @@
 # This associates an edm screen with the template
-# % gui, $(name=None), edm, CrateMon.edl, device=$(device)
 
 record(seq, "$(device):SEQ")
 {
@@ -196,7 +195,6 @@ record(ai, "$(device):FAN8")
 ################################################################################
 
 # This makes the component icon reflect the severity
-# % gui, $(name=None), sevr
 # % archiver 2 Monitor
 # % alh
 

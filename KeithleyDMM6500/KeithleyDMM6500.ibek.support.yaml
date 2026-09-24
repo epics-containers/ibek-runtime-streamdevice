@@ -29,4 +29,3 @@ entity_models:
       - file: dmm6500.template
         args:
           .*:
-          name: ""

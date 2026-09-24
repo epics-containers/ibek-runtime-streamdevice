@@ -31,7 +31,6 @@ entity_models:
       - file: centerN.template
         args:
           .*:
-          name: ""
 
   - name: coolpak
     description: |-

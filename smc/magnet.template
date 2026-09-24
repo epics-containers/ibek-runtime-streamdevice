@@ -4,9 +4,7 @@
 #! DBDEND
 
 
-#% gdatag,template,magnet,$(gda_name=),$(gda_desc=)
 # Disable record when PSU limit is zero.
-#% gdatag,pv,rw,$(gda_name=),XDMD,X Demand
 record(ao, "$(P):X:DMD") {
   field(DISV, "0")
   field(SDIS, "$(P):CALCLOWLIM.A CP")
@@ -15,7 +13,6 @@ record(ao, "$(P):X:DMD") {
 }
 
 # Disable record when PSU limit is zero.
-#% gdatag,pv,rw,$(gda_name=),YDMD,Y Demand
 record(ao, "$(P):Y:DMD") {
   field(DISV, "0")
   field(SDIS, "$(P):CALCLOWLIM.B CP")
@@ -24,7 +21,6 @@ record(ao, "$(P):Y:DMD") {
 }
 
 # Disable record when PSU limit is zero.
-#% gdatag,pv,rw,$(gda_name=),ZDMD,Z Demand
 record(ao, "$(P):Z:DMD") {
   field(DISV, "0")
   field(SDIS, "$(P):CALCLOWLIM.C CP")
@@ -33,7 +29,6 @@ record(ao, "$(P):Z:DMD") {
 }
 
 # % autosave 1 VAL
-#% gdatag,mbbinary,rw,$(gda_name=),MODE,Operational Mode
 record(mbbo, "$(P):MODE") {
   field(ZRST, "UNIAXIAL_X")
   field(ONST, "UNIAXIAL_Y")
@@ -92,7 +87,6 @@ record(transform, "$(P):ABSCALC") {
   field(INPC, "$(P):Z:DMD")
 }
 
-#% gdatag,pv,rw,$(gda_name=),START,Start Ramp
 record(calcout, "$(P):STARTRAMP") {
   field(CALC, "A=1")
   field(INPA, "$(P):LIMITSCHECKER.N PP")
@@ -162,19 +156,16 @@ record(calcout, "$(P):VECTORSUM:DMD") {
   field(INPC, "$(P):Z:DMD CP")
 }
 
-#% gdatag,pv,ro,$(gda_name=),XRBV,X Readback
 record(ai, "$(P):X:RBV") {
   field(INP, "$(X):STS:PMCURRENT CP")
   field(EGU, "T")
 }
 
-#% gdatag,pv,ro,$(gda_name=),YRBV,Y Readback
 record(ai, "$(P):Y:RBV") {
   field(INP, "$(Y):STS:PMCURRENT CP")
   field(EGU, "T")
 }
 
-#% gdatag,pv,ro,$(gda_name=),ZRBV,Z Readback
 record(ai, "$(P):Z:RBV") {
   field(INP, "$(Z):STS:PMCURRENT CP")
   field(EGU, "T")
@@ -227,7 +218,6 @@ record(calcout, "$(P):COMBINESTATUS") {
   field(DOPT, "Use CALC")
 }
 
-#% gdatag,binary,ro,$(gda_name=),LIMITSTATUS,Limit Status
 record(bi, "$(P):LIMITSTATUS") {
   field(PINI, "YES")
   field(VAL, "1")
@@ -237,7 +227,6 @@ record(bi, "$(P):LIMITSTATUS") {
   field(ONAM, "OK")
 }
 
-#% gdatag,binary,ro,$(gda_name=),RAMPSTATUS,Ramp Status
 record(mbbo, "$(P):RAMPSTATUS") {
   field(ZRST, "RAMPING")
   field(ONST, "RAMP MADE")
@@ -339,7 +328,6 @@ record(sseq, "$(P):SENDZ") {
 
 # Make sure each PSU is configured
 # to use Tesla at startup.
-#% gdatag,pv,rw,$(gda_name=),INIT,Initialize Controllers
 record(dfanout, "$(P):SETUNITS") {
   field(DESC, "Set units to Tesla")
   field(PINI, "YES")

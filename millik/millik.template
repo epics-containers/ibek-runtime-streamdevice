@@ -6,7 +6,6 @@
 # % macro, PORT, Asyn Port name
 # % macro, PREC, Precision. Default is 4
 # This associates the template with an edm screen
-# % gui, $(PORT), edm, millik.edl, P=$(P),R=$(R)
 record(waveform, "$(P)$(R)IDN") {
   field(DESC, "SCPI identification string")
   field(DTYP, "stream")

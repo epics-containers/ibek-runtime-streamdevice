@@ -11,9 +11,6 @@
 # % macro, P, Device prefix
 # % macro, R, Device suffix
 # % macro, PORT, Asyn Port for communication with device
-# % macro, name, object and gui association name
-# # gui, $(name=), edm, azuraV2-1S.edl, device=$(P)$(R)
-# % gui, $(name=), boydetail, knauerApp_opi/azuraV2-1S.opi, device=$(device),valve=$(valve)
 
 
 ######

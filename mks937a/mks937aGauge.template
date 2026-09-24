@@ -33,7 +33,6 @@
 #
 # gui substitutions:
 #% macro, name,        The device's name for gui purposes
-#% macro, GCTLR,       The gauge controller PV prefix, for gui purposes
 #
 # optional substitutions:
 #% macro, ctlsp_level, The desired control setpoint value (actually for the Pirg).
@@ -49,17 +48,10 @@
 #		               (appears as a label on the Pirg EDM screen).
 #
 # GCTLR used for the controller button
-# % gui, $(name=), edm, mks937aGauge.edl, dom=$(dom), id=$(id), GCTLR=$(GCTLR=)
 #
 # This associates BOY screens with the template
-# % gui, $(name=), boydetail, mks937aApp_opi/gauge_detail.opi, dom=$(dom), id=$(id), GCTLR=$(GCTLR=), name=$(name=)
-# % gui, $(name=), boyembed, mks937aApp_opi/gauge_embed_box.opi, dom=$(dom), id=$(id), GCTLR=$(GCTLR=), name=$(name=)
-# % gui, $(name=), boyembed, mks937aApp_opi/gauge_embed.opi, dom=$(dom), id=$(id), GCTLR=$(GCTLR=), name=$(name=)
 
 # These define what PVs a valve detail screen should contain
-# % gui, $(name=), readback, Pressure,   $(dom)-VA-GAUGE-$(id):P
-# % gui, $(name=), readback, Gauge,  $(dom)-VA-GAUGE-$(id):GAUGE
-# % gui, $(name=), enum, Setpoints Overwrite,  $(dom)-VA-GAUGE-$(id):ILKSETSP:NOWRITE
 
 
 ################################################################################

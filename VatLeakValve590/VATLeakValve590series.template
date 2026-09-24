@@ -4,7 +4,6 @@
 #
 # substitutions:
 #% macro, device, device name
-#% macro, name, Object name and gui association name
 #% macro, port, asyn serial port number (e.g. ty_40_0)
 #% macro, proto, name of protocol file, either V590.proto
 #  records which do not explicitly state their protocols will use the protocol
@@ -12,63 +11,13 @@
 
 # These define what PVs a valve detail screen should contain
 # Status:
-# % gui, $(name=), readback, Operation Mode,            $(device):ACCESSMODE
-# % gui, $(name=), readback, Control Mode,              $(device):CTRLMODE
-# % gui, $(name=), readback, Warnings,                  $(device):WARNINGS
-# % gui, $(name=), readback, Backup Battery,            $(device):POWERFAIL
-# % gui, $(name=), readback, Compressed Air,            $(device):COMPAIR
-# % gui, $(name=), readback, Current Valve Speed,       $(device):VALVESPEED
-# % gui, $(name=), readback, Controller,                $(device):PRESSCTRLR
-# % gui, $(name=), readback, Current Valve Pressure,    $(device):PRESSURE
-# % gui, $(name=), readback, Current Valve Position,    $(device):POSITION
-# % gui, $(name=), readback, Simulation Mode,           $(device):SIMULATION
-# % gui, $(name=), readback, Service Needed Warning,    $(device):SERVICEWARN
-# % gui, $(name=), readback, Backup Batt. Fail,         $(device):POWERFAIL
-# % gui, $(name=), readback, Measurement Unit,          $(device):PRESSUNIT
-# % gui, $(name=), readback, Fixed 2 Direction,         $(device):F2CTLRDIR
-# % gui, $(name=), readback, Fixed 2 P-gain,            $(device):F2PGAIN
-# % gui, $(name=), readback, Fixed 2 I-gain,            $(device):F2IGAIN
-# % gui, $(name=), readback, Sensor Metric Unit,        $(device):UNIT
-# % gui, $(name=), readback, Sensor Scaling Factor,     $(device):SCALE
-# % gui, $(name=), readback, Sensor Exponent Value,     $(device):EXP
-# % gui, $(name=), readback, Sensor Exponent Sign,      $(device):SIGN
-# % gui, $(name=), readback, Target Pressure,           $(device):TARGETPRESSURE
-# % gui, $(name=), readback, Pressure Reading Range,    $(device):PRESSRANGE
-# % gui, $(name=), readback, Position Movement Range,   $(device):POSITIONRANGE
-# % gui, $(name=), readback, Pressure Soft Interlock,   $(device):PRESSURESILK
-# % gui, $(name=), readback, Pressure Limit,            $(device):PRESSURELIMIT
-# % gui, $(name=), readback, Position Limit,            $(device):POSITIONLIMIT
 #
 
 # Control:
-# % gui, $(name=), demand,  Pressure,               $(device):SETPRESSURE
-# % gui, $(name=), demand,  Position,               $(device):SETPOSITION
-# % gui, $(name=), enum,    Pressure Controller,    $(device):SETPRESSCTRLR
-# % gui, $(name=), command, Close valve,            $(device):CLOSE
-# % gui, $(name=), command, Hold valve,             $(device):HOLD
-# % gui, $(name=), enum,    Clear Warings,          $(device):CLEAR
-# % gui, $(name=), demand,  Fixed 2 P-gain,         $(device):SETF2PGAIN
-# % gui, $(name=), demand,  Fixed 2 I-gain,         $(device):SETF2IGAIN
-# % gui, $(name=), demand,  Value to Inc./Dec. by,  $(device):SETINCDECVAL
-# % gui, $(name=), demand,  Decrememnt Position,    $(device):BUTTONDECPOS
-# % gui, $(name=), demand,  Incrememnt Position,    $(device):BUTTONINCPOS
 
 # Config:
-# % gui, $(name=), enum,    Access Mode,             $(device):SETACCESSMODE
-# % gui, $(name=), demand,  Valve Speed,             $(device):SETVALVESPEED
-# % gui, $(name=), demand,  Pressure Controller,     $(device):SETPRESSRANGE
-# % gui, $(name=), demand,  Sensor Scale,            $(device):SETSCALE
-# % gui, $(name=), enum,    Sensor Exponent,         $(device):SETEXP
-# % gui, $(name=), enum,    Sensor Metric Unit,      $(device):SETUNIT
-# % gui, $(name=), enum,    Sensor Exp. Sign,        $(device):SETSIGN
-# % gui, $(name=), demand,  Position Limit,          $(device):SETPOSITIONLIMIT
-# % gui, $(name=), demand,  Pressure Range,          $(device):SETPRESSRANGE
-# % gui, $(name=), enum,    Position Range,          $(device):SETPOSITIONRANGE
-# % gui, $(name=), enum,    Fixed 2 Direction,       $(device):SETF2CTLRDIRUP
 #
 # This associates an edm screen with the template
-# % gui, $(name=), edm, VATLeakValve590Series.edl, device=$(device)
-# % gui, $(name=), edm, VatValve590.edl, device=$(P)$(R)
 # These define what PVs a valve detail screen should contain
 # 
 

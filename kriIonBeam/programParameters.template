@@ -11,8 +11,6 @@
 # % macro, P,       EPICS PV prefix
 # % macro, PORT,    asyn port
 # % macro, PROG,    program number
-# % macro, name,    object and gui association name
-# % gui, $(name=), edm, programParameters.edl, P=$(P), TITLE=$(name=)
 
 ##### Parameter level (program control) #####
 

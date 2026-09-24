@@ -5,7 +5,6 @@
 #% macro, PORT, Asyn Port name
 #% macro, A, Timeout
 # This associates the template with an edm screen
-# % gui, $(PORT), edm, keithley6514.edl, P=$(P),R=$(R)
 
 
 

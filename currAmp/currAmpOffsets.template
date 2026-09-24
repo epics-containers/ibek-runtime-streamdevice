@@ -87,7 +87,6 @@ record(calcout, "$(P):PHD4:I_C") {
   field(LOPR, "0.0000001")
 }
 
-#% gdatag,pv,ro,$(gda_bpm_name=),CAL_INTENSITY,Intensity calibrated with offsets
 record(calcout, "$(P):INTEN_C") {
   field(DESC, "Calibrated intensity")
   field(SCAN, "Passive")
@@ -103,7 +102,6 @@ record(calcout, "$(P):INTEN_C") {
 
 # Normalize the intensity with respect to the beam current.
 # First check that the beam is greater than 1mA, if not set to zero and MAJOR alarm status.
-#% gdatag,pv,ro,$(gda_bpm_name=),NORM_INTENSITY,Intensity normalized to ring current
 record(calc, "$(P):INTEN_N") {
   field(DESC, "Normalized intensity")
   field(CALC, "B>1?(A/B)*100:0")

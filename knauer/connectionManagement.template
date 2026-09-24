@@ -11,8 +11,6 @@
 
 # % macro, P, Device prefix
 # % macro, R, Device suffix
-# % macro, name, object and gui association name
-# # gui, $(name=), edm, connection.edl, device=$(P)$(R), title=$(name=)
 
 ####################################################
 # Startup

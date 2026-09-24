@@ -1,9 +1,6 @@
 # % macro, P, Device prefix
 # % macro, Q, Device suffix
 # % macro, PORT, Asyn port name
-# % macro, name, Object and gui association name
-# % gui, $(name=), edm, watsonMarlow323Du.edl, device=$(P)$(Q)
-# % gui, $(name=), edmembed, watsonMarlow323Du_embed.edl, device=$(P)$(Q)
 
 record(bo, "$(P)$(Q):DISABLE") {
   field(DESC, "Disable comms")

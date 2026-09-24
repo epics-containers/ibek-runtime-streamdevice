@@ -27,7 +27,6 @@
 # % macro, name, Object and gui association name
 
 # Associate edm screen with template
-# % gui, Yaskawa-MainAdv, edm, yaskawaBARTRobot-MainAdv.edl, robot=$(P)
 
 record(stringin, "$(P):VER") {
   field(DTYP, "stream")

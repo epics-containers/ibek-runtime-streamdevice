@@ -5,9 +5,6 @@
 
 #% macro, P, Device prefix
 #% macro, bus, Asyn port to connect to
-#% macro, name, Object and gui association name
-#% gui, $(name=), edm, strainGaugeLimits.edl, P=$(P),gauge=''
-#% gdatag,template,simplePv,$(name=),Strain gauge
 record(stringin, "$(P):GETCONFIG") {
   field(DTYP, "stream")
   field(INP, "@strainGauge.protocol requestConfig $(bus)")
@@ -139,7 +136,6 @@ record(stringout, "$(P):RAWCOMMAND") {
 # Request the current value from the strain gauge once a second.
 # High and low limits are read from the gauges every ten seconds, but set
 # to constants at startup so as not to appear in error state.
-#% gdatag,pv,ro,$(name=),RECORD,Strain Gauge
 record(ai, "$(P):POLLVALUE") {
   field(SCAN, "1 second")
   field(DTYP, "stream")

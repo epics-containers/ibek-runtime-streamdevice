@@ -3,7 +3,6 @@
 # % macro, PORT, Asyn port name
 # % macro, ADDR, Address of unit, normally 0
 # % macro, CHAN, Channel number in range 0..3
-# % macro, gda_name, Name to export to gda as
 # % autosave 2 SCAN
 record(seq, "$(P)$(Q):UPDATE$(CHAN)") {
   field(DESC, "Update C$(CHAN) Params")
@@ -28,7 +27,6 @@ record(longout, "$(P)$(Q):HASC$(CHAN)") {
   field(OUT, "$(P)$(Q):UPDATE$(CHAN).PROC PP")
 }
 
-#% gdatag,pv,rw,$(gda_name),VSET$(CHAN)
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):VSET$(CHAN)") {
   field(DESC, "HV Setpoint")
@@ -43,7 +41,6 @@ record(ao, "$(P)$(Q):VSET$(CHAN)") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name),VSET$(CHAN)RBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):VSET$(CHAN):RBV") {
   field(DESC, "HV Setpoint Readback")
@@ -54,7 +51,6 @@ record(ai, "$(P)$(Q):VSET$(CHAN):RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name),VMON$(CHAN)RBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):VMON$(CHAN):RBV") {
   field(DESC, "HV Monitor")
@@ -65,7 +61,6 @@ record(ai, "$(P)$(Q):VMON$(CHAN):RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(gda_name),ISET$(CHAN)
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):ISET$(CHAN)") {
   field(DESC, "HV Current Setpoint")
@@ -80,7 +75,6 @@ record(ao, "$(P)$(Q):ISET$(CHAN)") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name),ISET$(CHAN)RBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):ISET$(CHAN):RBV") {
   field(DESC, "HV Current Setpoint Readback")
@@ -91,7 +85,6 @@ record(ai, "$(P)$(Q):ISET$(CHAN):RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name),IMON$(CHAN)RBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):IMON$(CHAN):RBV") {
   field(DESC, "HV Current Monitor")
@@ -102,7 +95,6 @@ record(ai, "$(P)$(Q):IMON$(CHAN):RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(gda_name),RUP$(CHAN)
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):RUP$(CHAN)") {
   field(DESC, "HV Ramp Up Rate")
@@ -117,7 +109,6 @@ record(ao, "$(P)$(Q):RUP$(CHAN)") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name),RUP$(CHAN)RBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):RUP$(CHAN):RBV") {
   field(DESC, "HV Ramp Up Rate Readback")
@@ -128,7 +119,6 @@ record(ai, "$(P)$(Q):RUP$(CHAN):RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(gda_name),RDW$(CHAN)
 # % autosave 2 VAL
 record(ao, "$(P)$(Q):RDW$(CHAN)") {
   field(DESC, "HV Ramp Down Rate")
@@ -143,7 +133,6 @@ record(ao, "$(P)$(Q):RDW$(CHAN)") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name),RDW$(CHAN)RBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):RDW$(CHAN):RBV") {
   field(DESC, "HV Ramp Down Rate Readback")
@@ -154,7 +143,6 @@ record(ai, "$(P)$(Q):RDW$(CHAN):RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,ro,$(gda_name),STAT$(CHAN)RBV
 # % archiver 10 Monitor
 record(mbbiDirect, "$(P)$(Q):STAT$(CHAN):RBV") {
   field(DESC, "Status")
@@ -163,7 +151,6 @@ record(mbbiDirect, "$(P)$(Q):STAT$(CHAN):RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,binary,ro,$(gda_name),ON$(CHAN)RBV
 # % archiver 10 Monitor
 record(bi, "$(P)$(Q):ON$(CHAN):RBV") {
   field(DESC, "Channel enabled readback")
@@ -173,7 +160,6 @@ record(bi, "$(P)$(Q):ON$(CHAN):RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,binary,rw,$(gda_name),ON$(CHAN)
 # % archiver 10 Monitor
 # % autosave 2 VAL
 record(bo, "$(P)$(Q):ON$(CHAN)") {

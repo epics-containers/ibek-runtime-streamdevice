@@ -29,4 +29,3 @@ entity_models:
       - file: specsVCU1000.template
         args:
           .*:
-          name: ""

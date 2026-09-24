@@ -66,7 +66,6 @@ entity_models:
       - file: lRE2xx.template
         args:
           .*:
-          DESC: ""
 
   - name: lIntegralT
     description: |-
@@ -175,7 +174,6 @@ entity_models:
       - file: lVariocool.template
         args:
           .*:
-          DESC: ""
 
   - name: lMCxxx
     description: |-
@@ -217,7 +215,6 @@ entity_models:
       - file: lMCxxx.template
         args:
           .*:
-          DESC: ""
 
   - name: lRE2xx_RS485
     description: |-

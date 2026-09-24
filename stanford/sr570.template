@@ -4,12 +4,9 @@
 # % macro, P, Device prefix
 # % macro, Q, Device suffix
 # % macro, PORT, Asyn port for this device
-# % macro, DESC, Description for this device (displayed on EDM screen)
 #
 # This associates an edm screen with the template
-# % gui, $(name=), edm, sr570.edl, CA=$(P)$(Q),CT=$(DESC)
 #
-# % gdatag,template,currAmpSingle,$(gda_name=),$(gda_desc=)
 record(bo, "$(P)$(Q):RESET") {
   field(DESC, "Reset")
   field(DTYP, "stream")
@@ -445,7 +442,6 @@ record(bo, "$(P)$(Q):SUCM") {
   field(ONAM, "UNCAL")
 }
 
-# % gdatag,mbbinary,rw,$(gda_name=),SETGAINUNIT,Set gain unit
 # % autosave 1 VAL
 #% archiver 10 Monitor
 record(mbbo, "$(P)$(Q):SENS:SEL2") {
@@ -466,7 +462,6 @@ record(mbbo, "$(P)$(Q):SENS:SEL2") {
   field(DISV, "100")
 }
 
-# % gdatag,mbbinary,rw,$(gda_name=),SETGAIN,Set gain
 # % autosave 1 VAL
 #% archiver 10 Monitor
 record(mbbo, "$(P)$(Q):SENS:SEL1") {
@@ -518,13 +513,11 @@ record(calcout, "$(P)$(Q):SENS:CALC2") {
   field(PINI, "YES")
 }
 
-# % gdatag,pv,ro,$(gda_name=),VENDOR,Vendor String
 record(stringout, "$(P)$(Q):VENDOR") {
   field(PINI, "YES")
   field(VAL, "Stanford")
 }
 
-# % gdatag,pv,ro,$(gda_name=),MODEL,Model String
 record(stringout, "$(P)$(Q):MODEL") {
   field(PINI, "YES")
   field(VAL, "SR570")

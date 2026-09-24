@@ -9,7 +9,6 @@
 #   MAXI - Maximum current
 # % macro, device, device name
 
-# %gui, $(name), edmembed, ttiCPX_channel.edl, P=$(P),CHAN=$(CHAN)
 
 # The desired output voltage.
 #% autosave 1 VAL

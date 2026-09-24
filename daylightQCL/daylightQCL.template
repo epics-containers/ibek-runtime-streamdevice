@@ -2,7 +2,6 @@
 # % macro, Q,      PV name suffix
 # % macro, PORT,   asyn port
 
-# % gui, $(name=), edm, daylightQCL.edl, P=$(P),Q=$(Q)
 
 record(longin, "$(P)$(Q):LASER:CURRENT_RBV")
 {

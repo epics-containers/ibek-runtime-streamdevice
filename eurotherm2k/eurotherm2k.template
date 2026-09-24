@@ -15,41 +15,9 @@
 # % macro, SPCMD, Setpoint command, set to 'write' for floating point
 # % macro, PREC, Setpoint precision
 # % macro, EGU, Engineering units for ramp rate, default is C/s
-# % macro, name, object and gui association name
-# % macro, gda_name, Name to export to gda as
-# % macro, gda_desc, Description for gda
-# % macro, desc, Description for CSS
-# % gdatag,template,eurotherm2k,$(gda_name=),$(gda_desc=)
-# % gui, $(name=), edmembed, eurotherm2k_embed.edl, eurotherm=$(P)$(Q)
-# % gui, $(name=), edm, eurotherm2k.edl, eurotherm=$(P)$(Q)
 
 # This associates a BOY screen with the template
-# % gui, $(name=), boydetail, eurotherm2kApp_opi/eurotherm2k_detail.opi, P=$(P),Q=$(Q),desc=$(desc=Eurotherm 2K)
-# % gui, $(name=), boyembed, eurotherm2kApp_opi/eurotherm2k_embed_box.opi, P=$(P),Q=$(Q),desc=$(desc=Eurotherm 2K)
-# % gui, $(name=), boyembed, eurotherm2kApp_opi/eurotherm2k_embed.opi, P=$(P),Q=$(Q),desc=$(desc=Eurotherm 2K)
 # These define what PVs the detail screen should contain
-# % gui, $(name=), enum, Enable,   $(P)$(Q):DISABLE
-# % gui, $(name=), demand, Set Point,   $(P)$(Q):SP
-# % gui, $(name=), readback, Set Point,   $(P)$(Q):SP:RBV
-# % gui, $(name=), demand, Set Point High Limit,   $(P)$(Q):SP:HIGH
-# % gui, $(name=), readback, Set Point High Limit,   $(P)$(Q):SP:HIGH:RBV
-# % gui, $(name=), demand, Ramp Rate,   $(P)$(Q):RR
-# % gui, $(name=), readback, Ramp Rate,   $(P)$(Q):RR:RBV
-# % gui, $(name=), demand, Output,   $(P)$(Q):O
-# % gui, $(name=), readback, Output,   $(P)$(Q):O:RBV
-# % gui, $(name=), enum, Mode,   $(P)$(Q):MAN
-# % gui, $(name=), readback, Mode,   $(P)$(Q):MAN:RBV
-# % gui, $(name=), enum, Update,   $(P)$(Q):UPDATE.SCAN
-# % gui, $(name=), readback, Temperature,   $(P)$(Q):PV:RBV
-# % gui, $(name=), demand, Proportional Gain,   $(P)$(Q):P
-# % gui, $(name=), readback, Proportional Gain,   $(P):P:RBV
-# % gui, $(name=), demand, Integral Gain,   $(P)$(Q):I
-# % gui, $(name=), readback, Integral Gain,   $(P):I:RBV
-# % gui, $(name=), demand, Differential Gain,   $(P)$(Q):D
-# % gui, $(name=), readback, Differential Gain,   $(P):D:RBV
-# % gui, $(name=), enum, PID Update,   $(P)$(Q):PID.SCAN
-# % gui, $(name=), readback, Error,   $(P):ERR
-# % gui, $(name=), command, Clear Error,   $(P):ERR
 
 # % autosave 2 SCAN
 record(seq, "$(P)$(Q):UPDATE") {
@@ -82,7 +50,6 @@ record(seq, "$(P)$(Q):PID") {
   field(PINI, "YES")
 }
 
-#% gdatag,pv,rw,$(gda_name=),SP
 record(ao, "$(P)$(Q):SP") {
   field(DESC, "Setpoint")
   field(DTYP, "stream")
@@ -96,7 +63,6 @@ record(ao, "$(P)$(Q):SP") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name=),SPRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):SP:RBV") {
   field(DESC, "Setpoint Readback")
@@ -135,7 +101,6 @@ record(ai, "$(P)$(Q):SP:HIGH:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(gda_name=),RR
 record(ao, "$(P)$(Q):RR") {
   field(DESC, "Ramprate")
   field(DTYP, "stream")
@@ -149,7 +114,6 @@ record(ao, "$(P)$(Q):RR") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name=),RRRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):RR:RBV") {
   field(DESC, "Ramprate Readback")
@@ -160,7 +124,6 @@ record(ai, "$(P)$(Q):RR:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(gda_name=),O
 record(ao, "$(P)$(Q):O") {
   field(DESC, "Output")
   field(DTYP, "stream")
@@ -174,7 +137,6 @@ record(ao, "$(P)$(Q):O") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name=),ORBV
 # % archiver 1 Monitor
 record(ai, "$(P)$(Q):O:RBV") {
   field(DESC, "Ouptut Readback")
@@ -185,7 +147,6 @@ record(ai, "$(P)$(Q):O:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name=),PVRBV
 # % archiver 1 Monitor
 record(ai, "$(P)$(Q):PV:RBV") {
   field(DESC, "Temperature Readback")
@@ -196,7 +157,6 @@ record(ai, "$(P)$(Q):PV:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(gda_name=),P
 record(ao, "$(P)$(Q):P") {
   field(DESC, "P Param")
   field(DTYP, "stream")
@@ -208,7 +168,6 @@ record(ao, "$(P)$(Q):P") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name=),PRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):P:RBV") {
   field(DESC, "P Param Readback")
@@ -218,7 +177,6 @@ record(ai, "$(P)$(Q):P:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(gda_name=),I
 record(ao, "$(P)$(Q):I") {
   field(DESC, "I Param")
   field(DTYP, "stream")
@@ -230,7 +188,6 @@ record(ao, "$(P)$(Q):I") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name=),IRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):I:RBV") {
   field(DESC, "I Param Readback")
@@ -240,7 +197,6 @@ record(ai, "$(P)$(Q):I:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-#% gdatag,pv,rw,$(gda_name=),D
 record(ao, "$(P)$(Q):D") {
   field(DESC, "D Param")
   field(DTYP, "stream")
@@ -252,7 +208,6 @@ record(ao, "$(P)$(Q):D") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name=),DRBV
 # % archiver 10 Monitor
 record(ai, "$(P)$(Q):D:RBV") {
   field(DESC, "D Param Readback")
@@ -262,7 +217,6 @@ record(ai, "$(P)$(Q):D:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,rw,$(gda_name=),ERR
 record(mbbi, "$(P)$(Q):ERR") {
   field(DESC, "Error message")
   field(DTYP, "stream")
@@ -281,7 +235,6 @@ record(mbbi, "$(P)$(Q):ERR") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,binary,rw,$(gda_name=),DISABLE
 record(bo, "$(P)$(Q):DISABLE") {
   field(DESC, "Disable comms")
   field(PINI, "YES")

@@ -49,7 +49,6 @@ entity_models:
       - file: alicatGasFlow.template
         args:
           .*:
-          name: ""
 
   - name: alicatPressureCtrl
     description: |-
@@ -96,7 +95,6 @@ entity_models:
       - file: alicatPressureCtrl.template
         args:
           .*:
-          name: ""
 
   - name: alicatMassCtrl
     description: |-
@@ -519,5 +517,3 @@ entity_models:
       - file: alicatMassCtrl.template
         args:
           .*:
-          DESC: ""
-          name: ""

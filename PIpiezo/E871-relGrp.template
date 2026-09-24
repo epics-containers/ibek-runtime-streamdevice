@@ -18,8 +18,6 @@
 # % macro, SC1, Scale factor for C1 move, set to -1 to move motor in opposite direction (default=1)
 # % macro, SC2, Scale factor for C2 move, set to -1 to move motor in opposite direction (default=1)
 # % macro, SC3, Scale factor for C3 move, set to -1 to move motor in opposite direction (default=1)
-# % macro, name, name for gui element
-# % gui, $(name=), edmembed, PI-E871-relGrp-embed.edl,P=$(P),Q=$(Q),GRP=$(GRP),DESC=$(DESC)
 # ####################################################################
 record(ao, "$(P)$(Q)$(GRP):MVR:WR") {
   field(DESC, "$(DESC)")

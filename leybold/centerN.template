@@ -4,10 +4,7 @@
 #
 # % macro, P, PV Prefix
 # % macro, PORT, Asyn port name
-# % macro, gda_name, GDA root name
-# % macro, gda_desc, GDA description
 
-# % gui, $(name).MAIN, edm, centerN.edl, P=$(P)
 #
 #*!*Section template begin*!*
 # %archiver 10 Monitor

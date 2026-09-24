@@ -13,7 +13,6 @@
 #Builder support
 # % macro, P, Device Prefix
 # % macro, PORT, Asyn Port
-# % gui, $(name=), edm, norhofLN2.edl, P=$(P)
 
 # /// 
 # /// Disable all comms to the controller.

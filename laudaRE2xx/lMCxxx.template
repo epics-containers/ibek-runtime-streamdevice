@@ -17,21 +17,8 @@
 # % macro,  HIGH, HIGH value for input temperature
 # % macro,  LOW,  LOW value for input temperature
 # % macro,  LOLO, LOLO value for input temperature
-# % macro,  name, object and gui association name
-# % macro,  DESC, Description
 # 
 # ##############################################################
-# % gui, $(name=), edmembed, lMCxxx_embed.edl, P=$(P),EDM_FILE=lMCxxx.edl
-# % gui, $(name=), edm, EDM_FILE=lMCxxx.edl, P=$(P)
-# % gui, $(name=), boydetail,laudaRE2xxApp_opi/laudaMCxxx_detail.opi, P=$(P), DESC=$(DESC)
-# % gui, $(name=), boyembed, laudaRE2xxApp_opi/laudaMCxxx_embed_box.opi, P=$(P), DESC=$(DESC)
-# % gui, $(name=), boyembed, laudaRE2xxApp_opi/laudaMCxxx_embed.opi, P=$(P), DESC=$(DESC)
-# % gui, $(name=), enum, Communications,   $(P):DISABLE
-# % gui, $(name=), demand, Water temperature,   $(P):SET_TEMP
-# % gui, $(name=), readback, Water temperature,   $(P):TEMP
-# % gui, $(name=), statusbits, Status,   $(P):STATUS, Error, Power, None, None, Water Low Level
-# % gui, $(name=), demand, Command,   $(P):COMMAND
-# % gui, $(name=), readback, Response,   $(P):RESPONSE
 # ##############################################################
 # Read records
 # ##############################################################

@@ -13,7 +13,6 @@ record(mbbi, "$(P)$(Q):TYPE")
 }
 
 # % archiver 1 Monitor
-# %gdatag,mbbinary,ro,$(gda_name=),RUNMODE
 record(mbbi, "$(P)$(Q):RUNMODE") {
   field(DESC, "Run Mode")
   field(DTYP, "Raw Soft Channel")
@@ -35,7 +34,6 @@ record(mbbi, "$(P)$(Q):RUNMODE") {
 }
 
 # % archiver 1 Monitor
-# %gdatag,pv,ro,$(gda_name=),RAMPRATE
 record(ai, "$(P)$(Q):RAMPRATE") {
   field(DESC, "Ramp Rate")
   field(DTYP, "Raw Soft Channel")
@@ -44,7 +42,6 @@ record(ai, "$(P)$(Q):RAMPRATE") {
 }
 
 # % archiver 1 Monitor
-# %gdatag,pv,ro,$(gda_name=),TARGETTEMP
 record(ai, "$(P)$(Q):TARGETTEMP") {
   field(DESC, "Target Temperature")
   field(DTYP, "Raw Soft Channel")
@@ -81,7 +78,6 @@ record(ai, "$(P)$(Q):SUCTTEMP") {
 }
 
 # % archiver 1 Monitor
-# %gdatag,pv,ro,$(gda_name=),REMAINING
 record(ai, "$(P)$(Q):REMAINING") {
   field(DESC, "Time Remaining in Phase")
   field(DTYP, "Raw Soft Channel")
@@ -126,7 +122,6 @@ record(ai, "$(P)$(Q):SUCTHEAT") {
 }
 
 # % archiver 1 Monitor
-# %gdatag,pv,ro,$(gda_name=),RUNTIME
 record(ai, "$(P)$(Q):RUNTIME") {
   field(DESC, "Pump Uptime")
   field(DTYP, "Raw Soft Channel")
@@ -202,7 +197,6 @@ record(asyn, "$(P)$(Q):ASYN") {
   field(TMOT, "0.1")
 }
 
-# %gdatag,pv,rw,$(gda_name=),RESTART
 record(ao, "$(P)$(Q):RESTART") {
   field(DESC, "Start/Restart program")
   field(DTYP, "stream")
@@ -210,7 +204,6 @@ record(ao, "$(P)$(Q):RESTART") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# %gdatag,pv,rw,$(gda_name=),RAMP
 record(ao, "$(P)$(Q):RAMP") {
   field(DESC, "Start a ramp")
   field(DTYP, "stream")
@@ -219,7 +212,6 @@ record(ao, "$(P)$(Q):RAMP") {
 }
 
 # % archiver 1 Monitor
-# %gdatag,pv,rw,$(gda_name=),RRATE
 record(ao, "$(P)$(Q):RRATE") {
   field(DESC, "Set Ramp Rate")
   field(DTYP, "Raw Soft Channel")
@@ -231,7 +223,6 @@ record(ao, "$(P)$(Q):RRATE") {
   field(FLNK, "$(P)$(Q):RRATECH")
 }
 
-# %gdatag,pv,rw,$(gda_name=),PLAT
 record(ao, "$(P)$(Q):PLAT") {
   field(DESC, "Start a plat")
   field(DTYP, "stream")
@@ -240,7 +231,6 @@ record(ao, "$(P)$(Q):PLAT") {
 }
 
 # % archiver 1 Monitor
-# %gdatag,pv,rw,$(gda_name=),PTIME
 record(ao, "$(P)$(Q):PTIME") {
   field(DESC, "Plat Time")
   field(DTYP, "Raw Soft Channel")
@@ -251,7 +241,6 @@ record(ao, "$(P)$(Q):PTIME") {
   field(FLNK, "$(P)$(Q):PTIMECH")
 }
 
-# %gdatag,pv,rw,$(gda_name=),HOLD
 record(ao, "$(P)$(Q):HOLD") {
   field(DESC, "Start a hold")
   field(DTYP, "stream")
@@ -259,7 +248,6 @@ record(ao, "$(P)$(Q):HOLD") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# %gdatag,pv,rw,$(gda_name=),COOL
 record(ao, "$(P)$(Q):COOL") {
   field(DESC, "Start a cool")
   field(DTYP, "stream")
@@ -268,7 +256,6 @@ record(ao, "$(P)$(Q):COOL") {
 }
 
 # % archiver 1 Monitor
-# %gdatag,pv,rw,$(gda_name=),CTEMP
 record(ao, "$(P)$(Q):CTEMP") {
   field(DESC, "Cool Temp")
   field(DTYP, "Raw Soft Channel")
@@ -283,7 +270,6 @@ record(ao, "$(P)$(Q):CTEMP") {
   field(FLNK, "$(P)$(Q):CTEMPCH")
 }
 
-# %gdatag,pv,rw,$(gda_name=),END,Warm to room temp and stop
 record(ao, "$(P)$(Q):END") {
   field(DTYP, "stream")
   field(OUT, "@OXcommon.proto end($(P)$(Q)) $(PORT)")
@@ -302,7 +288,6 @@ record(ao, "$(P)$(Q):ERATE") {
   field(FLNK, "$(P)$(Q):ERATECH")
 }
 
-# %gdatag,pv,rw,$(gda_name=),PURGE
 record(ao, "$(P)$(Q):PURGE") {
   field(DESC, "Start a Purge/Warm")
   field(DTYP, "stream")
@@ -310,7 +295,6 @@ record(ao, "$(P)$(Q):PURGE") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# %gdatag,pv,rw,$(gda_name=),PAUSE
 record(ao, "$(P)$(Q):PAUSE") {
   field(DESC, "Pause program")
   field(DTYP, "stream")
@@ -318,7 +302,6 @@ record(ao, "$(P)$(Q):PAUSE") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# %gdatag,pv,rw,$(gda_name=),RESUME
 record(ao, "$(P)$(Q):RESUME") {
   field(DESC, "Resume program")
   field(DTYP, "stream")
@@ -326,7 +309,6 @@ record(ao, "$(P)$(Q):RESUME") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# %gdatag,pv,rw,$(gda_name=),STOP
 record(ao, "$(P)$(Q):STOP") {
   field(DESC, "Stop program")
   field(DTYP, "stream")
@@ -354,7 +336,6 @@ record(calcout, "$(P)$(Q):TRIGGER_SETSTATUSFORMAT") {
 }
     
 # % archiver 1 Monitor
-# %gdatag,pv,rw,$(gda_name=),RTEMP
 record(ao, "$(P)$(Q):RTEMP") {
   field(DESC, "Ramp Target Temp")
   field(DTYP, "Raw Soft Channel")
@@ -512,7 +493,6 @@ record(ai, "$(P)$(Q):SETPOINT") {
 }
 
 # % archiver 1 Monitor
-# %gdatag,pv,ro,$(gda_name=),TEMP
 record(ai, "$(P)$(Q):TEMP") {
   field(DESC, "Current Temperature")
   field(DTYP, "Raw Soft Channel")
@@ -602,7 +582,6 @@ record(aai, "$(P)$(Q):ALARM_TABLE") {
 # :ALARM_SEVR through the MS disable link (DISV -1 is never read,
 # so the record is never disabled)
 # % archiver 1 Monitor
-# %gdatag,pv,ro,$(gda_name=),ALARM,Alarm Status,<pv>
 record(subArray, "$(P)$(Q):ALARM") {
   field(DESC, "Alarm Status")
   field(FTVL, "STRING")
@@ -656,7 +635,6 @@ record(ai, "$(P)$(Q):ALARMI") {
   field(HSV,  "MAJOR")
 }
 
-# % gdatag,binary,rw,$(gda_name=),DISABLE
 record(bo, "$(P)$(Q):DISABLE") {
   field(DESC, "Disable comms")
   field(PINI, "YES")

@@ -2,7 +2,6 @@
 # % macro, P,           Device prefix
 # % macro, PORT, asyn serial port number
 
-# % gui, SyconSTM100, edm, SyconSTM100.edl, P=$(P)
 
 ###################################################
 
