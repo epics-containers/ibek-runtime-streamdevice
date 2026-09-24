@@ -1,0 +1,3 @@
+$(P):$(CHAN):CURRENT
+$(P):$(CHAN):OUTPUT
+$(P):$(CHAN):VOLTAGE

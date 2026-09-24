@@ -29,10 +29,6 @@ entity_models:
         type: str
         description: |-
           Device asyn port
-      name:
-        type: id
-        description: |-
-          Device object name
     databases:
       - file: m10.template
         args:

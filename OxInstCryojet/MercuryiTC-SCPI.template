@@ -1,0 +1,7 @@
+# This template is for the Oxford Instruments Mercury iTC Controller.
+# The following handles the typical motherboard based configuration of one temperature sensor and one heater 
+# If daughter boards are fitted then additional instantiations of these templates may be required.
+include "MercuryiTC-SCPI_system.template"
+include "MercuryiTC-SCPI_tempSensor.template"
+include "MercuryiTC-SCPI_heater.template"
+include "MercuryiTC-SCPI_loop.template"

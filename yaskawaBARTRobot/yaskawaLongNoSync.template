@@ -1,6 +1,4 @@
 
-#% archiver 1 Monitor
-
 # % macro, P, Device Prefix
 # % macro, STREAMS_PORT, Asyn Port
 # % macro, VAR, Long integer (int32) to read/write but without sync of target value to RBV.  D Variable (e.g. D001) as Yaskawa refers to these as double precision variables.
@@ -11,7 +9,9 @@
 # % macro, DRVH, High limit
 # % macro, DESC, Variable's description
 
+
 # See above for SDIS and DISV defaults.
+#% archiver 1 Monitor
 record(ao, "$(P):D$(VAR)") {
     field(DESC, "$(DESC=)")
     field(SDIS, "$(P):$(DISWRITE=STA2)")
@@ -29,7 +29,7 @@ record(ao, "$(P):D$(VAR):WRITE") {
     field(DRVH, "$(DRVH)")
 }
 
-#% archiver 10 Monitor
+#% archiver 1 Monitor
 record(ai, "$(P):D$(VAR)_RBV") {
     field(DESC, "$(DESC=)")
     field(DISP, "1")

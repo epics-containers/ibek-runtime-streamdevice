@@ -29,14 +29,11 @@ entity_models:
         type: int
         description: |-
           Signal generator channel (1 or 2)
-      name:
-        type: id
-        description: |-
-          Name to export to gda as
     databases:
       - file: keysight33500Bchan.template
         args:
           .*:
+
   - name: keysight33500B
     description: |-
       Controls a Keysight 33500B function generator

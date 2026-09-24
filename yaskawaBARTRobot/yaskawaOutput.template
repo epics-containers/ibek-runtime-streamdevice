@@ -1,4 +1,4 @@
-#% archiver 1 Monitor
+
 # % macro, P, Device Prefix
 # % macro, STREAMS_PORT, Asyn Port
 # % macro, VAR, Network Output to read (e.g. O37010)
@@ -13,12 +13,14 @@
 # % macro, DESC6, Output bit 6 description
 # % macro, DESC7, Output bit 7 description
 
+
+#% archiver 1 Monitor
 record(mbbiDirect, "$(P):O$(VAR)") {
   field(DESC, "$(DESC=)")
   field(INP, "$(P):O$(VAR)_RBV NPP")
 }
 
-#% archiver 10 Monitor
+#% archiver 1 Monitor
 record(mbbiDirect, "$(P):O$(VAR)_RBV") {
   field(DESC, "$(DESC=)")
   field(DISP, "1")

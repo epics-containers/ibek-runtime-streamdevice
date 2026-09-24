@@ -1,8 +1,6 @@
-# % macro, name, Object name
 # % macro, P, Device prefix 1
 # % macro, R, Device prefix 2
 # % macro, PORT, Asyn PORT name
-# % gui, $(name), edm, dmm6500.edl, P=$(P), R=$(R)
 ########################################################################
 # Function selection
 # Desc: Measurement and digitize functions options

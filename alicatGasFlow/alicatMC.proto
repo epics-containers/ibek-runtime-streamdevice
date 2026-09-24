@@ -59,6 +59,13 @@ getGas
     in "\$1 %*f %*f %*f %*f %*f %s";
 }
 
+# Variant used if MFC has a totalizer, in which case there is an additional float sent before the gas name
+getGasLong
+{ 
+    out "\$1"; 
+    in "\$1 %*f %*f %*f %*f %*f %*f %s";
+}
+
 setGas 
 {
     out "\$1" "$$%d";

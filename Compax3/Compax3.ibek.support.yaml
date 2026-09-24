@@ -2,7 +2,10 @@
 
 # Imported from DLS production support module: Compax3 0-2
 # Source: /dls_sw/prod/R3.14.12.7/support/Compax3/0-2
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release,
+# except for these scripted changes:
+# - `Compax3.proto` is shipped as `compax3.protocol`, the name the template's
+#   `@compax3.protocol` links use.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/Compax3/ release.
 

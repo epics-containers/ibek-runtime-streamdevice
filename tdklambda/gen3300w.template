@@ -9,10 +9,7 @@
 # % macro,  P,       EPICS name prefix
 # % macro,  PORT,    asyn port
 # % macro,  CMDSET,  Command set: use 'R' for RS232(default) or 'S' for SCPI(Ethernet)
-# % macro,  name,    object and gui association name
 
-# % gui, $(name=), edm, gen3300w-full.edl, P=$(P)
-# % gui, $(name=), edmembed, gen3300w-embed.edl, P=$(P)
 
 # The device model
 record(stringin, "$(P):MODEL") {

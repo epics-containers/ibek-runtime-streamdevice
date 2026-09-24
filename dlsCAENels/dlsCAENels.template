@@ -1,0 +1,107 @@
+# dlsCAENels.template
+#
+# This is the top-level template representing a CAENels HV-Adaptos power supply.
+# It defines those records that are instantiated once per device.
+#
+# 2015 - Nicoletta De Maio
+#
+
+# Parameters:
+# % macro,  P,       EPICS name prefix
+# % macro,  PORT,    asyn port
+
+# This associates a BOY screen with the template
+# These define what PVs the detail screen should contain
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# A record to display the number of groups defined on the controller
+record(ai, "$(P):GROUPS") {
+    field(DESC, "number of channel groups")
+    field(INP, "$(P):GRSTRING")
+}
+
+# This record extracts the last group number from the string-valued list and
+# adds 1 to return the number of groups that are defined on the controller
+#
+# NB: This is a hack. It only works for groups in the single digits. Although
+#     single digits are probably found almost 100% of the time in practice.
+record(scalcout, "$(P):GRSTRING") {
+    field(DESC, "extracts number of groups")
+    field(INAA, "$(P):GETGRSTRING")
+    field(CALC, "LEN(AA)==0?0:AA[-2,-1]+1")
+    field(FLNK, "$(P):GROUPS PP")
+}
+
+# An interpose record because Diamond, in its infinite wisdom, doesn't build
+# the CALC dependency into its version of streamDevice. So the documentation
+# web page at PSI stating that streamDevice supports records of type scalcout
+# is wrong. For us. (Not that this is a rant or anything.)
+record(stringin, "$(P):GETGRSTRING") {
+    field(DESC, "list of channel groups")
+    field(DTYP, "stream")
+    field(PINI, "1")
+    field(INP, "@dlsCAENels.proto groupsList($(P)) $(PORT)")
+    field(FLNK, "$(P):GRSTRING PP")
+}
+
+# A catch-all, generic response field
+record(stringin, "$(P):RESPONSE") {
+    field(DESC, "response from device")
+}
+
+# An output record that sets the busy record
+record(bo, "$(P):SETBUSY") {
+    field(DESC, "set the busy record explicitly")
+    field(OUT, "$(P):BUSY.VAL PP")
+    field(VAL, "1")
+}
+
+# This record calculates the state of the busy record. The inputs are expected to
+# come from the status flags of the individual groups.
+record(calc, "$(P):BUSYCALC") {
+    field(DESC, "calculate the state of the busy record")
+    field(CALC, "A | B | C | D | E | F | G | H | I | J | K | L")
+    field(FLNK, "$(P):BUSYLNK PP")
+}
+
+# A re-direction record from calc to busy
+record(bo, "$(P):BUSYLNK") {
+    field(DESC, "redirect the calculated busy state")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(P):BUSYCALC")
+    field(OUT, "$(P):BUSY.VAL CA")
+}
+
+# A busy record to indicate to GDA if it's sane to send commands
+record(busy, "$(P):BUSY") {
+    field(DESC, "on if the device is busy")
+    field(OMSL, "supervisory")
+}
+
+# Direct access to the communication channel; useful for monitoring and debugging
+record(asyn, "$(P):ASYN") {
+    field(DESC, "direct line for monitoring and debugging")
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"0")
+    field(OMAX,"80")
+    field(IMAX,"80")
+    field(OEOS,"\r\n")
+    field(IEOS,"\r\n")
+}

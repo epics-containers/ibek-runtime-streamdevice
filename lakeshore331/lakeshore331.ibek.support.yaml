@@ -38,10 +38,6 @@ entity_models:
         type: int
         description: |-
           Default value for ON/OFF
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: lakeshore331.template
         args:

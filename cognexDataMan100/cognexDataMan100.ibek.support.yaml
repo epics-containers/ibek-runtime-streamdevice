@@ -25,10 +25,6 @@ entity_models:
         type: str
         description: |-
           asyn port name
-      name:
-        type: id
-        description: |-
-          gui element name
     databases:
       - file: dataman100.template
         args:

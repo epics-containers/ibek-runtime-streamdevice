@@ -6,8 +6,6 @@
 # % macro, BSTART, Bstart substitution ?
 # % macro, PV, PV substitution ?
 # % macro, DLY, DLY substitution ?
-# % macro, gda_name, GDA name
-# % macro, gda_desc, GDA description
 record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT5") {
   field(DESC, "if A=7+$(BSTART)-1")
   field(CALC, "A=(7+$(BSTART)-1)?1:0")
@@ -476,10 +474,6 @@ record(calcout, "$(P)$(Q):GDA:B$(BANK):CNT21") {
   field(FLNK, "$(P)$(Q):GDA:B$(BANK):CNT13")
 }
 
-#% gdatag,template,bimorphpsu,$(gda_name=),$(gda_desc=)
-#% gdatag,array,ro,$(gda_name=),VOUT,Output voltage
-# %gda,interface,$(gda_name=),general,bimorphpsu,Elettra bimorph PSU
-# %gda,subsystem,elettraSY900SBimorph,monitor,VOUT,Output voltage
 record(waveform, "$(PV):VOUT") {
   field(INP, "$(P)$(Q):GDA:B$(BANK):CMP.VAL")
   field(HOPR, "10000")
@@ -489,8 +483,6 @@ record(waveform, "$(PV):VOUT") {
   field(PREC, "1")
 }
 
-#% gdatag,array,ro,$(gda_name=),TARGETRBV,Read target voltages
-# %gda,subsystem,$(gda_name=),monitor,TARGETRBV,Read target voltages
 record(waveform, "$(PV):TARGETRBV") {
   field(INP, "$(P)$(Q):GDA:B$(BANK):CMP2.VAL")
   field(HOPR, "10000")
@@ -500,8 +492,6 @@ record(waveform, "$(PV):TARGETRBV") {
   field(PREC, "1")
 }
 
-#% gdatag,array,rw,$(gda_name=),TARGET,Set target voltages
-# %gda,subsystem,$(gda_name=),controlPoint,TARGET,Set target voltages
 record(waveform, "$(PV):TARGET") {
   field(HOPR, "10000")
   field(LOPR, "0")
@@ -511,16 +501,12 @@ record(waveform, "$(PV):TARGET") {
   field(FLNK, "$(P)$(Q):GDA:B$(BANK):START2")
 }
 
-#% gdatag,binary,rw,$(gda_name=),POWERONSET,Power on control
-# %gda,subsystem,$(gda_name=),controlPoint,POWERONSET,Power on control
 record(bo, "$(PV):POWERONSET") {
   field(FLNK, "$(P)$(Q):GDA:PWR$(BANK):CALC3")
   field(ZNAM, "Off")
   field(ONAM, "On")
 }
 
-#% gdatag,binary,ro,$(gda_name=),POWERON,Power on status
-# %gda,subsystem,$(gda_name=),monitor,POWERON,Power on status
 record(bi, "$(PV):POWERON") {
   field(FLNK, "$(P)$(Q):GDA:PWR$(BANK):CALC")
   field(INP, "$(P)$(Q):OUTPUT CP")
@@ -558,14 +544,10 @@ record(calcout, "$(P)$(Q):GDA:PWR$(BANK):CALC2") {
   field(DOPT, "Use CALC")
 }
 
-#% gdatag,pv,ro,$(gda_name=),ELECTRODES,Electrodes
-# %gda,subsystem,$(gda_name=),monitor,ELECTRODES,Electrodes
 record(longin, "$(PV):ELECTRODES") {
   field(VAL, "7")
 }
 
-#% gdatag,binary,rw,$(gda_name=),APPLYTARGET,Start ramping voltages
-# %gda,subsystem,$(gda_name=),controlPoint,APPLYTARGET,Start ramping voltages
 record(busy, "$(PV):APPLYTARGET") {
 }
 
@@ -605,8 +587,6 @@ record(calcout, "$(P)$(Q):GDA:ST$(BANK):CALC") {
   field(DOPT, "Use CALC")
 }
 
-#% gdatag,mbbinary,ro,$(gda_name=),STATUS,Status
-# %gda,subsystem,$(gda_name=),monitor,STATUS,Status
 record(mbbo, "$(PV):STATUS") {
   field(ZRVL, "0")
   field(ONVL, "1")

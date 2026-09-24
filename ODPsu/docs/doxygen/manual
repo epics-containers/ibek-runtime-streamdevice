@@ -1,0 +1,65 @@
+/**
+\mainpage Oxford Danfysik Bimorph Power Supply (ODPsu) EPICS Support Module
+\section intro_sec Introduction 
+This module supports FMB (formerly Oxford Danfysik) bimorph power supplies. 
+Manufacturer's web site: <a href="http://www.fmb-oxford.com/">FMB Oxford</a>
+\n
+\section firmware_versions_sec Firmware versions
+
+There are at least two versions of firmware in use at DLS.
+
+MX Beamlines use firmware version "RXM2PN/24/490 - Version 0.13b  06.06.2006"
+
+I24 uses "RXM2PN/24/490 - Version 1.2 29.08"
+
+\section manufacturer_documentation_sec Manufacturer-provided documentation
+
+Some manufacturer documentation is available in \$(TOP)/etc/private/manufacturer
+
+Getting-Started-Guide-2.0.pdf \n
+S1400-Bimorph-Power-Supply-DLS-I18-USER-MANUAL-2.0a.pdf \n
+47544-21-appendix-A-revision-K.pdf \n
+
+\section build_sec Build Instructions 
+\subsection templatesV1_sec Templates for older firmware
+For the older firmware:
+Protocol file  ODPsu.protocol
+
+Templates: \n
+   ODPsu.template once per power supply \n
+   ODPsuBank.template once per bank (normally two banks) \n
+   ODPsuChannel.template once per channel (e.g. 16, 22, 24) \n
+   
+   ODPsu16DUpdate.vdb once per power supply (in case of 16 channels) \n
+   ODPsu22DUpdate.vdb once per power supply (in case of 22 channels) \n
+   ODPsu24DUpdate.vdb once per power supply (in case of 24 channels) \n
+   
+   ODPsuFormat16.template once per power supply (in case of 16 channels) \n
+   ODPsuFormat22.template once per power supply (in case of 22 channels) \n
+   
+   ODPsugda.template \n
+
+
+\subsection templatesV2_sec Templates for newer firmware
+For the newer firmware:
+Protocol file  ODPsuV2.protocol \n
+Templates:\n
+ODPsuV2.template \n
+ODPsuBankV2.vdb \n
+ODPsuChannelV2.template \n
+ODPsugdaV2.template \n
+
+\section simulation_sec Simulation
+
+There is a simulation for the older firmware version in \$(TOP)/etc/simulations/ODPsu_sim.py
+
+
+**/
+
+/* Build instructions page will be generated from the xml file given to dls-make-doxygen-documentation.py */
+
+/** 
+\page user_manual User Manual
+
+
+**/

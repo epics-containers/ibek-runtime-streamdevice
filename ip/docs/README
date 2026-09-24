@@ -1,0 +1,15 @@
+---------------------------------
+README file for ip support module
+---------------------------------
+
+The ip module has support for serial devices.  
+There is documentation for it in file documentation/ipDoc.html
+Some of the links seem to be broken.
+
+The ip module is part of SynApps which originally covered all serial
+devices.  Now many of those devices have their own separate modules so
+check for one of those before using support from this module.
+
+It is still in use at DLS for a few devices.
+
+README last updated 02/03/2020

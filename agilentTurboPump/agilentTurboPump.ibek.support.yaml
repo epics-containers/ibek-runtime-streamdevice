@@ -13,10 +13,6 @@ entity_models:
     description: |-
       Agilent TwisTorr 305 turbo pump with integrated controller (IC)
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-
@@ -52,10 +48,6 @@ entity_models:
     description: |-
       Agilent TwisTorr 305 turbo pump with free-standing controller (FS)
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-

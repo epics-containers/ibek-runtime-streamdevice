@@ -1,0 +1,120 @@
+
+#
+# coolpak.template
+#
+# % macro, P, PV Prefix
+# % macro, PORT, Asyn port name
+#
+#*!*Section template begin*!*
+# %archiver 10 Monitor
+record(mbbi, "$(P):CONNECTION_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)CONNECTION")
+  field(ZRVL, "0")
+  field(ZRST, "Disconnected")
+  field(ONVL, "1")
+  field(ONST, "Connected")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SYSTEMMODE_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SYSTEMMODE")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SYSTEMMODE")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SYSTEMMODE")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):HEAD1MODE_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)HEAD1MODE")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):HEAD1MODE")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)HEAD1MODE")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):HEAD2MODE_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)HEAD2MODE")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):HEAD2MODE")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)HEAD2MODE")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+record(stringin, "$(P):SWVER_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)SWVER")
+}
+record(stringin, "$(P):LOGGEDTIME_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)LOGGEDTIME")
+}
+record(stringin, "$(P):UPTIME_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)UPTIME")
+}
+record(waveform, "$(P):DATA_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)DATA")
+  field(FTVL, "CHAR")
+  field(NELM, "256")
+}
+record(waveform, "$(P):ERRORS_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)ERRORS")
+  field(FTVL, "CHAR")
+  field(NELM, "256")
+}
+#*!*Section template end*!*

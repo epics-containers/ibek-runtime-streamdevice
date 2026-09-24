@@ -1,0 +1,242 @@
+# % macro, P, Device Prefix
+# % macro, Q, Device Suffix
+# % macro, PORT, Asyn Port
+# % macro, ZRST, Job 1 name
+# % macro, ONST, Job 2 name
+# % macro, TWST, Job 3 name
+# % macro, THST, Job 4 name
+# % macro, FRST, Job 5 name
+# % macro, FVST, Job 6 name
+# % macro, SXST, Job 7 name
+# % macro, SVST, Job 8 name
+# % macro, EIST, Job 9 name
+# % macro, NIST, Job 10 name
+# % macro, TEST, Job 11 name
+# % macro, ELST, Job 12 name
+# % macro, TVST, Job 13 name
+# % macro, TTST, Job 14 name
+# % macro, FTST, Job 15 name
+# % macro, FFST, Job 16 name
+# % macro, TYPE, Robot type: FS or NX (default)
+
+record(stringin, "$(P)$(Q):VER") {
+  field(DTYP, "stream")
+  field(INP, "@nx100.proto connect$(TYPE=NX)($(P)$(Q)) $(PORT)")
+  field(PINI, "YES")
+}
+
+#% archiver 10 Monitor
+record(longin, "$(P)$(Q):STA1") {
+  field(DESC, "Robot 1st status byte")
+  field(PINI, "YES")
+  field(VAL, "0")
+  field(FLNK, "$(P)$(Q):CHKRUN")
+}
+
+#% archiver 10 Monitor
+record(longin, "$(P)$(Q):STA2") {
+  field(DESC, "Robot 2nd status byte")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(Q):X") {
+  field(EGU, "mm")
+  field(PREC, "3")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(Q):Y") {
+  field(EGU, "mm")
+  field(PREC, "3")  
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(Q):Z") {
+  field(EGU, "mm")
+  field(PREC, "3")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(Q):TX") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(Q):TY") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(PINI, "YES")
+}
+
+record(ai, "$(P)$(Q):TZ") {
+  field(EGU, "deg")
+  field(PREC, "3")
+  field(PINI, "YES")
+}
+
+record(longin, "$(P)$(Q):S") {
+  field(EGU, "cts")
+  field(PINI, "YES")
+}
+
+record(longin, "$(P)$(Q):L") {
+  field(EGU, "cts")
+  field(PINI, "YES")
+}
+
+record(longin, "$(P)$(Q):U") {
+  field(EGU, "cts")
+  field(PINI, "YES")
+}
+
+record(longin, "$(P)$(Q):R") {
+  field(EGU, "cts")
+  field(PINI, "YES")
+}
+
+record(longin, "$(P)$(Q):B") {
+  field(EGU, "cts")
+  field(PINI, "YES")
+}
+
+record(longin, "$(P)$(Q):T") {
+  field(EGU, "cts")
+  field(PINI, "YES")
+}
+
+#% archiver 10 Monitor
+record(mbbi, "$(P)$(Q):JOB") {
+  field(DESC, "Robot Job Selection")
+  field(ZRST, "$(ZRST=)")
+  field(ONST, "$(ONST=)")
+  field(TWST, "$(TWST=)")
+  field(THST, "$(THST=)")
+  field(FRST, "$(FRST=)")
+  field(FVST, "$(FVST=)")
+  field(SXST, "$(SXST=)")
+  field(SVST, "$(SVST=)")
+  field(EIST, "$(EIST=)")
+  field(NIST, "$(NIST=)")
+  field(TEST, "$(TEST=)")
+  field(ELST, "$(ELST=)")
+  field(TVST, "$(TVST=)")
+  field(TTST, "$(TTST=)")
+  field(FTST, "$(FTST=)")
+  field(FFST, "$(FFST=)")
+  field(PINI, "YES")
+}
+
+#% archiver 10 Monitor
+record(ao, "$(P)$(Q):START") {
+  field(FLNK, "$(P)$(Q):CLEARCOUNTER")
+  field(SDIS, "$(P)$(Q):RUNNING")
+}
+
+record(ao, "$(P)$(Q):CLEARCOUNTER") {
+  field(VAL, "0")
+  field(FLNK, "$(P)$(Q):STARTSIG")  
+  field(OUT, "$(P)$(Q):COUNTER PP")
+}
+
+record(ao, "$(P)$(Q):STARTSIG") {
+  field(DESC, "Start Robot")
+  field(DTYP, "stream")
+  field(OUT, "@nx100.proto start($(P)$(Q)) $(PORT)") 
+  field(FLNK, "$(P)$(Q):SETRUNNING")  
+}
+
+record(ao, "$(P)$(Q):SETRUNNING") {
+  field(VAL, "1")
+  field(OUT, "$(P)$(Q):RUNNING PP")
+}
+
+record(ao, "$(P)$(Q):COUNTER") {
+  field(DESC, "Time robot running for")
+  field(VAL, "0")
+  field(PINI, "YES")
+  field(HIGH, "60")
+  field(HSV, "MINOR")  
+}
+
+record(calcout, "$(P)$(Q):COUNTERCALC") {
+  field(OUT, "$(P)$(Q):COUNTER PP")
+  field(CALC, "A+1")
+  field(INPA, "$(P)$(Q):COUNTER.VAL NPP")
+  field(SCAN, "1 second")  
+  field(SDIS, "$(P)$(Q):RUNNING")
+  field(DISV, "0")
+}
+
+record(calcout, "$(P)$(Q):CHKRUN") {
+  field(OUT, "$(P)$(Q):RUNNING.VAL CA")
+  field(CALC, "((A&8)=8)|B<2?1:0")
+  field(INPA, "$(P)$(Q):STA1.VAL NPP")
+  field(INPB, "$(P)$(Q):COUNTER.VAL NPP")  
+  field(OOPT, "When Zero")
+  field(DOPT, "Use CALC")
+}
+
+#% archiver 10 Monitor
+record(busy, "$(P)$(Q):RUNNING") {
+  field(VAL, "0")
+  field(PINI, "YES")  
+}
+
+#% archiver 10 Monitor
+record(bo, "$(P)$(Q):HOLD") {
+  field(DESC, "Hold/Stop Robot")
+  field(ZNAM, "Hold")
+  field(ONAM, "Release")
+  field(DTYP, "stream")
+  field(OUT, "@nx100.proto hold($(P)$(Q)) $(PORT)")  
+  field(VAL, "0")
+}
+
+#% archiver 10 Monitor
+record(bo, "$(P)$(Q):SVON") {
+  field(DESC, "Servo control")
+  field(ZNAM, "Servo Off")
+  field(ONAM, "Servo On")
+  field(DTYP, "stream")
+  field(OUT, "@nx100.proto svon($(P)$(Q)) $(PORT)")
+  field(VAL, "0")
+}
+
+record(stringin, "$(P)$(Q):STATUS") {
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@nx100.proto status($(P)$(Q)) $(PORT)")
+}
+
+#% archiver 10 Monitor 
+record(calcout, "$(P)$(Q):RECONNECTS") {
+  field(SCAN, "10 second")
+  field(SDIS, "$(P)$(Q):STATUS.SEVR")
+  field(DISV, "0") # Disables when connection is ok
+  field(FLNK, "$(P)$(Q):VER")
+  field(VAL, "0")
+  field(CALC, "A+1")
+  field(INPA, "$(P)$(Q):RECONNECTS")
+  field(OUT, "$(P)$(Q):RECONNECTS")
+}
+
+#% archiver 10 Monitor
+record(longin, "$(P)$(Q):ERR") {
+  field(DESC, "Error Number")
+  field(PINI, "YES")
+}
+
+#% archiver 10 Monitor
+record(stringin, "$(P)$(Q):ERRCMD") {
+  field(DESC, "Error Command")
+  field(PINI, "YES")
+}
+
+record(calcout, "$(P)$(Q):REINIT") {
+  field(INPA, "$(P)$(Q):ERR CP")
+  field(CALC, "A==1010")
+  field(OUT, "$(P)$(Q):VER.PROC PP")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use CALC")
+}

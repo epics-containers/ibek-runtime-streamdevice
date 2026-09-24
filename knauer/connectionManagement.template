@@ -1,0 +1,73 @@
+## 
+## \file connectionManagement.template 
+## \brief Template to monitor a connection to Knauer hardware and control polling.
+## \details Expects the following records to be present in another template:
+## - \$(P)\$(R):POLL This record is processed once each time the device is to be polled. It should carry out the actions required during a poll.
+## - \$(P)\$(R):HEALTH Record which reflects the health of the connection. Zero for health connection; nonzero otherwise.
+## - \$(P)\$(R):INIT Processed once following a connection being successfully opened. Perform any actions required at this time.
+##
+## \author Andrew Wilson
+##
+
+# % macro, P, Device prefix
+# % macro, R, Device suffix
+
+####################################################
+# Startup
+####################################################
+## \brief Connect to the device, and start polling if connection was successful
+record(seq, "$(P)$(R):CONN:CONNECT") {
+    field(DESC, "Connect to the device")
+    # Process on initialization
+    field(PINI, "1")
+    # 1. Try to poll the device once
+    field(DOL1, "1")
+    field(LNK1, "$(P)$(R):POLL.PROC")
+    # 2. Check for successful comms
+    field(DOL2, "1")
+    field(DLY2, "1.0")
+    field(LNK2, "$(P)$(R):CONN:CHECKCONN.PROC")
+    # 3. If connected, trigger other startup commands
+    field(DOL3, "1")
+    field(DLY3, "0.1")
+    field(LNK3, "$(P)$(R):INIT.PROC")
+}
+
+## Check health of connection
+record(calcout, "$(P)$(R):CONN:CHECKCONN") {
+	field(DESC, "Check connection")
+	field(INPA, "$(P)$(R):HEALTH PP")
+	field(INPB, "0")
+	field(CALC, "(A>B)?0:1")
+	field(OOPT, "Every Time")
+	field(DOPT, "Use CALC")
+	field(OUT, "$(P)$(R):CONN:ENABLEPOLL PP")
+}
+
+####################################################
+# Status
+####################################################
+## \brief Enable or disable polling
+## \details Polling will be disabled when this record has a value 0
+record(bo, "$(P)$(R):CONN:ENABLEPOLL"){
+    field(DESC, "Enable polling?")
+    field(VAL, "0") # Disabled on startup
+}
+
+## \brief Perform polling
+## \details If polling is enabled, process \$(P)\$(R):POLL at 1 Hz
+record(seq, "$(P)$(R):CONN:POLL"){
+    field(DESC, "Perform polling")
+	field(DO1, "1")
+	field(LNK1, "$(P)$(R):POLL.PROC")
+	field(DO2, "1")
+	field(LNK2, "$(P)$(R):CONN:CHECKCONN.PROC")
+	field(SCAN, "1 second")
+	field(SDIS, "$(P)$(R):CONN:ENABLEPOLL PP")
+	field(DISV, "0") # Don't poll while ENABLEPOLL == 0
+}
+
+## Dummy record to which to point links if we don't want them to do anything. 
+record(bo, "$(P)$(R):CONN:DUMMY"){
+	field(DESC, "Do nothing")
+}

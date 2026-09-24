@@ -1,0 +1,10 @@
+VCU1000 protocol requirements.
+
+Must implement all of messages required by database and EDM screens.
+
+Not implementing CAN, Info, GET CurrentTicks, GET/SET TTL/ADC, SET PressureInterface.
+Consider whether we actually need CurrentValvePercentage.
+
+Error handling:
+TBD - Will depend on database requirements. Should be OK to leave undefined for 
+now - rest of protocol will be same regardless.

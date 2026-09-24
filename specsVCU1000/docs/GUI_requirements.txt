@@ -1,0 +1,55 @@
+VCU1000 Control
+---------------
+Communication is UDP to port 2005
+	drvAsynIPPortConfigure("VCU1000", "10.105.8.?:2005 UDP", 0, 0, 0)
+
+
+Main Screen
+	GET/SET Remote Mode <On|Off>
+	- Remote mode enables the SET commands and disables the front panel controls. 
+	- GET commands work in either mode.
+
+	GET Status	
+	- returns: 	Standby (not regulating)
+			InProgess (regulating but not yet at target pressure)
+			Regulating (regulating at target pressure, inside Pressure Tolerance)
+			Error (regulation timeout expired before PressureTarget reached (+ some other faults?))
+
+	GET CurrentPressure <value in mbar, 10-3 - 10-9>
+	GET CurrentValvePercentage <value in %>
+	GET CurrentValveVoltage <value in v, 0-1200v>
+	GET CurrentTimer <value in sec>
+	- Does this return Timer count or RegulationTimer count or either depending on current Status?
+
+	GET/SET PressureTarget <value in mbar>
+	GET/SET PressureTolerance <value in %, 1-50%>
+
+	GET/SET Regulation <On|Off>
+	GET/SET RegulationTimeout <value 20-500sec>
+	- Timeout for 'InProgess' state. If 'Regulating' status is not achived in this time then regulation will turn off and Status becomes 'Error'.
+
+	GET/SET Timer <On|Off>
+	GET/SET TimerTarget <value in sec>
+	- Timeout for 'Regulating' state after which regulation will turn off (presumably returns to 'Standby' State). 
+
+	GET/SET ValveVoltage <value in v>
+	- manual control, presumably SET Regulation must be Off for this to work?
+
+Setup Screen
+	GET/SET PressureInterface
+	- Defines connected gauge controller type, probably just readback required as it wont be changed.
+	- In our case its a GranvillePhillips.
+
+	GET DeviceType
+	GET DeviceId
+	GET Version
+
+	RESET
+
+	GET/SET ValveKP <value>
+	GET/SET ValveKI <value>
+	GET/SET ValveVoltageMax <value in v>
+
+Commands not required
+	Info
+	GET/SET TTL/ADC inputs and outputs

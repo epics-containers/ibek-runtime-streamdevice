@@ -1,0 +1,315 @@
+# Modified version of cryojetITC503S.vdb for the ITC4 unit.
+
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q):P:SET") {
+  field(DESC, "Set PID P")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@itc4.proto set_p $(PORT) 0")
+  field(OMSL, "supervisory")
+  field(PREC, "1")
+  field(DRVH, "999.99")
+  field(DRVL, "0")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q):I:SET") {
+  field(DESC, "Set PID I")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@itc4.proto set_i $(PORT) 0")
+  field(OMSL, "supervisory")
+  field(PREC, "1")
+  field(DRVH, "9999.9")
+  field(DRVL, "0")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q):D:SET") {
+  field(DESC, "Set PID D")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@itc4.proto set_d $(PORT) 0")
+  field(OMSL, "supervisory")
+  field(PREC, "1")
+  field(DRVH, "9999.9")
+  field(DRVL, "0")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q):MAXV:SET") {
+  field(DESC, "Set max htr v")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@itc4.proto set_maxv $(PORT) 0")
+  field(OMSL, "supervisory")
+  field(PREC, "1")
+  field(DRVH, "99.9")
+  field(DRVL, "0")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q):GFLOW:SET") {
+  field(DESC, "Set gas flow")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@itc4.proto set_gflow $(PORT) 0")
+  field(OMSL, "supervisory")
+  field(PREC, "1")
+  field(DRVH, "999.9")
+  field(DRVL, "0")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q):MANV:SET") {
+  field(DESC, "Set man htr v")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@itc4.proto set_manv $(PORT) 0")
+  field(OMSL, "supervisory")
+  field(PREC, "1")
+  field(DRVH, "99.9")
+  field(DRVL, "0")
+}
+
+#% autosave 1 VAL
+record(bo, "$(P)$(Q):ACTIVITY:SET") {
+  field(DESC, "Set auto or man")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@itc4.proto set_act $(PORT) 0")
+  field(ZNAM, "Manual")
+  field(ONAM, "Auto")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q):TTEMP:SET") {
+  field(DESC, "Set target temp")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@itc4.proto set_ttemp $(PORT) 0")
+  field(OMSL, "supervisory")
+  field(PREC, "1")
+  field(DRVH, "999.99")
+  field(DRVL, "0")
+}
+
+record(bi, "$(P)$(Q):ACTIVITY") {
+  field(DESC, "Get status")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_sta($(P)$(Q):CTRL) $(PORT) 0")
+  field(ZNAM, "Manual")
+  field(ONAM, "Auto")
+}
+
+record(mbbi, "$(P)$(Q):CTRL") {
+  field(DESC, "Get control")
+  field(DTYP, "Soft Channel")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(ZRST, "FPLock")
+  field(ONST, "EPICS+FPLock")
+  field(TWST, "FPUnlock")
+  field(THST, "EPICS+FPUnlock")
+}
+
+#% autosave 1 VAL
+record(mbbo, "$(P)$(Q):CTRL:SET") {
+  field(DESC, "Set control")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(VAL, "1")
+  field(OUT, "@itc4.proto set_ctrl $(PORT) 0")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(ZRST, "FPLock")
+  field(ONST, "EPICS+FPLock")
+  field(TWST, "FPUnlock")
+  field(THST, "EPICS+FPUnlock")
+}
+
+record(ai, "$(P)$(Q):TTEMP") {
+  field(DESC, "Get tagret temp")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_ttemp $(PORT) 0")
+  field(PREC, "1")
+  field(HOPR, "999.99")
+  field(LOPR, "0")
+  field(EGU, "K")
+  field(ASLO, "0.1")
+}
+
+#% archiver 10 Monitor
+record(ai, "$(P)$(Q):STEMP") {
+  field(DESC, "Get sensor temp")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_stemp $(PORT) 0")
+  field(PREC, "1")
+  field(HOPR, "999.99")
+  field(LOPR, "0")
+  field(EGU, "K")
+  field(ASLO, "0.1")
+}
+
+#% archiver 10 Monitor
+record(ai, "$(P)$(Q):STEMP2") {
+  field(DESC, "Get sensor 2 temp")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_s2temp $(PORT) 0")
+  field(PREC, "2")
+  field(HOPR, "999.99")
+  field(LOPR, "0")
+  field(EGU, "K")
+  field(ASLO, "0.1")
+}
+
+#% archiver 10 Monitor
+record(ai, "$(P)$(Q):STEMP3") {
+  field(DESC, "Get sensor 3 temp")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_s3temp $(PORT) 0")
+  field(PREC, "2")
+  field(HOPR, "999.99")
+  field(LOPR, "0")
+  field(EGU, "mBar")
+  field(ASLO, "0.1")
+}
+
+record(ai, "$(P)$(Q):TEMP:ERR") {
+  field(DESC, "Get temp error")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_etemp $(PORT) 0")
+  field(PREC, "2")
+  field(HOPR, "999.99")
+  field(LOPR, "-999.99")
+  field(EGU, "K")
+  field(ASLO, "0.01")
+}
+
+record(ai, "$(P)$(Q):HEATERP") {
+  field(DESC, "Get heater %")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_htrp $(PORT) 0")
+  field(PREC, "0")
+  field(EGU, "%")
+  field(HOPR, "100")
+  field(LOPR, "0")
+  field(ASLO, "0.1")
+}
+
+record(ai, "$(P)$(Q):HEATERV") {
+  field(DESC, "Get heater volts")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_htrv $(PORT) 0")
+  field(PREC, "1")
+  field(EGU, "V")
+  field(HOPR, "99.9")
+  field(LOPR, "0")
+  field(ASLO, "0.1")
+}
+
+record(ai, "$(P)$(Q):GFLOW") {
+  field(DESC, "Get gas flow")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_gflow $(PORT) 0")
+  field(PREC, "1")
+  field(EGU, "")
+  field(HOPR, "999.9")
+  field(LOPR, "0")
+  field(ASLO, "0.1")
+}
+
+record(ai, "$(P)$(Q):P") {
+  field(DESC, "Get PID P")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_p $(PORT) 0")
+  field(PREC, "1")
+  field(HOPR, "999.99")
+  field(LOPR, "0")
+  field(ASLO, "0.1")
+}
+
+record(ai, "$(P)$(Q):I") {
+  field(DESC, "Get PID I")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_i $(PORT) 0")
+  field(PREC, "1")
+  field(HOPR, "999.9")
+  field(LOPR, "0")
+  field(ASLO, "0.1")
+}
+
+record(ai, "$(P)$(Q):D") {
+  field(DESC, "Get PID D")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(INP, "@itc4.proto get_d $(PORT) 0")
+  field(PREC, "1")
+  field(HOPR, "999.9")
+  field(LOPR, "0")
+  field(ASLO, "0.1")
+}
+
+record(bo, "$(P)$(Q):DISABLE") {
+  field(DESC, "Disable comms")
+  field(PINI, "YES")
+  field(VAL, "$(DISABLED=1)")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+record(asyn, "$(P)$(Q):ASYN") {
+  field(PORT, "$(PORT)")
+}
+
+
+record(fanout, "$(P)$(Q):FAN1") {
+  field(SCAN, "2 second")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(SELM, "All")
+  field(LNK1, "$(P)$(Q):STEMP")
+  field(LNK2, "$(P)$(Q):STEMP2")
+  field(LNK3, "$(P)$(Q):STEMP3")
+  field(LNK4, "$(P)$(Q):TTEMP")
+  field(LNK5, "$(P)$(Q):TEMP:ERR")
+}
+
+record(fanout, "$(P)$(Q):FAN2") {
+  field(SCAN, "5 second")
+  field(SDIS, "$(P)$(Q):DISABLE")
+  field(FLNK, "$(P)$(Q):FAN3")
+  field(SELM, "All")
+  field(LNK1, "$(P)$(Q):P")
+  field(LNK2, "$(P)$(Q):I")
+  field(LNK3, "$(P)$(Q):D")
+  field(LNK4, "$(P)$(Q):GFLOW")
+  field(LNK5, "$(P)$(Q):HEATERV")
+  field(LNK6, "$(P)$(Q):HEATERP")
+}
+
+record(fanout, "$(P)$(Q):FAN3") {
+  field(SELM, "All")
+  field(FLNK, "$(P)$(Q):FAN4")
+  field(LNK1, "$(P)$(Q):ACTIVITY")
+  field(LNK2, "$(P)$(Q):CHANFREQ")
+  field(LNK3, "$(P)$(Q):CTRL")
+}
+

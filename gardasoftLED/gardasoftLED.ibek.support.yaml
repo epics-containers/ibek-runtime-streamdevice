@@ -9,8 +9,7 @@
 # The .template files are DERIVED, not pristine: they come from that release's
 # gardasoftLEDApp/Db VDCT sources, converted to msi-native include/substitute by
 # vdct2template (VDCT does not exist in the EPICS 7 base epics-containers uses).
-# Annotation-only macros driving DLS EDM/GDA tooling carry empty defaults rather
-# than parameters.
+# DLS EDM/GDA annotation comments are stripped (see strip-dls-annotations.py).
 #
 # PP600SeriesChannel.template has two roles: DLS installs it standalone (the
 # gardasoftLEDChannel entity below) and PP612LED expands it twice, once per
@@ -19,16 +18,19 @@
 # can pin N=1 and N=2 without the _ prefix the other patterns need.
 #
 # Verified: all ten templates expand under msi to the same record and field set
-# as that release's VDCT-built db/ copies.
+# as that release's VDCT-built db/ copies (apart from the protocol file name above).
 #
-# UPSTREAM BUG: PP600SeriesChannel.template's SETMODE and SETOUTPUT records name
-# "@gardasoft.protocol", which no release of this module ships. Those two
-# records will fail to connect. Reproduced verbatim rather than patched.
+# Scripted fix on top of the derivation (upstream bug): PP600SeriesChannel.template's
+# SETMODE and SETOUTPUT records name "@gardasoft.protocol", which no release of this
+# module ships. PP600Series.protocol defines both setMode and setOutput and is the
+# file builder.py's ProtocolFiles names, so the derived template gets
+#   sed -i 's/"@gardasoft\.protocol /"@PP600Series.protocol /' PP600SeriesChannel.template
+# PP612LED reaches those records by including PP600SeriesChannel.template.
 #
-# NOTE: this pattern previously tracked release "2.9" -- a mis-numbered
-# directory that sorts after 2-13 but predates it (Jan 2024 vs Jun 2025). Moving
-# to 2-13 replaces RT460LED.template with the RTSeries pair and adds the PP800
-# and PP420Profile families.
+# NOTE: DLS also has a directory "2.9" -- a mis-numbered release that sorts after
+# 2-13 but predates it (Jan 2024 vs Jun 2025). This pattern tracks 2-13, which has
+# the RTSeries pair in place of RT460LED.template and adds the PP800 and
+# PP420Profile families.
 #
 # To check for updates: diff the .protocol files against that path, and re-run
 # the conversion on the newest /dls_sw/prod/*/support/gardasoftLED/ release.
@@ -86,10 +88,6 @@ entity_models:
         type: str
         description: |-
           Asyn port name for stream device
-      name:
-        type: id
-        description: |-
-          gui element name
     databases:
       - file: PP420LED.template
         args:
@@ -180,10 +178,6 @@ entity_models:
         type: str
         description: |-
           The lighting controller stream device serial comms port.
-      name:
-        type: id
-        description: |-
-          The name for gui elements.
     databases:
       - file: PP820LED.template
         args:
@@ -222,10 +216,6 @@ entity_models:
         type: str
         description: |-
           The lighting controller stream device serial comms port.
-      name:
-        type: id
-        description: |-
-          The name for gui elements.
     databases:
       - file: RTSeriesLED.template
         args:

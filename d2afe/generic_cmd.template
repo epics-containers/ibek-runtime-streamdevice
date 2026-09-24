@@ -1,0 +1,29 @@
+# generic_cmd.template
+# Records to allow generic execution of commands in the protocol file such as save_att, load_att etc.
+# Some records here were to help EDM buttons work and probably could be removed.
+# Instantiated via iocbuilder.Xml in builder.py
+# % macro, P, Device prefix
+# % macro, Q, Device suffix
+# % macro, CMD, Protocol method to execute
+# % macro, ADDR, D2AFE RS485 address
+# % macro, STREAMS_PORT, PTG streams port
+
+record(bi, "$(P)$(Q)_B")
+{
+  field(SCAN, "Passive")
+  field(FLNK, "$(P)$(Q)_PROC")
+}
+
+record(calcout, "$(P)$(Q)_PROC")
+{
+  field(INPA, "$(P)$(Q)_B")
+  field(CALC, "A")
+  field(OOPT, "Transition To Non-zero")
+  field(OUT, "$(P)$(Q).PROC")
+}
+
+record(ao, "$(P)$(Q)")
+{
+  field(DTYP, "stream")
+  field(OUT,  "@d2afe.proto $(CMD)($(ADDR),$(P):AFE:RESP) $(STREAMS_PORT)")
+}

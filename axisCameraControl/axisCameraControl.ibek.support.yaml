@@ -21,14 +21,6 @@ entity_models:
         type: str
         description: |-
           Asyn http port
-      IPADDR:
-        type: str
-        description: |-
-          IP address of the camera
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: axisCameraControl.template
         args:

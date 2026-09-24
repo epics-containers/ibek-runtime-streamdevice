@@ -1,7 +1,3 @@
-# %gdatag,template,simplePv,$(gda_name=).CH$(N)SETPOINT,$(gda_desc=) channel $(N) brightness setpoint
-# %gdatag,template,simplePv,$(gda_name=).CH$(N)READBACK,$(gda_desc=) channel $(N) brightness readback
-# %gdatag,template,simpleBinary,$(gda_name=).CH$(N)SWITCH,$(gda_desc=) channel $(N) on/off switch
-# %gdatag,pv,rw,$(gda_name=).CH$(N)SETPOINT,RECORD,Brightness setpoint
 record(ai, "$(P):CH$(N)SETOUTPUT") {
   field(DESC, "Set current output")
   field(FLNK, "$(P):CH$(N)CAPOUTPUT")
@@ -17,7 +13,7 @@ record(ai, "$(P):CH$(N)SETOUTPUT") {
 record(stringout, "$(P):CH$(N)SETMODE") {
   field(DESC, "Set output mode")
   field(DTYP, "stream")
-  field(OUT, "@gardasoft.protocol setMode($(N)) $(PORT)")
+  field(OUT, "@PP600Series.protocol setMode($(N)) $(PORT)")
   field(PINI, "YES")
   field(PRIO, "HIGH")
   field(VAL, "0")
@@ -41,7 +37,6 @@ record(ai, "$(P):CH$(N)MAXCURRENT") {
   field(EGU, "mA")
 }
 
-# %gdatag,binary,rw,$(gda_name=).CH$(N)SWITCH,RECORD,On/Off switch
 record(bo, "$(P):CH$(N)ON") {
   field(DESC, "Turns LED On/Off")
   field(FLNK, "$(P):CH$(N)SENDOUTPUT")
@@ -57,7 +52,7 @@ record(calcout, "$(P):CH$(N)SENDOUTPUT") {
   field(CALC, "B?A:B")
   field(INPA, "$(P):CH$(N)SETOUTPUT")
   field(INPB, "$(P):CH$(N)ON")
-  field(OUT, "@gardasoft.protocol setOutput($(N),$(P)) $(PORT)")
+  field(OUT, "@PP600Series.protocol setOutput($(N),$(P)) $(PORT)")
   field(OOPT, "Every Time")
   field(DOPT, "Use CALC")
   field(FLNK, "$(P):QUERYSETTINGS PP")
@@ -115,7 +110,6 @@ record(calcout, "$(P):ONOFFCHECK") {
   field(DOPT, "Use CALC")
 }
 
-# %gdatag,pv,ro,$(gda_name=).CH$(N)READBACK,RECORD,Brightness readback
 record(ai, "$(P):CH$(N)BRIGHTNESS") {
   field(DESC, "Output current")
   field(PREC, "2")

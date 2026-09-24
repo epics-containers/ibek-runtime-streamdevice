@@ -1,0 +1,134 @@
+# Protocol file for the Newport strain gauge
+# Version: 1.0
+# Date:    07-09-2006
+
+Terminator = CR;
+replytimeout = 1000;
+readtimeout  = 10000;
+locktimeout = 60000;
+
+# NOTE: This protocol file assumes the device is set to 'echo' mode
+# and the recognition character is '*'
+
+
+# Request the current communication parameters
+# Response is: <recognition char><device address><bus format><comms config>
+# (Encoded as 8 HEX-ASCII characters)
+requestConfig {
+	out "^AE";
+	in "%s";
+}
+
+# Set the serial communications configuration
+setCommsConfig {
+	out "*W18%s";
+	in "W18%s";
+}
+
+# Set the bus communications format using the hex string provided
+# Default assumed to be 34 (no checksum, no line feed, echo response,
+# point-to-point, RS-485 not installed, external print command disabled)
+# See p10-22
+setBusFormat {
+	out "*W1C%s";
+	in "W1C%s";
+}
+
+
+# Set the data format using the hex string provided
+# Default assumed to be D3 (alarm status, no peak/valley status, no units
+# of measure, and current, filtered, peak and valley values sent separated
+# by spaces
+# See p10-21
+setDataFormat {
+	out "*W1B%s";
+	in "W1B%s";
+}
+
+# Check the current data format
+getDataFormat {
+	out "*R1B";
+	in "%s";
+}
+
+
+# Read in the data string in the format:
+# <alarmStatusChar> <currentValue> <filtered> <peak> <valley>
+# This assumes that the data format has already been set to the hex string "D3"
+requestDataString {
+	out "*V01";
+	in "V01 %(\$1:CURRENT.VAL)f%(\$1:FILTERED.VAL)f"
+}
+
+# Read the current unfiltered value as a floating point
+readUnfilteredValue {
+	out "*X01";
+	in "X01%f";
+}
+
+# Read the current filtered value as a floating point
+readFilteredValue {
+	out "*X04";
+	in "X04%f";
+}
+
+
+# Set the alarm 1 (Setpoint 3) trigger value.
+# This is considered the lower HARD LIMIT and should be used with caution.
+# The value supplied should be 6 HEX-ASCII characters, see section 10.24 for
+# a description of how the 24 bits are decoded into the decimal value.
+# After setting the value a reset is required.
+setAlarm1Value {
+	out "*W23%s";
+	in "W23%s";
+}
+
+
+# Read the alarm 1 (Setpoint 3) trigger value.
+# This value is considered the lower hard limit.
+# The value will be 6 HEX-ASCII characters, see section 10.24 for
+# a description of how the 24 bits are decoded into the decimal value.
+readAlarm1Value {
+	out "*R23";
+	in "R23%s";
+}
+
+
+# Set the alarm 2 (Setpoint 4) trigger value.
+# This is considered the upper HARD LIMIT and should be used with caution.
+# The value supplied should be 6 HEX-ASCII characters, see section 10.24 for
+# a description of how the 24 bits are decoded into the decimal value.
+# After setting the value a reset is required.
+setAlarm2Value {
+	out "*W24%s";
+	in "W24%s";
+}
+
+
+# Read the alarm 2 (Setpoint 4) trigger value.
+# This value is considered the upper hard limit.
+# The value will be 6 HEX-ASCII characters, see section 10.24 for
+# a description of how the 24 bits are decoded into the decimal value.
+readAlarm2Value {
+	out "*R24";
+	in "R24%s";
+}
+
+
+# Hard reset
+reset {
+	out "*Z04";
+	in "Z04";
+}
+
+# Read error message
+# See p8-15 for error codes
+getErrorMsg {
+	in "?%s";
+}
+
+# Send a raw command string.  Useful for configuration changes required.
+sendRawCommand {
+	out "*%s";
+	in "%s";
+}

@@ -21,10 +21,6 @@ entity_models:
         type: str
         description: |-
           Mandatory. Asyn port name
-      name:
-        type: id
-        description: |-
-          Optional.  Name for gui element
     databases:
       - file: EdwardsGauge.template
         args:

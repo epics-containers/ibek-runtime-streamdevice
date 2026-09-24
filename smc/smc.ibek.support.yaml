@@ -1,0 +1,137 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: smc 1-8
+# Source: /dls_sw/prod/R3.14.12.7/support/smc/1-8
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/smc/ release.
+
+module: smc
+
+entity_models:
+  - name: magnet
+    description: |-
+      Imported from DLS module smc (magnet.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      SPHLIM:
+        type: str
+        description: |-
+          SPHLIM
+      PLANLIM:
+        type: str
+        description: |-
+          PLANLIM
+      QUADLIM:
+        type: str
+        description: |-
+          QUADLIM
+      CUBELIM:
+        type: str
+        description: |-
+          CUBELIM
+      X:
+        type: str
+        description: |-
+          X
+      Y:
+        type: str
+        description: |-
+          Y
+      Z:
+        type: str
+        description: |-
+          Z
+      MAXXRATE:
+        type: str
+        description: |-
+          MAXXRATE
+      QUADXYRATE:
+        type: str
+        description: |-
+          QUADXYRATE
+      XCUBICRATE:
+        type: str
+        description: |-
+          XCUBICRATE
+      MAXYRATE:
+        type: str
+        description: |-
+          MAXYRATE
+      YCUBICRATE:
+        type: str
+        description: |-
+          YCUBICRATE
+      MAXZRATE:
+        type: str
+        description: |-
+          MAXZRATE
+      ZCUBICRATE:
+        type: str
+        description: |-
+          ZCUBICRATE
+    databases:
+      - file: magnet.template
+        args:
+          .*:
+
+  - name: smc
+    description: |-
+      Imported from DLS module smc (smc.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      TY:
+        type: str
+        description: |-
+          TY
+      RAMPRATELIM:
+        type: str
+        description: |-
+          RAMPRATELIM
+      LIMCURRDB:
+        type: str
+        description: |-
+          LIMCURRDB
+      FIELDLIMUNI:
+        type: str
+        description: |-
+          FIELDLIMUNI
+      FIELDLIMVEC:
+        type: str
+        description: |-
+          FIELDLIMVEC
+    databases:
+      - file: smc.template
+        args:
+          .*:
+
+  - name: smcTripleAxis
+    description: |-
+      Imported from DLS module smc (smcTripleAxis.template)
+    parameters:
+      MAG:
+        type: str
+        description: |-
+          MAG
+      PZ:
+        type: str
+        description: |-
+          PZ
+      PX:
+        type: str
+        description: |-
+          PX
+      PY:
+        type: str
+        description: |-
+          PY
+    databases:
+      - file: smcTripleAxis.template
+        args:
+          .*:

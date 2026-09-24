@@ -12,8 +12,6 @@
 #   OMAX - Optional.  Defaults to 100.  Asyn record max output buffer for raw commands
 #   IMAX - Optional.  Defaults to 1000.  Asyn record max input buffer for raw commands
 #   TMOT - Optional.  Defaults to 1.  Asyn record timeout
-#   gda_name - Optional.  Defaults to be empty.  Name for gda interface appearing in percent gdatag line.
-#   gda_desc - Optional.  Defaults to be empty.  Description for gda interface appearing in percent gdatag line.
 #
 # Notes: 
 #   Voltage and Current are archived every 10 secs.
@@ -22,9 +20,7 @@
 #
 ################################################################
 
-#% gdatag,template,k2400,$(gda_name=),$(gda_desc=)
 
-# % gui, $(name), edm, k2400.edl, P=$(P)
 
 include "k2400_detail.template"
 
@@ -39,13 +35,10 @@ include "k2400_detail.template"
 # % macro, PORT, Asyn port name
 # % macro, ADDR, Asyn addr (usually 0)
 # % macro, SCAN, SCAN rate for read parameters.
-# % macro, name, Name of device for gui - only appears in percent gui lines.
 #
 # % macro, OMAX, Optional.  Defaults to 100.  Asyn record max output buffer for raw commands
 # % macro, IMAX, Optional.  Defaults to 1000.  Asyn record max input buffer for raw commands
 # % macro, TMOT, Optional.  Defaults to 1.  Asyn record timeout in seconds
-# % macro, gda_name, Optional.  Defaults to be empty.  Name for gda interface appearing in percent gdatag line.
-# % macro, gda_desc, Optional.  Defaults to be empty.  Description for gda interface appearing in percent gdatag line.
 #
 record(stringin, "$(P):ID") {
   field(DTYP, "stream")
@@ -57,7 +50,6 @@ record(stringin, "$(P):ID") {
 # ///
 # /// Read the voltage.
 # ///
-#% gdatag,pv,ro,$(gda_name=),V
 #% archiver 10 Monitor
 #% alh
 record(ai, "$(P):V") {
@@ -73,7 +65,6 @@ record(ai, "$(P):V") {
 # ///
 # /// Read the current.
 # ///
-#% gdatag,pv,ro,$(gda_name=),I
 #% archiver 10 Monitor
 #% alh
 record(ai, "$(P):I") {
@@ -88,7 +79,6 @@ record(ai, "$(P):I") {
 # ///
 # /// Read the resistance.
 # ///
-#% gdatag,pv,ro,$(gda_name=),R
 #% archiver 10 Monitor
 #% alh
 record(ai, "$(P):R") {
@@ -108,7 +98,6 @@ record(ai, "$(P):R") {
 # ///
 # /// Control the output (ON/OFF).
 # ///
-#% gdatag,pv,rw,$(gda_name=),OUTP
 #% autosave 1 VAL
 record(bo, "$(P):OUTP") {
   field(DTYP, "stream")
@@ -133,7 +122,6 @@ record(dfanout, "$(P):ENABLESCAN") {
 # ///
 # /// Control the source operating mode (VOLT/CURR).
 # ///
-#% gdatag,pv,rw,$(gda_name=),SOUR_FUNC
 #% autosave 1 VAL
 record(bo, "$(P):SOUR_FUNC") {
   field(DTYP, "stream")
@@ -146,7 +134,6 @@ record(bo, "$(P):SOUR_FUNC") {
 # ///
 # /// Control the fixed source (VOLT/CURR).
 # ///
-#% gdatag,pv,rw,$(gda_name=),SOUR_MODE
 #% autosave 1 VAL
 record(bo, "$(P):SOUR_MODE") {
   field(DTYP, "stream")
@@ -160,7 +147,6 @@ record(bo, "$(P):SOUR_MODE") {
 # /// Set this to VOLT or CURR, to set the XXX mode to use for the source settings. 
 # /// Used for any commands that need the XXX as part of the command string.
 # ///
-#% gdatag,pv,rw,$(gda_name=),SOTX
 #% autosave 1 VAL
 record(bo, "$(P):SOTX") {
    field(DESC, "String used for XXX part")
@@ -171,7 +157,6 @@ record(bo, "$(P):SOTX") {
 # ///
 # /// Control the source range (VOLT/CURR, float range).
 # ///
-#% gdatag,pv,rw,$(gda_name=),SOUR_RANG
 #% autosave 1 VAL
 record(ao, "$(P):SOUR_RANG") {
   field(DTYP, "stream")
@@ -182,7 +167,6 @@ record(ao, "$(P):SOUR_RANG") {
 # ///
 # /// Control the source level (VOLT/CURR, float level).
 # ///
-#% gdatag,pv,rw,$(gda_name=),SOUR_LEV
 #% autosave 1 VAL
 record(ao, "$(P):SOUR_LEV") {
   field(DTYP, "stream")
@@ -193,7 +177,6 @@ record(ao, "$(P):SOUR_LEV") {
 # ///
 # /// Control the sense operating mode (VOLT/CURR).
 # ///
-#% gdatag,pv,rw,$(gda_name=),SENS_FUNC
 #% autosave 1 VAL
 record(bo, "$(P):SENS_FUNC") {
   field(DTYP, "stream")
@@ -207,7 +190,6 @@ record(bo, "$(P):SENS_FUNC") {
 # /// Set this to VOLT or CURR, to set the XXX mode to use for the sense settings. 
 # /// Used for any commands that need the XXX as part of the command string.
 # ///
-#% gdatag,pv,rw,$(gda_name=),SETX
 #% autosave 1 VAL
 record(bo, "$(P):SETX") {
    field(DESC, "String used for sense XXX")
@@ -218,7 +200,6 @@ record(bo, "$(P):SETX") {
 # ///
 # /// Control the sense compliance range (VOLT/CURR, float compliance level).
 # ///
-#% gdatag,pv,rw,$(gda_name=),SENS_PROT
 #% autosave 1 VAL
 record(ao, "$(P):SENS_PROT") {
   field(DTYP, "stream")
@@ -229,7 +210,6 @@ record(ao, "$(P):SENS_PROT") {
 # ///
 # /// Control the sense measure range (VOLT/CURR, float measure range).
 # ///
-#% gdatag,pv,rw,$(gda_name=),SENS_RANG
 #% autosave 1 VAL
 record(ao, "$(P):SENS_RANG") {
   field(DTYP, "stream")
@@ -240,7 +220,6 @@ record(ao, "$(P):SENS_RANG") {
 # ///
 # /// Control the sense auto range (VOLT/CURR, ON/OFF).
 # ///
-#% gdatag,pv,rw,$(gda_name=),SENS_RANG_AUTO
 #% autosave 1 VAL
 record(bo, "$(P):SENS_RANG_AUTO") {
   field(DTYP, "stream")
@@ -258,7 +237,6 @@ record(bo, "$(P):SENS_RANG_AUTO") {
 # ///
 # /// Generic commands. Do a caput on this, and do a subsequent caget to get the response. Max 39 chars.
 # ///
-#% gdatag,pv,rw,$(gda_name=),RESPONSE
 record (stringin, "$(P):RESPONSE") {
   field (DTYP, "stream")
   field (DESC, "Holds command response.")
@@ -268,7 +246,6 @@ record (stringin, "$(P):RESPONSE") {
 # ///
 # /// Generic command. This holds the command and stores it.
 # ///
-#% gdatag,pv,rw,$(gda_name=),COMMAND
 record (stringout, "$(P):COMMAND") {
   field (DESC, "Holds command string.")
   field (OUT, "$(P):RESPONSE")

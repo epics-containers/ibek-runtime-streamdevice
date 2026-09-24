@@ -5,6 +5,12 @@
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/digitelMpc/ release.
+#
+# `simulation_digitelMpcIonp.template` is NOT imported into sim/: it calls sub
+# $(device):SIM:P SNAM=pressRanProcess and INAM=pressRanInit, neither of which is
+# registered in the generic image - loading it is fine, but iocInit fails.
+# `simulation_digitelMpc.template` and `simulation_digitelMpcTsp.template` have no
+# such routine and are imported into sim/.
 
 module: digitelMpc
 
@@ -39,10 +45,6 @@ entity_models:
     description: |-
       digitel MPC Controller (multi-drop serial vacuum pump controller).
     parameters:
-      name:
-        type: id
-        description: |-
-          Gui tag
       device:
         type: str
         description: |-
@@ -69,10 +71,6 @@ entity_models:
         type: str
         description: |-
           device name
-      name:
-        type: id
-        description: |-
-          Object name and gui association name
       port:
         type: str
         description: |-
@@ -112,10 +110,6 @@ entity_models:
         type: str
         description: |-
           device name
-      name:
-        type: id
-        description: |-
-          Object name and gui association name
       port:
         type: str
         description: |-
@@ -155,10 +149,6 @@ entity_models:
         type: str
         description: |-
           device name
-      name:
-        type: id
-        description: |-
-          Object name and gui association name
       port:
         type: str
         description: |-
@@ -199,7 +189,7 @@ entity_models:
       alh:
         type: str
         description: |-
-          alarm handler tag (Defaults to None) c.f. mp49's commit 80833
+          alarm handler tag (Defaults to None)
         default: None
       text:
         type: str
@@ -241,10 +231,6 @@ entity_models:
         type: str
         description: |-
           device name
-      name:
-        type: id
-        description: |-
-          Object name and gui association name
       pump:
         type: int
         description: |-
@@ -276,7 +262,7 @@ entity_models:
       alh:
         type: str
         description: |-
-          alarm handler tag (Defaults to None) c.f. mp49's commit 80833
+          alarm handler tag (Defaults to None)
         default: None
       text:
         type: str
@@ -389,5 +375,44 @@ entity_models:
           device name
     databases:
       - file: dummyIonp.template
+        args:
+          .*:
+
+  - name: digitelMpcIonpSps
+    description: |-
+      Imported from DLS module digitelMpc (digitelMpcIonpSps.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      sp1:
+        type: str
+        description: |-
+          sp1
+      sp2:
+        type: str
+        description: |-
+          sp2
+    databases:
+      - file: digitelMpcIonpSps.template
+        args:
+          .*:
+
+  - name: digitelMpcTspDummy
+    description: |-
+      Template dummy records for digitel MPC - Titanium Sublimation Pump
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      ctlsrc:
+        type: str
+        description: |-
+          ctlsrc
+        default: "0"
+    databases:
+      - file: digitelMpcTspDummy.template
         args:
           .*:

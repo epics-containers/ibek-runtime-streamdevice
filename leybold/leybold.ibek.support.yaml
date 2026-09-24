@@ -1,0 +1,1251 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: leybold 2-2
+# Source: /dls_sw/prod/R3.14.12.7/support/leybold/2-2
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/leybold/ release.
+#
+# Templates needing a generic IOC built with this module (not the plain
+# generic image):
+# - `centerN.template` needs a generic IOC built with `leybold` (compiled support), not the plain generic image.
+# - `coolpak.template` needs a generic IOC built with `leybold` (compiled support), not the plain generic image.
+
+module: leybold
+
+entity_models:
+  - name: centerN
+    description: |-
+      Imported from DLS module leybold (centerN.template)
+      NOTE: needs a generic IOC built with leybold (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: centerN.template
+        args:
+          .*:
+
+  - name: coolpak
+    description: |-
+      Imported from DLS module leybold (coolpak.template)
+      NOTE: needs a generic IOC built with leybold (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: coolpak.template
+        args:
+          .*:
+
+  - name: read_floatE
+    description: |-
+      Imported from DLS module leybold (read_floatE.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PARAM:
+        type: str
+        description: |-
+          PARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: read_floatE.template
+        args:
+          .*:
+
+  - name: read_float_float_float
+    description: |-
+      Imported from DLS module leybold (read_float_float_float.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PARAM:
+        type: str
+        description: |-
+          PARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: read_float_float_float.template
+        args:
+          .*:
+
+  - name: read_int
+    description: |-
+      Imported from DLS module leybold (read_int.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PARAM:
+        type: str
+        description: |-
+          PARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: read_int.template
+        args:
+          .*:
+
+  - name: read_int_floatE
+    description: |-
+      Imported from DLS module leybold (read_int_floatE.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      FPARAM:
+        type: str
+        description: |-
+          FPARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      IPARAM:
+        type: str
+        description: |-
+          IPARAM
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      HIGH:
+        type: str
+        description: |-
+          HIGH
+      LOW:
+        type: str
+        description: |-
+          LOW
+      HIHI:
+        type: str
+        description: |-
+          HIHI
+      LOLO:
+        type: str
+        description: |-
+          LOLO
+      ZRSTI:
+        type: str
+        description: |-
+          ZRSTI
+        default: ""
+      ONSTI:
+        type: str
+        description: |-
+          ONSTI
+        default: ""
+      TWSTI:
+        type: str
+        description: |-
+          TWSTI
+        default: ""
+      THSTI:
+        type: str
+        description: |-
+          THSTI
+        default: ""
+      FRSTI:
+        type: str
+        description: |-
+          FRSTI
+        default: ""
+      FVSTI:
+        type: str
+        description: |-
+          FVSTI
+        default: ""
+      SXSTI:
+        type: str
+        description: |-
+          SXSTI
+        default: ""
+      SVSTI:
+        type: str
+        description: |-
+          SVSTI
+        default: ""
+      EISTI:
+        type: str
+        description: |-
+          EISTI
+        default: ""
+      NISTI:
+        type: str
+        description: |-
+          NISTI
+        default: ""
+      TESTI:
+        type: str
+        description: |-
+          TESTI
+        default: ""
+      ELSTI:
+        type: str
+        description: |-
+          ELSTI
+        default: ""
+      TVSTI:
+        type: str
+        description: |-
+          TVSTI
+        default: ""
+      TTSTI:
+        type: str
+        description: |-
+          TTSTI
+        default: ""
+      FTSTI:
+        type: str
+        description: |-
+          FTSTI
+        default: ""
+      FFSTI:
+        type: str
+        description: |-
+          FFSTI
+        default: ""
+      ZRVLI:
+        type: int
+        description: |-
+          ZRVLI
+        default: 0
+      ONVLI:
+        type: int
+        description: |-
+          ONVLI
+        default: 1
+      TWVLI:
+        type: int
+        description: |-
+          TWVLI
+        default: 2
+      THVLI:
+        type: int
+        description: |-
+          THVLI
+        default: 3
+      FRVLI:
+        type: int
+        description: |-
+          FRVLI
+        default: 4
+      FVVLI:
+        type: int
+        description: |-
+          FVVLI
+        default: 5
+      SXVLI:
+        type: int
+        description: |-
+          SXVLI
+        default: 6
+      SVVLI:
+        type: int
+        description: |-
+          SVVLI
+        default: 7
+      EIVLI:
+        type: int
+        description: |-
+          EIVLI
+        default: 8
+      NIVLI:
+        type: int
+        description: |-
+          NIVLI
+        default: 9
+      TEVLI:
+        type: int
+        description: |-
+          TEVLI
+        default: 10
+      ELVLI:
+        type: int
+        description: |-
+          ELVLI
+        default: 11
+      TVVLI:
+        type: int
+        description: |-
+          TVVLI
+        default: 12
+      TTVLI:
+        type: int
+        description: |-
+          TTVLI
+        default: 13
+      FTVLI:
+        type: int
+        description: |-
+          FTVLI
+        default: 14
+      FFVLI:
+        type: int
+        description: |-
+          FFVLI
+        default: 15
+    databases:
+      - file: read_int_floatE.template
+        args:
+          .*:
+
+  - name: read_string
+    description: |-
+      Imported from DLS module leybold (read_string.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PARAM:
+        type: str
+        description: |-
+          PARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+    databases:
+      - file: read_string.template
+        args:
+          .*:
+
+  - name: read_write_float
+    description: |-
+      Imported from DLS module leybold (read_write_float.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PARAM:
+        type: str
+        description: |-
+          PARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      PINIR:
+        type: str
+        description: |-
+          PINIR
+      PINIW:
+        type: str
+        description: |-
+          PINIW
+      DEFAULT_VAL:
+        type: float
+        description: |-
+          DEFAULT_VAL
+        default: 0.0
+      DRVH:
+        type: str
+        description: |-
+          DRVH
+      DRVL:
+        type: str
+        description: |-
+          DRVL
+    databases:
+      - file: read_write_float.template
+        args:
+          .*:
+
+  - name: read_write_floatE_floatE
+    description: |-
+      Imported from DLS module leybold (read_write_floatE_floatE.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PARAM:
+        type: str
+        description: |-
+          PARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      CMD:
+        type: str
+        description: |-
+          CMD
+      SUF1:
+        type: str
+        description: |-
+          SUF1
+      SUF2:
+        type: str
+        description: |-
+          SUF2
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      DRVH:
+        type: str
+        description: |-
+          DRVH
+      DRVL:
+        type: str
+        description: |-
+          DRVL
+    databases:
+      - file: read_write_floatE_floatE.template
+        args:
+          .*:
+
+  - name: read_write_int
+    description: |-
+      Imported from DLS module leybold (read_write_int.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PARAM:
+        type: str
+        description: |-
+          PARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      PINIR:
+        type: str
+        description: |-
+          PINIR
+      ZRSTI:
+        type: str
+        description: |-
+          ZRSTI
+        default: ""
+      ONSTI:
+        type: str
+        description: |-
+          ONSTI
+        default: ""
+      TWSTI:
+        type: str
+        description: |-
+          TWSTI
+        default: ""
+      THSTI:
+        type: str
+        description: |-
+          THSTI
+        default: ""
+      FRSTI:
+        type: str
+        description: |-
+          FRSTI
+        default: ""
+      FVSTI:
+        type: str
+        description: |-
+          FVSTI
+        default: ""
+      SXSTI:
+        type: str
+        description: |-
+          SXSTI
+        default: ""
+      SVSTI:
+        type: str
+        description: |-
+          SVSTI
+        default: ""
+      EISTI:
+        type: str
+        description: |-
+          EISTI
+        default: ""
+      NISTI:
+        type: str
+        description: |-
+          NISTI
+        default: ""
+      TESTI:
+        type: str
+        description: |-
+          TESTI
+        default: ""
+      ELSTI:
+        type: str
+        description: |-
+          ELSTI
+        default: ""
+      TVSTI:
+        type: str
+        description: |-
+          TVSTI
+        default: ""
+      TTSTI:
+        type: str
+        description: |-
+          TTSTI
+        default: ""
+      FTSTI:
+        type: str
+        description: |-
+          FTSTI
+        default: ""
+      FFSTI:
+        type: str
+        description: |-
+          FFSTI
+        default: ""
+      ZRVLI:
+        type: int
+        description: |-
+          ZRVLI
+        default: 0
+      ONVLI:
+        type: int
+        description: |-
+          ONVLI
+        default: 1
+      TWVLI:
+        type: int
+        description: |-
+          TWVLI
+        default: 2
+      THVLI:
+        type: int
+        description: |-
+          THVLI
+        default: 3
+      FRVLI:
+        type: int
+        description: |-
+          FRVLI
+        default: 4
+      FVVLI:
+        type: int
+        description: |-
+          FVVLI
+        default: 5
+      SXVLI:
+        type: int
+        description: |-
+          SXVLI
+        default: 6
+      SVVLI:
+        type: int
+        description: |-
+          SVVLI
+        default: 7
+      EIVLI:
+        type: int
+        description: |-
+          EIVLI
+        default: 8
+      NIVLI:
+        type: int
+        description: |-
+          NIVLI
+        default: 9
+      TEVLI:
+        type: int
+        description: |-
+          TEVLI
+        default: 10
+      ELVLI:
+        type: int
+        description: |-
+          ELVLI
+        default: 11
+      TVVLI:
+        type: int
+        description: |-
+          TVVLI
+        default: 12
+      TTVLI:
+        type: int
+        description: |-
+          TTVLI
+        default: 13
+      FTVLI:
+        type: int
+        description: |-
+          FTVLI
+        default: 14
+      FFVLI:
+        type: int
+        description: |-
+          FFVLI
+        default: 15
+      ZRSTO:
+        type: str
+        description: |-
+          ZRSTO
+        default: "$(ZRSTI=)"
+      ONSTO:
+        type: str
+        description: |-
+          ONSTO
+        default: "$(ONSTI=)"
+      TWSTO:
+        type: str
+        description: |-
+          TWSTO
+        default: "$(TWSTI=)"
+      THSTO:
+        type: str
+        description: |-
+          THSTO
+        default: "$(THSTI=)"
+      FRSTO:
+        type: str
+        description: |-
+          FRSTO
+        default: "$(FRSTI=)"
+      FVSTO:
+        type: str
+        description: |-
+          FVSTO
+        default: "$(FVSTI=)"
+      SXSTO:
+        type: str
+        description: |-
+          SXSTO
+        default: "$(SXSTI=)"
+      SVSTO:
+        type: str
+        description: |-
+          SVSTO
+        default: "$(SVSTI=)"
+      EISTO:
+        type: str
+        description: |-
+          EISTO
+        default: "$(EISTI=)"
+      NISTO:
+        type: str
+        description: |-
+          NISTO
+        default: "$(NISTI=)"
+      TESTO:
+        type: str
+        description: |-
+          TESTO
+        default: "$(TESTI=)"
+      ELSTO:
+        type: str
+        description: |-
+          ELSTO
+        default: "$(ELSTI=)"
+      TVSTO:
+        type: str
+        description: |-
+          TVSTO
+        default: "$(TVSTI=)"
+      TTSTO:
+        type: str
+        description: |-
+          TTSTO
+        default: "$(TTSTI=)"
+      FTSTO:
+        type: str
+        description: |-
+          FTSTO
+        default: "$(FTSTI=)"
+      FFSTO:
+        type: str
+        description: |-
+          FFSTO
+        default: "$(FFSTI=)"
+      ZRVLO:
+        type: str
+        description: |-
+          ZRVLO
+        default: "$(ZRVLI=0)"
+      ONVLO:
+        type: str
+        description: |-
+          ONVLO
+        default: "$(ONVLI=1)"
+      TWVLO:
+        type: str
+        description: |-
+          TWVLO
+        default: "$(TWVLI=2)"
+      THVLO:
+        type: str
+        description: |-
+          THVLO
+        default: "$(THVLI=3)"
+      FRVLO:
+        type: str
+        description: |-
+          FRVLO
+        default: "$(FRVLI=4)"
+      FVVLO:
+        type: str
+        description: |-
+          FVVLO
+        default: "$(FVVLI=5)"
+      SXVLO:
+        type: str
+        description: |-
+          SXVLO
+        default: "$(SXVLI=6)"
+      SVVLO:
+        type: str
+        description: |-
+          SVVLO
+        default: "$(SVVLI=7)"
+      EIVLO:
+        type: str
+        description: |-
+          EIVLO
+        default: "$(EIVLI=8)"
+      NIVLO:
+        type: str
+        description: |-
+          NIVLO
+        default: "$(NIVLI=9)"
+      TEVLO:
+        type: str
+        description: |-
+          TEVLO
+        default: "$(TEVLI=10)"
+      ELVLO:
+        type: str
+        description: |-
+          ELVLO
+        default: "$(ELVLI=11)"
+      TVVLO:
+        type: str
+        description: |-
+          TVVLO
+        default: "$(TVVLI=12)"
+      TTVLO:
+        type: str
+        description: |-
+          TTVLO
+        default: "$(TTVLI=13)"
+      FTVLO:
+        type: str
+        description: |-
+          FTVLO
+        default: "$(FTVLI=14)"
+      FFVLO:
+        type: str
+        description: |-
+          FFVLO
+        default: "$(FFVLI=15)"
+      PINIW:
+        type: str
+        description: |-
+          PINIW
+        default: "YES"
+      DEFAULT_VAL:
+        type: str
+        description: |-
+          DEFAULT_VAL
+        default: "0"
+      DRVH:
+        type: str
+        description: |-
+          DRVH
+      DRVL:
+        type: str
+        description: |-
+          DRVL
+    databases:
+      - file: read_write_int.template
+        args:
+          .*:
+
+  - name: read_write_int_floatE
+    description: |-
+      Imported from DLS module leybold (read_write_int_floatE.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      IPARAM:
+        type: str
+        description: |-
+          IPARAM
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      FPARAM:
+        type: str
+        description: |-
+          FPARAM
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      DRVH:
+        type: str
+        description: |-
+          DRVH
+      DRVL:
+        type: str
+        description: |-
+          DRVL
+      ZRSTI:
+        type: str
+        description: |-
+          ZRSTI
+        default: ""
+      ONSTI:
+        type: str
+        description: |-
+          ONSTI
+        default: ""
+      TWSTI:
+        type: str
+        description: |-
+          TWSTI
+        default: ""
+      THSTI:
+        type: str
+        description: |-
+          THSTI
+        default: ""
+      FRSTI:
+        type: str
+        description: |-
+          FRSTI
+        default: ""
+      FVSTI:
+        type: str
+        description: |-
+          FVSTI
+        default: ""
+      SXSTI:
+        type: str
+        description: |-
+          SXSTI
+        default: ""
+      SVSTI:
+        type: str
+        description: |-
+          SVSTI
+        default: ""
+      EISTI:
+        type: str
+        description: |-
+          EISTI
+        default: ""
+      NISTI:
+        type: str
+        description: |-
+          NISTI
+        default: ""
+      TESTI:
+        type: str
+        description: |-
+          TESTI
+        default: ""
+      ELSTI:
+        type: str
+        description: |-
+          ELSTI
+        default: ""
+      TVSTI:
+        type: str
+        description: |-
+          TVSTI
+        default: ""
+      TTSTI:
+        type: str
+        description: |-
+          TTSTI
+        default: ""
+      FTSTI:
+        type: str
+        description: |-
+          FTSTI
+        default: ""
+      FFSTI:
+        type: str
+        description: |-
+          FFSTI
+        default: ""
+      ZRVLI:
+        type: int
+        description: |-
+          ZRVLI
+        default: 0
+      ONVLI:
+        type: int
+        description: |-
+          ONVLI
+        default: 1
+      TWVLI:
+        type: int
+        description: |-
+          TWVLI
+        default: 2
+      THVLI:
+        type: int
+        description: |-
+          THVLI
+        default: 3
+      FRVLI:
+        type: int
+        description: |-
+          FRVLI
+        default: 4
+      FVVLI:
+        type: int
+        description: |-
+          FVVLI
+        default: 5
+      SXVLI:
+        type: int
+        description: |-
+          SXVLI
+        default: 6
+      SVVLI:
+        type: int
+        description: |-
+          SVVLI
+        default: 7
+      EIVLI:
+        type: int
+        description: |-
+          EIVLI
+        default: 8
+      NIVLI:
+        type: int
+        description: |-
+          NIVLI
+        default: 9
+      TEVLI:
+        type: int
+        description: |-
+          TEVLI
+        default: 10
+      ELVLI:
+        type: int
+        description: |-
+          ELVLI
+        default: 11
+      TVVLI:
+        type: int
+        description: |-
+          TVVLI
+        default: 12
+      TTVLI:
+        type: int
+        description: |-
+          TTVLI
+        default: 13
+      FTVLI:
+        type: int
+        description: |-
+          FTVLI
+        default: 14
+      FFVLI:
+        type: int
+        description: |-
+          FFVLI
+        default: 15
+      ZRSTO:
+        type: str
+        description: |-
+          ZRSTO
+        default: "$(ZRSTI=)"
+      ONSTO:
+        type: str
+        description: |-
+          ONSTO
+        default: "$(ONSTI=)"
+      TWSTO:
+        type: str
+        description: |-
+          TWSTO
+        default: "$(TWSTI=)"
+      THSTO:
+        type: str
+        description: |-
+          THSTO
+        default: "$(THSTI=)"
+      FRSTO:
+        type: str
+        description: |-
+          FRSTO
+        default: "$(FRSTI=)"
+      FVSTO:
+        type: str
+        description: |-
+          FVSTO
+        default: "$(FVSTI=)"
+      SXSTO:
+        type: str
+        description: |-
+          SXSTO
+        default: "$(SXSTI=)"
+      SVSTO:
+        type: str
+        description: |-
+          SVSTO
+        default: "$(SVSTI=)"
+      EISTO:
+        type: str
+        description: |-
+          EISTO
+        default: "$(EISTI=)"
+      NISTO:
+        type: str
+        description: |-
+          NISTO
+        default: "$(NISTI=)"
+      TESTO:
+        type: str
+        description: |-
+          TESTO
+        default: "$(TESTI=)"
+      ELSTO:
+        type: str
+        description: |-
+          ELSTO
+        default: "$(ELSTI=)"
+      TVSTO:
+        type: str
+        description: |-
+          TVSTO
+        default: "$(TVSTI=)"
+      TTSTO:
+        type: str
+        description: |-
+          TTSTO
+        default: "$(TTSTI=)"
+      FTSTO:
+        type: str
+        description: |-
+          FTSTO
+        default: "$(FTSTI=)"
+      FFSTO:
+        type: str
+        description: |-
+          FFSTO
+        default: "$(FFSTI=)"
+      ZRVLO:
+        type: str
+        description: |-
+          ZRVLO
+        default: "$(ZRVLI=0)"
+      ONVLO:
+        type: str
+        description: |-
+          ONVLO
+        default: "$(ONVLI=1)"
+      TWVLO:
+        type: str
+        description: |-
+          TWVLO
+        default: "$(TWVLI=2)"
+      THVLO:
+        type: str
+        description: |-
+          THVLO
+        default: "$(THVLI=3)"
+      FRVLO:
+        type: str
+        description: |-
+          FRVLO
+        default: "$(FRVLI=4)"
+      FVVLO:
+        type: str
+        description: |-
+          FVVLO
+        default: "$(FVVLI=5)"
+      SXVLO:
+        type: str
+        description: |-
+          SXVLO
+        default: "$(SXVLI=6)"
+      SVVLO:
+        type: str
+        description: |-
+          SVVLO
+        default: "$(SVVLI=7)"
+      EIVLO:
+        type: str
+        description: |-
+          EIVLO
+        default: "$(EIVLI=8)"
+      NIVLO:
+        type: str
+        description: |-
+          NIVLO
+        default: "$(NIVLI=9)"
+      TEVLO:
+        type: str
+        description: |-
+          TEVLO
+        default: "$(TEVLI=10)"
+      ELVLO:
+        type: str
+        description: |-
+          ELVLO
+        default: "$(ELVLI=11)"
+      TVVLO:
+        type: str
+        description: |-
+          TVVLO
+        default: "$(TVVLI=12)"
+      TTVLO:
+        type: str
+        description: |-
+          TTVLO
+        default: "$(TTVLI=13)"
+      FTVLO:
+        type: str
+        description: |-
+          FTVLO
+        default: "$(FTVLI=14)"
+      FFVLO:
+        type: str
+        description: |-
+          FFVLO
+        default: "$(FFVLI=15)"
+      PINIW:
+        type: str
+        description: |-
+          PINIW
+        default: "YES"
+      DEFAULT_VAL:
+        type: str
+        description: |-
+          DEFAULT_VAL
+        default: "0"
+    databases:
+      - file: read_write_int_floatE.template
+        args:
+          .*:
+
+  - name: write_raw_int
+    description: |-
+      Imported from DLS module leybold (write_raw_int.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PARAM:
+        type: str
+        description: |-
+          PARAM
+      CMD:
+        type: str
+        description: |-
+          CMD
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      DRVH:
+        type: str
+        description: |-
+          DRVH
+      DRVL:
+        type: str
+        description: |-
+          DRVL
+      DEFAULT_VAL:
+        type: float
+        description: |-
+          DEFAULT_VAL
+        default: 0.0
+    databases:
+      - file: write_raw_int.template
+        args:
+          .*:

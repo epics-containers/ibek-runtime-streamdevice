@@ -1,0 +1,5 @@
+$(P)$(S):FLOW.HIGH
+$(P)$(S):FLOW.HIHI
+$(P)$(S):FLOW.LOLO
+$(P)$(S):FLOW.LOW
+$(P)$(S):SELECTGAS

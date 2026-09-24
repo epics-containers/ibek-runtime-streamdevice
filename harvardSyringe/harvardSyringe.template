@@ -1,62 +1,17 @@
 # % macro, P, Device prefix
 # % macro, Q, Device suffix
-# % macro, desc, Device label for GUI
 # % macro, PORT, Asyn port name
 # % macro, DISABLE, Set to 0 to enable this at startup
-# % macro, name, object and gui association name
 
 # EDM GUI
-# % gui, $(name=), edmembed, harvardSyringe_embed.edl, device=$(P)$(Q)
-# % gui, $(name=), edm, harvardSyringe.edl, device=$(P)$(Q)
 
 # CSS GUI
-# % gui, $(name=), boydetail, harvardSyringeApp_opi/harvardSyringe_detail.opi, P=$(P),Q=$(Q),desc=$(desc=Harvard Syringe Pump)
-# % gui, $(name=), boyembed, harvardSyringeApp_opi/harvardSyringe_embed_box.opi, P=$(P),Q=$(Q),desc=$(desc=Harvard Syringe Pump)
-# % gui, $(name=), boyembed, harvardSyringeApp_opi/harvardSyringe_embed.opi, P=$(P),Q=$(Q),desc=$(desc=Harvard Syringe Pump)
 
 # Detail screen objects
 ## Setup
-# % gui, $(name=), groupHeading,  Setup
-# % gui, $(name=), demand,        Target Time,            $(P)$(Q):TTIME
-# % gui, $(name=), readback,      Target Time,            $(P)$(Q):TTIME:RBV
-# % gui, $(name=), enum,          Infuse Rate Units,      $(P)$(Q):IRATEUNITS
-# % gui, $(name=), readback,      Infuse Rate Units,      $(P)$(Q):IRATEUNITS:RBV
-# % gui, $(name=), demand,        Infuse Rate,            $(P)$(Q):IRATE
-# % gui, $(name=), readback,      Infuse Rate,            $(P)$(Q):IRATE:RBV
-# % gui, $(name=), enum,          Withdraw Rate Units,    $(P)$(Q):WRATEUNITS
-# % gui, $(name=), readback,      Withdraw Rate Units,    $(P)$(Q):WRATEUNITS:RBV
-# % gui, $(name=), demand,        Withdraw Rate,          $(P)$(Q):WRATE
-# % gui, $(name=), readback,      Withdraw Rate,          $(P)$(Q):WRATE:RBV
-# % gui, $(name=), readback,      Infused Volume,         $(P)$(Q):IVOLUME:RBV
-# % gui, $(name=), readback,      Infused Volume Units,   $(P)$(Q):IVOLUMEUNITS:RBV
-# % gui, $(name=), command,       Infused Volume Clear,   $(P)$(Q):CLEARINFUSED
-# % gui, $(name=), readback,      Withdrawn Volume,       $(P)$(Q):WVOLUME:RBV
-# % gui, $(name=), readback,      Withdrawn Volume Units, $(P)$(Q):WVOLUMEUNITS:RBV
-# % gui, $(name=), command,       Withdrawn Volume Clear, $(P)$(Q):CLEARWITHDRAWN
-# % gui, $(name=), enum,          Target Volume Units,    $(P)$(Q):TVOLUMEUNITS
-# % gui, $(name=), readback,      Target Volume Units,    $(P)$(Q):TVOLUMEUNITS:RBV
-# % gui, $(name=), demand,        Target Volume,          $(P)$(Q):TVOLUME
-# % gui, $(name=), readback,      Target Volume,          $(P)$(Q):TVOLUME:RBV
-# % gui, $(name=), groupExit,     SetupExit
 ## Operation
-# % gui, $(name=), groupHeading,  Operation
-# % gui, $(name=), command,       Infuse,                 $(P)$(Q):IRUN
-# % gui, $(name=), command,       Withdraw,               $(P)$(Q):WRUN
-# % gui, $(name=), command,       Stop,                   $(P)$(Q):STOP
-# % gui, $(name=), readback,      Status,                 $(P)$(Q):STATUS
-# % gui, $(name=), groupExit,     OperationExit
 ## Config
-# % gui, $(name=), groupHeading,  Config
-# % gui, $(name=), demand,        Force,                  $(P)$(Q):FORCE
-# % gui, $(name=), readback,      Force,                  $(P)$(Q):FORCE:RBV
-# % gui, $(name=), demand,        Diameter,               $(P)$(Q):DIAMETER
-# % gui, $(name=), readback,      Diameter,               $(P)$(Q):DIAMETER:RBV
-# % gui, $(name=), groupExit,     ConfigExit
 ## Comms
-# % gui, $(name=), groupHeading,  Comms
-# % gui, $(name=), enum,          Enable,                 $(P)$(Q):DISABLE
-# % gui, $(name=), enum,          Update,                 $(P)$(Q):UPDATE.SCAN
-# % gui, $(name=), groupExit,     CommsExit
 
 record(ao, "$(P)$(Q):POLLON") {
   field(DESC, "Set Polling")
@@ -528,7 +483,7 @@ record(mbbi, "$(P)$(Q):CALIBRATION:RBV") {
 }
 
 record(calc, "$(P)$(Q):IRATEMATCHES") {
-  field(DESC, "True if readback for infuse rate matches setpoint")
+  field(DESC, "True if infuse rate matches setpoint")
   field(INPA, "$(P)$(Q):IRATE")
   field(INPB, "$(P)$(Q):IRATE:RBV PP")
   field(INPC, "$(P)$(Q):IRATEUNITS")
@@ -546,7 +501,7 @@ record(calc, "$(P)$(Q):INFUSEDISABLE") {
 }
 
 record(calc, "$(P)$(Q):WRATEMATCHES") {
-  field(DESC, "True if readback for withdraw rate matches setpoint")
+  field(DESC, "True if withdraw rate matches setpoint")
   field(INPA, "$(P)$(Q):WRATE")
   field(INPB, "$(P)$(Q):WRATE:RBV PP")
   field(INPC, "$(P)$(Q):WRATEUNITS")

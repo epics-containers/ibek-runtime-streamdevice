@@ -1,0 +1,32 @@
+#% archiver 10 Monitor
+# % macro, P, Device Prefix
+# % macro, Q, Device Suffix
+# % macro, PORT, Asyn Port
+# % macro, VAR, D Variable to read/write
+# % macro, SCAN, Scan rate
+
+record(ao, "$(P)$(Q):D$(VAR)") {
+    field(OUT, "$(P)$(Q):D$(VAR):WRITE PP")
+}
+
+record(ao, "$(P)$(Q):D$(VAR):WRITE") {
+  field(SDIS, "$(P)$(Q):D$(VAR):SYNC.PACT")
+  field(DISV, "1")
+  field(DTYP, "stream")
+  field(OUT, "@nx100.proto writed($(P)$(Q),$(VAR)) $(PORT)")
+  field(PREC, "0")
+}
+#% archiver 10 Monitor
+record(ai, "$(P)$(Q):D$(VAR):RBV") {
+    field(DTYP, "stream")
+    field(INP, "@nx100.proto readd($(P)$(Q),$(VAR)) $(PORT)")
+    field(PREC, "0")
+    field(SCAN, "$(SCAN)")
+    field(FLNK, "$(P)$(Q):D$(VAR):SYNC")
+}
+record(ao, "$(P)$(Q):D$(VAR):SYNC")
+{
+    field(DOL, "$(P)$(Q):D$(VAR):RBV NPP")
+    field(OMSL, "closed_loop")
+    field(OUT, "$(P)$(Q):D$(VAR) PP")
+}

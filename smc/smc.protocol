@@ -1,0 +1,267 @@
+# Protocol file for the Twickenham Instruments Superconducting Magnet Controller
+# Version: 1.0
+# Date:    31-03-2008
+#
+# Written for Beamline I06 based on Revision 5.6 of 
+# Twickenham Superconduction Magnet Controller manual, dated Jan 2008.
+#
+#
+# The requirements are for most of its features to be implemented in
+# the protocol.  The exception is the X command, which causes an
+# interrupt, which is specifically excluded in the requirements
+# document BLS-I06-CTRL-0003.doc, although the equivalent X status is
+# made available.  
+#
+# The status commands return strings with several
+# different parameters.  These are parsed and sent to different named
+# PVs in the database.  Thus this file is closely coupled to the
+# record structure in the template file.  There is some name
+# flexibility, as the protocol commands that do this take a position
+# parameter ($1) for the prefix.  However you must name the VAL field
+# (if that's the one you want) when using this syntax as it does not
+# understand the use the VAL field by default.
+#
+# The smc seems to use "software flow control".  
+# It sends characters 
+# Ox11 (DC1 (Device Control 1) a.k.a. XON (Transmission ON) and 
+# Ox13 (DC3 (Device Control 3) a.k.a. XOFF (Transmission OFF))
+#
+# XOFF tells the other end, the receiver (the IOC) not to transmit while the unit is sending data.
+# XON tells the receiver the sender has finished.
+#
+# What you see on the hand held serial analyser is D3messageCRLFD1, where message is the status report
+# as described in the manual eg. T0U098.999L094.001Y10.00
+#
+# Unfortunately, it does not seem to send them everytime.
+# The first format converter in every "get" function uses a perl compatible regular expression (PCRE)
+# format converter to look for an optional DC3 character.
+#
+# It would appear that you cannot have an optional character in a terminator but the streams 
+# converter seems quite happy to ignore the occasional DC1 following the terminator. 
+#
+
+# Don't put a space before the semicolon!
+Terminator = CR LF;
+ReadTimeout = 500;
+#ReadTimeout = 1000;
+#ReadTimeout = 5000;
+#ReadTimeout = 250;
+WriteTimeout = 250;
+ReplyTimeout = 2000;
+#InTerminator = CR LF "\x11";
+#OutTerminator = CR LF;
+ExtraInput=Ignore;
+
+#@mismatch { in "%*s"; disconnect; }
+@mismatch { in "%*/.+/"; }
+
+# /// Sets the ramp rate in Amps per second.  This gets rounded to one of 65 values internally.
+setRampRate {
+	out "A%08.5f";
+}
+
+# /// Sets the front panel lock, ie whether the unit in the rack can be controlled by pressing
+# /// buttons on the front.  
+# /// It's a binary. 0 = Off (unlocked) and 1 = On (locked).
+setFrontPanelLock {
+	out "B%1b";
+}
+
+# /// Sets the calibration factor to convert Current to Field, or Amps to Tesla in Tesla per Amp.
+# 0.5 < C < 0.01
+setCalibration {
+	out "C%08.6f";
+}
+
+# /// Set the reversing switch direction.
+# /// 0 = Forward, 1 = Reverse
+setRampDirection {
+	out "D%1b";
+}
+
+# Gets the output parameters as
+# I, V, R, A/V
+# Current, Terminal Voltage, Ramp target, ramp mode (set current or constant voltage).
+#getOutputParametersCurrent {
+#	out "G" ;
+#	in "%s" ;
+#}
+
+# /// Gets the output parameters as
+# /// I, V, R, A/V
+# /// Current, Terminal Voltage, Ramp target, ramp mode (set current or constant voltage).
+getOutputParametersCurrent {
+	out "G" ;
+	in 
+#	  "%/\x13?/"
+	  "I%(\$1:STS:CURRENT.VAL)8f"
+	  "V%(\$1:STS:VOLTAGE.VAL)5f"
+	  "R%(\$1:STS:RAMP:TARGET.VAL)1u"
+	  "%(\$1:STS:RAMP:AORV.VAL)[AV]"
+	;
+	# Try to recover from any mismatch by writing the value of the input that doesn't match to the GET record.
+#	@mismatch { in "%(\$1:DBG:PROTOCOL:MISMATCH.VAL)s"; out "G" ; in "%s" ;}
+
+}
+
+# /// Sets the persistant mode heater on/off, etc  Turns out not relevant for BL I06 magnet.
+# /// 0 = off, 1 = conditional On, 2 = unconditional on, 9 = reset persistent mode current record to zero.
+setHeaterMode {
+	out "H%1d" ;
+}
+
+# /// Gets the magnet status. But this command doesn't tell us anything we don't already
+# /// know if we are using all the other commands, G,K,N,O,S, so not scanning this one.
+# /// F, H, or I, H
+# /// Magnetic field, Heater mode, or Current, Heater mode.
+getMagnetStatus {
+	out "J";
+	in "%s" ;
+}
+
+# Gets the current status as a single string.
+# R, M, P, X, H, Z, E, Q
+# Ramp target, Whether ramp generator has made target or is ramping, ramp pause, external interrupt, 
+# Heater mode, Zero, Error and Quench.
+#getCurrentStatus {
+#	out "K" ;
+#	in "%s" ;
+#}
+
+
+# /// Gets the current status as a single string.
+# /// R, M, P, X, H, Z, E, Q
+# /// Ramp target, Whether ramp generator has made target or is ramping, ramp pause, external interrupt, 
+# /// Heater mode, Zero, Error and Quench.
+# /// It uses a position parameter, $1 for the macro in the name of the PV and breaks the string up amongst different
+# /// appropriate PVs.
+getCurrentStatus {
+	out "K" ;
+	in 
+#	  "%/\x13?/"
+	  "R%(\$1:STS:RAMP:TARGET.VAL)1u"
+	  "M%(\$1:STS:RAMP:MADE.VAL)1b"
+	  "P%(\$1:STS:RAMP:PAUSE.VAL)1b"
+	  "X%(\$1:STS:EXTERNALTRIP.VAL)1u"
+	  "H%(\$1:STS:HEATER:MODE.VAL)1u"
+	  "Z0.00"
+	  "E%(\$1:STS:ERROR:REVERSE.VAL)1u%(\$1:STS:ERROR:TRIPS.VAL)1u"
+	  "Q%(\$1:STS:QUENCH:CURRENT.VAL)8f"
+	;
+	# Try to recover from any mismatch by writing the value of the input that doesn't match to the GET record.
+#	@mismatch { in "%(\$1:DBG:PROTOCOL:MISMATCH.VAL)s"; }
+}
+
+
+# /// Sets the lower set point in Amps, to be used when Amps units mode is set.
+setLowerCurrentSetpoint {
+	out "L%07.4f";
+}
+
+# /// Gets the output parameters as
+# /// F or I, V, R, A/V
+# /// Field or Current, Terminal Voltage, Ramp target, ramp mode (set current or constant voltage).
+getOutputParametersField {
+	out "N" ;
+	in 
+#	  "%/\x13?/"
+	  "%(\$1:PROP:UNIT:IORF.VAL)[FI]%(\$1:STS:PMCURRENT.VAL)8f"
+	  "V%(\$1:STS:VOLTAGE.VAL)5f"
+	  "R%(\$1:STS:RAMP:TARGET.VAL)1u"
+	  "%(\$1:STS:RAMP:AORV.VAL)[AV]"
+	;
+	# Try to recover from any mismatch by writing the value of the input that doesn't match to the GET record.
+#	@mismatch { in "%(\$1:DBG:PROTOCOL:MISMATCH.VAL)s"; }
+}
+
+
+# Gets the settings of the operating parameters as a single string.
+# A, D, T, B, W, C
+# Ramp rate, ramp direction, units, front panel lock, heater current, Tesla per Amp Calibration.
+#getOperatingParameters {
+#	out "O" ;
+#	in "%s" ;
+#}
+
+# /// Gets the settings of the operating parameters as a single string.
+# /// A, D, T, B, W, C
+# /// Ramp rate, ramp direction, units, front panel lock, heater current, Tesla per Amp Calibration.
+getOperatingParameters {
+	out "O" ;
+	in 
+#	  "%/\x13?/"
+	  "A%(\$1:STS:RAMP:RATE.VAL)8f"
+	  "D%(\$1:STS:RAMP:DIR.VAL)1u"
+	  "T%(\$1:STS:UNITS.VAL)1b"
+	  "B%(\$1:STS:FPLOCK.VAL)1b"
+	  "W%(\$1:STS:HEATER:CURRENT.VAL)4f"
+	  "C%(\$1:STS:CALIBRATION.VAL)8f"
+	;
+	# Try to recover from any mismatch by writing the value of the input that doesn't match to the GET record.
+#	@mismatch { in "%(\$1:DBG:PROTOCOL:MISMATCH.VAL)s"; }
+}
+
+
+
+# /// Sets the Pause ramp, ie tells the unit to pause ramping.
+# /// 0 = Pause off, 1 = Pause on, ie ramp on, ramp off respectively.
+setRampPause {
+	out "P%1b";
+}
+
+# /// Sets the ramp target.
+# /// 0 = Zero, 1 = Lower, 2 = Upper.
+setRampTarget {
+	out "R%1u";
+}
+
+# Gets the status of the "setpoints" as
+# T, U, L, Y
+# Units, Upper current limit, lower current limit, terminal voltage limit.
+#getPointStatus {
+#	out "S" ;
+#	in "%s" ;
+#}
+
+# /// Gets the status of the "setpoints" as
+# /// T, U, L, Y
+# /// Units, Upper current limit, lower current limit, terminal voltage limit.
+# This one uses a position variable, $1 for the macro in the name of the PV.
+# The slash is to escape the dollar.
+getPointStatus {
+	out "S" ;
+	in 
+#	  "%/\x13?/"
+	  "T%(\$1:STS:UNITS.VAL)1b"
+	  "U%(\$1:STS:POINT:UPPER.VAL)7f"
+	  "L%(\$1:STS:POINT:LOWER.VAL)7f"
+	  "Y%(\$1:STS:VOLTAGE:LIMIT.VAL)4f"
+	;
+	# Try to recover from any mismatch by writing the value of the input that doesn't match to the GET record.
+#	@mismatch { in "%(\$1:DBG:PROTOCOL:MISMATCH.VAL)s"; }
+}
+
+# /// Sets whether conversion to from current magnetic field units is in force, 
+# /// ie whether to use Tesla rather than Amps for values some settings are set with
+# /// and some statuses are reported with.
+# /// It's a binary. 0 = Off (Amps) and 1 = On (Tesla).
+setUnits {
+	out "T%1b";
+}
+
+# /// Sets the upper set point in Amps, to be used when Amps units mode is set.
+setUpperCurrentSetpoint {
+	out "U%07.4f";
+}
+
+# /// Sets the heater current in mA.  Turns out not relevant for BL I06 magnet.
+setHeaterCurrent {
+	out "W%#4f" ;
+}
+
+# /// Sets the terminal voltage limit in Volts.  There is an internal maximum, which
+# /// cannot be exceeded.
+setTerminalVoltage {
+	out "Y%4.1f" ;
+}
+

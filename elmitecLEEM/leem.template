@@ -4,8 +4,6 @@
 # % macro, Q, Device suffix
 # % macro, PORT, Asyn port name
 # % macro, PHI_MTR_RBV, PHI rotation motor RBV link or const e.g. "BL06I-MO-PEEM-01:PHI:OS.RBV MS" (default = 0)
-# % macro, name, Name to export to gda as
-# % gui, $(name=), edm, leem.edl, device=$(P)$(Q)
 #
 record(asyn, "$(P)$(Q):ASET") {
   field(SCAN, "Passive")

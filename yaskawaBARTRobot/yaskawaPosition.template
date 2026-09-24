@@ -1,7 +1,9 @@
+
 # % macro, P, Device Prefix
 # % macro, STREAMS_PORT, Asyn Port
 # % macro, VAR, P Variable to read/write
 # % macro, SCAN, Scan rate or readback
+
 
 record(ai, "$(P):P$(VAR):X") {
   field(EGU, "mm")

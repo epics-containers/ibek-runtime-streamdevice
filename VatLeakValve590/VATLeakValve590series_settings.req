@@ -1,0 +1,5 @@
+$(device):SETF2IGAIN
+$(device):SETF2PGAIN
+$(device):SETPOSITIONLIMIT
+$(device):SETPRESSURELIMIT
+$(device):SETVALVESPEED

@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
 
-# Imported from DLS production support module: alicatGasFlow 2-14
-# Source: /dls_sw/prod/R3.14.12.7/support/alicatGasFlow/2-14
+# Imported from DLS production support module: alicatGasFlow 2-15
+# Source: /dls_sw/prod/R3.14.12.7/support/alicatGasFlow/2-15
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/alicatGasFlow/ release.
@@ -13,10 +13,6 @@ entity_models:
     description: |-
       Alicat gas flow meter
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-
@@ -53,14 +49,11 @@ entity_models:
       - file: alicatGasFlow.template
         args:
           .*:
+
   - name: alicatPressureCtrl
     description: |-
       Alicat pressure controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-
@@ -102,14 +95,11 @@ entity_models:
       - file: alicatPressureCtrl.template
         args:
           .*:
+
   - name: alicatMassCtrl
     description: |-
       Alicat mass flow controller
     parameters:
-      name:
-        type: id
-        description: |-
-          Object name
       P:
         type: str
         description: |-
@@ -167,7 +157,7 @@ entity_models:
         type: str
         description: |-
           Name of gas00 default Air
-        default: Air
+        default: "Air"
       GASNUM01:
         type: int
         description: |-
@@ -177,7 +167,7 @@ entity_models:
         type: str
         description: |-
           Name of gas01 default Ar
-        default: Ar
+        default: "Ar"
       GASNUM02:
         type: int
         description: |-
@@ -187,7 +177,7 @@ entity_models:
         type: str
         description: |-
           Name of gas02 default CH4
-        default: CH4
+        default: "CH4"
       GASNUM03:
         type: int
         description: |-
@@ -197,7 +187,7 @@ entity_models:
         type: str
         description: |-
           Name of gas03 default CO
-        default: CO
+        default: "CO"
       GASNUM04:
         type: int
         description: |-
@@ -207,7 +197,7 @@ entity_models:
         type: str
         description: |-
           Name of gas04 default CO2
-        default: CO2
+        default: "CO2"
       GASNUM05:
         type: int
         description: |-
@@ -217,7 +207,7 @@ entity_models:
         type: str
         description: |-
           Name of gas05 default C2H6
-        default: C2H6
+        default: "C2H6"
       GASNUM06:
         type: int
         description: |-
@@ -227,7 +217,7 @@ entity_models:
         type: str
         description: |-
           Name of gas06 default H2
-        default: H2
+        default: "H2"
       GASNUM07:
         type: int
         description: |-
@@ -237,7 +227,7 @@ entity_models:
         type: str
         description: |-
           Name of gas07 default He
-        default: He
+        default: "He"
       GASNUM08:
         type: int
         description: |-
@@ -247,7 +237,7 @@ entity_models:
         type: str
         description: |-
           Name of gas08 default N2
-        default: N2
+        default: "N2"
       GASNUM09:
         type: int
         description: |-
@@ -257,7 +247,7 @@ entity_models:
         type: str
         description: |-
           Name of gas09 default N2O
-        default: N2O
+        default: "N2O"
       GASNUM10:
         type: int
         description: |-
@@ -267,7 +257,7 @@ entity_models:
         type: str
         description: |-
           Name of gas10 default Ne
-        default: Ne
+        default: "Ne"
       GASNUM11:
         type: int
         description: |-
@@ -277,7 +267,7 @@ entity_models:
         type: str
         description: |-
           Name of gas11 default O2
-        default: O2
+        default: "O2"
       GASNUM12:
         type: int
         description: |-
@@ -287,7 +277,7 @@ entity_models:
         type: str
         description: |-
           Name of gas12 default C3H8
-        default: C3H8
+        default: "C3H8"
       GASNUM13:
         type: int
         description: |-
@@ -297,7 +287,7 @@ entity_models:
         type: str
         description: |-
           Name of gas13 default n-C4H10
-        default: n-C4H10
+        default: "n-C4H10"
       GASNUM14:
         type: int
         description: |-
@@ -307,7 +297,7 @@ entity_models:
         type: str
         description: |-
           Name of gas14 default C2H2
-        default: C2H2
+        default: "C2H2"
       GASNUM15:
         type: int
         description: |-
@@ -317,7 +307,7 @@ entity_models:
         type: str
         description: |-
           Name of gas15 default C2H4
-        default: C2H4
+        default: "C2H4"
       GASNUM16:
         type: int
         description: |-
@@ -327,7 +317,7 @@ entity_models:
         type: str
         description: |-
           Name of gas16 default i-C4H10
-        default: i-C4H10
+        default: "i-C4H10"
       GASNUM17:
         type: int
         description: |-
@@ -337,7 +327,7 @@ entity_models:
         type: str
         description: |-
           Name of gas17 default Kr
-        default: Kr
+        default: "Kr"
       GASNUM18:
         type: int
         description: |-
@@ -347,7 +337,7 @@ entity_models:
         type: str
         description: |-
           Name of gas18 default Xe
-        default: Xe
+        default: "Xe"
       GASNUM19:
         type: int
         description: |-
@@ -357,7 +347,7 @@ entity_models:
         type: str
         description: |-
           Name of gas19 default SF6
-        default: SF6
+        default: "SF6"
       GASNUM20:
         type: int
         description: |-
@@ -367,7 +357,7 @@ entity_models:
         type: str
         description: |-
           Name of gas20 default C-25
-        default: C-25
+        default: "C-25"
       GASNUM21:
         type: int
         description: |-
@@ -377,7 +367,7 @@ entity_models:
         type: str
         description: |-
           Name of gas21 default C-10
-        default: C-10
+        default: "C-10"
       GASNUM22:
         type: int
         description: |-
@@ -387,7 +377,7 @@ entity_models:
         type: str
         description: |-
           Name of gas22 default C-8
-        default: C-8
+        default: "C-8"
       GASNUM23:
         type: int
         description: |-
@@ -397,7 +387,7 @@ entity_models:
         type: str
         description: |-
           Name of gas23 default C-2
-        default: C-2
+        default: "C-2"
       GASNUM24:
         type: int
         description: |-
@@ -407,7 +397,7 @@ entity_models:
         type: str
         description: |-
           Name of gas24 default C-75
-        default: C-75
+        default: "C-75"
       GASNUM25:
         type: int
         description: |-
@@ -417,7 +407,7 @@ entity_models:
         type: str
         description: |-
           Name of gas25 default A-75
-        default: A-75
+        default: "A-75"
       GASNUM26:
         type: int
         description: |-
@@ -427,7 +417,7 @@ entity_models:
         type: str
         description: |-
           Name of gas26 default A-25
-        default: A-25
+        default: "A-25"
       GASNUM27:
         type: int
         description: |-
@@ -437,7 +427,7 @@ entity_models:
         type: str
         description: |-
           Name of gas27 default A-1025
-        default: A-1025
+        default: "A-1025"
       GASNUM28:
         type: int
         description: |-
@@ -447,7 +437,7 @@ entity_models:
         type: str
         description: |-
           Name of gas28 default Star29
-        default: Star29
+        default: "Star29"
       GASNUM29:
         type: int
         description: |-
@@ -457,7 +447,7 @@ entity_models:
         type: str
         description: |-
           Name of gas29 default P-5
-        default: P-5
+        default: "P-5"
       GASNUM30:
         type: int
         description: |-
@@ -518,6 +508,11 @@ entity_models:
         description: |-
           Name of gas35 default ""
         default: ""
+      GASNAMEPROTOCOL:
+        type: str
+        description: |-
+          GASNAMEPROTOCOL
+        default: "getGas"
     databases:
       - file: alicatMassCtrl.template
         args:

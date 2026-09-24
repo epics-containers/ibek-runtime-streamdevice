@@ -8,8 +8,6 @@
 # % macro, Q, Device suffix
 # % macro, PORT, Asyn port name
 # % macro, CHAN, Signal generator channel (1 or 2)
-# % macro, name, Name to export to gda as
-# % gui, $(name=), edm, keysight33500B.edl, P=$(P), Q=$(Q), CHAN=$(CHAN)
 # % autosave 2 SCAN
 record(seq, "$(P)$(Q):CH$(CHAN):UPDATE") {
   field(DESC, "Update Params")

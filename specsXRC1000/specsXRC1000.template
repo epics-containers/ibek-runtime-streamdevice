@@ -2,7 +2,6 @@
 # % macro, P, Device prefix
 # % macro, PORT, terminal server asyn serial port number
 
-# % gui, specsXRC1000, edm, specsXRC1000.edl, P=$(P)
 
 record(stringin, "$(P):MESSAGE") {
 

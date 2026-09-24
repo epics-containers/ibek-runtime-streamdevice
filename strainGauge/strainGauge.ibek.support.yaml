@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: strainGauge 2-9
+# Source: /dls_sw/prod/R3.14.12.7/support/strainGauge/2-9
+# Pristine copy of the StreamDevice protocols + EPICS db/templates from that release,
+# with one scripted change in strainGauge.template: its two genSub records
+# ($(P):PARSELOW, $(P):PARSEHIGH, SNAM parseSetpointValue) are converted to aSub
+# records (record type only; every field kept, the explicit FTA STRING / FTVA DOUBLE
+# match what the routine reads and writes). genSub is not in EPICS 7 base; aSub is.
+#
+# Templates needing a generic IOC built with this module (not the plain
+# generic image):
+# - `strainGauge.template` needs a generic IOC built with `strainGauge` (compiled support), not the plain generic image.
+#   Its aSub records call parseSetpointValue, compiled C in the module's
+#   strainGaugeApp/src/genSubRoutines.c, which the generic image does not have.
+#   That IOC must register the routine ported to aSub (aSubRecord *, same a/vala
+#   fields). An aSub skips its OUTx puts when the routine returns non-zero (genSub
+#   always writes them); parseSetpointValue always returns 0 and has no OUTx, so
+#   this changes nothing here.
+#
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/strainGauge/ release.
+
+module: strainGauge
+
+entity_models:
+  - name: strainGaugeOmegaPt
+    description: |-
+      Controls Omega Pt series controllers
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      port:
+        type: str
+        description: |-
+          Asyn port to connect to
+      HL_NAL:
+        type: int
+        description: |-
+          The OmegaPt alarm for high limit, 1 or 2
+        default: 2
+      LL_NAL:
+        type: int
+        description: |-
+          The OmegaPt alarm for low limit, 1 or 2
+        default: 1
+    databases:
+      - file: strainGaugeOmegaPt.template
+        args:
+          .*:
+
+  - name: strainGauge
+    description: |-
+      Support for the Newport strain gauge
+      NOTE: needs a generic IOC built with strainGauge (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      bus:
+        type: str
+        description: |-
+          Asyn port to connect to
+    databases:
+      - file: strainGauge.template
+        args:
+          .*:
+
+  - name: motorInit
+    description: |-
+      Sets a motor record's position at init
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      M:
+        type: str
+        description: |-
+          Motor suffix
+      R:
+        type: str
+        description: |-
+          Value to set the motor at init
+    databases:
+      - file: motorInit.template
+        args:
+          .*:

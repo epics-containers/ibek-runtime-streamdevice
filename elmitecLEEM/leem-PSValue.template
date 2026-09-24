@@ -150,8 +150,6 @@ record(sseq, "$(P)$(Q):UPDATE:DB") {
 # % macro, EGU, EGU for the LEEM parameter RBV (default = "")
 # % macro, HOPR, HOPR for the LEEM parameter (default = "")
 # % macro, LOPR, LOPR for the LEEM parameter (default = "") 
-# % macro, name, Name to export to gda as
-# % gui, $(name=), edm, leem-PSValue.edl, device=$(P)$(Q)
 #
 record(ai, "$(P)$(Q):RD") {
   field(DESC, "read PSValue")

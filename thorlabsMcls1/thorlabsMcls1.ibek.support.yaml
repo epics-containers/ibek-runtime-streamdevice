@@ -13,10 +13,6 @@ entity_models:
     description: |-
       Thorlabs MCLS1 laser source
     parameters:
-      name:
-        type: id
-        description: |-
-          Name
       P:
         type: str
         description: |-
@@ -45,10 +41,6 @@ entity_models:
         type: str
         description: |-
           asyn port
-      desc:
-        type: str
-        description: |-
-          Description
     databases:
       - file: thorlabsMcls1.template
         args:

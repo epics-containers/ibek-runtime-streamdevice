@@ -1,0 +1,2 @@
+Support module for 12 channel Lakeshore 224 Temperature Monitor.
+Loosely based on the lakeshore218 module.

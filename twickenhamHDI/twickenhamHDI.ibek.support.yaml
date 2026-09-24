@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: twickenhamHDI 2-3
+# Source: /dls_sw/prod/R3.14.12.7/support/twickenhamHDI/2-3
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/twickenhamHDI/ release.
+
+module: twickenhamHDI
+
+entity_models:
+  - name: twickenhamHDI
+    description: |-
+      Imported from DLS module twickenhamHDI (twickenhamHDI.template)
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      AA_SV:
+        type: str
+        description: |-
+          AA_SV
+        default: "NO_ALARM"
+      BA_SV:
+        type: str
+        description: |-
+          BA_SV
+        default: "NO_ALARM"
+      AB_SV:
+        type: str
+        description: |-
+          AB_SV
+        default: "NO_ALARM"
+      BB_SV:
+        type: str
+        description: |-
+          BB_SV
+        default: "NO_ALARM"
+      A_SV:
+        type: str
+        description: |-
+          A_SV
+        default: "NO_ALARM"
+      B_SV:
+        type: str
+        description: |-
+          B_SV
+        default: "NO_ALARM"
+    databases:
+      - file: twickenhamHDI.template
+        args:
+          .*:

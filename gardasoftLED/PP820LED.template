@@ -1,7 +1,5 @@
 # % macro, P, The PV device name prefix for the lighting controller.
 # % macro, PORT, The lighting controller stream device serial comms port.
-# % macro, name, The name for gui elements.
-# % gui, $(name=), edm, PP800Series.edl, P=$(P)
 
 ##################### Save ######################
 

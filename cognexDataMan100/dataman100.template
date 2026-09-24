@@ -1,8 +1,6 @@
 # % macro, P, prefix
 # % macro, R, suffix
 # % macro, PORT, asyn port name
-# % macro, name, gui element name
-# % gui, $(name), edm, dataman100.edl,P=$(P),R=$(R)
 
 record(waveform, "$(P)$(R):CODE")
 {

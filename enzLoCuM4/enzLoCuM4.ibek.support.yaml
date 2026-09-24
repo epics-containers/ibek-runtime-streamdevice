@@ -2,9 +2,17 @@
 
 # Imported from DLS production support module: enzLoCuM4 2-42
 # Source: /dls_sw/prod/R3.14.12.7/support/enzLoCuM4/2-42
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release,
+# except for these scripted changes:
+# - enzLoCuM4Readback_generic_diagonal.template: include target given its real
+#   file name (`..._common` -> `..._common.template`), and a stray trailing `)` removed
+#   from 2 CALC expressions (EPICS 7 rejects the unbalanced expression).
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/enzLoCuM4/ release.
+#
+# Templates needing a generic IOC built with this module (not the plain
+# generic image):
+# - `enzLoCuM4Readback.template` needs a generic IOC built with `enzLoCuM4` (compiled support), not the plain generic image.
 
 module: enzLoCuM4
 
@@ -25,10 +33,6 @@ entity_models:
         type: str
         description: |-
           Address (e.g. 01)
-      name:
-        type: id
-        description: |-
-          Object and gui association name
       noinit:
         type: str
         description: |-
@@ -36,5 +40,194 @@ entity_models:
         default: ""
     databases:
       - file: enzLoCuM4.template
+        args:
+          .*:
+
+  - name: enzLoCuM4Readback
+    description: |-
+      Imported from DLS module enzLoCuM4 (enzLoCuM4Readback.template)
+      NOTE: needs a generic IOC built with enzLoCuM4 (not the plain generic image).
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      adel:
+        type: str
+        description: |-
+          adel
+        default: "0.002*B"
+      desc_prefix:
+        type: str
+        description: |-
+          desc_prefix
+      blade_a_card:
+        type: str
+        description: |-
+          blade_a_card
+      blade_a_chan:
+        type: str
+        description: |-
+          blade_a_chan
+      blade_b_card:
+        type: str
+        description: |-
+          blade_b_card
+      blade_b_chan:
+        type: str
+        description: |-
+          blade_b_chan
+      blade_c_card:
+        type: str
+        description: |-
+          blade_c_card
+      blade_c_chan:
+        type: str
+        description: |-
+          blade_c_chan
+      blade_d_card:
+        type: str
+        description: |-
+          blade_d_card
+      blade_d_chan:
+        type: str
+        description: |-
+          blade_d_chan
+      egu:
+        type: str
+        description: |-
+          Engineering units
+    databases:
+      - file: enzLoCuM4Readback.template
+        args:
+          .*:
+
+  - name: enzLoCuM4Readback_generic_diagonal
+    description: |-
+      Imported from DLS module enzLoCuM4 (enzLoCuM4Readback_generic_diagonal.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      desc_prefix:
+        type: str
+        description: |-
+          desc_prefix
+      dtyp:
+        type: str
+        description: |-
+          dtyp
+      top_right:
+        type: str
+        description: |-
+          top_right
+      top_left:
+        type: str
+        description: |-
+          top_left
+      bottom_left:
+        type: str
+        description: |-
+          bottom_left
+      bottom_right:
+        type: str
+        description: |-
+          bottom_right
+      dtyp_wf:
+        type: str
+        description: |-
+          dtyp_wf
+      top_right_wf:
+        type: str
+        description: |-
+          top_right_wf
+      nelm:
+        type: int
+        description: |-
+          nelm
+      top_left_wf:
+        type: str
+        description: |-
+          top_left_wf
+      bottom_left_wf:
+        type: str
+        description: |-
+          bottom_left_wf
+      bottom_right_wf:
+        type: str
+        description: |-
+          bottom_right_wf
+      egu:
+        type: str
+        description: |-
+          Engineering units
+    databases:
+      - file: enzLoCuM4Readback_generic_diagonal.template
+        args:
+          .*:
+
+  - name: enzLoCuM4Readback_generic_vertical
+    description: |-
+      Imported from DLS module enzLoCuM4 (enzLoCuM4Readback_generic_vertical.template)
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      desc_prefix:
+        type: str
+        description: |-
+          desc_prefix
+      dtyp:
+        type: str
+        description: |-
+          dtyp
+      pos_y:
+        type: str
+        description: |-
+          pos_y
+      neg_x:
+        type: str
+        description: |-
+          neg_x
+      pos_x:
+        type: str
+        description: |-
+          pos_x
+      neg_y:
+        type: str
+        description: |-
+          neg_y
+      dtyp_wf:
+        type: str
+        description: |-
+          dtyp_wf
+      pos_y_wf:
+        type: str
+        description: |-
+          pos_y_wf
+      nelm:
+        type: int
+        description: |-
+          nelm
+      neg_x_wf:
+        type: str
+        description: |-
+          neg_x_wf
+      pos_x_wf:
+        type: str
+        description: |-
+          pos_x_wf
+      neg_y_wf:
+        type: str
+        description: |-
+          neg_y_wf
+      egu:
+        type: str
+        description: |-
+          Engineering units
+    databases:
+      - file: enzLoCuM4Readback_generic_vertical.template
         args:
           .*:

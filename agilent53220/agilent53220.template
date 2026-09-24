@@ -12,8 +12,6 @@
 #################################################################################
 # Read records (for frequency parameters)
 
-# % gdatag,template,agilent33220A,$(name=),$(gda_desc=)
-# % gdatag,pv,ro,$(name=),FREQ1RBV
 # % archiver 1 Monitor
 # % autosave 1 LOLO LOW HIGH HIHI
 record(ai, "$(P)$(Q):FREQ1:RBV") {
@@ -31,7 +29,6 @@ record(ai, "$(P)$(Q):FREQ1:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),FREQ2RBV
 # % archiver 1 Monitor
 # % autosave 1 LOLO LOW HIGH HIHI
 record(ai, "$(P)$(Q):FREQ2:RBV") {
@@ -49,7 +46,6 @@ record(ai, "$(P)$(Q):FREQ2:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),PHASERBV
 # % archiver 1 Monitor
 # % autosave 1 LOLO LOW HIGH HIHI
 record(ai, "$(P)$(Q):PHASE:RBV") {
@@ -72,7 +68,6 @@ record(ai, "$(P)$(Q):PHASE:RBV") {
 #############################################################################
 # Set records for the threshold settings
 
-# % gdatag,pv,rw,$(name=),LEVEL1
 # % autosave 1 VAL
 record(ao, "$(P)$(Q):LEVEL1") {
   field(DESC, "Thres 1 Level Chan 1")
@@ -84,7 +79,6 @@ record(ao, "$(P)$(Q):LEVEL1") {
   field(FLNK, "$(P)$(Q):UPDATE.PROC")
 }
 
-# % gdatag,pv,rw,$(name=),LEVEL2
 # % autosave 1 VAL
 record(ao, "$(P)$(Q):LEVEL2") {
   field(DESC, "Thres 1 Level Chan 2")
@@ -96,7 +90,6 @@ record(ao, "$(P)$(Q):LEVEL2") {
   field(FLNK, "$(P)$(Q):UPDATE.PROC")
 }
 
-#% gdatag,mbbinary,rw,$(name=),AUTOLEVEL1
 record(mbbo, "$(P)$(Q):AUTOLEVEL1") {
   field(DESC, "Set autolevel for chan1")
   field(DTYP, "stream")
@@ -109,7 +102,6 @@ record(mbbo, "$(P)$(Q):AUTOLEVEL1") {
   field(FLNK, "$(P)$(Q):UPDATE.PROC")
 }
 
-#% gdatag,mbbinary,rw,$(name=),AUTOLEVEL2
 record(mbbo, "$(P)$(Q):AUTOLEVEL2") {
   field(DESC, "Set autolevel for chan2")
   field(DTYP, "stream")
@@ -149,7 +141,6 @@ record(seq, "$(P)$(Q):UPDATE") {
 }
 
 
-# % gdatag,pv,ro,$(name=),LEVEL1RBV
 # % archiver 1 Monitor
 record(ai, "$(P)$(Q):LEVEL1:RBV") {
   field(DESC, "Thres 1 Level Chan 1")
@@ -161,7 +152,6 @@ record(ai, "$(P)$(Q):LEVEL1:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(name=),LEVEL2RBV
 # % archiver 1 Monitor
 record(ai, "$(P)$(Q):LEVEL2:RBV") {
   field(DESC, "Thres 1 Level Chan 2")
@@ -173,7 +163,6 @@ record(ai, "$(P)$(Q):LEVEL2:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,ro,$(name=),AUTOLEVEL1RBV
 # % archiver 10 Monitor
 record(mbbi, "$(P)$(Q):AUTOLEVEL1:RBV") {
   field(DESC, "Auto level for chan 1")
@@ -187,7 +176,6 @@ record(mbbi, "$(P)$(Q):AUTOLEVEL1:RBV") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,ro,$(name=),AUTOLEVEL2RBV
 # % archiver 10 Monitor
 record(mbbi, "$(P)$(Q):AUTOLEVEL2:RBV") {
   field(DESC, "Auto level for chan 2")

@@ -62,10 +62,6 @@ entity_models:
         description: |-
           Default disable mode for comms
         default: 1
-      name:
-        type: id
-        description: |-
-          Gui association name
       label0:
         type: str
         description: |-

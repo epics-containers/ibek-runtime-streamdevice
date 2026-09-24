@@ -1,0 +1,10 @@
+$(P)$(Q):ACTIVITY:SET
+$(P)$(Q):CTRL:SET
+$(P)$(Q):D:SET
+$(P)$(Q):I:SET
+$(P)$(Q):MANV:SET
+$(P)$(Q):MAXV:SET
+$(P)$(Q):P:SET
+$(P)$(Q):SAMPLEFLW:SET
+$(P)$(Q):SHIELDFLW:SET
+$(P)$(Q):TTEMP:SET

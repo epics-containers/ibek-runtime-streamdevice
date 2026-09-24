@@ -1,0 +1,227 @@
+Overriding Defaults
+-------------------
+
+The vacuum gauge templates in the mks937a module contain numerous
+values that were hard-coded to appropriate default values for
+the gauges as they are used in the vacuum systems across the majority
+of Diamond.  These values are the setpoints for the gauges and
+associated alarm and limit fields.
+
+However, there are a few applications where vacuum group have
+requested the setpoint levels on particular gauges be altered.  Once
+the setpoint levels have been changed, it can become necessary to
+change limits and alarm levels to accommodate and change the description.
+
+To facilitate this, whilst keeping backwards compatibility with existing
+substitution files some optional macros are defined.
+
+Optional Default Override Macros In Vacuum Gauge Templates
+----------------------------------------------------------
+
+The optional override macros use the msi default value syntax to add
+macros that default to the original values coded into the templates if
+no value is set, but allow the values to be overridden as needed.  The
+result for substitution files that do not use the new optional macros
+is an identical database (apart from additional comment lines on the
+new macros).  Only default values that are already defined in the
+existing template have optional override macros defined.
+
+Three template files are involved:
+mks937aGauge.template
+mks937aPirg.template
+mks937aImg.template
+
+For each setpoint in a template there are 2 records with names of the
+form
+
+<device>:<name>:SETSP
+and
+<device>:<name>:SP
+where 
+
+<device> is the name the setpoint is applied to, not necessarily the
+same as the device macro for the template and
+<name> is the name of the setpoint (which is in upper case).
+
+For example, after expansion:
+BL06I-VA-PIRG-01:RLY:SETSP
+BL06I-VA-PIRG-01:RLY:SP
+
+Where the same field is set in these 2 records, they both have the same default value.
+
+In the gauge template the setpoint is for the PIRG device and is called CTL.
+
+In the pirg template the setpoint is for the PIRG device and is called RLY.
+
+In the img template several setpoints are implemented for the IMG device, 
+they are called CTL, RLY, PRO and RLA.
+
+For each setpoint level, the following EPICS fields are given default values
+DRVH DRVL
+HOPR LOPR
+HIHI LOLO (apart from in the Gauge template, which does not currently set these.)
+HIGH LOW (apart from in the Gauge template, which does not currently set these.)
+DESC
+
+While some of these have the same default values they have been given
+separate macros to allow flexibility in what is required to be
+overridden.  
+
+The macro names for the setpoint are in lower case and refer to which
+setpoint they override, of the form 
+<name>sp_level.
+For example,
+ rlysp_level
+
+The remaining macros name which EPICS field they refer to
+
+<name>sp_<EPICS_field>
+
+For example,
+ rlysp_drvh  = the DRVH field on relay setpoint records 
+              (limits max value of relay setpoint)
+ rlysp_drvl  = the DRVL field on relay setpoint records.
+              (limits min value of relay setpoint)
+ rlysp_hopr  = the HOPR field on relay setpoint records
+              (high operator value - helps display set correct range).
+ rlysp_lopr  = the LOPR field on relay setpoint records
+              (low operator value - helps display set correct range).
+ rlysp_hihi  = the HIHI alarm field on the relay setpoint record.
+ rlysp_lolo  = the LOLO alarm field on the relay setpoint record.
+ rlysp_high  = the HIGH alarm field on the relay setpoint record.
+ rlysp_low   = the LOW alarm field on the relay setpoint record.
+ rlysp_desc  = the DESC field on the relay setpoint record.
+
+This particular example is the same for the Pirg or Img template.  A
+complete list is given at the end of this file.  They also appear in
+the generated doxygen documentation.
+
+The default values in the macro definitions are identical to the
+default values that were previously defined in their EPICS fields.
+
+When constructing substitution files, some care is needed to handle a
+mixture of gauges, some not using the optional macros at all and
+others using different optional macros.  Once optional macros are used
+in a pattern, either you have to lookup the default values and supply
+those for gauges not wanting to override the default or you have to use
+separate patterns, for example,
+
+file mks937aImg.template
+{
+pattern {device,port,channel}
+{ME01D-VA-IMG-05,ty_40_4,1}
+pattern {device,port,channel,rlysp_level,rlysp_high}
+{ME01D-VA-IMG-01,ty_40_3,1,1e-05,1.1e-05}
+}
+
+For a beamline signal list spreadsheet, empty cells will unfortunately
+override the default value with an empty string unless the default row
+value is set for that column.  Alternatively a separate FILE row and
+column heading definition row can be given for standard and non-standard
+gauges.
+
+From experience so far, each gauge that needs a modification overrides
+only a few of the several macros available.
+
+For spreadsheets or substitution files that do not use or need the new
+macros, no change is necessary to use the new gauge templates.
+
+Complete list of optional macros.
+================================
+
+mks937aGauge.template
+---------------------
+ctlsp_level = the desired control setpoint value (actually for the PIRG).
+ctlsp_drvh  = the DRVH field on control setpoint records 
+             (limits max value of control setpoint)
+ctlsp_drvl  = the DRVL field on control setpoint records.
+             (limits min value of control setpoint)
+ctlsp_hopr  = the HOPR field on control setpoint records
+             (high operator value - helps display set correct range).
+ctlsp_lopr  = the LOPR field on control setpoint records
+             (low operator value - helps display set correct range).
+ctlsp_desc  = the DESC field on control setpoint records
+             (appears as a label on the Pirg EDM screen).
+
+mks937aPirg.template
+--------------------
+rlysp_level = the desired relay setpoint value for the PIRG.
+rlysp_drvh  = the DRVH field on relay setpdoint records 
+             (limits max value of relay setpoint)
+rlysp_drvl  = the DRVL field on relay setpoint records.
+             (limits min value of relay setpoint)
+rlysp_hopr  = the HOPR field on relay setpoint records
+             (high operator value - helps display set correct range).
+rlysp_lopr  = the LOPR field on relay setpoint records
+             (low operator value - helps display set correct range).
+rlysp_hihi  = the HIHI alarm field on the relay setpoint record.
+rlysp_lolo  = the LOLO alarm field on the relay setpoint record.
+rlysp_high  = the HIGH alarm field on the relay setpoint record.
+rlysp_low   = the LOW alarm field on the relay setpoint record.
+rlysp_desc  = the DESC field on the relay setpoint records
+             (appears as a label on the Pirg EDM screen).
+
+mks937aImg.template
+-------------------
+ctlsp_level = the desired control setpoint value on the IMG device.
+ctlsp_drvh  = the DRVH field on control setpoint records 
+             (limits max value of control setpoint)
+ctlsp_drvl  = the DRVL field on control setpoint records.
+             (limits min value of control setpoint)
+ctlsp_hopr  = the HOPR field on control setpoint records
+             (high operator value - helps display set correct range).
+ctlsp_lopr  = the LOPR field on control setpoint records
+             (low operator value - helps display set correct range).
+ctlsp_hihi  = the HIHI alarm field on the control setpoint record.
+ctlsp_lolo  = the LOLO alarm field on the control setpoint record.
+ctlsp_high  = the HIGH alarm field on the control setpoint record.
+cltsp_low   = the LOW alarm field on the control setpoint record.
+ctlsp_desc  = the DESC field on the control setpoint record.
+
+prosp_level = the desired protection setpoint value on the IMG device.
+prosp_drvh  = the DRVH field on protection setpoint records 
+             (limits max value of protection setpoint)
+prosp_drvl  = the DRVL field on protection setpoint records.
+             (limits min value of protection setpoint)
+prosp_hopr  = the HOPR field on protection setpoint records
+             (high operator value - helps display set correct range).
+prosp_lopr  = the LOPR field on protection setpoint records
+             (low operator value - helps display set correct range).
+prosp_hihi  = the HIHI alarm field on the protection setpoint record.
+prosp_lolo  = the LOLO alarm field on the protection setpoint record.
+prosp_high  = the HIGH alarm field on the protection setpoint record.
+prosp_low   = the LOW alarm field on the protection setpoint record.
+prosp_desc  = the DESC field on the protection setpoint record
+              (appears as a label on the Img EDM screen).
+
+rlysp_level = the desired relay setpoint value on the IMG device.
+rlysp_drvh  = the DRVH field on relay setpdoint records 
+             (limits max value of relay setpoint)
+rlysp_drvl  = the DRVL field on relay setpoint records.
+             (limits min value of relay setpoint)
+rlysp_hopr  = the HOPR field on relay setpoint records
+             (high operator value - helps display set correct range).
+rlysp_lopr  = the LOPR field on relay setpoint records
+             (low operator value - helps display set correct range).
+rlysp_hihi  = the HIHI alarm field on the relay setpoint record.
+rlysp_lolo  = the LOLO alarm field on the relay setpoint record.
+rlysp_high  = the HIGH alarm field on the relay setpoint record.
+rlysp_low   = the LOW alarm field on the relay setpoint record.
+rlysp_desc  = the DESC field on the relay setpoint record
+              (appears as a label on the Img EDM screen).
+
+rlasp_level = the desired second relay setpoint value on the IMG device.
+rlasp_drvh  = the DRVH field on second relay setpoint records 
+             (limits max value of second relay setpoint)
+rlasp_drvl  = the DRVL field on second relay setpoint records.
+             (limits min value of second relay setpoint)
+rlasp_hopr  = the HOPR field on second relay setpoint records
+             (high operator value - helps display set correct range).
+rlasp_lopr  = the LOPR field on second relay setpoint records
+             (low operator value - helps display set correct range).
+rlasp_hihi  = the HIHI alarm field on the second relay setpoint record.
+rlasp_lolo  = the LOLO alarm field on the second relay setpoint record.
+rlasp_high  = the HIGH alarm field on the second relay setpoint record.
+rlasp_low   = the LOW alarm field on the second relay setpoint record.
+rlasp_desc  = the DESC field on the second relay setpoint record.
+

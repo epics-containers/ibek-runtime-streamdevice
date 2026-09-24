@@ -2,7 +2,10 @@
 
 # Imported from DLS production support module: harvardSyringe 1-12
 # Source: /dls_sw/prod/R3.14.12.7/support/harvardSyringe/1-12
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release,
+# except for these scripted changes:
+# - harvardSyringe.template: 2 DESC strings shortened to 40 characters or fewer
+#   (EPICS 7 rejects longer DESC values).
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/harvardSyringe/ release.
 
@@ -21,10 +24,6 @@ entity_models:
         type: str
         description: |-
           Device suffix
-      desc:
-        type: str
-        description: |-
-          Device label for GUI
       PORT:
         type: str
         description: |-
@@ -34,10 +33,6 @@ entity_models:
         description: |-
           Set to 0 to enable this at startup
         default: 1
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: harvardSyringe.template
         args:

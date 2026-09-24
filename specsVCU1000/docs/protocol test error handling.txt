@@ -1,0 +1,17 @@
+Tests of streamDevice handling of invalid responses.
+
+Test 1: No mismatch handler:
+An invalid response message simply results in an error printed to the IOC console:
+
+  2013/10/11 12:20:00.938 vcu1000 TS-VA-FAKE-VCU1000-01:SETREM: Input "ERROR BadRemoteMode " mismatch after 0 bytes
+  2013/10/11 12:20:00.939 vcu1000 TS-VA-FAKE-VCU1000-01:SETREM: got "ERROR BadRemoteMode " where "OK " was expected
+
+Test 2: Mismatch handler with no body:
+Same as 1
+
+Test 3: Mismatch handler consumes error message with in command.
+Error silently consumed; no error message generated, SETREM.VAL is set to correct
+value (although SEVR remain INVALID). 
+
+Test 4: Same as 3 but with SETREM initially in No_Alarm rather than Invalid. 
+Same result. Bad response triggers transition to Invalid. 

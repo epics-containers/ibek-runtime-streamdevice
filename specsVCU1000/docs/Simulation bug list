@@ -1,0 +1,11 @@
+- GET messages for internal variables such as PersistentTimer will work rather than 
+  returning BadParameter.
+- SET ValveVoltageMax 0.0 causes ZeroDivisionError when we subsequently call
+  GET CurrentValvePercentage (not sure what the actual device does).
+- "SET Regulation Foo" responds with "OK Regulation Foo", not "OK Foo". - FIXED
+- Increment was set to once every 120s - FIXED
+- Not sure valve percentage is done right (actually gives as a decimal, not true
+  percentage).
+- Valve voltage is not truncated in Standby when we set VMax to less than the 
+  current voltage. Not sure whether this bug also exists in device - check this - 
+  but I think the device does truncate when the max is changed. 

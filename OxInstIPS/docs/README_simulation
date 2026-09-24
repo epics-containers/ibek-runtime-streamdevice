@@ -1,0 +1,28 @@
+--------------------------------------------------
+README_simulation file for OxInsIPS Support Module
+--------------------------------------------------
+
+How to run the test simulation, the test ioc and the tests all in one go.
+
+./etc/test/OxInstIPS_test.py -t simulation -i -e -g
+
+Do this from the module top directory after you have built it and also
+built the generated ioc directory.  
+
+12/01/2018: Above is not working.  Dont think development of the
+simulation was completed and there is no example IOC and no
+documentation.
+
+The test development was started during development of the module at a
+time when the policy was supposed to be the testing simulation was
+written before the actual code during the early days of the
+development of the python ioc builder.  However there was insufficient
+time before the module had to be delivered, so it was never completed
+and no example IOC was tested either.  Be extremely sceptical about
+any python code, the builder went through rapid evolution, so code in
+this module is out-of-date.
+
+BL10J Magnet End Station is probably the only example of this power
+module in use at DLS, so the simulation is unlikely to be required.
+
+Last updated 02/12/2019

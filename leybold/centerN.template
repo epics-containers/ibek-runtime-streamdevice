@@ -1,0 +1,1615 @@
+
+#
+# centerN.template
+#
+# % macro, P, PV Prefix
+# % macro, PORT, Asyn port name
+
+#
+#*!*Section template begin*!*
+# %archiver 10 Monitor
+record(mbbi, "$(P):CONNECTION_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)CONNECTION")
+  field(ZRVL, "0")
+  field(ZRST, "Disconnected")
+  field(ONVL, "1")
+  field(ONST, "Connected")
+}
+record(longin, "$(P):ERROR_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)ERROR")
+}
+record(stringin, "$(P):FIRMWAREVER_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)FIRMWAREVER")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):UNITS_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)UNITS")
+  field(ZRVL, "0")
+  field(ZRST, "mBar")
+  field(ONVL, "1")
+  field(ONST, "Torr")
+  field(TWVL, "2")
+  field(TWST, "Pascal")
+  field(THVL, "3")
+  field(THST, "Micron")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):UNITS")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)UNITS")
+  field(ZRVL, "0")
+  field(ZRST, "mBar")
+  field(ONVL, "1")
+  field(ONST, "Torr")
+  field(TWVL, "2")
+  field(TWST, "Pascal")
+  field(THVL, "3")
+  field(THST, "Micron")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):RECORDERCHANNEL_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)RECORDERCHANNEL")
+  field(ZRVL, "0")
+  field(ZRST, "Channel1")
+  field(ONVL, "1")
+  field(ONST, "Channel2")
+  field(TWVL, "2")
+  field(TWST, "Channel3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):RECORDERCHANNEL")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)RECORDERCHANNEL")
+  field(ZRVL, "0")
+  field(ZRST, "Channel1")
+  field(ONVL, "1")
+  field(ONST, "Channel2")
+  field(TWVL, "2")
+  field(TWST, "Channel3")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):RECORDERCURVEMODE_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)RECORDERCURVEMODE")
+  field(ZRVL, "0")
+  field(ZRST, "Logarithmic")
+  field(ONVL, "1")
+  field(ONST, "Linear")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):RECORDERCURVEMODE")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)RECORDERCURVEMODE")
+  field(ZRVL, "0")
+  field(ZRST, "Logarithmic")
+  field(ONVL, "1")
+  field(ONST, "Linear")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):RECORDERCURVELOG_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)RECORDERCURVELOG")
+  field(ZRVL, "0")
+  field(ZRST, "Log")
+  field(ONVL, "1")
+  field(ONST, "Log A")
+  field(TWVL, "2")
+  field(TWST, "Log -6")
+  field(THVL, "3")
+  field(THST, "Log -3")
+  field(FRVL, "4")
+  field(FRST, "Log +0")
+  field(FVVL, "5")
+  field(FVST, "Log +3")
+  field(SXVL, "6")
+  field(SXST, "Log C1")
+  field(SVVL, "7")
+  field(SVST, "Log C2")
+  field(EIVL, "8")
+  field(EIST, "Log C3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):RECORDERCURVELOG")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)RECORDERCURVELOG")
+  field(ZRVL, "0")
+  field(ZRST, "Log")
+  field(ONVL, "1")
+  field(ONST, "Log A")
+  field(TWVL, "2")
+  field(TWST, "Log -6")
+  field(THVL, "3")
+  field(THST, "Log -3")
+  field(FRVL, "4")
+  field(FRST, "Log +0")
+  field(FVVL, "5")
+  field(FVST, "Log +3")
+  field(SXVL, "6")
+  field(SXST, "Log C1")
+  field(SVVL, "7")
+  field(SVST, "Log C2")
+  field(EIVL, "8")
+  field(EIST, "Log C3")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):RECORDERCURVELIN_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)RECORDERCURVELIN")
+  field(ZRVL, "0")
+  field(ZRST, "Lin -10")
+  field(ONVL, "1")
+  field(ONST, "Lin -9")
+  field(TWVL, "2")
+  field(TWST, "Lin -8")
+  field(THVL, "3")
+  field(THST, "Lin -7")
+  field(FRVL, "4")
+  field(FRST, "Lin -6")
+  field(FVVL, "5")
+  field(FVST, "Lin -5")
+  field(SXVL, "6")
+  field(SXST, "Lin -4")
+  field(SVVL, "7")
+  field(SVST, "Lin -3")
+  field(EIVL, "8")
+  field(EIST, "Lin -2")
+  field(NIVL, "9")
+  field(NIST, "Lin -1")
+  field(TEVL, "10")
+  field(TEST, "Lin +0")
+  field(ELVL, "11")
+  field(ELST, "Lin +1")
+  field(TVVL, "12")
+  field(TVST, "Lin +2")
+  field(TTVL, "13")
+  field(TTST, "Lin +3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):RECORDERCURVELIN")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)RECORDERCURVELIN")
+  field(ZRVL, "0")
+  field(ZRST, "Lin -10")
+  field(ONVL, "1")
+  field(ONST, "Lin -9")
+  field(TWVL, "2")
+  field(TWST, "Lin -8")
+  field(THVL, "3")
+  field(THST, "Lin -7")
+  field(FRVL, "4")
+  field(FRST, "Lin -6")
+  field(FVVL, "5")
+  field(FVST, "Lin -5")
+  field(SXVL, "6")
+  field(SXST, "Lin -4")
+  field(SVVL, "7")
+  field(SVST, "Lin -3")
+  field(EIVL, "8")
+  field(EIST, "Lin -2")
+  field(NIVL, "9")
+  field(NIST, "Lin -1")
+  field(TEVL, "10")
+  field(TEST, "Lin +0")
+  field(ELVL, "11")
+  field(ELST, "Lin +1")
+  field(TVVL, "12")
+  field(TVST, "Lin +2")
+  field(TTVL, "13")
+  field(TTST, "Lin +3")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):ERRORRELAY_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)ERRORRELAY")
+  field(ZRVL, "0")
+  field(ZRST, "All errors")
+  field(ONVL, "1")
+  field(ONST, "Device errors")
+  field(TWVL, "2")
+  field(TWST, "Sensor 1 & device")
+  field(THVL, "3")
+  field(THST, "Sensor 2 & device")
+  field(FRVL, "4")
+  field(FRST, "Sensor 3 & device")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):ERRORRELAY")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)ERRORRELAY")
+  field(ZRVL, "0")
+  field(ZRST, "All errors")
+  field(ONVL, "1")
+  field(ONST, "Device errors")
+  field(TWVL, "2")
+  field(TWST, "Sensor 1 & device")
+  field(THVL, "3")
+  field(THST, "Sensor 2 & device")
+  field(FRVL, "4")
+  field(FRST, "Sensor 3 & device")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):PARAMETERLOCK_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)PARAMETERLOCK")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):PARAMETERLOCK")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)PARAMETERLOCK")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+record(longout, "$(P):FACTORYDEFAULT")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)FACTORYDEFAULT")
+}
+record(longout, "$(P):SAVE")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SAVE")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):STATUS1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)STATUS1")
+  field(ZRVL, "0")
+  field(ZRST, "Ok")
+  field(ONVL, "1")
+  field(ONST, "Underrange")
+  field(TWVL, "2")
+  field(TWST, "Overrange")
+  field(THVL, "3")
+  field(THST, "Sensor Error")
+  field(FRVL, "4")
+  field(FRST, "Sensor Off")
+  field(FVVL, "5")
+  field(FVST, "No Sensor")
+  field(SXVL, "6")
+  field(SXST, "Ident Error")
+  field(SVVL, "7")
+  field(SVST, "ITR Error")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):PRESSURE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)PRESSURE1")
+  field(PREC, "2")
+}
+record(stringin, "$(P):SENSORTYPE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)SENSORTYPE1")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):CORRFACTOR1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)CORRFACTOR1")
+  field(PREC, "2")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):CORRFACTOR1")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)CORRFACTOR1")
+  field(PREC, "2")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):DEGAS1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)DEGAS1")
+  field(ZRVL, "0")
+  field(ZRST, "off")
+  field(ONVL, "1")
+  field(ONST, "on")
+}
+# %archiver 10 Monitor
+record(mbbo, "$(P):DEGAS1")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)DEGAS1")
+  field(ZRVL, "0")
+  field(ZRST, "off")
+  field(ONVL, "1")
+  field(ONST, "on")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):FILTER1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)FILTER1")
+  field(ZRVL, "0")
+  field(ZRST, "Fast")
+  field(ONVL, "1")
+  field(ONST, "Medium")
+  field(TWVL, "2")
+  field(TWST, "Slow")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):FILTER1")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)FILTER1")
+  field(ZRVL, "0")
+  field(ZRST, "Fast")
+  field(ONVL, "1")
+  field(ONST, "Medium")
+  field(TWVL, "2")
+  field(TWST, "Slow")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):GAS1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)GAS1")
+  field(ZRVL, "0")
+  field(ZRST, "Nitrogen/Air")
+  field(ONVL, "1")
+  field(ONST, "Argon")
+  field(TWVL, "2")
+  field(TWST, "Hydrogen")
+  field(THVL, "3")
+  field(THST, "Other")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):GAS1")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)GAS1")
+  field(ZRVL, "0")
+  field(ZRST, "Nitrogen/Air")
+  field(ONVL, "1")
+  field(ONST, "Argon")
+  field(TWVL, "2")
+  field(TWST, "Hydrogen")
+  field(THVL, "3")
+  field(THST, "Other")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):HIGHVACUUM1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)HIGHVACUUM1")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):HIGHVACUUM1")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)HIGHVACUUM1")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):OFFSETCORRMODE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)OFFSETCORRMODE1")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+  field(TWVL, "2")
+  field(TWST, "Calculate")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):OFFSETCORRMODE1")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)OFFSETCORRMODE1")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+  field(TWVL, "2")
+  field(TWST, "Calculate")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):OFFSETCORRVALUE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)OFFSETCORRVALUE1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):OFFSETCORRVALUE1")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)OFFSETCORRVALUE1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SENSORACTIVATIONMODE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SENSORACTIVATIONMODE1")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SENSORACTIVATIONMODE1")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORACTIVATIONMODE1")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SENSORDEACTIVATIONMODE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONMODE1")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SENSORDEACTIVATIONMODE1")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONMODE1")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SENSORACTIVATIONVALUE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SENSORACTIVATIONVALUE1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SENSORACTIVATIONVALUE1")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORACTIVATIONVALUE1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SENSORDEACTIVATIONVALUE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONVALUE1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SENSORDEACTIVATIONVALUE1")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONVALUE1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):STATUS2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)STATUS2")
+  field(ZRVL, "0")
+  field(ZRST, "Ok")
+  field(ONVL, "1")
+  field(ONST, "Underrange")
+  field(TWVL, "2")
+  field(TWST, "Overrange")
+  field(THVL, "3")
+  field(THST, "Sensor Error")
+  field(FRVL, "4")
+  field(FRST, "Sensor Off")
+  field(FVVL, "5")
+  field(FVST, "No Sensor")
+  field(SXVL, "6")
+  field(SXST, "Ident Error")
+  field(SVVL, "7")
+  field(SVST, "ITR Error")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):PRESSURE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)PRESSURE2")
+  field(PREC, "2")
+}
+record(stringin, "$(P):SENSORTYPE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)SENSORTYPE2")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):CORRFACTOR2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)CORRFACTOR2")
+  field(PREC, "2")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):CORRFACTOR2")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)CORRFACTOR2")
+  field(PREC, "2")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):DEGAS2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)DEGAS2")
+  field(ZRVL, "0")
+  field(ZRST, "off")
+  field(ONVL, "1")
+  field(ONST, "on")
+}
+# %archiver 10 Monitor
+record(mbbo, "$(P):DEGAS2")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)DEGAS2")
+  field(ZRVL, "0")
+  field(ZRST, "off")
+  field(ONVL, "1")
+  field(ONST, "on")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):FILTER2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)FILTER2")
+  field(ZRVL, "0")
+  field(ZRST, "Fast")
+  field(ONVL, "1")
+  field(ONST, "Medium")
+  field(TWVL, "2")
+  field(TWST, "Slow")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):FILTER2")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)FILTER2")
+  field(ZRVL, "0")
+  field(ZRST, "Fast")
+  field(ONVL, "1")
+  field(ONST, "Medium")
+  field(TWVL, "2")
+  field(TWST, "Slow")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):GAS2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)GAS2")
+  field(ZRVL, "0")
+  field(ZRST, "Nitrogen/Air")
+  field(ONVL, "1")
+  field(ONST, "Argon")
+  field(TWVL, "2")
+  field(TWST, "Hydrogen")
+  field(THVL, "3")
+  field(THST, "Other")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):GAS2")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)GAS2")
+  field(ZRVL, "0")
+  field(ZRST, "Nitrogen/Air")
+  field(ONVL, "1")
+  field(ONST, "Argon")
+  field(TWVL, "2")
+  field(TWST, "Hydrogen")
+  field(THVL, "3")
+  field(THST, "Other")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):HIGHVACUUM2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)HIGHVACUUM2")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):HIGHVACUUM2")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)HIGHVACUUM2")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):OFFSETCORRMODE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)OFFSETCORRMODE2")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+  field(TWVL, "2")
+  field(TWST, "Calculate")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):OFFSETCORRMODE2")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)OFFSETCORRMODE2")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+  field(TWVL, "2")
+  field(TWST, "Calculate")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):OFFSETCORRVALUE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)OFFSETCORRVALUE2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):OFFSETCORRVALUE2")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)OFFSETCORRVALUE2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SENSORACTIVATIONMODE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SENSORACTIVATIONMODE2")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SENSORACTIVATIONMODE2")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORACTIVATIONMODE2")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SENSORDEACTIVATIONMODE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONMODE2")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SENSORDEACTIVATIONMODE2")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONMODE2")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SENSORACTIVATIONVALUE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SENSORACTIVATIONVALUE2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SENSORACTIVATIONVALUE2")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORACTIVATIONVALUE2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SENSORDEACTIVATIONVALUE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONVALUE2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SENSORDEACTIVATIONVALUE2")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONVALUE2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):STATUS3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)STATUS3")
+  field(ZRVL, "0")
+  field(ZRST, "Ok")
+  field(ONVL, "1")
+  field(ONST, "Underrange")
+  field(TWVL, "2")
+  field(TWST, "Overrange")
+  field(THVL, "3")
+  field(THST, "Sensor Error")
+  field(FRVL, "4")
+  field(FRST, "Sensor Off")
+  field(FVVL, "5")
+  field(FVST, "No Sensor")
+  field(SXVL, "6")
+  field(SXST, "Ident Error")
+  field(SVVL, "7")
+  field(SVST, "ITR Error")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):PRESSURE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)PRESSURE3")
+  field(PREC, "2")
+}
+record(stringin, "$(P):SENSORTYPE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynOctetRead")
+  field(INP,  "@asyn($(PORT),0,5)SENSORTYPE3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):CORRFACTOR3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)CORRFACTOR3")
+  field(PREC, "2")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):CORRFACTOR3")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)CORRFACTOR3")
+  field(PREC, "2")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):DEGAS3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)DEGAS3")
+  field(ZRVL, "0")
+  field(ZRST, "off")
+  field(ONVL, "1")
+  field(ONST, "on")
+}
+# %archiver 10 Monitor
+record(mbbo, "$(P):DEGAS3")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)DEGAS3")
+  field(ZRVL, "0")
+  field(ZRST, "off")
+  field(ONVL, "1")
+  field(ONST, "on")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):FILTER3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)FILTER3")
+  field(ZRVL, "0")
+  field(ZRST, "Fast")
+  field(ONVL, "1")
+  field(ONST, "Medium")
+  field(TWVL, "2")
+  field(TWST, "Slow")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):FILTER3")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)FILTER3")
+  field(ZRVL, "0")
+  field(ZRST, "Fast")
+  field(ONVL, "1")
+  field(ONST, "Medium")
+  field(TWVL, "2")
+  field(TWST, "Slow")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):GAS3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)GAS3")
+  field(ZRVL, "0")
+  field(ZRST, "Nitrogen/Air")
+  field(ONVL, "1")
+  field(ONST, "Argon")
+  field(TWVL, "2")
+  field(TWST, "Hydrogen")
+  field(THVL, "3")
+  field(THST, "Other")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):GAS3")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)GAS3")
+  field(ZRVL, "0")
+  field(ZRST, "Nitrogen/Air")
+  field(ONVL, "1")
+  field(ONST, "Argon")
+  field(TWVL, "2")
+  field(TWST, "Hydrogen")
+  field(THVL, "3")
+  field(THST, "Other")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):HIGHVACUUM3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)HIGHVACUUM3")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):HIGHVACUUM3")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)HIGHVACUUM3")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):OFFSETCORRMODE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)OFFSETCORRMODE3")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+  field(TWVL, "2")
+  field(TWST, "Calculate")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):OFFSETCORRMODE3")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)OFFSETCORRMODE3")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+  field(TWVL, "2")
+  field(TWST, "Calculate")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):OFFSETCORRVALUE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)OFFSETCORRVALUE3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):OFFSETCORRVALUE3")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)OFFSETCORRVALUE3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SENSORACTIVATIONMODE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SENSORACTIVATIONMODE3")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SENSORACTIVATIONMODE3")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORACTIVATIONMODE3")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SENSORDEACTIVATIONMODE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONMODE3")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SENSORDEACTIVATIONMODE3")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONMODE3")
+  field(ZRVL, "0")
+  field(ZRST, "Manual")
+  field(ONVL, "1")
+  field(ONST, "Hot start")
+  field(TWVL, "2")
+  field(TWST, "By chan 1")
+  field(THVL, "3")
+  field(THST, "By chan 2")
+  field(FRVL, "4")
+  field(FRST, "By chan 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SENSORACTIVATIONVALUE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SENSORACTIVATIONVALUE3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SENSORACTIVATIONVALUE3")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORACTIVATIONVALUE3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SENSORDEACTIVATIONVALUE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONVALUE3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SENSORDEACTIVATIONVALUE3")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SENSORDEACTIVATIONVALUE3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHMODE1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHMODE1")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SWITCHMODE1")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHMODE1")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHLOWER1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHLOWER1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHLOWER1")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHLOWER1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHUPPER1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHUPPER1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHUPPER1")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHUPPER1")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHSTATUS1_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHSTATUS1")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHMODE2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHMODE2")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SWITCHMODE2")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHMODE2")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHLOWER2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHLOWER2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHLOWER2")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHLOWER2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHUPPER2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHUPPER2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHUPPER2")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHUPPER2")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHSTATUS2_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHSTATUS2")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHMODE3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHMODE3")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SWITCHMODE3")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHMODE3")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHLOWER3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHLOWER3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHLOWER3")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHLOWER3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHUPPER3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHUPPER3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHUPPER3")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHUPPER3")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHSTATUS3_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHSTATUS3")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHMODE4_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHMODE4")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SWITCHMODE4")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHMODE4")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHLOWER4_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHLOWER4")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHLOWER4")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHLOWER4")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHUPPER4_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHUPPER4")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHUPPER4")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHUPPER4")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHSTATUS4_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHSTATUS4")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHMODE5_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHMODE5")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SWITCHMODE5")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHMODE5")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHLOWER5_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHLOWER5")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHLOWER5")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHLOWER5")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHUPPER5_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHUPPER5")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHUPPER5")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHUPPER5")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHSTATUS5_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHSTATUS5")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHMODE6_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHMODE6")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):SWITCHMODE6")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHMODE6")
+  field(ZRVL, "0")
+  field(ZRST, "Channel 1")
+  field(ONVL, "1")
+  field(ONST, "Channel 2")
+  field(TWVL, "2")
+  field(TWST, "Channel 3")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHLOWER6_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHLOWER6")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHLOWER6")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHLOWER6")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(ai, "$(P):SWITCHUPPER6_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynFloat64")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHUPPER6")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(ao, "$(P):SWITCHUPPER6")
+{
+  field(DTYP, "asynFloat64")
+  field(OUT,  "@asyn($(PORT),0,5)SWITCHUPPER6")
+  field(PREC, "4")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):SWITCHSTATUS6_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)SWITCHSTATUS6")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+record(mbbi, "$(P):TORRLOCK_RBV")
+{
+  field(SCAN, "I/O Intr")
+  field(DTYP, "asynInt32")
+  field(INP,  "@asyn($(PORT),0,5)TORRLOCK")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+# %archiver 10 Monitor
+# %autosave 2 VAL
+record(mbbo, "$(P):TORRLOCK")
+{
+  field(DTYP, "asynInt32")
+  field(OUT,  "@asyn($(PORT),0,5)TORRLOCK")
+  field(ZRVL, "0")
+  field(ZRST, "Off")
+  field(ONVL, "1")
+  field(ONST, "On")
+}
+#*!*Section template end*!*

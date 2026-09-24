@@ -4,12 +4,10 @@
 # Authors: Laura Arcidiacono, Gary Yendell
 
 # Macros:
-# % macro, name, Device name
 # % macro, P, Device Prefix
 # % macro, PORT, Asyn Port name
 
 # This associates the template with an edm screen
-# % gui, $(name), edm, SQC-310.edl, P=$(P)
 
 # Disable Polling
 record(bo, "$(P):Disable") {

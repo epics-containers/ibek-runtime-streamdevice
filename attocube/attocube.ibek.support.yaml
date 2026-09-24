@@ -29,10 +29,6 @@ entity_models:
         type: int
         description: |-
           Motor axis number
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: ANC150.template
         args:

@@ -1,0 +1,7 @@
+$(P)$(R):ENABLE2
+$(P)$(R):GRAD
+$(P)$(R):GRAD2
+$(P)$(R):OFF
+$(P)$(R):OFF2
+$(P)$(R):VAL.EGU
+$(P)$(R):VAL2.EGU

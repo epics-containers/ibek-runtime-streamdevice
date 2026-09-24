@@ -1,0 +1,143 @@
+# TTi CPX Power Supply
+# I.Gillingham May 2013
+# 
+# Macros:
+#   P    - The prefix name
+#   PORT - The asyn port
+#   CHAN - The channel (1-based)
+#   MAXV - Maximum voltage
+#   MAXI - Maximum current
+# % macro, device, device name
+
+
+# The desired output voltage.
+#% autosave 1 VAL
+# %archiver 1 Monitor VAL
+record(ao, "$(P):$(CHAN):VOLTAGE") {
+    field(DESC, "Output voltage")
+    field(EGU, "V")
+    field(SCAN, "Passive")
+    field(DRVH, "$(MAXV=0)")
+    field(DRVL, "0")
+    field(EGUF, "$(MAXV=0)")
+    field(EGUL, "0")
+    field(HOPR, "$(MAXV=0)")
+    field(LOPR, "0")
+    field(PREC, "2")
+    field(DTYP, "stream")
+    field(OUT, "@ttiCPX.proto setVoltage($(CHAN)) $(PORT)")
+    field(PINI, "YES")
+}
+
+record(ai, "$(P):$(CHAN):VOLTAGE_TWSTEP") {
+    field(DESC, "Voltage tweak step size")
+    field(VAL, "0.1")
+    field(EGUL, "0")
+    field(PREC, "2")
+}
+
+record(calcout, "$(P):$(CHAN):VOLTAGE_TWPOS") {
+    field(INPA, "$(P):$(CHAN):VOLTAGE NPP NMS")
+    field(INPB, "$(P):$(CHAN):VOLTAGE_TWSTEP NPP NMS")
+    field(CALC, "A+B")
+    field(OUT, "$(P):$(CHAN):VOLTAGE PP")
+}
+
+record(calcout, "$(P):$(CHAN):VOLTAGE_TWNEG") {
+    field(INPA, "$(P):$(CHAN):VOLTAGE NPP NMS")
+    field(INPB, "$(P):$(CHAN):VOLTAGE_TWSTEP NPP NMS")
+    field(CALC, "A-B")
+    field(OUT, "$(P):$(CHAN):VOLTAGE PP")
+}
+
+# The desired output current.
+#% autosave 1 VAL
+# %archiver 1 Monitor VAL
+record(ao, "$(P):$(CHAN):CURRENT") {
+    field(DESC, "Output current")
+    field(EGU, "A")
+    field(SCAN, "Passive")
+    field(DRVH, "$(MAXI=0)")
+    field(DRVL, "0")
+    field(EGUF, "$(MAXI=0)")
+    field(EGUL, "0")
+    field(HOPR, "$(MAXI=0)")
+    field(LOPR, "0")
+    field(PREC, "2")
+    field(DTYP, "stream")
+    field(OUT, "@ttiCPX.proto setCurrent($(CHAN)) $(PORT)")
+    field(PINI, "YES")
+}
+
+# The read back setpoint voltage
+# %archiver 1 Monitor VAL
+record(ai, "$(P):$(CHAN):VOLTAGE_SP") {
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(EGU, "V")
+    field(PREC, "2")
+    field(HOPR, "$(MAXV=0)")
+    field(LOPR, "0")
+    field(INP, "@ttiCPX.proto getSetpointVoltage($(CHAN)) $(PORT)")
+    field(PINI, "YES")
+}
+
+# The read back output voltage
+# %archiver 1 Monitor VAL
+record(ai, "$(P):$(CHAN):VOLTAGE_RBV") {
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(EGU, "V")
+    field(PREC, "2")
+    field(HOPR, "$(MAXV=0)")
+    field(LOPR, "0")
+    field(INP, "@ttiCPX.proto getActualVoltage($(CHAN)) $(PORT)")
+    field(PINI, "YES")
+}
+
+# The read back setpoint current
+# %archiver 1 Monitor VAL
+record(ai, "$(P):$(CHAN):CURRENT_SP") {
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(EGU, "A")
+    field(PREC, "2")
+    field(HOPR, "$(MAXI=0)")
+    field(LOPR, "0")
+    field(INP, "@ttiCPX.proto getSetpointCurrent($(CHAN)) $(PORT)")
+    field(PINI, "YES")
+}
+
+# The read back output current
+# %archiver 1 Monitor VAL
+record(ai, "$(P):$(CHAN):CURRENT_RBV") {
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(EGU, "A")
+    field(PREC, "2")
+    field(HOPR, "$(MAXI=0)")
+    field(LOPR, "0")
+    field(INP, "@ttiCPX.proto getActualCurrent($(CHAN)) $(PORT)")
+    field(PINI, "YES")
+}
+
+# Output control
+#% autosave 1 VAL
+# %archiver 1 Monitor VAL
+record(bo, "$(P):$(CHAN):OUTPUT") {
+    field(DESC, "Output control")
+    field(SCAN, "Passive")
+    field(DTYP, "stream")
+    field(OUT, "@ttiCPX.proto setOutput($(CHAN)) $(PORT)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+
+# Output state
+record(bi, "$(P):$(CHAN):OUTPUT_RBV") {
+    field(SCAN, "1 second")
+    field(DTYP, "stream")
+    field(INP, "@ttiCPX.proto getOutput($(CHAN)) $(PORT)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}

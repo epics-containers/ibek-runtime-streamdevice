@@ -13,10 +13,6 @@ entity_models:
     description: |-
       SQC-310 Quartz Crystal Microbalance
     parameters:
-      name:
-        type: id
-        description: |-
-          Device name
       P:
         type: str
         description: |-

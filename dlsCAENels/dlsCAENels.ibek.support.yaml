@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: dlsCAENels 2-6
+# Source: /dls_sw/prod/R3.14.12.7/support/dlsCAENels/2-6
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release,
+# with one scripted change in dlsCAENels_group.template:
+#
+# $(P):GROUP$(GR):TARGETWIPE and $(P):GROUP$(GR):KILLERWIPE are genSub records
+# running the compiled routine wipeStates (dlsCAENelsApp/src/wipeStates.c), which
+# only copies the string "empty" into VALA..VALH; the genSub then writes those to
+# the 8 state strings (ZRST..SVST) of the TARGETC / KILLERC mbbo records. Neither
+# genSub nor wipeStates is in the generic image, so each is replaced by an sseq
+# record (calc module) of the same name with STR1..STR8 "empty" and LNK1..LNK8 the
+# genSub's OUTA..OUTH, which performs the same 8 puts. Verified in an EPICS 7.0.9
+# IOC against the C routine (built as an aSub): after each of 5 rounds of distinct
+# preset strings, all 16 state strings read "empty" for both.
+#
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/dlsCAENels/ release.
+
+module: dlsCAENels
+
+entity_models:
+  - name: dlsCAENels
+    description: |-
+      Instantiates the template for a CAENels high-voltage power supply
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS name prefix
+      PORT:
+        type: str
+        description: |-
+          asyn port
+    databases:
+      - file: dlsCAENels.template
+        args:
+          .*:
+
+  - name: dlsCAENelsGroup
+    description: |-
+      Instantiates the template for a group of channels
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS name prefix
+      GR:
+        type: int
+        description: |-
+          Channel group number
+      PORT:
+        type: str
+        description: |-
+          asyn port
+      BUSYIN:
+        type: str
+        description: |-
+          letter indicating the input link on a calc record
+    databases:
+      - file: dlsCAENels_group.template
+        args:
+          .*:
+
+  - name: dlsCAENelsChannel
+    description: |-
+      Instantiates the template for a single channel
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS name prefix
+      GR:
+        type: int
+        description: |-
+          Channel group number
+      CH:
+        type: int
+        description: |-
+          Channel number
+      PORT:
+        type: str
+        description: |-
+          asyn port
+    databases:
+      - file: dlsCAENels_channel.template
+        args:
+          .*:

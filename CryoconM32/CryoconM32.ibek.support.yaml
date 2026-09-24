@@ -30,3 +30,91 @@ entity_models:
       - file: M32_system.template
         args:
           .*:
+
+  - name: CryoconM32_control
+    description: |-
+      A control loop for the CryoconM32
+    parameters:
+      tctrlr:
+        type: str
+        description: |-
+          The PV prefix of the owning CryoconM32 (its tctrlr)
+      loop:
+        type: str
+        description: |-
+          Loop number (1 or 2)
+      scan:
+        type: str
+        description: |-
+          Scan rate, e.g. 2 or .1
+        default: "2"
+      port:
+        type: str
+        description: |-
+          Asyn port of the owning CryoconM32
+      rampratelim:
+        type: float
+        description: |-
+          Limit to the ramprate
+    databases:
+      - file: M32_control.template
+        args:
+          .*:
+
+  - name: CryoconM32_sensor
+    description: |-
+      A sensor channel for the CryoconM32
+    parameters:
+      record:
+        type: str
+        description: |-
+          Raw output suffix
+      device:
+        type: str
+        description: |-
+          Sensor output prefix
+      sensor:
+        type: str
+        description: |-
+          Sensor output suffix (A or B)
+      port:
+        type: str
+        description: |-
+          Asyn port of the owning CryoconM32
+      egu:
+        type: str
+        description: |-
+          Engineering units for the sensor output
+      scan:
+        type: str
+        description: |-
+          Scan rate, e.g. 2 or .1
+        default: "2"
+      adel:
+        type: float
+        description: |-
+          Archive deadband increment
+      hihi:
+        type: float
+        description: |-
+          hihi alarm for sensor reading
+      high:
+        type: float
+        description: |-
+          high alarm for sensor reading
+      low:
+        type: float
+        description: |-
+          low alarm for sensor reading
+      lolo:
+        type: float
+        description: |-
+          lolo alarm for sensor reading
+      tctrlr:
+        type: str
+        description: |-
+          The PV prefix of the owning CryoconM32 (its tctrlr)
+    databases:
+      - file: M32_sensor.template
+        args:
+          .*:

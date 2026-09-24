@@ -30,10 +30,6 @@ entity_models:
         description: |-
           PHI rotation motor RBV link or const e.g. "BL06I-MO-PEEM-01:PHI:OS.RBV MS" (default = 0)
         default: "0"
-      name:
-        type: id
-        description: |-
-          Name to export to gda as
     databases:
       - file: leem.template
         args:
@@ -60,10 +56,10 @@ entity_models:
           The PS index of the LEEM parameter (default = 0)
         default: 0
       SCAN:
-        type: int
+        type: str
         description: |-
-          Scan ratefor reading value from LEEM (default = 10)
-        default: 10
+          Scan rate for reading value from LEEM
+        default: 10 second
       PREC:
         type: int
         description: |-
@@ -84,10 +80,6 @@ entity_models:
         description: |-
           LOPR for the LEEM parameter (default = "")
         default: ""
-      name:
-        type: id
-        description: |-
-          Name to export to gda as
     databases:
       - file: leem-PSValue.template
         args:

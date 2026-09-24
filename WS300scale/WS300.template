@@ -7,8 +7,6 @@
 # % macro, P, Device prefix
 # % macro, S, Device suffix
 # % macro, PORT, asyn port
-# % macro, name, object and gui association name
-# % gui, $(name=), edm, WS300.edl, P=$(P),S=$(S)
 record(bo, "$(P)$(S):MEASURE") {
   field(DESC, "request measurement")
   field(DTYP, "stream")

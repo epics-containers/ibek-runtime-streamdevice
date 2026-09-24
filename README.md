@@ -34,11 +34,48 @@ references:
 | `*.req` | autosave request file(s) | optional |
 | `*.pvi.device.yaml` | PVI device descriptor (UI/PV generation) | optional |
 | anything else the support yaml references | … | optional |
+| `ibek.manifest.yaml` | declares which files are vendored, and where | **yes** in this repo |
+| `README.md` | the pattern's documentation: source, entity models, files, caveats | **yes** in this repo |
+| `docs/`, `sim/`, `test/` | documentation, device simulator and tests from the DLS source release | optional |
 
 There is **no hard-coded proto/template/support shape**. The vendoring lock simply
 hashes a **file list**, so it already generalises to any combination of the above (or
 files not yet invented). Add the files your support yaml needs and they are vendored
 together as a unit.
+
+### Runtime files and pattern docs: `ibek.manifest.yaml`
+
+A pattern folder holds two kinds of file: **runtime files**, which `ibek pattern`
+copies into an IOC instance, and **pattern docs**, which stay in this library. The
+pattern's `ibek.manifest.yaml` is what tells them apart. It is an ordered,
+first-match-wins **allow-list**: each `src` regex is matched (`re.fullmatch`) against a
+file's path relative to the pattern folder, and a file matched by no entry is never
+vendored. Every pattern here carries the same manifest:
+
+```yaml
+version: 1
+vendor:
+  - src: '[^/]+\.(template|proto|protocol|db|req|ibek\.support\.yaml|pvi\.device\.yaml)$'
+    dest: config
+```
+
+It vendors the runtime file types at the top of the folder into the instance's
+`config/`, and nothing else: `README.md`, the manifest itself and everything under
+`docs/`, `sim/` and `test/` stay here. A file that should reach the IOC must therefore
+sit at the top of the folder with one of those suffixes; a new runtime file type needs
+the regex extending in every manifest that ships one.
+
+Each pattern's `README.md` says which DLS module and release the pattern came from,
+lists its entity models and which files are vendored, and records what a user needs to
+know before loading it: templates that need more than the generic image, and upstream
+defects carried as-is. How each file was obtained, and any change made to it, stays in
+the header of the pattern's `*.ibek.support.yaml`: that file is vendored, so the notes
+travel into every IOC instance that uses the pattern.
+
+The manifest format is documented in ibek's
+[`ibek.manifest.yaml` reference](https://github.com/epics-containers/ibek/blob/main/docs/reference/pattern-manifest.md).
+It needs ibek 4.8 or later; an older ibek ignores the manifest and vendors every file in
+the folder.
 
 This repo provides StreamDevice patterns for many devices, each a top-level folder
 auto-generated from the device's DLS XMLbuilder support module (`etc/builder.py` +
@@ -50,9 +87,14 @@ lakeshore340/
   lakeshore340.ibek.support.yaml   # entity_model "lakeshore340", parameters, databases:
   lakeshore340.proto               # StreamDevice protocol
   lakeshore340.template            # EPICS records
+  lakeshore340_settings.req        # autosave request file
+  ibek.manifest.yaml               # vendors the four files above - not vendored itself
+  README.md                        # pattern docs - not vendored
+  sim/                             # device simulator - not vendored
+  test/                            # device tests - not vendored
 ```
 
-## Faithful storage and the vendored header
+## Faithful storage
 
 **Extracted device files stay as close to their DLS source as possible.** Copy
 byte-for-byte wherever the file works unmodified; where it cannot, apply only
@@ -72,18 +114,11 @@ epics-containers, so these are always exact copies.
 
 Many DLS modules author their databases in **VisualDCT**, which does not exist in the
 vanilla EPICS 7 base the generic IOC images build against. A verbatim VDCT template
-cannot load at runtime, so `.template`/`.db` from those modules are **derived**, via two
-mechanical steps:
-
-1. **VDCT → msi.** `expand()` blocks become native msi `substitute`/`include`
-   directives, `#!` layout lines and `template() { }` blocks are dropped, and macros
-   passed into an included template gain a `_` prefix. Done by
-   [vdct2template](https://github.com/epics-containers/vdct2template).
-2. **Annotation-only macro defaults.** Macros appearing only inside `#%` annotation
-   comments — DLS EDM/GDA tooling such as `name` and `gda_*` — get an empty default
-   (`$(name)` → `$(name=)`), so they are not mistaken for required entity parameters.
-   This already matches DLS practice: `$(gda_name=)` and `$(gda_desc=)` ship defaulted
-   upstream.
+cannot load at runtime, so `.template`/`.db` from those modules are **derived**:
+`expand()` blocks become native msi `substitute`/`include` directives, `#!` layout
+lines and `template() { }` blocks are dropped, and macros passed into an included
+template gain a `_` prefix. Done by
+[vdct2template](https://github.com/epics-containers/vdct2template).
 
 A derived pattern **must** say so in its `*.ibek.support.yaml` header, naming the source
 module, version and `/dls_sw/prod/...` path, and which files are derived versus
@@ -92,10 +127,34 @@ pristine. See `currAmp/` for the worked example.
 The procedure and its helper scripts live in the `vdct-conversion` skill in
 [builder2ibek](https://github.com/epics-containers/builder2ibek).
 
+### Derived — DLS annotation comments stripped
+
+DLS databases carry comment lines for DLS screen and GDA tooling:
+
+```
+# % gui, $(name=), edm, device.edl, P=$(P)
+#% gdatag,pv,ro,$(gda_name=),RANGE,Range Selection
+# %gda,subsystem,ODCurrAmp,monitor,channel1,Channel 1 value
+```
+
+epics-containers has no consumer for them (screens come from PVI), yet msi and
+`dbLoadRecords` expand macros on every line, comments included, so each macro they name
+would need a value or the IOC logs `macLib: macro ... is undefined` at boot. They are
+removed from every `.template`/`.db` by
+[`strip-dls-annotations.py`](strip-dls-annotations.py), which also drops the
+`# % macro` documentation lines and empty `databases` args left pointing at macros
+nothing references any more. Record content is untouched. `# % macro` lines for live
+macros, and `# % autosave`, `# % archiver`, `# % alh` and `# % controldesk` lines, stay.
+
+Run it after importing templates from a DLS release; `--check` exits non-zero if any
+file still needs it.
+
 ### Checking a pattern against a newer DLS release
 
 - **Pristine files** — diff directly against `/dls_sw/prod/*/support/<module>/`.
 - **Derived files** — re-run the conversion on the new release and diff the outputs.
+- **Databases** — every `.template`/`.db` has had its annotation comments stripped, so
+  run `strip-dls-annotations.py` over the imported release too before diffing.
 
 For a stronger check than text diffing, expand both the pattern's template and the DLS
 module's built `db/` copy with `msi` using the same macros, then compare canonical
@@ -106,27 +165,17 @@ templates.
 ### The support yaml
 
 The repo-authored **`*.ibek.support.yaml`** is generated here rather than extracted, so
-it may begin with the DLS-source provenance comment described above. That comment is
-static and deterministic, so it does not affect consumer-side hashing.
+it begins with the DLS-source provenance comment described above. That comment is
+static and deterministic, and is vendored along with the rest of the file.
 
-Either way, **the consumer-side vendor header below must never be committed here.**
+### Vendored files are byte-identical
 
-When `ibek pattern` vendors a file into an IOC instance, it injects a deterministic
-provenance header as the first line **before hashing**:
-
-```
-# Vendored from github.com/epics-containers/ibek-runtime-streamdevice@v0.1.0 — DO NOT EDIT
-```
-
-(note: em dash `—`). Because the header is added at vendor time and is part of the
-content that is hashed into the instance's lock file, integrity checking on the
-consumer side is a trivial `sha256(file_as_written) == lock`. The header is
-deterministic (no timestamps or absolute paths) so it is reproducible.
-
-**Do not commit this vendor header here.** It is a consumer-side artifact: it is added
-at vendor time and the header you see in a vendored copy belongs to the IOC instance,
-not to this library (distinct from the static DLS-source comment described above, which
-the `support.yaml` may carry).
+`ibek pattern` copies each runtime file into an IOC instance **verbatim**: it adds no
+header and rewrites nothing, and the per-file `sha256` in the instance's
+`runtime-lock.yaml` is taken over the library's bytes. So `diff -r` between an instance's
+`config/` and the pattern folder at the pinned tag shows only the files the manifest
+leaves out. The instance's provenance is the adjacent `runtime-lock.yaml`, which records
+the library, the pinned tag and every vendored file's hash.
 
 ## Versioning
 
@@ -160,7 +209,8 @@ ibek pattern add ibek-runtime-streamdevice:lakeshore340@v0.1.0 services/bl01t-ea
 This:
 
 1. fetches the pattern's file-set at tag `v0.1.0`,
-2. writes each file into `services/bl01t-ea-lake-01/config/` with the vendored header,
+2. writes each runtime file the pattern's `ibek.manifest.yaml` selects into
+   `services/bl01t-ea-lake-01/config/`, byte-for-byte,
 3. records `version`, `source` and a per-file `sha256` in
    `services/bl01t-ea-lake-01/runtime-lock.yaml`,
 4. merges the pattern's entity models into the instance's
@@ -186,21 +236,28 @@ entities:
 The resulting `runtime-lock.yaml` looks like:
 
 ```yaml
-version: v0.1.0
-source: github.com/epics-containers/ibek-runtime-streamdevice
-files:
-  config/lakeshore340.ibek.support.yaml: "sha256:…"
-  config/lakeshore340.proto: "sha256:…"
-  config/lakeshore340.template: "sha256:…"
+version: 1
+patterns:
+  lakeshore340:
+    version: v0.1.0
+    source: github.com/epics-containers/ibek-runtime-streamdevice
+    files:
+      config/lakeshore340.ibek.support.yaml: sha256:…
+      config/lakeshore340.proto: sha256:…
+      config/lakeshore340.template: sha256:…
+      config/lakeshore340_settings.req: sha256:…
 ```
+
+Only the files the manifest selects appear: `README.md`, `sim/` and `test/` are not
+vendored.
 
 (a hash value may be `"DIRTY # <reason>"` for a deliberately locally-modified file).
 
 ### Update a pin
 
 ```bash
-ibek pattern update lakeshore340 services/bl01t-ea-lake-01 -v v0.2.0
-# or update every pinned pattern to its latest resolvable version:
+ibek pattern update services/bl01t-ea-lake-01 --name lakeshore340 --version v0.2.0
+# or re-vendor every pinned pattern at its recorded version:
 ibek pattern update services/bl01t-ea-lake-01
 ```
 
@@ -217,8 +274,8 @@ be marked `DIRTY` in the lock.
 ### Restore vendored files
 
 ```bash
-ibek pattern restore lakeshore340 services/bl01t-ea-lake-01   # one pattern
-ibek pattern restore services/bl01t-ea-lake-01                # all patterns
+ibek pattern restore services/bl01t-ea-lake-01 --name lakeshore340   # one pattern
+ibek pattern restore services/bl01t-ea-lake-01                       # all patterns
 ```
 
 Rewrites the vendored files from the locked version, discarding local edits.
@@ -264,14 +321,20 @@ the test used to tell them apart — are listed in [BUILD-TIME-ONLY.md](BUILD-TI
      `entity_models` with their parameters, and a `databases:` list referencing the
      template/DB files),
    - the `*.proto`, `*.template`/`*.db`, and any other files that support yaml
-     references.
+     references,
+   - `ibek.manifest.yaml` — copy it from any other pattern; extend its `src` regex only
+     for a runtime file type it does not list,
+   - `README.md` — the pattern docs, following any other pattern's `README.md`,
+   - any publishable documentation, simulator or tests from the DLS source release, in
+     `docs/`, `sim/` and `test/`.
 3. Copy each file unmodified where it works as-is. If the module is VDCT-authored,
-   convert it as described in [Faithful storage](#faithful-storage-and-the-vendored-header)
+   convert it as described in [Faithful storage](#faithful-storage)
    — scripted, never hand-edited — and record the derivation in the support yaml header.
-   No vendored header (that is added by `ibek pattern` at vendor time).
+   Add nothing to the files for the vendoring step: `ibek pattern` copies them verbatim.
 4. Validate locally by vendoring into a scratch IOC instance:
-   `ibek pattern add ibek-runtime-streamdevice:mydevice@HEAD <instance>` (or test
-   against a branch) and run `ibek pattern check`.
+   `ibek pattern add mydevice@work <instance> --source <this repo's checkout>`, run
+   `ibek pattern check <instance>`, and confirm `<instance>/config/` holds the runtime
+   files and nothing from `README.md`, `docs/`, `sim/` or `test/`.
    For a derived pattern also check `msi` expands it with no undefined macros, and that
    its canonical record/field set matches the DLS module's built `db/` copy.
 5. Open a PR. Once merged, **cut a new semver tag** (`vX.Y.Z`) so consumers can pin the

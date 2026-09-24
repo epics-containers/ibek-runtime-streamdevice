@@ -1,0 +1,141 @@
+- Device Type
+    ! Failed - \'s used to escape "'s being included in output string.
+- Device Id
+    * Passed
+- Version
+    ! Failed - string exceeds 40 chars.
+- Remote
+  - Remote 
+  * Passed
+  - Local
+  * Passed
+- SET remote
+  - Remote
+  * Passed
+  - Local
+  * Passed
+- Status
+  - Standby
+  * Passed
+  - InProgress
+  * Passed
+  - Regulating
+  * Passed
+  - Error
+  * Passed
+- RESET
+  * Passed
+- P Interface
+  * Passed
+- P
+  * Passed
+- P:SP
+  * Passed
+- P:TOL
+  * Passed
+- P:SETSP
+  - %f
+  * Passed
+  - %e
+  * Passed
+  - Limits (over, under, top, bottom)
+  !!**
+  Fixed using DRVH/DRVL fields - retest:
+  ****
+- P:SETTOL
+  - Normal
+  * Passed
+  - Limits
+  !!**
+  Fixed - retest:
+  ****
+- V   
+  * Passed  
+- V:PER
+  * Passed
+- V:MAX
+  * Passed
+- V:SETMAX
+  - Normal
+  * Passed
+  - Limits
+  !!**
+  Retest:
+  ****
+- V:SET
+  - Normal
+  * Passed
+  - Limits
+  !!**
+  Retest
+  !!**
+  Fixed - dfanout record not set to closed-loop. Retest:
+  ****
+- T:STA
+  - On
+  ! Failed
+  - Off
+  ! Failed
+  Fixed this - scan was not processing. Retest:
+- T:STA
+  - On
+  * Passed
+  - Off
+  * Passed
+- T:TAR
+  * Passed
+- T
+  * Passed
+- T:CON
+  - On
+  * Passed
+  - Off
+  * Passed
+- T:SETTARG
+  - Normal
+  * Passed
+  - During reg
+  ! Failed
+  - Limits
+  * Passed
+- REG:STA
+  - On
+  * Passed
+  - Off
+  * Passed
+- REG:TIM
+  * Passed
+- REG:KI
+  * Passed
+- REG:KP
+  * Passed
+- REG:CON
+  - On
+  * Passed
+  - Off
+  * Passed
+- REG:SETTIM
+  - Normal
+  * Passed
+  - Limits
+  !!**
+  Retest:
+  ****
+- REG:SETKP
+  - Normal
+  * Passed
+  - Limits
+  !!**
+  Retest:
+  ****
+  - Reg running
+  ! Failed
+- REG:SETKI
+  - Normal
+  * Passed
+  - Limits
+  !!**
+  Retest:
+  ****
+  - Reg running
+  ! Failed

@@ -35,7 +35,7 @@ entity_models:
         type: int
         description: |-
           Address of device (normally 1)
-      OFF:
+      "OFF":
         type: float
         description: |-
           Conversion offset

@@ -26,10 +26,6 @@ entity_models:
         description: |-
           Command set: use 'R' for RS232(default) or 'S' for SCPI(Ethernet)
         default: R
-      name:
-        type: id
-        description: |-
-          object and gui association name
     databases:
       - file: gen3300w.template
         args:

@@ -1,0 +1,56 @@
+/**
+\mainpage Knauer EPICS Support Module
+\section intro_sec Introduction
+Support module for Knauer instruments:
+
+- Pump BlueShadow 40P (http://www.knauer.net/en/product/blueshadow_pump_40p-13.html)
+- Valve Drive Azura V 2.1S with 6-port multiposition valve head (http://www.knauer.net/en/product/azura_v_21s_with_6_port_multi_position_valve_head-1.html)
+
+There are four templates
+- connectionManagement.template: Monitor the connection to the device, and manage polling while connected. One instance per device.
+- blueShadow40P.template: Records for Pump BlueShadow 40P
+- azuraV2-1S.template: Records for Valve Drive Azura V2.1S
+- pumpAndValve.template: Just exists to generate a high-level EDM screen for using the pump and valve together in series
+
+Connection with the devices is by serial with an AsynSerial port, or by TCP/IP with an AsynIP port. The name of the Asyn port is supplied in the `PORT` macro 
+to blueShadow40P.template and azuraV2-1S.template.
+
+connectionManagement.template needs to know the values of the `P` and `R` macros (device prefix and suffix) used for the corresponding pump or valve. 
+
+An example setup is in etc/makeIocs/example.xml
+
+<pre>
+    \<?xml version="1.0" ?\>
+    \<components arch="linux-x86"\>
+    	\<asyn.AsynIP input_eos="\r" name="pumpsim" output_eos="\r" port="localhost:5555"/\>
+    	\<asyn.AsynIP input_eos="\r" name="valvesim" output_eos="\r" port="localhost:5556"/\>
+    	...
+    	\<knauer.ConnectionManagement P="TDQ39642-HPLC-01" R=":40P" name="Pump"/\>
+    	\<knauer.ConnectionManagement P="TDQ39642-HPLC-01" R=":AZ21S" name="Valve"/\>
+    	\<knauer.BlueShadow40P P="TDQ39642-HPLC-01" PORT="pumpsim" R=":40P" name="pump40P"/\>
+    	\<knauer.Azura21S P="TDQ39642-HPLC-01" PORT="valvesim" R=":AZ21S" name="valve21S"/\>
+    	\<knauer.PumpAndValve PUMP="TDQ39642-HPLC-01:40P" VALVE="TDQ39642-HPLC-01:AZ21S" name="topscreen"/\>
+    	...
+    \</components\>
+</pre>
+
+\section sim_sec Simulations
+A very basic Python simulator is provided for both devices in `etc/simulations`. They require the DLS serial simulation library.
+
+- `pump_sim.py` for BlueShadow 40P: runs on local port 5555
+- `valve_sim.py` for Azura V2.1S: runs on local port 5556
+
+Execute the script to start the simulator, e.g. `./etc/simulations/pump_sim.py`. Configure your IOC with an asynIP port for each simulator, with macro `port=localhost:5555` or `port=localhost:5556`
+
+Both simulators respond to the basic set of commands, and change state instantaneously (no ramping or response time).
+
+\section user_sec User Manual
+This section contains instructions for the end user
+
+\section build_sec Build Instructions 
+- \subpage build_instructions_example
+
+IOCs build using these build instructions are available in iocs/
+**/
+
+/* Build instructions page will be generated from the xml file given to dls-xml-iocbuilder.py --doc */

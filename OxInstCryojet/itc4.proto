@@ -1,0 +1,60 @@
+#######################################################################
+#
+# This protocol file is for use with StreamDevice-2-0 (i.e. epics 3.14)
+#
+#######################################################################
+#
+# Stream Device Protocol for Oxford Instruments ITC4 Intelligent Temperature Controller
+#
+# The device sends and recieves commands using 5 digits, where the first 4 are the 
+# integer part, and the last one is the decimal. When sending commands, it's ok to 
+# send a decimal point.
+#
+
+terminator   = CR;
+replytimeout = 5000;
+readtimeout  = 500;
+locktimeout = 20000;
+extrainput   = Ignore;
+separator = "";
+
+#################################################################################
+# Command set
+
+
+#Monitor commands
+
+set_ctrl{out"%{C0|C1|C2|C3}"}
+
+get_param{out"R%2u"; in"R%d"}
+get_ttemp{out"R0"; in"R%d"}
+get_stemp{out"R1"; in"R%d"}
+get_s2temp{out"R2"; in"R%d"}
+get_s3temp{out"R3"; in"R%d"}
+get_etemp{out"R4"; in"R%d"}
+get_htrp{out"R5"; in"R%d"}
+get_htrv{out"R6"; in"R%d"}
+get_gflow{out"R7"; in"R%d"}
+get_p{out"R8"; in"R%d"}
+get_i{out"R9"; in"R%d"}
+get_d{out"R10"; in"R%d"}
+
+get_sta{out"X"; in "X0%{A0|A1}%(\$1.VAL){C0|C1|C2|C3}"}
+
+
+#Control comamnds
+
+set_act{out"%{A0|A1}"}
+set_d{out"D%.1f"; in"D"}
+set_i{out"I%.1f"; in"I"}
+set_sh_flo{out"J%.1f"; in"J"}
+set_sa_flo{out"K%.1f"; in"K"}
+set_maxv{out"M%.1f"; in"M"}
+set_manv{out"O%.1f"; in"O"}
+set_gflow{out"G%.1f"; in"G"}
+set_p{out"P%.1f"; in"P"}
+set_ttemp{out"T%.1f"; in"T"}
+
+
+
+#################################################################################

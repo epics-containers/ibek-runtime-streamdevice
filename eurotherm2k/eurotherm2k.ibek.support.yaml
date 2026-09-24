@@ -1,3 +1,24 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+# Imported from DLS production support module: eurotherm2k 2-10
+# Source: /dls_sw/prod/R3.14.12.7/support/eurotherm2k/2-10
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# The eurotherm2k entity model is hand-written (ibek-runtime-streamdevice#22); the
+# others are imported from the release's db/ templates.
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/eurotherm2k/ release.
+#
+# Templates needing a generic IOC built with this module (not the plain
+# generic image):
+# - `eurothermModbus.template` needs a generic IOC built with `eurotherm2k` (compiled support), not the plain generic image.
+# - `eurothermModbusLoop.template` needs a generic IOC built with `eurotherm2k` (compiled support), not the plain generic image.
+# - `eurothermModbusPV.template` needs a generic IOC built with `eurotherm2k` (compiled support), not the plain generic image.
+# Their records are asyn records on a Modbus port, which the DLS builder.py creates at
+# startup with the module's compiled commands (modbusInterposeConfig +
+# eurothermModbusCtrlConfigure for eurothermModbus, eurothermModbusLoopConfigure for
+# eurothermModbusLoop, drvModbusAsynConfigure for eurothermModbusPV). Those commands
+# are not part of these entity models.
+
 module: eurotherm2k
 
 entity_models:
@@ -52,5 +73,316 @@ entity_models:
         default: C/min
     databases:
       - file: eurotherm2k.template
+        args:
+          .*:
+
+  - name: eurothermParam
+    description: |-
+      Set and read back a parameter on a eurotherm 2k series controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix (should match eurotherm2k.template)
+      Q:
+        type: str
+        description: |-
+          Device suffix (should match eurotherm2k.template)
+      GAD:
+        type: int
+        description: |-
+          Global address number, normally 0 (should match eurotherm2k.template)
+      LAD:
+        type: int
+        description: |-
+          Local address number, normally 1 (should match eurotherm2k.template)
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      NAME:
+        type: str
+        description: |-
+          Parameter name
+      DESC:
+        type: str
+        description: |-
+          Parameter description
+      CMD:
+        type: str
+        description: |-
+          Parameter mnemonic
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      PREC:
+        type: int
+        description: |-
+          Precision
+      DRVH:
+        type: float
+        description: |-
+          Max allowed value
+      DRVL:
+        type: float
+        description: |-
+          Min allowed value
+      SPCMD:
+        type: str
+        description: |-
+          Set to 'write' for floating point or 'writeint' for integer parameter
+        default: "writeint"
+    databases:
+      - file: eurothermParam.template
+        args:
+          .*:
+
+  - name: eurothermConfParam
+    description: |-
+      Generic database for setting a parameter on a eurotherm 2k series controller, works when it is in configure mode.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix (should match eurotherm2k.template)
+      Q:
+        type: str
+        description: |-
+          Device suffix (should match eurotherm2k.template)
+      GAD:
+        type: int
+        description: |-
+          Global address number, normally 0 (should match eurotherm2k.template)
+      LAD:
+        type: int
+        description: |-
+          Local address number, normally 1 (should match eurotherm2k.template)
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      NAME:
+        type: str
+        description: |-
+          Parameter name
+      DESC:
+        type: str
+        description: |-
+          Parameter description
+      CMD:
+        type: str
+        description: |-
+          Parameter mnemonic
+      EGU:
+        type: str
+        description: |-
+          Engineering units for parameter control and readback records
+      PREC:
+        type: int
+        description: |-
+          Precision for parameter control and readback records
+      DRVH:
+        type: float
+        description: |-
+          Max allowed value
+      DRVL:
+        type: float
+        description: |-
+          Min allowed value
+      SPCMD:
+        type: str
+        description: |-
+          Set to 'write' for floating point or 'writeint' for integer parameter
+        default: "writeint"
+    databases:
+      - file: eurothermConfParam.template
+        args:
+          .*:
+
+  - name: eurothermPV
+    description: |-
+      Read back a process value from a eurotherm 2k series controller
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix (should match eurotherm2k.template)
+      Q:
+        type: str
+        description: |-
+          Device suffix (should match eurotherm2k.template)
+      GAD:
+        type: int
+        description: |-
+          Global address number, normally 0 (should match eurotherm2k.template)
+      LAD:
+        type: int
+        description: |-
+          Local address number, normally 1 (should match eurotherm2k.template)
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      NAME:
+        type: str
+        description: |-
+          PV name
+      DESC:
+        type: str
+        description: |-
+          PV description
+      PV:
+        type: str
+        description: |-
+          PV mnemonic
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      PREC:
+        type: int
+        description: |-
+          Precision
+      SCAN:
+        type: str
+        description: |-
+          Record scan rate
+    databases:
+      - file: eurothermPV.template
+        args:
+          .*:
+
+  - name: eurothermModbus
+    description: |-
+      Controls the eurotherm 2000 series temp controller via modbus interface
+      NOTE: needs a generic IOC built with eurotherm2k (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port
+      ADDR:
+        type: int
+        description: |-
+          Modbus address
+      DISABLED:
+        type: int
+        description: |-
+          Start disabled?
+        default: 0
+      MULTILOOP:
+        type: int
+        description: |-
+          Is this a multi-loop controller (e.g. 2700 series) or single-loop (e.g. 2400 or 2200)?
+        default: 0
+    databases:
+      - file: eurothermModbus.template
+        args:
+          .*:
+
+  - name: eurothermModbusLoop
+    description: |-
+      Controls an individual channel of eurotherm, requires a eurothermModbus entry
+      NOTE: needs a generic IOC built with eurotherm2k (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      PORT:
+        type: str
+        description: |-
+          Asyn port
+      ADDR:
+        type: int
+        description: |-
+          Modbus address
+      LOOP:
+        type: int
+        description: |-
+          Loop number
+        default: 1
+      SPMIN:
+        type: float
+        description: |-
+          Minimum setpoint
+        default: -273
+      SPMAX:
+        type: float
+        description: |-
+          Maximum setpoint
+        default: 1000
+      RRMAX:
+        type: float
+        description: |-
+          Maximum ramp rate
+        default: 1
+      PREC:
+        type: int
+        description: |-
+          Setpoint precision, must match controller setup
+      EGUT:
+        type: str
+        description: |-
+          Engineering units for SP & RBV, etc
+        default: C
+      EGU:
+        type: str
+        description: |-
+          Engineering units for ramp rate
+        default: C/s
+    databases:
+      - file: eurothermModbusLoop.template
+        args:
+          .*:
+
+  - name: eurothermModbusPV
+    description: |-
+      Controls an individual channel of eurotherm, requires a eurothermModbus entry
+      NOTE: needs a generic IOC built with eurotherm2k (not the plain generic image).
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+      NAME:
+        type: str
+        description: |-
+          PV name
+      DESC:
+        type: str
+        description: |-
+          PV description
+      PORT:
+        type: str
+        description: |-
+          Modbus port name
+      PREC:
+        type: int
+        description: |-
+          Precision
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+    databases:
+      - file: eurothermModbusPV.template
         args:
           .*:

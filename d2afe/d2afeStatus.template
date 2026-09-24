@@ -1,0 +1,69 @@
+# d2afeStatus.template
+# Records to trigger mon command and split the response over the relevant PVs
+# Also takes care of firmware, calid and eid reading
+# % macro, P, Device prefix
+# % macro, ADDR, D2AFE RS485 address
+# % macro, STREAMS_PORT, PTG streams port
+# % macro, NEXT, PV of CAL:MON for next D2AFE.
+
+record(ao, "$(P):AFE:MON")
+{
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(DTYP, "stream")
+  field(OUT,  "@d2afe.proto mon($(ADDR),$(P):AFE) $(STREAMS_PORT)")
+  field(FLNK, "$(NEXT)")
+}
+
+record(ai, "$(P):AFE:CH1_TEMP"){}
+record(ai, "$(P):AFE:CH2_TEMP"){}
+record(ai, "$(P):AFE:CH3_TEMP"){}
+record(ai, "$(P):AFE:CH4_TEMP"){}
+record(ai, "$(P):AFE:RF1_DBM"){}
+record(ai, "$(P):AFE:RF2_DBM"){}
+record(ai, "$(P):AFE:RF3_DBM"){}
+record(ai, "$(P):AFE:RF4_DBM"){}
+record(ai, "$(P):AFE:RADSENSE"){}
+record(ai, "$(P):AFE:12V_MON"){}
+record(ai, "$(P):AFE:5V_MON"){}
+record(ai, "$(P):AFE:I_MON"){}
+record(ai, "$(P):AFE:UPTIME"){}
+record(ai, "$(P):AFE:BUFF_PEAK"){}
+record(ai, "$(P):AFE:CH1_IN_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:CH1_OUT_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:CH2_IN_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:CH2_OUT_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:CH3_IN_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:CH3_OUT_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:CH4_IN_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:CH4_OUT_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:PILOT_ATT_RAW_RBV"){}
+record(ai, "$(P):AFE:CH1_IN_ATT_RBV"){}
+record(ai, "$(P):AFE:CH1_OUT_ATT_RBV"){}
+record(ai, "$(P):AFE:CH2_IN_ATT_RBV"){}
+record(ai, "$(P):AFE:CH2_OUT_ATT_RBV"){}
+record(ai, "$(P):AFE:CH3_IN_ATT_RBV"){}
+record(ai, "$(P):AFE:CH3_OUT_ATT_RBV"){}
+record(ai, "$(P):AFE:CH4_IN_ATT_RBV"){}
+record(ai, "$(P):AFE:CH4_OUT_ATT_RBV"){}
+record(ai, "$(P):AFE:PILOT_ATT_RBV"){}
+
+
+
+######################
+# Display the response for selected commands for 2 seconds before clearing
+record(seq, "$(P):AFE:RESP_CLR_DELAY") {
+  field(SELM, "All")
+  field(DLY1, "2.0")
+  field(DOL1, "1")
+  field(LNK1, "$(P):AFE:RESP_CLR.PROC PP")
+}
+
+record(stringout, "$(P):AFE:RESP_CLR") {
+  field(VAL, "")
+  field(OUT, "$(P):AFE:RESP PP")
+}
+
+record(stringin, "$(P):AFE:RESP") {
+  field(FLNK, "$(P):AFE:RESP_CLR_DELAY PP")
+}

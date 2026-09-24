@@ -29,10 +29,6 @@ entity_models:
         type: str
         description: |-
           Asyn port name
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: NSC200.template
         args:

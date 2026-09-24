@@ -94,4 +94,3 @@ addrRead  { InTerminator = "\x03"; out "\x0400%(\$1:ADDR.VAL)i%(\$1:ADDR.VAL)i%s
 
 
 
-

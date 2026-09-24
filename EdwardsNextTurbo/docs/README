@@ -1,0 +1,17 @@
+-----------------------------------------------
+README file for EdwardsNextTurbo Support Module
+-----------------------------------------------
+
+README last updated 06/08/2024
+
+This module supports the Edwards nEXT series of Turbo pump controllers
+which each control one Edwards Turbo pump.
+
+Module was originally tested with EPICS R3.14.12.3 over RS232 against
+Edwards nEXT Turbomolecular pump reporting:
+Pump Model nEXT-P2 
+Firmware   D39649602C
+Bootloader D37479601C
+
+It has been deployed on several beamline end stations over many years,
+experiencing version dependency and EPIC base upgrades.

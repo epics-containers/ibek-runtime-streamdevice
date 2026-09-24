@@ -1,0 +1,83 @@
+Notes on implementation of specsVCU1000 support module.
+
+Done so far:
+
+- Initialised support module and added to svn.
+- Created iocs folder with various practise IOCs in it.
+- Added simulation to /etc
+- Created prototype example IOC.
+- Commented out default makeIOCs and makeDocumentation rules in <top>/etc/Makefile
+- Create substitution in example IOC to test support module is imported correctly.
+- Added support module to example IOC configure/RELEASE, set up Makefiles and startup script
+- Tested example IOC builds, launches and test PV exists and is visible to caget/put.
+- Added working prototype (without protocol) to subversion.
+- Added script to launch simulation from example IOC.
+- Added script to launch example GUI.
+- Prepared IOC for testing on hardware (mostly means implementing non-sim boot 
+  script).
+
+Protocol:
+
+- Created prototype protocol
+- Set up example IOC to use template, protocol and simulation and demonstrated it
+  works (send/receive a simple message to/from simulation).
+- Performed a quick test to see what happens when we get an invalid response. Results in 
+  documentation folder.
+- Designed the protocol:
+   - Enumerated the messages we need to implement.
+   - Worked out the possible arguments and responses.
+   - Consider if we can simplify by using arguments for similar messages (e.g. 
+     KI and KP).
+     - Done this for KI and KP (SET and GET)
+- Implemented a basic form of the protocol.
+- Got IOC to build with basic protocol.
+- Tested the basic protocol and fixed any bugs.
+- Bug - Regulating SET/GET doesn't work
+  Fixed - bug in simulation
+- Consider any extensions we may need, in particular error handling:
+     - streamDevice provides an @mismatch exception handler, which can be used
+       to re-parse an input and effectively act as a condition.
+     - We could rely on internal database logic to ensure we do not send a command
+       which would result in an error. 
+  - Not actually going to do much error handling - range set on voltage but not
+    much else. IOC handles errors by logging them and continuing running - not 
+    helpful to mask these. 
+
+Database:
+
+- Created prototype template file.
+- Design the interface to the protocol (which records and their types).
+- Implement the necessary ao, ai, bo, bi records to interface with the device.
+- Bug - Status not updating
+  Fixed - not set to process
+- Make sure the limits and units on all i/o records are set correctly.
+- Bug - Version string is too long for stringin record
+  Fixed - Set protocol to ignore whitespace, and checked OK to truncate version
+          string.
+- Add any internal functionality the database needs - e.g. interlocks to 
+     disable output records when invalid, abstractions not provided by device 
+     (e.g. adding an explicit "regulation" vs "manual" state).
+     In practice not much of this done - mostly defer to reporting raw device
+     values rather than trying to mask odd states.
+- Implement disabling of V setter during regulation.
+
+Interface:
+- Designed the EDM interface.
+- Implemented the EDM interface.
+- Test interface thoroughly against simulation and check behaves sensibly in 
+  most cases.
+- Implemented various bug fixes
+- Planned necessary suite of tests to run on real device. 
+- Tested against actual device to ensure functions correctly. 
+
+To do:
+
+- Implement any further bug fixes
+- Add to IOC on beamline. 
+- Messages always take 100ms to complete because no InTerminator - as such will always wait until ReadTimeout to look for reply. Can we use an InTerminator that won't cause errors?
+
+Protocol:
+
+Database:
+
+EDM interface:

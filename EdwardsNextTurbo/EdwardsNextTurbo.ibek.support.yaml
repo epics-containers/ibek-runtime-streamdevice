@@ -71,10 +71,6 @@ entity_models:
         description: |-
           Optional. Whether the pump has a vent valve on it. Enables display of vent valve widgets on GUI. 0 - Disable, 1 - Enable. Defaults to 0, Disable
         default: 0
-      name:
-        type: id
-        description: |-
-          Optional. Name for gui tag definitions. Defaults to empty string.
     databases:
       - file: EdwardsNextTurbo.template
         args:

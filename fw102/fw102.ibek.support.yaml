@@ -2,7 +2,10 @@
 
 # Imported from DLS production support module: fw102 2-1
 # Source: /dls_sw/prod/R3.14.12.7/support/fw102/2-1
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# fw102.template is a pristine copy of that release's db/fw102.template.
+# fw102.proto deviates from the pristine data/fw102.proto in one line: setPos reads
+# the device's echo of the command (`in "pos=%*d";`), which the DLS protocol leaves
+# unread in the input buffer.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/fw102/ release.
 
@@ -25,10 +28,6 @@ entity_models:
         type: str
         description: |-
           asyn port name
-      name:
-        type: id
-        description: |-
-          module name
       FILTER1:
         type: str
         description: |-

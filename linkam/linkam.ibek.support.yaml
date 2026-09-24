@@ -30,10 +30,6 @@ entity_models:
         description: |-
           Optional macro for whether device is polled or not.
         default: 1
-      name:
-        type: id
-        description: |-
-          Object and gui association name
     databases:
       - file: linkam.template
         args:

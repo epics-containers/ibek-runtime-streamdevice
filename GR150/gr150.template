@@ -9,8 +9,6 @@
 # % macro, bus, Asyn port name
 # % macro, DISABLE, If 1 then disable the comms on startup
 # % macro, tempdesc,  Optional.  Description in TEMPERATURE record DESC field.  Defaults to "Chiller water temp"
-# % macro, name, Object and GUI association name
-# % gui, $(name=), edm, gr150.edl, P=$(P)
 # % archiver 10 monitor
 record(calcout, "$(P):TEMPERATURE") {
   field(DESC, "$(tempdesc=Chiller water temperature)")
@@ -77,7 +75,6 @@ record(calcout, "$(P):CALC_LIM") {
   field(OUT, "$(P):LVIO PP")
 }
 
-# % gui, $(name=), sevr
 # % archiver 10 monitor
 record(longout, "$(P):LVIO") {
   field(VAL, 0)
@@ -96,7 +93,6 @@ record(calc, "$(P):CALCCOMMS") {
 
 # An alarm flag that indicates the state of the
 # communications with the device.
-# % gui, $(name=), sevr
 # % archiver 10 monitor
 record(bi, "$(P):COMMSFAIL") {
   field(DESC, "Communications failed")

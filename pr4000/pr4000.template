@@ -5,10 +5,6 @@
 # substitutions:
 # % macro, device, Device e.g.BLxxI-VA-GCTLR-01
 # % macro, port, Asyn port name
-# % macro, ch1pv, Channel 1 PV (as device in pr4000chan.template)
-# % macro, ch2pv, Channel 2 PV (as device in pr4000chan.template)
-# % macro, name, Name to export to gda as
-# % gui, $(name=), edm, pr4000.edl, device=$(device), ch1pv=$(ch1pv), ch2pv=$(ch2pv)
 #
 ################################################################################
 # Error code

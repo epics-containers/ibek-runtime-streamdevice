@@ -4,13 +4,6 @@
 # % macro, Q,     PV name suffix
 # % macro, PORT,  asyn name for serial port connected to device
 # % macro, DISABLED, Optional macro for whether device is polled or not.
-# % macro, name, Object and gui association name
-# % macro, gda_name, gda name
-# % macro, gda_desc, gda description
-# % gui, $(name=), edm, linkam.edl, P=$(P),Q=$(Q)
-# % gui, $(name=), edmembed, linkam_embed.edl, P=$(P),Q=$(Q)
-# % gdatag,template,linkam,$(gda_name=),$(gda_desc=)
-# % gdatag,binary,rw,$(gda_name=),SETPUMPMODE, Set pump mode
 record(bo, "$(P)$(Q):PUMP:MODE:SET") {
   field(DESC, "Set pump mode")
   field(DTYP, "stream")
@@ -21,7 +14,6 @@ record(bo, "$(P)$(Q):PUMP:MODE:SET") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,rw,$(gda_name=),SETRAMPLIMIT,Set ramp limit
 record(ao, "$(P)$(Q):RAMP:LIMIT:SET") {
   field(DESC, "Set ramp rate")
   field(SCAN, "Passive")
@@ -37,7 +29,6 @@ record(ao, "$(P)$(Q):RAMP:LIMIT:SET") {
   field(EGU, "C")
 }
 
-# % gdatag,pv,rw,$(gda_name=),SETRAMPRATE,Set ramp rate
 record(ao, "$(P)$(Q):RAMP:RATE:SET") {
   field(DESC, "Set ramp rate")
   field(SCAN, "Passive")
@@ -53,7 +44,6 @@ record(ao, "$(P)$(Q):RAMP:RATE:SET") {
   field(EGU, "C/min")
 }
 
-# % gdatag,mbbinary,rw,$(gda_name=),SETRAMPCONTROL,Set ramp control
 record(mbbo, "$(P)$(Q):RAMP:CTRL:SET") {
   field(DESC, "Ramp stop/start/hold control")
   field(DTYP, "stream")
@@ -68,7 +58,6 @@ record(mbbo, "$(P)$(Q):RAMP:CTRL:SET") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,rw,$(gda_name=),SETLOGPERIOD,Set log period
 record(mbbo, "$(P)$(Q):LOG:PERIOD:SET") {
   field(DESC, "Set temp logging period")
   field(SCAN, "Passive")
@@ -102,7 +91,6 @@ record(mbbo, "$(P)$(Q):LOG:PERIOD:SET") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,binary,rw,$(gda_name=),CLEARLOG,Clear log
 record(bo, "$(P)$(Q):LOG:RESET") {
   field(DESC, "Send reset cmd")
   field(SCAN, "Passive")
@@ -113,7 +101,6 @@ record(bo, "$(P)$(Q):LOG:RESET") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,rw,$(gda_name=),SETLOGMODE,Set log mode
 record(mbbo, "$(P)$(Q):LOG:MODE:SET") {
   field(DESC, "Temp logging stop mode")
   field(DTYP, "stream")
@@ -126,7 +113,6 @@ record(mbbo, "$(P)$(Q):LOG:MODE:SET") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,mbbinary,ro,$(gda_name=),STATUS,Get ramp status
 record(mbbi, "$(P)$(Q):STATUS") {
   field(DESC, "Get status")
   field(ZRVL, "1")
@@ -146,7 +132,6 @@ record(mbbi, "$(P)$(Q):STATUS") {
   field(INP, "$(P)$(Q):CALCSB1")
 }
 
-# % gdatag,pv,ro,$(gda_name=),EB1,Get EB1
 record(longout, "$(P)$(Q):ERROR") {
   field(DESC, "Get error")
   field(DTYP, "Soft Channel")
@@ -155,7 +140,6 @@ record(longout, "$(P)$(Q):ERROR") {
   field(DRVL, "-256")
 }
 
-# % gdatag,pv,ro,$(gda_name=),GS1,Get GS1
 record(longout, "$(P)$(Q):GSTATUS") {
   field(DESC, "Get general status")
   field(DTYP, "Soft Channel")
@@ -164,7 +148,6 @@ record(longout, "$(P)$(Q):GSTATUS") {
   field(DRVL, "-256")
 }
 
-# % gdatag,pv,ro,$(gda_name=),SB1,Get SB1
 record(scalcout, "$(P)$(Q):CALCSB1") {
   field(FLNK, "$(P)$(Q):STATUS")
   field(CALC, "BYTE(AA[0,0])")
@@ -208,7 +191,6 @@ record(stringin, "$(P)$(Q):RSTATUS") {
   field(SDIS, "$(P)$(Q):DISABLE.VAL")
 }
 
-# % gdatag,pv,ro,$(gda_name=),PUMPSPEED,Get pump speed
 record(longout, "$(P)$(Q):PUMP:SPEED") {
   field(DESC, "Get error")
   field(DTYP, "Soft Channel")
@@ -217,7 +199,6 @@ record(longout, "$(P)$(Q):PUMP:SPEED") {
   field(DRVL, "-256")
 }
 
-# % gdatag,pv,rw,$(gda_name=),SETPUMPSPEED,Set manual pump speed
 record(longout, "$(P)$(Q):PUMP:SPEED:SET") {
   field(DESC, "Set pump speed")
   field(SCAN, "Passive")
@@ -231,7 +212,6 @@ record(longout, "$(P)$(Q):PUMP:SPEED:SET") {
   field(SDIS, "$(P)$(Q):DISABLE")
 }
 
-# % gdatag,pv,ro,$(gda_name=),PUMPMODE,Get pump mode
 record(bo, "$(P)$(Q):PUMP:MODE") {
   field(SCAN, "Passive")
   field(DTYP, "Soft Channel")
@@ -250,7 +230,6 @@ record(scalcout, "$(P)$(Q):CALCPB2") {
   field(DOPT, "Use CALC")
 }
 
-# % gdatag,pv,ro,$(gda_name=),STAGESTATUS,Get stage status
 record(stringin, "$(P)$(Q):RSTATUS2") {
   field(SCAN, "2 second")
   field(DTYP, "stream")
@@ -259,7 +238,6 @@ record(stringin, "$(P)$(Q):RSTATUS2") {
   field(DESC, "Stage status")
 }
 
-# % gdatag,binary,rw,$(gda_name=),STARTREAD,Read log
 record(busy, "$(P)$(Q):LOG:STARTREAD") {
   field(DESC, "Initiate read")
 }
@@ -278,7 +256,6 @@ record(asyn, "$(P)$(Q):ASYN") {
   field(PORT, "$(PORT)")
 }
 
-# % gdatag,binary,rw,$(gda_name=),DISABLE,Disable comms
 record(bo, "$(P)$(Q):DISABLE") {
   field(OMSL, "supervisory")
   field(ZNAM, "Enabled")
@@ -310,7 +287,6 @@ record(calcout, "$(P)$(Q):LOG:NODATA") {
   field(FLNK, "$(P)$(Q):LOG:IFFINISH")
 }
 
-# % gdatag,array,ro,$(gda_name=),LOGTEMP,Log temp data
 record(compress, "$(P)$(Q):LOG:TEMP:CMP") {
   field(INP, "$(P)$(Q):LOG:TEMP.VAL")
   field(ALG, "Circular Buffer")
@@ -321,7 +297,6 @@ record(compress, "$(P)$(Q):LOG:TEMP:CMP") {
   field(DESC, "log temperatures")
 }
 
-# % gdatag,array,ro,$(gda_name=),LOGDSC,Log DSC data
 record(compress, "$(P)$(Q):LOG:DSC:CMP") {
   field(FLNK, "$(P)$(Q):LOG:NEXT")
   field(INP, "$(P)$(Q):LOG:DSC.VAL")
@@ -367,7 +342,6 @@ record(ai, "$(P)$(Q):TEMP2") {
   field(FLNK, "$(P)$(Q):TEMP")
 }
 
-# % gdatag,pv,ro,$(gda_name=),TEMP,Current temp
 # % archiver 10 Monitor
 record(calc, "$(P)$(Q):TEMP") {
   field(DESC, "correct -ve temps")

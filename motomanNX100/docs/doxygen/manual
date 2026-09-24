@@ -1,0 +1,68 @@
+/**
+\mainpage motomanNX100 EPICS Support Module
+\section intro_sec Introduction 
+
+This EPICS module provides streamDevice support for the <a href="http://www.yaskawa.eu.com/en/products/robotic/controller/">Yaskawa</a>,
+(formerly Motoman) NX100, NXC100 and FS100 robot controllers.
+
+The interface is at the Job and P or D variable level, it is expected
+that the programmer will create several jobs using the robot pendant,
+and then interact with the robot by calling these jobs.
+
+\section setup EServer protocol setup
+- Short instructions:
+    Set \c FD78=1 to enable the newer TCP command/response protocol. You may need to contact your motoman representative to gain access.
+
+- Longer instructions:
+    The module uses the EServer protocol.
+    The settings below are from the document "Eserver DX Setup" (in German) provided by a Yaskawa representative.
+    
+    -# Set FD003=1   
+    -# Set FD42=1
+    -# Set IP address in RS70-73
+    -# Set subnet mask in RS74-77
+    -# Set gateway in RS78-81
+    -# Test that ping is possible.
+    -# Set FD077=1
+    -# Set FD078=1
+    -# Set RS000=2
+    -# Set RS005=1
+    -# Set RS007=2
+    -# I/O: From the menus, On/Off => Pseudo Input Signals => CommandRemote (#82015)=ON\n
+       The translation above is approximate and from memory, the manual shows\n
+       Ein/Aus=>Pseudo Eingangs Signale=>CommandRemote (#82015)=ON
+       
+    The manual indicates that the test of the Eserver mode is tested using "MotoAdmin", which is Yaskawa's robot software. I have not used it.
+
+\section usage_sec Usage
+    
+- Setup the IP address of the controller, and put it in remote mode (3 way toggle switch)
+- <tt>telnet \<IP_addr\> 80</tt> and type <tt>CONNECT Robot_access Keep-Alive:-1</tt>. If you get a message back, you can talk to the robot with the EPICS module
+- Program each job in with a different name
+- Use D and P variables for passing parameters
+- Specify <tt>ZRST..TEST</tt> with the job names that you wish to be able to run
+- Run up IOC, press Servo on, select job, then Start.
+
+\section bugs_sec Known Bugs
+- If you interrupt a command (by rebooting the IOC), then the robot controller will get a "Mal-formed request" error on the pendant, beep, and stop responding. At this point it is easiest to reboot the controller.
+When rebooting, it is best to set <tt>\$(P)\$(Q):UPDATE.SCAN</tt> to \c PASSIVE to avoid this
+
+\section releases Release Notes
+
+Release notes in reverse chronology (newest at the top)
+
+- Release 1-15 (Nov 2016) Add template BL11I-barcode.db to map a D variable to a binary output 
+                          enable/disable record, with feedback from robot hardware
+
+- Release 1-14 (Oct 2016) Minor change to the protocol file and templates to support FS100 controller in beamline I11-1\n
+  Documentation updated.
+
+- Release 1-13 (Jan 2014) For use in beamline I11
+
+
+\section build_sec Build Instructions 
+The \subpage build_instructions_example page contains instructions to setup this module
+
+An example built using these instructions is available in iocs/example
+
+**/

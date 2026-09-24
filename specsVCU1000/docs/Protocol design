@@ -1,0 +1,166 @@
+Basic structure of the protocol:
+
+RESET
+  - No args
+  - Response: "OK"
+
+
+GET
+  Status
+  - "OK %{Standby|InProgress|Regulating|Error}"
+  RemoteMode
+  - "OK %{Local|Remote}"
+  DeviceType
+  - "OK %s"
+  DeviceId
+  - "OK %s"
+  Version
+  - "OK %s"
+
+  PressureInterface
+  - "OK %s"
+  CurrentPressure
+  - "OK %.1e"
+  PressureTolerance
+  - "OK %d"
+  PressureTarget
+  - "OK %.1e"
+
+  CurrentValveVoltage
+  - "OK %.2f"
+  CurrentValvePercentage
+  - "OK %.2f"
+  ValveVoltageMax
+  - "OK %.2f"
+
+  Timer
+  - "OK %{Off|On}"
+  TimerTarget
+  - "OK %d"
+  CurrentTimer
+  - "OK %d"
+  
+  Regulation
+  - "OK %{On|Off}"
+  RegulationTimeout
+  - "OK %d"
+  ValueKI
+  - "OK %.1e"
+  ValueKP
+  - "OK %.1e"
+
+
+
+SET
+  RemoteMode %{Local|Remote}
+  - "OK %{Local|Remote}"
+  
+  PressureTarget %e
+  - "OK %.1e"
+    Errors:
+    - RemoteModeIsLocal
+    - OutOfRange
+  PressureTolerance %d
+  - "OK %d"
+    Errors:s
+    - RemoteModeIsLocal
+    - OutOfRange  
+  
+  ValveVoltageMax %f
+  - "OK %.2f"
+    Errors:
+    - RemoteModeIsLocal
+    - OutOfRange
+  ValveVoltage %f
+  - "OK %.2f"
+    Errors:
+    - RemoteModeIsLocal
+    - OutOfRange  
+  
+  Timer %{Off|On}
+  - "OK %{Off|On}
+    Errors:
+    - RemoteModeIsLocal
+  TimerTarget %{d}
+  - "OK %d"
+    Errors:
+    - RemoteModeIsLocal
+    - TimerIsRunning
+
+  Regulation {Off|On}
+  - "OK %{Off|On}"
+    Errors:
+    - RemoteModeIsLocal
+    - OutOfRange
+  RegulationTimeout %d
+  - "OK %d"
+    Errors:
+    - RemoteModeIsLocal
+    - OutOfRange
+  ValueKP %e
+  - "OK %.1e"
+    Errors:
+    - RemoteModeIsLocal
+    - OutOfRange
+    - RegulationIsRunning
+  ValueKI %e
+  - "OK %.1e"
+    Errors:
+    - RemoteModeIsLocal
+    - OutOfRange
+    - RegulationIsRunning
+  
+Other considerations:
+  
+Error handling:
+ 
+RemoteModeIsLocal
+- Could use an interlock preventing any SET being written to output unless
+  RemoteMode is Remote.
+- Could catch the mismatch and parse this specific error in each protocol 
+  definition. 
+  - Possibility - have handler call a record which sets alarm status of all
+    input fields to Invalid.
+
+OutOfRange
+- Could define range limits internally in the records' EGUL/EGUF. Will need 
+careful testing of bounds.
+- Could handle OutOfRange replies and parse the relevant limits to truncate the
+input.
+
+TimerIsRunning
+- Would need interlock to disable SET for timer when Status is not in permitted
+  state.
+  Can we do this without a race condition? I don't think there's any way to 
+  atomically check Status and set Timer in the same operation, so not sure can 
+  guarantee this.
+- Could handle replies - only effect of pressing Timer button would be to cause 
+  it to become invalid, which is probably fine. 
+
+RegulationIsRunning
+
+BadCommand
+NoParameter
+BadParameter      - Should not need to handle these as caused by syntax errors -
+BadRemoteMode       can be eliminated by proper design of the protocol and database.
+BadOnOff
+
+Synchronization:
+ 
+ - Device uses UDP, so we cannot rule out receiving any 
+error condition based on the internal state of the device (e.g. we can't be certain
+another application won't set the device to local when we send any given SET message).
+That is, we can't guarantee that enforcing atomicity in the database will result in 
+atomicity in the operations done in the device, unless we can be sure nothing else
+can talk to the device.
+Need to consider how to cope with this.
+
+I think for now we will not perform any error handling - instead we should make 
+sure that anything reporting on the internal state fetches the latest value from
+the GET record, not the value in the SET record - including the RBV of the SET record.
+No way to resolve the underlying synchronisation problem as UDP - all we can do is 
+poll for latest data regularly, check everything is OK, and make sure UI reflects 
+any failure to modify a variable. 
+
+
+

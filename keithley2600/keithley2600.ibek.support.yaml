@@ -52,14 +52,11 @@ entity_models:
         description: |-
           Highest current value settable on the device
         default: 1.5
-      name:
-        type: id
-        description: |-
-          Name to export to gda as
     databases:
       - file: keithley2600chan.template
         args:
           .*:
+
   - name: keithley2600
     description: |-
       Controls a Keithley 2600 source meter

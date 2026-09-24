@@ -25,10 +25,6 @@ entity_models:
         type: str
         description: |-
           Asyn port name
-      name:
-        type: id
-        description: |-
-          Name to export to gda as
     databases:
       - file: agilent53220.template
         args:

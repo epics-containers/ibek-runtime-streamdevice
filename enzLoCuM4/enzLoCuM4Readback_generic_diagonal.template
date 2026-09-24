@@ -1,0 +1,186 @@
+################################################################################
+# enzLoCuM4Readback_generic_vertical.template
+# Readback analogue signals from the enzLoCuM4 current amplifier.
+#
+# For BPM in diagonal configuration i.e. (+Y/-X, +Y/+X, -Y/-X, -Y/+X)
+#
+# substitutions:
+#% macro, device, device name
+#% macro, egu, units for positions
+#% macro, dtyp, DTYP of record for ai e.g. asynInt32
+#% macro, top_left, input link of record e.g. @asyn(ADC1 0)GENDATA
+#% macro, top_right, input link of record e.g. @asyn(ADC1 0)GENDATA
+#% macro, bottom_left, input link of record e.g. @asyn(ADC1 0)GENDATA
+#% macro, bottom_right, input link of record e.g. @asyn(ADC1 0)GENDATA
+#% macro, dtyp_wf, DTYP of record for waveforms e.g. asynInt32ArrayIn
+#% macro, top_left_wf, input link of record e.g. @asyn(ADC1 0)GENDATA
+#% macro, top_right_wf, input link of record e.g. @asyn(ADC1 0)GENDATA
+#% macro, bottom_left_wf, input link of record e.g. @asyn(ADC1 0)GENDATA
+#% macro, bottom_right_wf, input link of record e.g. @asyn(ADC1 0)
+#% macro, nelm, number of elements in waveform record
+#% macro, desc_prefix, Prefix for descriptions. Used by screens. E.g. 'PBPM Blade'
+################################################################################
+
+include "enzLoCuM4Readback_generic_common.template"
+
+#% archiver 1 Monitor
+record(ai, "$(device):BLADE1") {
+  field(DESC, "$(desc_prefix) 1")
+  field(DTYP, "$(dtyp)")
+  field(SCAN, ".1 second")
+  field(INP, "$(top_right)")
+  field(EGU, "A")
+  field(LINR, "LINEAR")
+  field(EGUF, "1e-10")
+  field(EGUL, "-1e-10")
+  field(HOPR, "1e-10")
+  field(LOPR, "-1e-10")
+  field(HIGH, "0.9e-10")
+  field(LOW, "-0.9e-10")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(MDEL, "-1")
+  field(PREC, "5")
+  field(FLNK, "$(device):BLADE2")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(device):BLADE2") {
+  field(DESC, "$(desc_prefix) 2")
+  field(DTYP, "$(dtyp)")
+  field(INP, "$(top_left)")
+  field(EGU, "A")
+  field(LINR, "LINEAR")
+  field(EGUF, "1e-10")
+  field(EGUL, "-1e-10")
+  field(HOPR, "1e-10")
+  field(LOPR, "-1e-10")
+  field(HIGH, "0.9e-10")
+  field(LOW, "-0.9e-10")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(MDEL, "-1")
+  field(PREC, "5")
+  field(FLNK, "$(device):BLADE3")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(device):BLADE3") {
+  field(DESC, "$(desc_prefix) 3")
+  field(DTYP, "$(dtyp)")
+  field(INP, "$(bottom_left)")
+  field(EGU, "A")
+  field(LINR, "LINEAR")
+  field(EGUF, "1e-10")
+  field(EGUL, "-1e-10")
+  field(HOPR, "1e-10")
+  field(LOPR, "-1e-10")
+  field(HIGH, "0.9e-10")
+  field(LOW, "-0.9e-10")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(MDEL, "-1")
+  field(PREC, "5")
+  field(FLNK, "$(device):BLADE4")
+}
+
+#% archiver 1 Monitor
+record(ai, "$(device):BLADE4") {
+  field(DESC, "$(desc_prefix) 4")
+  field(DTYP, "$(dtyp)")
+  field(INP, "$(bottom_right)")
+  field(EGU, "A")
+  field(LINR, "LINEAR")
+  field(EGUF, "1e-10")
+  field(EGUL, "-1e-10")
+  field(HOPR, "1e-10")
+  field(LOPR, "-1e-10")
+  field(HIGH, "0.9e-10")
+  field(LOW, "-0.9e-10")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+  field(MDEL, "-1")
+  field(PREC, "5")
+  field(FLNK, "$(device):INTENSITY")
+}
+
+record(waveform, "$(device):BLADE1WF") {
+  field(DESC, "Blade 1 waveform")
+  field(SCAN, "1 second")
+  field(DTYP, "$(dtyp_wf)")
+  field(INP, "$(top_right_wf)")
+  field(FTVL, "FLOAT")
+  field(NELM, "$(nelm)")
+#  field(FLNK, "$(device):BLADE2WF")
+}
+
+record(waveform, "$(device):BLADE2WF") {
+  field(DESC, "Blade 2 waveform")
+  field(SCAN, "1 second")
+  field(DTYP, "$(dtyp_wf)")
+  field(INP, "$(top_left_wf)")
+  field(FTVL, "FLOAT")
+  field(NELM, "$(nelm)")
+#  field(FLNK, "$(device):BLADE3WF")
+}
+
+record(waveform, "$(device):BLADE3WF") {
+  field(DESC, "Blade 3 waveform")
+  field(SCAN, "1 second")
+  field(DTYP, "$(dtyp_wf)")
+  field(INP, "$(bottom_left_wf)")
+  field(FTVL, "FLOAT")
+  field(NELM, "$(nelm)")
+#  field(FLNK, "$(device):BLADE4WF")
+}
+
+record(waveform, "$(device):BLADE4WF") {
+  field(DESC, "Blade 4 waveform")
+  field(SCAN, "1 second")
+  field(DTYP, "$(dtyp_wf)")
+  field(INP, "$(bottom_right_wf)")
+  field(FTVL, "FLOAT")
+  field(NELM, "$(nelm)")
+}
+
+record(stringout, "$(device):ORIENT_STR"){
+  field(OUT, "$(device):ORIENT")
+  field(PINI, "YES")
+  field(VAL, "Diagonal")
+  field(DTYP, "Soft Channel")
+}
+
+record(bi, "$(device):ORIENT"){
+  field(DTYP, "Soft Channel")
+  field(INP, "$(device):ORIENT_STR CA")
+  field(ZNAM, "Diagonal")
+  field(ONAM, "Vertical")
+}
+
+#% archiver 1 Monitor
+record(calc, "$(device):BEAMX") {
+  field(INPA, "$(device):BLADE1 NPP")
+  field(INPB, "$(device):BLADE2 NPP")
+  field(INPC, "$(device):BLADE3 NPP")
+  field(INPD, "$(device):BLADE4 NPP")
+  field(INPE, "$(device):KX NPP")
+  field(INPF, "$(device):OFFSETX NPP")
+  field(CALC, "(A+B+C+D)=0?0:(E*(A+D-B-C)/(A+B+C+D))+F")
+  field(FLNK, "$(device):BEAMY")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
+
+#% archiver 1 Monitor
+record(calc, "$(device):BEAMY") {
+  field(INPA, "$(device):BLADE1 NPP")
+  field(INPB, "$(device):BLADE2 NPP")
+  field(INPC, "$(device):BLADE3 NPP")
+  field(INPD, "$(device):BLADE4 NPP")
+  field(INPE, "$(device):KY NPP")
+  field(INPF, "$(device):OFFSETY NPP")
+  field(INPG, "$(device):ORIENT NPP")
+  field(CALC, "(A+B+C+D)=0?0:(E*(A+B-C-D)/(A+B+C+D))+F")
+  field(PREC, "5")
+  field(EGU, "$(egu)")
+}
