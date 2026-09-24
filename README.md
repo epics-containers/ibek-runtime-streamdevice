@@ -63,7 +63,13 @@ It vendors the runtime file types at the top of the folder into the instance's
 `config/`, and nothing else: `README.md`, the manifest itself and everything under
 `docs/`, `sim/` and `test/` stay here. A file that should reach the IOC must therefore
 sit at the top of the folder with one of those suffixes; a new runtime file type needs
-the regex extending in every manifest that ships one.
+the regex extending in every manifest that ships one. **A pattern with no
+`ibek.manifest.yaml` vendors every file in its folder** — the default is one mechanism,
+not two: an implicit manifest matching everything, into `config/`. A pattern only needs
+an explicit manifest once it holds files that are not meant to be vendored, such as
+`docs/`, `sim/` or `test/` — respectively the DLS module's own documentation and test
+material, and loadable `*_sim`/`simulation_*` templates for exercising the pattern's
+records against a plain simulation IOC rather than the real device.
 
 Each pattern's `README.md` says which DLS module and release the pattern came from,
 lists its entity models and which files are vendored, and records what a user needs to
@@ -96,14 +102,23 @@ lakeshore340/
 
 ## Faithful storage
 
-**Extracted device files stay as close to their DLS source as possible.** Copy
-byte-for-byte wherever the file works unmodified; where it cannot, apply only
-**mechanical, scripted, re-runnable** transformations and record that you did. Never
-hand-edit an extracted file. They carry **no provenance header**.
+**Extracted device files stay as close to their DLS source as possible.** A pattern's
+protocol/DB/template files are imported from the DLS module's **built `db/` directory**
+— the files as actually shipped in the release, already expanded by the module's own
+build — copied byte-for-byte wherever the file loads unmodified as-is. Where the built
+copy leaves a macro unresolved (a placeholder like `$(X,undefined)`), the source
+`<module>App/Db/*.template` is imported instead. Where a file cannot load unmodified
+(VisualDCT-authored databases — see Derived, below), apply only **mechanical,
+scripted, re-runnable** transformations and record what you did in the support yaml
+header, the way `celerotonChopper/celerotonChopper.ibek.support.yaml` and
+`VatLeakValve590/VatLeakValve590.ibek.support.yaml` do. A hand-authored msi derivation
+already in the library (for example `currAmp/`, `eurotherm2k/`, `oxCryo/`) is kept and
+merged with — never overwritten by — a re-import from a newer DLS release. Files
+imported this way carry **no provenance header** of their own.
 
-The point of the old byte-for-byte rule was to keep patterns diffable against future
-DLS releases. Reproducible derivation preserves that — you re-run the conversion on the
-new release and compare, instead of diffing text.
+Diffing a pattern against a newer DLS release means re-running the same import (or the
+same scripted transformation, or the same VDCT derivation) on that release and
+comparing the output, rather than diffing text against what is committed here.
 
 ### Pristine — always
 
@@ -311,7 +326,8 @@ Treat them as two views of one device and keep them in step.
 Not every DLS StreamDevice module can take the runtime path: some need a module-specific
 **compiled** library, `.dbd`, or SNL sequencer program that the generic
 `ioc-streamdevice` image does not ship, so they are build-time-only. Those modules — and
-the test used to tell them apart — are listed in [BUILD-TIME-ONLY.md](BUILD-TIME-ONLY.md).
+the test used to tell them apart — are listed in
+[_docs/BUILD-TIME-ONLY.md](_docs/BUILD-TIME-ONLY.md).
 
 ## Adding a new pattern
 
@@ -368,6 +384,17 @@ deliberately when the library adopts a new ibek. Known faults in the library
 content are listed, each with its reason, in `ci/template-load.yaml`,
 `ci/autosave-allow.yaml` and `ci/content-allow.yaml`; an entry that no longer
 applies fails its check, so remove it when the fault is fixed.
+
+## Documentation
+
+- [_docs/BUILD-TIME-ONLY.md](_docs/BUILD-TIME-ONLY.md) — StreamDevice modules that need a
+  module-specific compiled library, `.dbd`, or SNL sequencer program the generic
+  `ioc-streamdevice` image does not ship, and the test used to tell them apart.
+- [_docs/CHANGELOG-rescan.md](_docs/CHANGELOG-rescan.md) — per-pattern changes from the
+  most recent rescan of every pattern against its DLS source module's latest release.
+- [_docs/REJECTED_EXTRAS.md](_docs/REJECTED_EXTRAS.md) — upstream files (vendor manuals,
+  files marked private upstream, or ones holding personal or site-internal details) not
+  imported into any pattern, and why.
 
 ## License
 
