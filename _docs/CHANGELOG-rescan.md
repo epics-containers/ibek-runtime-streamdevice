@@ -31,9 +31,10 @@ An instance picks these up only when it moves its pin to a release containing th
 - **`name` parameter removed** wherever no template uses it (hard rule). An `ioc.yaml`
   that sets `name:` on these entities fails validation with *Extra inputs are not
   permitted*; delete the line. Patterns: `agilent33220A`, `agilent4UHV`, `agilent53220`, `agilentTurboPump`, `alicatGasFlow`, `APD-ACE`, `attocube`, `attocubeInterf`, `axisCameraControl`, `belektronig_btc`, `caenN1470`, `chemyxFusion`, `chillax`, `cognexDataMan100`, `CrateMonitor`, `CryoconM14`, `cyberstar`, `digitelMpc`, `EdwardsNextTurbo`, `EdwardsRangeGauge`, `EdwardsScroll`, `elmitecLEEM`, `enzLoCuM4`, `ETLdetector`, `fw102`, `gardasoftLED`, `GR150`, `gssExplorIR`, `harvardSyringe`, `keithley2400`, `keithley2600`, `Keithley6487`, `KeithleyDMM6500`, `keysight33500B`, `knauer`, `kriIonBeam`, `lakeshore218`, `lakeshore331`, `lakeshore340`, `laudaRE2xx`, `leyboldCenterOne`, `linkam`, `microlab500`, `mks937a`, `mks937b`, `newstep`, `norhofLN2`, `omegaIR2C`, `OxInstCryojet`, `OxInstIPS`, `PIpiezo`, `pr4000`, `SierraInstMassFlowMeters`, `specsVCU1000`, `SQC-310`, `SycosH-Hot`, `tdklambda`, `thermocube`, `thorlabsMcls1`, `VatLeakValve590`, `VCH10Light`, `vici`, `watson-marlow`, `WS300scale`, `zaber_T-LSR`.
-- **Other parameters removed** (each used only in template comments; accepted as
-  consumer breaks and tracked in [ibek#377](https://github.com/epics-containers/ibek/issues/377),
-  except `IPADDR`, whose asyn port the instance creates itself):
+- **Other parameters removed** (accepted as consumer breaks and tracked in
+  [ibek#377](https://github.com/epics-containers/ibek/issues/377). These parameters
+  are used only in template comments, except `IPADDR`, whose asyn port the instance
+  creates itself):
   - `attocubeInterf` `ids3010`: `label1`, `label2`, `label3` removed
   - `axisCameraControl` `axisCameraControl`: `IPADDR` removed
   - `CryoconM14` `M14_sensor`: `desc` removed
