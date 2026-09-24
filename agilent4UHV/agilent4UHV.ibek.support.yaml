@@ -5,6 +5,11 @@
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/agilent4UHV/ release.
+#
+# `agilent4UHVIonp`'s `databases.args` excludes its `CTLR` parameter by name (see the
+# comment there): `_agilent4UHVIonpTemplate` loads the same agilent4UHVIonp.template
+# with `.*`, and an instance holding one of each entity needs both to pass identical
+# args so ibek writes one ioc.subst block for the file.
 
 module: agilent4UHV
 
@@ -83,5 +88,12 @@ entity_models:
           Controller pumpnel
     databases:
       - file: agilent4UHVIonp.template
+        # CTLR is a parameter of this entity (the agilent4UHV controller
+        # object reference) but is not an agilent4UHVIonp.template macro.
+        # Excluding it by name, rather than matching every parameter with
+        # `.*`, keeps this entity's arg set identical to
+        # _agilent4UHVIonpTemplate's, which shares the same template file
+        # and does use `.*` - both entities then land in the same
+        # ioc.subst block.
         args:
-          .*:
+          (?!CTLR$).*:
