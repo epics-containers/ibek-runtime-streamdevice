@@ -1,0 +1,8 @@
+# Accepted content-scan findings: the file, the exact matched text, and why it
+# is accepted. An entry that no longer matches anything fails the check.
+
+# The table row records why isegHVPSU's documentation/manual.src was left out
+# of the library: it links to this intranet host. The row names the host; it
+# does not link to anything.
+- file: REJECTED_EXTRAS.md
+  match: http://diamdocs

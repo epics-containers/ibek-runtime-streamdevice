@@ -1,0 +1,14 @@
+# Known differences between a pattern's autosave tags and its .req files.
+# Each entry is one line of check_autosave.py output, with the reason it is
+# accepted. An entry that no longer matches a problem fails the check, so this
+# list only ever shrinks as the library is fixed.
+
+currAmp:
+  # CHANGELOG-rescan.md: no existing currAmp file is touched, to keep the
+  # unmerged I03-1110 branch's edits to this pattern mergeable. Its templates
+  # carry autosave tags but no .req files are shipped yet.
+  - problem: "YMCS0009_settings.req: missing; YMCS0009.template tags 8 PV(s)"
+  - problem: "YMCS0012_settings.req: missing; YMCS0012.template tags 8 PV(s)"
+  - problem: "currAmpADC_settings.req: missing; currAmpADC.template tags 4 PV(s)"
+  - problem: "currAmpRange_settings.req: missing; currAmpRange.template tags 4 PV(s)"
+  - problem: "currAmpRangeADC_settings.req: missing; currAmpRangeADC.template tags 4 PV(s)"

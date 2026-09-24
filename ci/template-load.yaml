@@ -1,0 +1,121 @@
+# Configuration for template_load.py.
+
+# values: parameter values for entity models whose placeholder values do not
+# load, as {pattern: {entity_model: {parameter: value}}}. Parameters with a
+# default keep it; other parameters get a placeholder by type (int 1,
+# float 1.0, enum its first value, str "1", which loads as a name or a number).
+values:
+  d2afe:
+    # CMD names the protocol the record runs
+    attenuator_cmd: {CMD: att_set}
+    generic_cmd: {CMD: reset}
+  leybold:
+    # FPARAM and IPARAM name two different records
+    read_int_floatE: {FPARAM: F, IPARAM: I}
+    read_write_int_floatE: {FPARAM: F, IPARAM: I}
+
+# xfail: templates that need more than the generic ioc-streamdevice image, as
+# listed in BUILD-TIME-ONLY.md "Runtime patterns with marked templates". They
+# must fail to load; one that loads fails the check until it is removed here.
+xfail:
+  - pattern: PIpiezo
+    template: E871-absGrp.template
+    reason: 'the motor record'
+  - pattern: PIpiezo
+    template: PI-E516.template
+    reason: 'the motor record'
+  - pattern: d2afe
+    template: fwVersionCheck.template
+    reason: 'compiled aSub routine checkFW'
+  - pattern: enzLoCuM4
+    template: enzLoCuM4Readback.template
+    reason: 'DTYP "Hy8401ip" (Hytec IP ADC)'
+  - pattern: eurotherm2k
+    template: eurothermModbus.template
+    reason: 'compiled Modbus asyn driver'
+  - pattern: eurotherm2k
+    template: eurothermModbusLoop.template
+    reason: 'compiled Modbus asyn driver'
+  - pattern: eurotherm2k
+    template: eurothermModbusPV.template
+    reason: 'compiled Modbus asyn driver'
+  - pattern: leybold
+    template: centerN.template
+    reason: 'compiled asyn driver centerNConfig'
+  - pattern: leybold
+    template: coolpak.template
+    reason: 'compiled asyn driver coolpakConfig'
+  - pattern: microlab500
+    template: microlab500whole.template
+    reason: 'the motor record'
+  - pattern: mks937a
+    template: mks937aGauge.template
+    reason: 'DTYP "$(aitype=Hy8401ip)"'
+  - pattern: mks937a
+    template: mks937aImgMean.template
+    reason: 'compiled aSub routines mks937aMeanInit, mks937aMeanCalc'
+  - pattern: mks937b
+    template: mks937bHy8401.template
+    reason: 'DTYP "Hy8401ip"'
+  - pattern: mks937b
+    template: mks937bImgMean.template
+    reason: 'compiled aSub routines mks937bMeanInit, mks937bMeanCalc'
+  - pattern: strainGauge
+    template: strainGauge.template
+    reason: 'compiled aSub routine parseSetpointValue'
+  - pattern: yaskawaBARTRobot
+    template: BARTRobot.db
+    reason: 'compiled aSub routines DecToAsc, GripperState; compiled FINS asyn driver'
+  - pattern: leybold
+    template: read_floatE.template
+    reason: 'protocol get_floatE, which leybold.proto (and leybold 2-2 upstream) lacks'
+
+# known_errors: error lines, matched as substrings, that a template's case is
+# allowed to print because the library content has a known fault. Each must
+# still occur, so an entry is removed once the fault is fixed.
+known_errors:
+  # Faults copied faithfully from the DLS release; each record still loads.
+  # A link field holding a bare "@" on a record whose device support is not
+  # INST_IO: EPICS 7 reports it and leaves the link CONSTANT.
+  - pattern: APD-ACE
+    template: apd-ace.template
+    error: '1:ERRORSTATUS.SIOL: can''t initialize link type CONSTANT with "@"'
+  - pattern: alicatGasFlow
+    template: alicatPressureCtrl.template
+    error: '11:DGAIN:WR.DOL: can''t initialize link type CONSTANT with "@"'
+  - pattern: alicatGasFlow
+    template: alicatMassCtrl.template
+    error: '11:DGAIN:WR.DOL: can''t initialize link type CONSTANT with "@"'
+  # A StreamDevice INP link on a record with no DTYP "stream": the record
+  # never talks to the device.
+  - pattern: CryoconM32
+    template: M32_system.template
+    error: '1:STS:SINKTEMP.INP: can''t initialize link type CONSTANT'
+  - pattern: CryoconM32
+    template: M32_system.template
+    error: '1:STS:AMBIENTTEMP.INP: can''t initialize link type CONSTANT'
+  - pattern: PIpiezo
+    template: C877.template
+    error: '111:REF:MODE.INP: can''t initialize link type CONSTANT'
+  # Not a fault: getvdformat redirects into the records of all 24 ODPsuChannel
+  # entities (CHAN 0 to 23), as ODPsuV2.protocol notes; the test instance
+  # has one, with CHAN 1.
+  - pattern: ODPsu
+    template: ODPsuV2.template
+    error: "ODPsuV2.protocol line 62: Field '11:FMT:V0DR.RVAL' not found"
+  - pattern: ODPsu
+    template: ODPsuV2.template
+    error: '11:FMT:GET: Protocol parse error'
+
+# generate_together_xfail: patterns whose entity models, one of each in a
+# single instance, fail `ibek runtime generate2`.
+generate_together_xfail:
+  # Two entity models load the same template with different parameters
+  # (_digitelMpcIonpTemplate and digitelMpcIonp: digitelMpcIonp.template;
+  # _agilent4UHVIonpTemplate and agilent4UHVIonp: agilent4UHVIonp.template).
+  # ibek writes one substitution-file column set per template, so an instance
+  # using both models fails with IndexError in RenderDb.align_columns.
+  - pattern: digitelMpc
+    reason: two entity models load digitelMpcIonp.template with different parameters
+  - pattern: agilent4UHV
+    reason: two entity models load agilent4UHVIonp.template with different parameters

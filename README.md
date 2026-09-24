@@ -340,6 +340,35 @@ the test used to tell them apart — are listed in [BUILD-TIME-ONLY.md](BUILD-TI
 5. Open a PR. Once merged, **cut a new semver tag** (`vX.Y.Z`) so consumers can pin the
    new pattern; Renovate will then offer the bump downstream.
 
+## CI checks
+
+Every pull request runs the checks in `ci/`, which also run locally from the
+repo root with [uv](https://docs.astral.sh/uv/):
+
+| Check | Command |
+|---|---|
+| Schema: each `*.ibek.support.yaml` against the pinned ibek release's `ibek.support.schema.json` and ibek's loader; each `ibek.manifest.yaml` through ibek's vendoring plan | `uv run --with-requirements ci/requirements.txt ci/check_schema.py` |
+| Autosave: each `.req` file holds exactly the PVs its template's `# % autosave` tags give | `uv run --with-requirements ci/requirements.txt ci/check_autosave.py` |
+| Content: no hostnames, IP addresses, internal URLs or credentials | `uv run --with-requirements ci/requirements.txt ci/check_content.py` |
+| Pattern add: a real `ibek pattern add` of every pattern, and of a sample together, into a scratch services repo; checks the lock, the vendored files, the instance schema and `ibek pattern check` | `uv run --with-requirements ci/requirements.txt ci/check_pattern_add.py` |
+| Template load: every vendored template loaded through `iocInit` in the generic `ioc-streamdevice` IOC, with the macros its entity model passes | see below |
+
+Each takes pattern names to check only those patterns. The template load test
+runs inside the published generic IOC image named in `.github/workflows/ci.yml`:
+
+```bash
+uv run --with-requirements ci/requirements.txt ci/template_load.py prepare build/load
+docker run --rm -v "$PWD:$PWD" -w "$PWD" \
+    ghcr.io/epics-containers/ioc-streamdevice-runtime:2.8.26ec4 \
+    python ci/template_load.py run build/load
+```
+
+The ibek version the checks use is pinned in `ci/requirements.txt`; move it
+deliberately when the library adopts a new ibek. Known faults in the library
+content are listed, each with its reason, in `ci/template-load.yaml`,
+`ci/autosave-allow.yaml` and `ci/content-allow.yaml`; an entry that no longer
+applies fails its check, so remove it when the fault is fixed.
+
 ## License
 
 [Apache License 2.0](LICENSE).
