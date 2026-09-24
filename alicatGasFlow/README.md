@@ -40,3 +40,7 @@ Everything else in this folder stays in the library and is never vendored:
 - `docs/` - documentation from the DLS source release (1 file)
 - `sim/` - device simulator from the DLS source release (3 files)
 - `test/` - device tests from the DLS source release (1 file)
+
+## Upstream defects carried as-is
+
+- `DGAIN:WR` has a bare `DOL "@"` (`alicatMassCtrl.template:127`, `alicatPressureCtrl.template:107`)

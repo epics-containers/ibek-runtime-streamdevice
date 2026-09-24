@@ -1,8 +1,12 @@
 # eurotherm2k
 
 Runtime StreamDevice pattern imported from the DLS support module `eurotherm2k`, release
-`2-10` (`/dls_sw/prod/R3.14.12.7/support/eurotherm2k/2-10`). Its files are pristine
-copies of that release.
+`2-10` (`/dls_sw/prod/R3.14.12.7/support/eurotherm2k/2-10`). Its templates and protocol
+file are pristine copies of that release. The `eurotherm2k.eurotherm2k` entity model is
+hand-written
+([ibek-runtime-streamdevice#22](https://github.com/epics-containers/ibek-runtime-streamdevice/issues/22))
+and sets its own defaults for `SPMAX` (`100`) and `EGU` (`C/min`), which differ from
+`eurotherm2k.template`'s defaults of `1000` and `C/s`.
 
 How each file was obtained, and any change made to it, is recorded in the header of
 [`eurotherm2k.ibek.support.yaml`](eurotherm2k.ibek.support.yaml). That header is
