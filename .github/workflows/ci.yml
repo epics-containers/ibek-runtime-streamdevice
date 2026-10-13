@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # generate-pvi.py reads the DLS annotations from git history
+          fetch-depth: 0
 
       - uses: astral-sh/setup-uv@v10.2.0
         with:
@@ -37,6 +40,14 @@ jobs:
       - name: ibek pattern add
         if: ${{ !cancelled() }}
         run: $UV_RUN ci/check_pattern_add.py
+
+      - name: PVI device yamls against the templates
+        if: ${{ !cancelled() }}
+        run: uv run generate-pvi.py --check
+
+      - name: PVI screens render and their PVs resolve
+        if: ${{ !cancelled() }}
+        run: $UV_RUN ci/check_pvi.py
 
   template-load:
     runs-on: ubuntu-latest

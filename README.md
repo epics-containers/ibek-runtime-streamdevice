@@ -402,9 +402,11 @@ repo root with [uv](https://docs.astral.sh/uv/):
 | Autosave: each `.req` file holds exactly the PVs its template's `# % autosave` tags give | `uv run --with-requirements ci/requirements.txt ci/check_autosave.py` |
 | Content: no hostnames, IP addresses, internal URLs or credentials | `uv run --with-requirements ci/requirements.txt ci/check_content.py` |
 | Pattern add: a real `ibek pattern add` of every pattern, and of a sample together, into a scratch services repo; checks the lock, the vendored files, the instance schema and `ibek pattern check` | `uv run --with-requirements ci/requirements.txt ci/check_pattern_add.py` |
+| PVI drift: every `*.pvi.device.yaml` and `pvi:` block is what `generate-pvi.py` writes from the templates (needs a full clone, see [PVI screens](#pvi-screens)) | `uv run generate-pvi.py --check` |
+| PVI render: one IOC with an entity of every entity model, all patterns' files flattened into its `config/`, through `ibek runtime generate2` with PVI on; every device yaml loads in pvi and renders a `.bob`, every model with databases has a screen on the index, and every PV on a screen (subscreens included) resolves, with the index button's macros, to a record its model's templates create | `uv run --with-requirements ci/requirements.txt ci/check_pvi.py` |
 | Template load: every vendored template loaded through `iocInit` in the generic `ioc-streamdevice` IOC, with the macros its entity model passes | see below |
 
-Each takes pattern names to check only those patterns. The template load test
+Each takes pattern names to check only those patterns (`ci/check_pvi.py --keep DIR` keeps the generated IOC files). The template load test
 runs inside the published generic IOC image named in `.github/workflows/ci.yml`:
 
 ```bash

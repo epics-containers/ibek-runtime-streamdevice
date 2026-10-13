@@ -2,3 +2,5 @@
 # the library adopts a new ibek.
 ibek>=4.8.0b1
 jsonschema
+# generate-pvi.py, whose template parser check_pvi.py reuses
+pyyaml
