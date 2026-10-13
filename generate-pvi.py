@@ -186,7 +186,12 @@ CONTROLDESK = re.compile(
 )
 ARCHIVER = re.compile(r"^\s*#\s*%\s*archiver\b")
 AUTOSAVE = re.compile(r"^\s*#+\s*%\s*autosave\s+(\d)\s*(.*?)\s*$")
-TOKEN = re.compile(r'"(?:[^"\\]|\\.)*"|#[^\n]*|[(){},]|[^\s(){},"#]+')
+# An unquoted word may contain macro references such as $(P) or ${P=x}, whose
+# brackets (one level of nesting) are part of the word, not record punctuation.
+_MACRO_REF = r"\$(?:\((?:[^()\s]|\$\([^()\s]*\))*\)|\{(?:[^{}\s]|\$\{[^{}\s]*\})*\})"
+TOKEN = re.compile(
+    r'"(?:[^"\\]|\\.)*"|#[^\n]*|[(){},]|(?:' + _MACRO_REF + r'|[^\s(){},"#])+'
+)
 MACRO = re.compile(r"\$[({]([A-Za-z_][A-Za-z0-9_]*)(?:=([^)}]*))?[)}]")
 
 
@@ -333,6 +338,27 @@ def history_annotations(pattern: Path) -> dict[str, dict]:
     annotations as a list of (label, raw pv, heading).
     """
     result: dict = {}
+    check = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "rev-parse",
+            "--verify",
+            f"{ANNOTATION_REF}^{{commit}}",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if check.returncode:
+        raise SystemExit(
+            f"Cannot resolve ANNOTATION_REF {ANNOTATION_REF} in {ROOT}: "
+            f"{check.stderr.strip()}\n"
+            "The '# % gui' annotations are read from git history, so this needs a "
+            "full clone (git fetch --unshallow; in CI use actions/checkout with "
+            "fetch-depth: 0), not a shallow clone or git archive."
+        )
     for f in sorted(pattern.glob("*.template")) + sorted(pattern.glob("*.db")):
         rel = f"{pattern.name}/{f.name}"
         try:
@@ -343,7 +369,7 @@ def history_annotations(pattern: Path) -> dict[str, dict]:
                 check=True,
             ).stdout
         except subprocess.CalledProcessError:
-            continue
+            continue  # the file did not exist at ANNOTATION_REF
         heading = ""
         found: dict[str, tuple[str, str, str]] = {}
         commands: list[tuple[str, str, str]] = []

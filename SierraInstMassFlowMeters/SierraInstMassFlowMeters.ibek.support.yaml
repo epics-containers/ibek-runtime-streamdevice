@@ -31,4 +31,6 @@ entity_models:
           .*:
     pvi:
       yaml_path: SierraInstMassFlowMeters.pvi.device.yaml
-      ui_macros: {}
+      ui_macros:
+        P:
+        Q:
