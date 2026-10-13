@@ -37,6 +37,10 @@ entity_models:
       - file: mks937a.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937a.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aGauge
     description: |-
@@ -101,6 +105,11 @@ entity_models:
       - file: mks937aGauge.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aGauge.pvi.device.yaml
+      ui_macros:
+        dom:
+        id:
 
   - name: mks937aGaugeGroup
     description: |-
@@ -156,6 +165,10 @@ entity_models:
       - file: mks937aGaugeGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aGaugeGroup.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aImg
     description: |-
@@ -382,6 +395,10 @@ entity_models:
       - file: mks937aImg.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aImg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aImgDummy
     description: |-
@@ -445,6 +462,10 @@ entity_models:
       - file: mks937aImgDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aImgDummy.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aImgGroup
     description: |-
@@ -494,6 +515,10 @@ entity_models:
       - file: mks937aImgGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aImgGroup.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aImgMean
     description: |-
@@ -556,6 +581,10 @@ entity_models:
       - file: mks937aImgMean.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aImgMean.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aInterlock
     description: |-
@@ -585,6 +614,10 @@ entity_models:
       - file: mks937aInterlock.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aInterlock.pvi.device.yaml
+      ui_macros:
+        interlock:
 
   - name: mks937aPirg
     description: |-
@@ -661,6 +694,10 @@ entity_models:
       - file: mks937aPirg.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aPirg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aPirgDummy
     description: |-
@@ -674,6 +711,10 @@ entity_models:
       - file: mks937aPirgDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aPirgDummy.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aPirgGroup
     description: |-
@@ -719,6 +760,10 @@ entity_models:
       - file: mks937aPirgGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aPirgGroup.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aPlogADC
     description: |-
@@ -736,6 +781,10 @@ entity_models:
       - file: mks937aPlogADC.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aPlogADC.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937aPlogEGU
     description: |-
@@ -753,3 +802,7 @@ entity_models:
       - file: mks937aPlogEGU.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937aPlogEGU.pvi.device.yaml
+      ui_macros:
+        device:

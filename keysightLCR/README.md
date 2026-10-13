@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `keysightLCR.ibek.support.yaml`
 - `keysightLCR.proto`
+- `keysightLCR.pvi.device.yaml`
 - `keysightLCR.template`
 - `keysightLCR_settings.req`
 

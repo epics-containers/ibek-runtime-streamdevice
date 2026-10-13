@@ -25,3 +25,7 @@ entity_models:
       - file: telna.template
         args:
           .*:
+    pvi:
+      yaml_path: telna.pvi.device.yaml
+      ui_macros:
+        P:

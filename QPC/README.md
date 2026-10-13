@@ -23,6 +23,8 @@ instance's `config/`:
 - `QPC.ibek.support.yaml`
 - `digitelQPCController.template`
 - `digitelQpc.proto`
+- `digitelQpc.pvi.device.yaml`
+- `digitelQpcIonp.pvi.device.yaml`
 - `digitelQpcIonp.template`
 
 Everything else in this folder stays in the library and is never vendored:

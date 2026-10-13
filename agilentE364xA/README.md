@@ -22,8 +22,10 @@ it.
 instance's `config/`:
 
 - `E364xA.proto`
+- `E364xA.pvi.device.yaml`
 - `E364xA.template`
 - `agilentE364xA.ibek.support.yaml`
+- `caputcallback.pvi.device.yaml`
 - `caputcallback.template`
 
 Everything else in this folder stays in the library and is never vendored:

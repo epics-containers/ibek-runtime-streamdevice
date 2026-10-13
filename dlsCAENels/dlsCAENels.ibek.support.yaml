@@ -37,6 +37,10 @@ entity_models:
       - file: dlsCAENels.template
         args:
           .*:
+    pvi:
+      yaml_path: dlsCAENels.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: dlsCAENelsGroup
     description: |-
@@ -62,6 +66,11 @@ entity_models:
       - file: dlsCAENels_group.template
         args:
           .*:
+    pvi:
+      yaml_path: dlsCAENelsGroup.pvi.device.yaml
+      ui_macros:
+        P:
+        GR:
 
   - name: dlsCAENelsChannel
     description: |-
@@ -87,3 +96,9 @@ entity_models:
       - file: dlsCAENels_channel.template
         args:
           .*:
+    pvi:
+      yaml_path: dlsCAENelsChannel.pvi.device.yaml
+      ui_macros:
+        P:
+        GR:
+        CH:

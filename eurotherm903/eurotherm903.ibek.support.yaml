@@ -62,3 +62,8 @@ entity_models:
       - file: eurotherm903.template
         args:
           .*:
+    pvi:
+      yaml_path: Eurotherm903.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

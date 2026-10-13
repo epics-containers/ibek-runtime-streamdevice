@@ -25,6 +25,8 @@ instance's `config/`:
 - `agilentTurboPump.ibek.support.yaml`
 - `agilentTwisTorr305-FS.template`
 - `agilentTwisTorr305-IC.template`
+- `twisTorr305FS.pvi.device.yaml`
+- `twisTorr305IC.pvi.device.yaml`
 
 Everything else in this folder stays in the library and is never vendored:
 

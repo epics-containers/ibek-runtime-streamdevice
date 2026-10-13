@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `GR150.ibek.support.yaml`
 - `gr150.protocol`
+- `gr150.pvi.device.yaml`
 - `gr150.template`
 
 Everything else in this folder stays in the library and is never vendored:

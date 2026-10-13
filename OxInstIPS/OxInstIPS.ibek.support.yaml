@@ -30,3 +30,7 @@ entity_models:
       - file: OxInstIPS.template
         args:
           .*:
+    pvi:
+      yaml_path: OxInstIPS.pvi.device.yaml
+      ui_macros:
+        P:

@@ -35,3 +35,7 @@ entity_models:
       - file: ttiEX355P.template
         args:
           .*:
+    pvi:
+      yaml_path: ttiEX355P.pvi.device.yaml
+      ui_macros:
+        P:

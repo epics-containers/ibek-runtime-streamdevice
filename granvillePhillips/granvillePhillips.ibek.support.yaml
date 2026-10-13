@@ -25,6 +25,10 @@ entity_models:
       - file: gp350.template
         args:
           .*:
+    pvi:
+      yaml_path: gp350.pvi.device.yaml
+      ui_macros:
+        gctrl:
 
   - name: gp307
     description: |-
@@ -42,6 +46,10 @@ entity_models:
       - file: gp307.template
         args:
           .*:
+    pvi:
+      yaml_path: gp307.pvi.device.yaml
+      ui_macros:
+        gctrl:
 
   - name: gp307Gauge
     description: |-
@@ -59,6 +67,11 @@ entity_models:
       - file: gp307Gauge.template
         args:
           .*:
+    pvi:
+      yaml_path: gp307Gauge.pvi.device.yaml
+      ui_macros:
+        dom:
+        id:
 
   - name: gp307Hcg
     description: |-
@@ -84,6 +97,10 @@ entity_models:
       - file: gp307Hcg.template
         args:
           .*:
+    pvi:
+      yaml_path: gp307Hcg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: gp307HcgDummy
     description: |-
@@ -97,6 +114,10 @@ entity_models:
       - file: gp307HcgDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: gp307HcgDummy.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: gp307Pirg
     description: |-
@@ -172,6 +193,10 @@ entity_models:
       - file: gp307Pirg.template
         args:
           .*:
+    pvi:
+      yaml_path: gp307Pirg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: gp307PirgDummy
     description: |-
@@ -235,6 +260,10 @@ entity_models:
       - file: gp307PirgDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: gp307PirgDummy.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: gp350Gauge
     description: |-
@@ -252,6 +281,11 @@ entity_models:
       - file: gp350Gauge.template
         args:
           .*:
+    pvi:
+      yaml_path: gp350Gauge.pvi.device.yaml
+      ui_macros:
+        dom:
+        id:
 
   - name: gp350Hcg
     description: |-
@@ -273,6 +307,10 @@ entity_models:
       - file: gp350Hcg.template
         args:
           .*:
+    pvi:
+      yaml_path: gp350Hcg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: gp350HcgDummy
     description: |-
@@ -286,6 +324,10 @@ entity_models:
       - file: gp350HcgDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: gp350HcgDummy.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: gp350Pirg
     description: |-
@@ -361,6 +403,10 @@ entity_models:
       - file: gp350Pirg.template
         args:
           .*:
+    pvi:
+      yaml_path: gp350Pirg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: gp350PirgDummy
     description: |-
@@ -424,3 +470,7 @@ entity_models:
       - file: gp350PirgDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: gp350PirgDummy.pvi.device.yaml
+      ui_macros:
+        device:

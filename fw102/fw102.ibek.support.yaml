@@ -56,3 +56,8 @@ entity_models:
       - file: fw102.template
         args:
           .*:
+    pvi:
+      yaml_path: _fw102Template.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

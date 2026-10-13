@@ -33,6 +33,11 @@ entity_models:
       - file: ETLdetector.template
         args:
           .*:
+    pvi:
+      yaml_path: ETLdetector.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: ETLdetectorDebug
     description: |-
@@ -50,3 +55,7 @@ entity_models:
       - file: ETLdetectorDebug.template
         args:
           .*:
+    pvi:
+      yaml_path: ETLdetectorDebug.pvi.device.yaml
+      ui_macros:
+        P:

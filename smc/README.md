@@ -21,11 +21,14 @@ pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `magnet.pvi.device.yaml`
 - `magnet.template`
 - `magnet_settings.req`
 - `smc.ibek.support.yaml`
 - `smc.protocol`
+- `smc.pvi.device.yaml`
 - `smc.template`
+- `smcTripleAxis.pvi.device.yaml`
 - `smcTripleAxis.template`
 - `smc_settings.req`
 

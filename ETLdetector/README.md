@@ -23,7 +23,9 @@ instance's `config/`:
 
 - `ETLdetector.ibek.support.yaml`
 - `ETLdetector.protocol`
+- `ETLdetector.pvi.device.yaml`
 - `ETLdetector.template`
+- `ETLdetectorDebug.pvi.device.yaml`
 - `ETLdetectorDebug.template`
 - `ETLdetector_settings.req`
 

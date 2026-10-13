@@ -31,6 +31,10 @@ entity_models:
       - file: centerN.template
         args:
           .*:
+    pvi:
+      yaml_path: centerN.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: coolpak
     description: |-
@@ -49,6 +53,10 @@ entity_models:
       - file: coolpak.template
         args:
           .*:
+    pvi:
+      yaml_path: coolpak.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: read_floatE
     description: |-
@@ -78,6 +86,11 @@ entity_models:
       - file: read_floatE.template
         args:
           .*:
+    pvi:
+      yaml_path: read_floatE.pvi.device.yaml
+      ui_macros:
+        P:
+        PARAM:
 
   - name: read_float_float_float
     description: |-
@@ -107,6 +120,11 @@ entity_models:
       - file: read_float_float_float.template
         args:
           .*:
+    pvi:
+      yaml_path: read_float_float_float.pvi.device.yaml
+      ui_macros:
+        P:
+        PARAM:
 
   - name: read_int
     description: |-
@@ -136,6 +154,11 @@ entity_models:
       - file: read_int.template
         args:
           .*:
+    pvi:
+      yaml_path: read_int.pvi.device.yaml
+      ui_macros:
+        P:
+        PARAM:
 
   - name: read_int_floatE
     description: |-
@@ -345,6 +368,12 @@ entity_models:
       - file: read_int_floatE.template
         args:
           .*:
+    pvi:
+      yaml_path: read_int_floatE.pvi.device.yaml
+      ui_macros:
+        P:
+        FPARAM:
+        IPARAM:
 
   - name: read_string
     description: |-
@@ -374,6 +403,11 @@ entity_models:
       - file: read_string.template
         args:
           .*:
+    pvi:
+      yaml_path: read_string.pvi.device.yaml
+      ui_macros:
+        P:
+        PARAM:
 
   - name: read_write_float
     description: |-
@@ -424,6 +458,11 @@ entity_models:
       - file: read_write_float.template
         args:
           .*:
+    pvi:
+      yaml_path: read_write_float.pvi.device.yaml
+      ui_macros:
+        P:
+        PARAM:
 
   - name: read_write_floatE_floatE
     description: |-
@@ -469,6 +508,13 @@ entity_models:
       - file: read_write_floatE_floatE.template
         args:
           .*:
+    pvi:
+      yaml_path: read_write_floatE_floatE.pvi.device.yaml
+      ui_macros:
+        P:
+        PARAM:
+        SUF1:
+        SUF2:
 
   - name: read_write_int
     description: |-
@@ -840,6 +886,11 @@ entity_models:
       - file: read_write_int.template
         args:
           .*:
+    pvi:
+      yaml_path: read_write_int.pvi.device.yaml
+      ui_macros:
+        P:
+        PARAM:
 
   - name: read_write_int_floatE
     description: |-
@@ -1211,6 +1262,12 @@ entity_models:
       - file: read_write_int_floatE.template
         args:
           .*:
+    pvi:
+      yaml_path: read_write_int_floatE.pvi.device.yaml
+      ui_macros:
+        P:
+        IPARAM:
+        FPARAM:
 
   - name: write_raw_int
     description: |-
@@ -1249,3 +1306,8 @@ entity_models:
       - file: write_raw_int.template
         args:
           .*:
+    pvi:
+      yaml_path: write_raw_int.pvi.device.yaml
+      ui_macros:
+        P:
+        PARAM:

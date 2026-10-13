@@ -38,6 +38,11 @@ entity_models:
       - file: ODPsu.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsu.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: ODPsuV2
     description: |-
@@ -59,6 +64,11 @@ entity_models:
       - file: ODPsuV2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsuV2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: ODPsuChannel
     description: |-
@@ -88,6 +98,12 @@ entity_models:
       - file: ODPsuChannel.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsuChannel.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        CHAN:
 
   - name: ODPsuChannelV2
     description: |-
@@ -125,6 +141,12 @@ entity_models:
       - file: ODPsuChannelV2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsuChannelV2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        CHAN:
 
   - name: ODPsuBank
     description: |-
@@ -150,6 +172,12 @@ entity_models:
       - file: ODPsuBank.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsuBank.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
 
   - name: ODPsuBankV2
     description: |-
@@ -175,6 +203,12 @@ entity_models:
       - file: ODPsuBankV2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsuBankV2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
 
   - name: ODPsuFormat16
     description: |-
@@ -196,6 +230,11 @@ entity_models:
       - file: ODPsuFormat16.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsuFormat16.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: ODPsuFormat22
     description: |-
@@ -217,6 +256,11 @@ entity_models:
       - file: ODPsuFormat22.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsuFormat22.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: ODPsugda
     description: |-
@@ -254,6 +298,13 @@ entity_models:
       - file: ODPsugda.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugdaV2
     description: |-
@@ -287,6 +338,13 @@ entity_models:
       - file: ODPsugdaV2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugdaV2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda24
     description: |-
@@ -320,6 +378,13 @@ entity_models:
       - file: ODPsugda24.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda24.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda16
     description: |-
@@ -353,6 +418,13 @@ entity_models:
       - file: ODPsugda16.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda16.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda14
     description: |-
@@ -386,6 +458,13 @@ entity_models:
       - file: ODPsugda14.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda14.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda12
     description: |-
@@ -419,6 +498,13 @@ entity_models:
       - file: ODPsugda12.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda12.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda8
     description: |-
@@ -452,6 +538,13 @@ entity_models:
       - file: ODPsugda8.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda8.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda7
     description: |-
@@ -485,6 +578,13 @@ entity_models:
       - file: ODPsugda7.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda7.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda24V2
     description: |-
@@ -514,6 +614,13 @@ entity_models:
       - file: ODPsugda24V2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda24V2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda16V2
     description: |-
@@ -543,6 +650,13 @@ entity_models:
       - file: ODPsugda16V2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda16V2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda14V2
     description: |-
@@ -572,6 +686,13 @@ entity_models:
       - file: ODPsugda14V2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda14V2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda12V2
     description: |-
@@ -601,6 +722,13 @@ entity_models:
       - file: ODPsugda12V2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda12V2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda8V2
     description: |-
@@ -630,6 +758,13 @@ entity_models:
       - file: ODPsugda8V2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda8V2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsugda7V2
     description: |-
@@ -659,6 +794,13 @@ entity_models:
       - file: ODPsugda7V2.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsugda7V2.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        BANK:
+        PV:
 
   - name: ODPsu16DUpdate
     description: |-
@@ -676,6 +818,11 @@ entity_models:
       - file: ODPsu16DUpdate.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsu16DUpdate.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: ODPsu22DUpdate
     description: |-
@@ -693,6 +840,11 @@ entity_models:
       - file: ODPsu22DUpdate.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsu22DUpdate.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: ODPsu24DUpdate
     description: |-
@@ -710,3 +862,8 @@ entity_models:
       - file: ODPsu24DUpdate.template
         args:
           .*:
+    pvi:
+      yaml_path: ODPsu24DUpdate.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

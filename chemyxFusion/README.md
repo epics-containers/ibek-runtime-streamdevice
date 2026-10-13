@@ -20,6 +20,7 @@ it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `Fusion4000.pvi.device.yaml`
 - `chemyxFusion.ibek.support.yaml`
 - `fusion4000.proto`
 - `fusion4000.template`

@@ -21,6 +21,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `_chillaxSubstituionsTemplate.pvi.device.yaml`
 - `chillax.ibek.support.yaml`
 - `chillax.proto`
 - `chillax_abs.db`

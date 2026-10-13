@@ -114,6 +114,11 @@ entity_models:
       - file: nx100.template
         args:
           .*:
+    pvi:
+      yaml_path: nx100.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: nx100dvar
     description: |-
@@ -143,6 +148,12 @@ entity_models:
       - file: nx100dvar.template
         args:
           .*:
+    pvi:
+      yaml_path: nx100dvar.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        VAR:
 
   - name: nx100io
     description: |-
@@ -212,6 +223,12 @@ entity_models:
       - file: nx100io.template
         args:
           .*:
+    pvi:
+      yaml_path: nx100io.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        VAR:
 
   - name: nx100pvar
     description: |-
@@ -241,3 +258,9 @@ entity_models:
       - file: nx100pvar.template
         args:
           .*:
+    pvi:
+      yaml_path: nx100pvar.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        VAR:

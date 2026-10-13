@@ -33,3 +33,8 @@ entity_models:
       - file: NSC200.template
         args:
           .*:
+    pvi:
+      yaml_path: NSC200.pvi.device.yaml
+      ui_macros:
+        P:
+        M:

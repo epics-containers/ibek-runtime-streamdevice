@@ -19,6 +19,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `EBE4.pvi.device.yaml`
 - `ebe4.db`
 - `ebe4.proto`
 - `ebe4_settings.req`

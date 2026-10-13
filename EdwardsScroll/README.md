@@ -23,7 +23,9 @@ instance's `config/`:
 
 - `EdScroll.proto`
 - `EdwardsScroll.ibek.support.yaml`
+- `EdwardsScroll.pvi.device.yaml`
 - `EdwardsScroll.template`
+- `EdwardsScroll_SerialOnOffExtra.pvi.device.yaml`
 - `EdwardsScroll_SerialOnOffExtra.template`
 
 Everything else in this folder stays in the library and is never vendored:

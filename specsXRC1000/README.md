@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `specsXRC1000.ibek.support.yaml`
 - `specsXRC1000.proto`
+- `specsXRC1000.pvi.device.yaml`
 - `specsXRC1000.template`
 
 Everything else in this folder stays in the library and is never vendored:

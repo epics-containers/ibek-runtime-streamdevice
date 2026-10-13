@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `kellerPyrometer.ibek.support.yaml`
 - `kellerPyrometer.proto`
+- `kellerPyrometer.pvi.device.yaml`
 - `kellerPyrometer.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `VCH10Light.ibek.support.yaml`
 - `VCH10Light.proto`
+- `VCH10Light.pvi.device.yaml`
 - `VCH10Light.template`
 
 Everything else in this folder stays in the library and is never vendored:

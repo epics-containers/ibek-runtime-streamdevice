@@ -45,3 +45,8 @@ entity_models:
       - file: thorlabsMcls1.template
         args:
           .*:
+    pvi:
+      yaml_path: thorlabsMcls1.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

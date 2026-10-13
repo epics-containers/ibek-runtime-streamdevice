@@ -31,3 +31,7 @@ entity_models:
       - file: gen3300w.template
         args:
           .*:
+    pvi:
+      yaml_path: Gen3300w.pvi.device.yaml
+      ui_macros:
+        P:

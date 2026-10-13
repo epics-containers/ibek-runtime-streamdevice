@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `telna.ibek.support.yaml`
 - `telna.proto`
+- `telna.pvi.device.yaml`
 - `telna.template`
 
 Everything else in this folder stays in the library and is never vendored:

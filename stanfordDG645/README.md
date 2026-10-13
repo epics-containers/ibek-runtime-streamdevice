@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `stanfordDG645.ibek.support.yaml`
 - `stanfordDG645.proto`
+- `stanfordDG645.pvi.device.yaml`
 - `stanfordDG645.template`
 
 Everything else in this folder stays in the library and is never vendored:

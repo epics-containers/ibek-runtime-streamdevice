@@ -84,6 +84,10 @@ entity_models:
       - file: isegNHQ223M.template
         args:
           .*:
+    pvi:
+      yaml_path: isegNHQ223M.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: isegHVPSU
     description: |-
@@ -160,6 +164,10 @@ entity_models:
       - file: isegHVPSU.template
         args:
           .*:
+    pvi:
+      yaml_path: isegHVPSU.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: trigger_process
     description: |-
@@ -177,3 +185,8 @@ entity_models:
       - file: trigger_process.template
         args:
           .*:
+    pvi:
+      yaml_path: trigger_process.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

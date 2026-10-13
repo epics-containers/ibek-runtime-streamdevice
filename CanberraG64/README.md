@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `CanberraG64.ibek.support.yaml`
 - `CanberraG64.protocol`
+- `CanberraG64.pvi.device.yaml`
 - `CanberraG64.template`
 
 Everything else in this folder stays in the library and is never vendored:

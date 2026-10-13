@@ -20,6 +20,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 instance's `config/`:
 
 - `NSC200.proto`
+- `NSC200.pvi.device.yaml`
 - `NSC200.template`
 - `NSC200_settings.req`
 - `newstep.ibek.support.yaml`

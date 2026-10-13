@@ -29,3 +29,7 @@ entity_models:
       - file: CBY-2206.template
         args:
           .*:
+    pvi:
+      yaml_path: CBY_2206.pvi.device.yaml
+      ui_macros:
+        P:

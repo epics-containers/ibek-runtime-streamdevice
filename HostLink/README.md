@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `HostLink.ibek.support.yaml`
 - `HostLink.template`
+- `HostLinkTemplate.pvi.device.yaml`
 - `HostlinkFINS.proto`
 
 Everything else in this folder stays in the library and is never vendored:

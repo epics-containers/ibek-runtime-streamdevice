@@ -32,3 +32,8 @@ entity_models:
       - file: celerotonChopper.template
         args:
           .*:
+    pvi:
+      yaml_path: celerotonChopper.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

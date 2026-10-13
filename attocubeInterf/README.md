@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `attocubeInterf.ibek.support.yaml`
 - `ids3010.proto`
+- `ids3010.pvi.device.yaml`
 - `ids3010.template`
 
 Everything else in this folder stays in the library and is never vendored:

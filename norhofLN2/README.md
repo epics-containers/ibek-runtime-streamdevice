@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `norhof.proto`
 - `norhofLN2.ibek.support.yaml`
+- `norhofLN2.pvi.device.yaml`
 - `norhofLN2.template`
 - `norhofLN2_positions.req`
 - `norhofLN2_settings.req`

@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `lakeshore218.ibek.support.yaml`
 - `lakeshore218.proto`
+- `lakeshore218.pvi.device.yaml`
 - `lakeshore218.template`
 - `lakeshore218_settings.req`
 - `lakeshore218channel.template`

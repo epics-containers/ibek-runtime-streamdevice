@@ -75,3 +75,8 @@ entity_models:
       - file: dmc-a2.template
         args:
           .*:
+    pvi:
+      yaml_path: dmc_a2.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

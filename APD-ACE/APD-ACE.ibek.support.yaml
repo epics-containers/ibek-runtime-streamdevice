@@ -29,3 +29,7 @@ entity_models:
       - file: apd-ace.template
         args:
           .*:
+    pvi:
+      yaml_path: APDACE.pvi.device.yaml
+      ui_macros:
+        P:

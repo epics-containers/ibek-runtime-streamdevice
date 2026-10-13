@@ -58,3 +58,8 @@ entity_models:
       - file: devKeithley6487.db
         args:
           .*:
+    pvi:
+      yaml_path: Keithley6487.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

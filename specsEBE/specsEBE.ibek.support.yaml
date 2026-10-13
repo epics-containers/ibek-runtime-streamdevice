@@ -29,3 +29,7 @@ entity_models:
       - file: ebe4.db
         args:
           .*:
+    pvi:
+      yaml_path: EBE4.pvi.device.yaml
+      ui_macros:
+        P:

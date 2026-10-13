@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `CrateMon.proto`
 - `CrateMonitor.ibek.support.yaml`
+- `CrateMonitor.pvi.device.yaml`
 - `CrateMonitor.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -20,6 +20,8 @@ with the pattern, so the provenance travels into every IOC instance that uses it
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `_caenN1470.pvi.device.yaml`
+- `_caenN1470chan.pvi.device.yaml`
 - `caenN1470.ibek.support.yaml`
 - `caenN1470.proto`
 - `caenN1470.template`

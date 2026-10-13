@@ -26,6 +26,10 @@ entity_models:
       - file: autocontroller.template
         args:
           .*:
+    pvi:
+      yaml_path: Autocontroller.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: KaufmanSourceController
     description: |-
@@ -44,6 +48,10 @@ entity_models:
       - file: kaufmanSourceController.template
         args:
           .*:
+    pvi:
+      yaml_path: KaufmanSourceController.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: ProgramParameters
     description: |-
@@ -66,3 +74,8 @@ entity_models:
       - file: programParameters.template
         args:
           .*:
+    pvi:
+      yaml_path: ProgramParameters.pvi.device.yaml
+      ui_macros:
+        P:
+        PROG:

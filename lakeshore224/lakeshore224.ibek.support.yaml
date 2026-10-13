@@ -30,6 +30,10 @@ entity_models:
       - file: lakeshore224.template
         args:
           .*:
+    pvi:
+      yaml_path: lakeshore224.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: lakeshore224_input_dls
     description: |-
@@ -85,3 +89,9 @@ entity_models:
       - file: lakeshore224_input_dls.template
         args:
           .*:
+    pvi:
+      yaml_path: lakeshore224_input_dls.pvi.device.yaml
+      ui_macros:
+        TNAME:
+        P:
+        INDEX:

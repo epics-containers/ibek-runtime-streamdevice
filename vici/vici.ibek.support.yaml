@@ -37,6 +37,11 @@ entity_models:
       - file: viciE2CA.template
         args:
           .*:
+    pvi:
+      yaml_path: viciE2CA.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: viciEMT
     description: |-
@@ -138,6 +143,11 @@ entity_models:
       - file: viciEMT.template
         args:
           .*:
+    pvi:
+      yaml_path: viciEMT.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: viciEUTA
     description: |-
@@ -239,6 +249,11 @@ entity_models:
       - file: viciEUTA.template
         args:
           .*:
+    pvi:
+      yaml_path: viciEUTA.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: viciUM
     description: |-
@@ -336,6 +351,11 @@ entity_models:
       - file: viciUM.template
         args:
           .*:
+    pvi:
+      yaml_path: viciUM.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: eightGasSelect
     description: |-
@@ -381,6 +401,11 @@ entity_models:
       - file: eightGasSelect.template
         args:
           .*:
+    pvi:
+      yaml_path: eightGasSelect.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: fourGasSelect
     description: |-
@@ -410,6 +435,11 @@ entity_models:
       - file: fourGasSelect.template
         args:
           .*:
+    pvi:
+      yaml_path: fourGasSelect.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: sixteenGasSelect_2EMT_1E2CA
     description: |-
@@ -549,6 +579,11 @@ entity_models:
       - file: sixteenGasSelect_2EMT_1E2CA.template
         args:
           .*:
+    pvi:
+      yaml_path: sixteenGasSelect_2EMT_1E2CA.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: sixteenGasSelect_2EMT_1VALVE
     description: |-
@@ -698,6 +733,11 @@ entity_models:
       - file: sixteenGasSelect_2EMT_1VALVE.template
         args:
           .*:
+    pvi:
+      yaml_path: sixteenGasSelect_2EMT_1VALVE.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: viciEMT_dummy
     description: |-
@@ -795,3 +835,8 @@ entity_models:
       - file: viciEMT_dummy.template
         args:
           .*:
+    pvi:
+      yaml_path: viciEMT_dummy.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

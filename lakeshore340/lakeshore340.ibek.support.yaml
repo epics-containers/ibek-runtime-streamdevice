@@ -46,3 +46,7 @@ entity_models:
       - file: lakeshore340.template
         args:
           .*:
+    pvi:
+      yaml_path: lakeshore340.pvi.device.yaml
+      ui_macros:
+        P:

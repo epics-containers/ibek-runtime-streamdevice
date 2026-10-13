@@ -20,6 +20,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 instance's `config/`:
 
 - `APD-ACE.ibek.support.yaml`
+- `APDACE.pvi.device.yaml`
 - `ace.proto`
 - `apd-ace.template`
 - `apd-ace_settings.req`

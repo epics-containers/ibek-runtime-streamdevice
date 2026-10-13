@@ -28,17 +28,27 @@ pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `attenuator_cmd.pvi.device.yaml`
 - `attenuator_cmd.template`
+- `attenuators_set_fan.pvi.device.yaml`
 - `attenuators_set_fan.template`
+- `cal_table.pvi.device.yaml`
 - `cal_table.template`
 - `d2afe.ibek.support.yaml`
 - `d2afe.proto`
+- `d2afeStatus.pvi.device.yaml`
 - `d2afeStatus.template`
+- `d2ptg.pvi.device.yaml`
 - `d2ptg.template`
+- `d2ptg_cal_scan_list.pvi.device.yaml`
 - `d2ptg_cal_scan_list.template`
+- `d2ptg_mon_scan_list.pvi.device.yaml`
 - `d2ptg_mon_scan_list.template`
+- `d2ptg_scan.pvi.device.yaml`
 - `d2ptg_scan.template`
+- `fwVersionCheck.pvi.device.yaml`
 - `fwVersionCheck.template`
+- `generic_cmd.pvi.device.yaml`
 - `generic_cmd.template`
 
 Everything else in this folder stays in the library and is never vendored:

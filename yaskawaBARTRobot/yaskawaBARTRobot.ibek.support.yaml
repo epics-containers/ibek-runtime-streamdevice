@@ -61,6 +61,11 @@ entity_models:
       - file: yaskawaPosition.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawaPosition.pvi.device.yaml
+      ui_macros:
+        P:
+        VAR:
 
   - name: yaskawaLong
     description: |-
@@ -110,6 +115,11 @@ entity_models:
       - file: yaskawaLong.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawaLong.pvi.device.yaml
+      ui_macros:
+        P:
+        VAR:
 
   - name: yaskawaLongNoSync
     description: |-
@@ -160,6 +170,11 @@ entity_models:
       - file: yaskawaLongNoSync.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawaLongNoSync.pvi.device.yaml
+      ui_macros:
+        P:
+        VAR:
 
   - name: yaskawaLongReadOnly
     description: |-
@@ -191,6 +206,11 @@ entity_models:
       - file: yaskawaLongReadOnly.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawaLongReadOnly.pvi.device.yaml
+      ui_macros:
+        P:
+        VAR:
 
   - name: yaskawaByte
     description: |-
@@ -229,6 +249,11 @@ entity_models:
       - file: yaskawaByte.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawaByte.pvi.device.yaml
+      ui_macros:
+        P:
+        VAR:
 
   - name: yaskawaInput
     description: |-
@@ -299,6 +324,11 @@ entity_models:
       - file: yaskawaInput.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawaInput.pvi.device.yaml
+      ui_macros:
+        P:
+        VAR:
 
   - name: yaskawaOutput
     description: |-
@@ -369,6 +399,11 @@ entity_models:
       - file: yaskawaOutput.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawaOutput.pvi.device.yaml
+      ui_macros:
+        P:
+        VAR:
 
   - name: yaskawa
     description: |-
@@ -475,6 +510,10 @@ entity_models:
       - file: yaskawa.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawa.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: yaskawaReal
     description: |-
@@ -523,6 +562,11 @@ entity_models:
       - file: yaskawaReal.template
         args:
           .*:
+    pvi:
+      yaml_path: yaskawaReal.pvi.device.yaml
+      ui_macros:
+        P:
+        VAR:
 
   - name: BARTRobot
     description: |-
@@ -671,3 +715,13 @@ entity_models:
       - file: BARTRobot.db
         args:
           .*:
+    pvi:
+      yaml_path: BARTRobot.pvi.device.yaml
+      ui_macros:
+        P:
+        CUR_COLUMN_VAR_NUM:
+        CUR_ROW_VAR_NUM:
+        CUR_SLOT_VAR_NUM:
+        NEXT_COLUMN_VAR_NUM:
+        NEXT_ROW_VAR_NUM:
+        NEXT_SLOT_VAR_NUM:

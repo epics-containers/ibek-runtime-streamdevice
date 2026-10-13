@@ -33,19 +33,32 @@ instance's `config/`:
 
 - `mks937a.ibek.support.yaml`
 - `mks937a.protocol`
+- `mks937a.pvi.device.yaml`
 - `mks937a.template`
+- `mks937aGauge.pvi.device.yaml`
 - `mks937aGauge.template`
+- `mks937aGaugeGroup.pvi.device.yaml`
 - `mks937aGaugeGroup.template`
 - `mks937aGauge_positions.req`
+- `mks937aImg.pvi.device.yaml`
 - `mks937aImg.template`
+- `mks937aImgDummy.pvi.device.yaml`
 - `mks937aImgDummy.template`
+- `mks937aImgGroup.pvi.device.yaml`
 - `mks937aImgGroup.template`
+- `mks937aImgMean.pvi.device.yaml`
 - `mks937aImgMean.template`
+- `mks937aInterlock.pvi.device.yaml`
 - `mks937aInterlock.template`
+- `mks937aPirg.pvi.device.yaml`
 - `mks937aPirg.template`
+- `mks937aPirgDummy.pvi.device.yaml`
 - `mks937aPirgDummy.template`
+- `mks937aPirgGroup.pvi.device.yaml`
 - `mks937aPirgGroup.template`
+- `mks937aPlogADC.pvi.device.yaml`
 - `mks937aPlogADC.template`
+- `mks937aPlogEGU.pvi.device.yaml`
 - `mks937aPlogEGU.template`
 
 Everything else in this folder stays in the library and is never vendored:

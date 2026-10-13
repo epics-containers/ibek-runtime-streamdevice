@@ -19,6 +19,7 @@ with the pattern, so the provenance travels into every IOC instance that uses it
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `thermoCube.pvi.device.yaml`
 - `thermocube.ibek.support.yaml`
 - `thermocube.proto`
 - `thermocube.template`

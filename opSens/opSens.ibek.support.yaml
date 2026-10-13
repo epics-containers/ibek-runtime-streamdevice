@@ -25,3 +25,7 @@ entity_models:
       - file: opSens.template
         args:
           .*:
+    pvi:
+      yaml_path: opSens.pvi.device.yaml
+      ui_macros:
+        device:

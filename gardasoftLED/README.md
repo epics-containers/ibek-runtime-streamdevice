@@ -51,6 +51,16 @@ instance's `config/`:
 - `RTSeriesChannel_settings.req`
 - `RTSeriesLED.template`
 - `gardasoftLED.ibek.support.yaml`
+- `gardasoftLED.pvi.device.yaml`
+- `gardasoftLED400Channel.pvi.device.yaml`
+- `gardasoftLED420.pvi.device.yaml`
+- `gardasoftLED420Profile.pvi.device.yaml`
+- `gardasoftLED420ProfileChannel.pvi.device.yaml`
+- `gardasoftLED800Channel.pvi.device.yaml`
+- `gardasoftLED820.pvi.device.yaml`
+- `gardasoftLEDChannel.pvi.device.yaml`
+- `gardasoftLEDRTSeries.pvi.device.yaml`
+- `gardasoftLEDRTSeriesChannel.pvi.device.yaml`
 
 Everything else in this folder stays in the library and is never vendored:
 

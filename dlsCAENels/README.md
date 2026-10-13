@@ -23,7 +23,10 @@ instance's `config/`:
 
 - `dlsCAENels.ibek.support.yaml`
 - `dlsCAENels.proto`
+- `dlsCAENels.pvi.device.yaml`
 - `dlsCAENels.template`
+- `dlsCAENelsChannel.pvi.device.yaml`
+- `dlsCAENelsGroup.pvi.device.yaml`
 - `dlsCAENels_channel.template`
 - `dlsCAENels_group.template`
 

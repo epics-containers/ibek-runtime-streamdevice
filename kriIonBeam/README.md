@@ -21,6 +21,9 @@ with the pattern, so the provenance travels into every IOC instance that uses it
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `Autocontroller.pvi.device.yaml`
+- `KaufmanSourceController.pvi.device.yaml`
+- `ProgramParameters.pvi.device.yaml`
 - `autocontroller.template`
 - `kaufmanSourceController.template`
 - `kriIonBeam.ibek.support.yaml`

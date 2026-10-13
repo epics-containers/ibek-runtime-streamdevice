@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `millik.ibek.support.yaml`
 - `millik.proto`
+- `millik.pvi.device.yaml`
 - `millik.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -46,6 +46,10 @@ entity_models:
       - file: digitelMpc.template
         args:
           .*:
+    pvi:
+      yaml_path: _digitelMpcTemplate.pvi.device.yaml
+      ui_macros:
+        device:
   - name: digitelMpc
     description: |-
       digitel MPC Controller (multi-drop serial vacuum pump controller).
@@ -107,6 +111,10 @@ entity_models:
       - file: digitelMpcTsp.template
         args:
           .*:
+    pvi:
+      yaml_path: digitelMpcTsp.pvi.device.yaml
+      ui_macros:
+        device:
   - name: digitelMpcqTsp
     description: |-
       Template database for digitel MPCq - Titanium Sublimation Pump
@@ -146,6 +154,10 @@ entity_models:
       - file: digitelMpcqTsp.template
         args:
           .*:
+    pvi:
+      yaml_path: digitelMpcqTsp.pvi.device.yaml
+      ui_macros:
+        device:
   - name: _digitelMpcIonpTemplate
     description: |-
       Template database for digitel MPC - Ion Pump
@@ -210,6 +222,10 @@ entity_models:
       - file: digitelMpcIonp.template
         args:
           .*:
+    pvi:
+      yaml_path: _digitelMpcIonpTemplate.pvi.device.yaml
+      ui_macros:
+        device:
   - name: digitelMpcIonp
     description: |-
       Template database for digitel MPC - Ion Pump
@@ -284,6 +300,10 @@ entity_models:
         # then land in the same ioc.subst block.
         args:
           (?!MPC$).*:
+    pvi:
+      yaml_path: digitelMpcIonp.pvi.device.yaml
+      ui_macros:
+        device:
   - name: digitelMpcIonpGroup
     description: |-
       Template database for a group of up to 8 digitel MPC Ion Pumps
@@ -332,6 +352,10 @@ entity_models:
       - file: digitelMpcIonpGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: digitelMpcIonpGroup.pvi.device.yaml
+      ui_macros:
+        device:
   - name: digitelMpcTspGroup
     description: |-
       Template database for a group of up to 8 digitel MPC TSPs
@@ -376,6 +400,10 @@ entity_models:
       - file: digitelMpcTspGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: digitelMpcTspGroup.pvi.device.yaml
+      ui_macros:
+        device:
   - name: dummyIonp
     description: |-
       Template database for dummy Ion Pump.
@@ -388,6 +416,10 @@ entity_models:
       - file: dummyIonp.template
         args:
           .*:
+    pvi:
+      yaml_path: dummyIonp.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: digitelMpcIonpSps
     description: |-
@@ -409,6 +441,10 @@ entity_models:
       - file: digitelMpcIonpSps.template
         args:
           .*:
+    pvi:
+      yaml_path: digitelMpcIonpSps.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: digitelMpcTspDummy
     description: |-
@@ -427,3 +463,7 @@ entity_models:
       - file: digitelMpcTspDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: digitelMpcTspDummy.pvi.device.yaml
+      ui_macros:
+        device:

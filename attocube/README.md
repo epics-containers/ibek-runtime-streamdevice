@@ -20,6 +20,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 instance's `config/`:
 
 - `ANC150.proto`
+- `ANC150.pvi.device.yaml`
 - `ANC150.template`
 - `attocube.ibek.support.yaml`
 

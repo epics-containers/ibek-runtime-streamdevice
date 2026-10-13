@@ -20,8 +20,10 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `dummy_stanford_ai.pvi.device.yaml`
 - `dummy_stanford_ai.template`
 - `sr570.proto`
+- `sr570.pvi.device.yaml`
 - `sr570.template`
 - `sr570_settings.req`
 - `stanford.ibek.support.yaml`

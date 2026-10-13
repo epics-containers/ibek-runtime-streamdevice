@@ -33,6 +33,12 @@ entity_models:
       - file: keysight33500Bchan.template
         args:
           .*:
+    pvi:
+      yaml_path: keysight33500Bchan.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        CHAN:
 
   - name: keysight33500B
     description: |-
@@ -64,3 +70,8 @@ entity_models:
       - file: keysight33500B.template
         args:
           .*:
+    pvi:
+      yaml_path: keysight33500B.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

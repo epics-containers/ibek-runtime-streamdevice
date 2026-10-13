@@ -25,9 +25,13 @@ instance's `config/`:
 
 - `motomanNX100.ibek.support.yaml`
 - `nx100.proto`
+- `nx100.pvi.device.yaml`
 - `nx100.template`
+- `nx100dvar.pvi.device.yaml`
 - `nx100dvar.template`
+- `nx100io.pvi.device.yaml`
 - `nx100io.template`
+- `nx100pvar.pvi.device.yaml`
 - `nx100pvar.template`
 
 Everything else in this folder stays in the library and is never vendored:

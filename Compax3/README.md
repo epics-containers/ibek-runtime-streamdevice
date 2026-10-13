@@ -20,6 +20,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 instance's `config/`:
 
 - `Compax3.ibek.support.yaml`
+- `Compax3.pvi.device.yaml`
 - `Compax3.template`
 - `compax3.protocol`
 

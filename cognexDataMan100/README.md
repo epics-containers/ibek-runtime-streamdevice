@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `cognexDataMan100.ibek.support.yaml`
 - `dataman.proto`
+- `dataman100.pvi.device.yaml`
 - `dataman100.template`
 
 Everything else in this folder stays in the library and is never vendored:

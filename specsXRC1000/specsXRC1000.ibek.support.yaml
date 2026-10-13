@@ -25,3 +25,7 @@ entity_models:
       - file: specsXRC1000.template
         args:
           .*:
+    pvi:
+      yaml_path: specsXRC1000.pvi.device.yaml
+      ui_macros:
+        P:

@@ -22,8 +22,10 @@ it.
 instance's `config/`:
 
 - `keysight33500B.ibek.support.yaml`
+- `keysight33500B.pvi.device.yaml`
 - `keysight33500B.template`
 - `keysight33500B_settings.req`
+- `keysight33500Bchan.pvi.device.yaml`
 - `keysight33500Bchan.template`
 - `keysight33500Bchan_settings.req`
 - `ks33500B.proto`

@@ -23,9 +23,12 @@ it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `_agilent4UHVIonpTemplate.pvi.device.yaml`
+- `_agilent4UHVTemplate.pvi.device.yaml`
 - `agilent4UHV.ibek.support.yaml`
 - `agilent4UHV.proto`
 - `agilent4UHV.template`
+- `agilent4UHVIonp.pvi.device.yaml`
 - `agilent4UHVIonp.template`
 
 Everything else in this folder stays in the library and is never vendored:

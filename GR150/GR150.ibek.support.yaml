@@ -35,3 +35,7 @@ entity_models:
       - file: gr150.template
         args:
           .*:
+    pvi:
+      yaml_path: gr150.pvi.device.yaml
+      ui_macros:
+        P:

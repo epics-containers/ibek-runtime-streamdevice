@@ -22,7 +22,9 @@ instance's `config/`:
 
 - `CryoconM14.ibek.support.yaml`
 - `M14.protocol`
+- `M14_sensor.pvi.device.yaml`
 - `M14_sensor.template`
+- `M14_system.pvi.device.yaml`
 - `M14_system.template`
 
 Everything else in this folder stays in the library and is never vendored:

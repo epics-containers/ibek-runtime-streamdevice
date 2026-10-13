@@ -37,6 +37,12 @@ entity_models:
       - file: caenN1470chan.template
         args:
           .*:
+    pvi:
+      yaml_path: _caenN1470chan.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        CHAN:
   - name: _caenN1470
     description: |-
       CAEN N1470 HV power supply (board-level template)
@@ -82,3 +88,8 @@ entity_models:
       - file: caenN1470.template
         args:
           .*:
+    pvi:
+      yaml_path: _caenN1470.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

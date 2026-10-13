@@ -77,6 +77,10 @@ entity_models:
       - file: magnet.template
         args:
           .*:
+    pvi:
+      yaml_path: magnet.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: smc
     description: |-
@@ -110,6 +114,10 @@ entity_models:
       - file: smc.template
         args:
           .*:
+    pvi:
+      yaml_path: smc.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: smcTripleAxis
     description: |-
@@ -135,3 +143,7 @@ entity_models:
       - file: smcTripleAxis.template
         args:
           .*:
+    pvi:
+      yaml_path: smcTripleAxis.pvi.device.yaml
+      ui_macros:
+        MAG:

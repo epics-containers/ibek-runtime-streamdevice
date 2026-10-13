@@ -22,6 +22,8 @@ instance's `config/`:
 
 - `ttiCPX.ibek.support.yaml`
 - `ttiCPX.proto`
+- `ttiCPX.pvi.device.yaml`
+- `ttiCPXChannel.pvi.device.yaml`
 - `ttiCPX_channel.template`
 - `ttiCPX_channel_settings.req`
 - `ttiCPX_general.template`

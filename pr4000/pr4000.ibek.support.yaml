@@ -30,6 +30,10 @@ entity_models:
         args:
           .*:
           domain: ""
+    pvi:
+      yaml_path: pr4000chan.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: pr4000
     description: |-
@@ -47,3 +51,7 @@ entity_models:
       - file: pr4000.template
         args:
           .*:
+    pvi:
+      yaml_path: pr4000.pvi.device.yaml
+      ui_macros:
+        device:

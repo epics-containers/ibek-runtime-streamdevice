@@ -25,6 +25,10 @@ entity_models:
       - file: M14_system.template
         args:
           .*:
+    pvi:
+      yaml_path: M14_system.pvi.device.yaml
+      ui_macros:
+        tmon:
 
   - name: M14_sensor
     description: |-
@@ -82,3 +86,10 @@ entity_models:
       - file: M14_sensor.template
         args:
           .*:
+    pvi:
+      yaml_path: M14_sensor.pvi.device.yaml
+      ui_macros:
+        tmon:
+        sensor:
+        device:
+        record:

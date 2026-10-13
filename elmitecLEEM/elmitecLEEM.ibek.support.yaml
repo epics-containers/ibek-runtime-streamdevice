@@ -34,6 +34,11 @@ entity_models:
       - file: leem.template
         args:
           .*:
+    pvi:
+      yaml_path: leem.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
   - name: leemPSValue
     description: |-
       Elmitec LEEM power supply value parameter
@@ -84,3 +89,8 @@ entity_models:
       - file: leem-PSValue.template
         args:
           .*:
+    pvi:
+      yaml_path: leemPSValue.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

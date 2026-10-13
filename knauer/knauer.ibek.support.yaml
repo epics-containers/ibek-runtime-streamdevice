@@ -29,6 +29,11 @@ entity_models:
       - file: blueShadow40P.template
         args:
           .*:
+    pvi:
+      yaml_path: BlueShadow40P.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
   - name: Azura21S
     description: |-
       Controls a Knauer Azuar V2.1S valve drive
@@ -49,6 +54,11 @@ entity_models:
       - file: azuraV2-1S.template
         args:
           .*:
+    pvi:
+      yaml_path: Azura21S.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
 
   - name: ConnectionManagement
     description: |-
@@ -66,3 +76,8 @@ entity_models:
       - file: connectionManagement.template
         args:
           .*:
+    pvi:
+      yaml_path: ConnectionManagement.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

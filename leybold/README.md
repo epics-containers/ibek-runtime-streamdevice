@@ -30,24 +30,36 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `centerN.pvi.device.yaml`
 - `centerN.template`
 - `centerN_settings.req`
+- `coolpak.pvi.device.yaml`
 - `coolpak.template`
 - `coolpak_settings.req`
 - `leybold.ibek.support.yaml`
 - `leybold.proto`
+- `read_floatE.pvi.device.yaml`
 - `read_floatE.template`
+- `read_float_float_float.pvi.device.yaml`
 - `read_float_float_float.template`
+- `read_int.pvi.device.yaml`
 - `read_int.template`
+- `read_int_floatE.pvi.device.yaml`
 - `read_int_floatE.template`
 - `read_int_floatE_settings.req`
+- `read_string.pvi.device.yaml`
 - `read_string.template`
+- `read_write_float.pvi.device.yaml`
 - `read_write_float.template`
+- `read_write_floatE_floatE.pvi.device.yaml`
 - `read_write_floatE_floatE.template`
+- `read_write_int.pvi.device.yaml`
 - `read_write_int.template`
+- `read_write_int_floatE.pvi.device.yaml`
 - `read_write_int_floatE.template`
 - `read_write_int_floatE_settings.req`
 - `read_write_int_settings.req`
+- `write_raw_int.pvi.device.yaml`
 - `write_raw_int.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -37,3 +37,8 @@ entity_models:
       - file: harvardSyringe.template
         args:
           .*:
+    pvi:
+      yaml_path: harvardSyringe.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

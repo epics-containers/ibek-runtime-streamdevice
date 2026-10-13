@@ -28,3 +28,7 @@ entity_models:
       - file: centerOne.template
         args:
           .*:
+    pvi:
+      yaml_path: centerOne.pvi.device.yaml
+      ui_macros:
+        P:

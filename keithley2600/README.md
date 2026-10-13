@@ -23,7 +23,9 @@ instance's `config/`:
 
 - `keithley2600.ibek.support.yaml`
 - `keithley2600.proto`
+- `keithley2600.pvi.device.yaml`
 - `keithley2600.template`
+- `keithley2600chan.pvi.device.yaml`
 - `keithley2600chan.template`
 
 Everything else in this folder stays in the library and is never vendored:

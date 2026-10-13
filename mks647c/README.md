@@ -23,8 +23,11 @@ instance's `config/`:
 
 - `mks647C.proto`
 - `mks647c.ibek.support.yaml`
+- `mks647c4ChanCtrl.pvi.device.yaml`
 - `mks647c4ChanCtrl.template`
+- `mks647c8ChanCtrl.pvi.device.yaml`
 - `mks647c8ChanCtrl.template`
+- `mks647cChan.pvi.device.yaml`
 - `mks647cChan.template`
 
 Everything else in this folder stays in the library and is never vendored:

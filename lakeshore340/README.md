@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `lakeshore340.ibek.support.yaml`
 - `lakeshore340.proto`
+- `lakeshore340.pvi.device.yaml`
 - `lakeshore340.template`
 - `lakeshore340_settings.req`
 

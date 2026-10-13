@@ -29,3 +29,8 @@ entity_models:
       - file: WS300.template
         args:
           .*:
+    pvi:
+      yaml_path: WS300.pvi.device.yaml
+      ui_macros:
+        P:
+        S:

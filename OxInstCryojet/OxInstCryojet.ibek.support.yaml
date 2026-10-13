@@ -64,6 +64,11 @@ entity_models:
       - file: cryojetITC503S.template
         args:
           .*:
+    pvi:
+      yaml_path: cryojetITC503S.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: cryojet
     description: |-
@@ -95,6 +100,11 @@ entity_models:
       - file: cryojet.template
         args:
           .*:
+    pvi:
+      yaml_path: cryojet.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: MercuryiTC_SCPI_heater
     description: |-
@@ -121,6 +131,11 @@ entity_models:
       - file: MercuryiTC-SCPI_heater.template
         args:
           .*:
+    pvi:
+      yaml_path: MercuryiTC_SCPI_heater.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: MercuryiTC_SCPI_loop
     description: |-
@@ -147,6 +162,11 @@ entity_models:
       - file: MercuryiTC-SCPI_loop.template
         args:
           .*:
+    pvi:
+      yaml_path: MercuryiTC_SCPI_loop.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: MercuryiTC_SCPI_system
     description: |-
@@ -168,6 +188,11 @@ entity_models:
       - file: MercuryiTC-SCPI_system.template
         args:
           .*:
+    pvi:
+      yaml_path: MercuryiTC_SCPI_system.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: MercuryiTC_SCPI_tempSensor
     description: |-
@@ -194,6 +219,11 @@ entity_models:
       - file: MercuryiTC-SCPI_tempSensor.template
         args:
           .*:
+    pvi:
+      yaml_path: MercuryiTC_SCPI_tempSensor.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: ILM201
     description: |-
@@ -241,6 +271,10 @@ entity_models:
       - file: ILM201.template
         args:
           .*:
+    pvi:
+      yaml_path: ILM201.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: ITC4
     description: |-
@@ -267,6 +301,11 @@ entity_models:
       - file: ITC4.template
         args:
           .*:
+    pvi:
+      yaml_path: ITC4.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: MercuryiTC_SCPI
     description: |-
@@ -288,3 +327,8 @@ entity_models:
       - file: MercuryiTC-SCPI.template
         args:
           .*:
+    pvi:
+      yaml_path: MercuryiTC_SCPI.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

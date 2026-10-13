@@ -32,18 +32,30 @@ that uses it.
 instance's `config/`:
 
 - `gp307.proto`
+- `gp307.pvi.device.yaml`
 - `gp307.template`
+- `gp307Gauge.pvi.device.yaml`
 - `gp307Gauge.template`
+- `gp307Hcg.pvi.device.yaml`
 - `gp307Hcg.template`
+- `gp307HcgDummy.pvi.device.yaml`
 - `gp307HcgDummy.template`
+- `gp307Pirg.pvi.device.yaml`
 - `gp307Pirg.template`
+- `gp307PirgDummy.pvi.device.yaml`
 - `gp307PirgDummy.template`
 - `gp350.proto`
+- `gp350.pvi.device.yaml`
 - `gp350.template`
+- `gp350Gauge.pvi.device.yaml`
 - `gp350Gauge.template`
+- `gp350Hcg.pvi.device.yaml`
 - `gp350Hcg.template`
+- `gp350HcgDummy.pvi.device.yaml`
 - `gp350HcgDummy.template`
+- `gp350Pirg.pvi.device.yaml`
 - `gp350Pirg.template`
+- `gp350PirgDummy.pvi.device.yaml`
 - `gp350PirgDummy.template`
 - `granvillePhillips.ibek.support.yaml`
 

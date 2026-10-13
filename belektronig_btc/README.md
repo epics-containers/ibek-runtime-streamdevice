@@ -21,6 +21,7 @@ it.
 instance's `config/`:
 
 - `belektronig_btc.ibek.support.yaml`
+- `belektronig_btc.pvi.device.yaml`
 - `m10.proto`
 - `m10.template`
 

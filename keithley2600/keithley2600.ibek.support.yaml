@@ -56,6 +56,12 @@ entity_models:
       - file: keithley2600chan.template
         args:
           .*:
+    pvi:
+      yaml_path: keithley2600chan.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        CHAN:
 
   - name: keithley2600
     description: |-
@@ -77,3 +83,8 @@ entity_models:
       - file: keithley2600.template
         args:
           .*:
+    pvi:
+      yaml_path: keithley2600.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

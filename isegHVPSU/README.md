@@ -23,10 +23,13 @@ instance's `config/`:
 
 - `isegHVPSU.ibek.support.yaml`
 - `isegHVPSU.proto`
+- `isegHVPSU.pvi.device.yaml`
 - `isegHVPSU.template`
 - `isegHVPSU_settings.req`
+- `isegNHQ223M.pvi.device.yaml`
 - `isegNHQ223M.template`
 - `isegNHQ223M_settings.req`
+- `trigger_process.pvi.device.yaml`
 - `trigger_process.template`
 
 Everything else in this folder stays in the library and is never vendored:
