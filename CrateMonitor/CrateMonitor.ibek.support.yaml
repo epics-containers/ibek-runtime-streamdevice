@@ -21,3 +21,7 @@ entity_models:
       - file: CrateMonitor.template
         args:
           .*:
+    pvi:
+      yaml_path: CrateMonitor.pvi.device.yaml
+      ui_macros:
+        device:

@@ -23,6 +23,7 @@ instance's `config/`:
 
 - `SierraInstMassFlowMeters.ibek.support.yaml`
 - `SierraInstMassFlowMeters.proto`
+- `SierraInstMassFlowMeters.pvi.device.yaml`
 - `SierraInstMassFlowMeters.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -22,7 +22,9 @@ instance's `config/`:
 
 - `pr4000.ibek.support.yaml`
 - `pr4000.protocol`
+- `pr4000.pvi.device.yaml`
 - `pr4000.template`
+- `pr4000chan.pvi.device.yaml`
 - `pr4000chan.template`
 
 Everything else in this folder stays in the library and is never vendored:

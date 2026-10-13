@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `EdNxtT.proto`
 - `EdwardsNextTurbo.ibek.support.yaml`
+- `EdwardsNextTurbo.pvi.device.yaml`
 - `EdwardsNextTurbo.template`
 - `EdwardsNextTurbo_settings.req`
 

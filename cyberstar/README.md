@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `CBY-2206.proto`
 - `CBY-2206.template`
+- `CBY_2206.pvi.device.yaml`
 - `cyberstar.ibek.support.yaml`
 
 Everything else in this folder stays in the library and is never vendored:

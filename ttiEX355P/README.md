@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `ttiEX355P.ibek.support.yaml`
 - `ttiEX355P.proto`
+- `ttiEX355P.pvi.device.yaml`
 - `ttiEX355P.template`
 - `ttiEX355P_settings.req`
 

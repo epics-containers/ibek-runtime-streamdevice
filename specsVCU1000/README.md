@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `specsVCU1000.ibek.support.yaml`
 - `specsVCU1000.proto`
+- `specsVCU1000.pvi.device.yaml`
 - `specsVCU1000.template`
 
 Everything else in this folder stays in the library and is never vendored:

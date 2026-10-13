@@ -29,6 +29,11 @@ entity_models:
       - file: sr570.template
         args:
           .*:
+    pvi:
+      yaml_path: sr570.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: dummy_stanford_ai
     description: |-
@@ -46,3 +51,8 @@ entity_models:
       - file: dummy_stanford_ai.template
         args:
           .*:
+    pvi:
+      yaml_path: dummy_stanford_ai.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `iR2C.proto`
 - `omegaIR2C.ibek.support.yaml`
+- `omegaIR2C.pvi.device.yaml`
 - `omegaIR2C.template`
 
 Everything else in this folder stays in the library and is never vendored:

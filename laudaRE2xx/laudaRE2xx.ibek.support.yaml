@@ -66,6 +66,10 @@ entity_models:
       - file: lRE2xx.template
         args:
           .*:
+    pvi:
+      yaml_path: lRE2xx.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: lIntegralT
     description: |-
@@ -123,6 +127,10 @@ entity_models:
       - file: lIntegralT.template
         args:
           .*:
+    pvi:
+      yaml_path: lIntegralT.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: lVariocool
     description: |-
@@ -174,6 +182,10 @@ entity_models:
       - file: lVariocool.template
         args:
           .*:
+    pvi:
+      yaml_path: lVariocool.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: lMCxxx
     description: |-
@@ -215,6 +227,10 @@ entity_models:
       - file: lMCxxx.template
         args:
           .*:
+    pvi:
+      yaml_path: lMCxxx.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: lRE2xx_RS485
     description: |-
@@ -260,3 +276,7 @@ entity_models:
       - file: lRE2xx_RS485.template
         args:
           .*:
+    pvi:
+      yaml_path: lRE2xx_RS485.pvi.device.yaml
+      ui_macros:
+        P:

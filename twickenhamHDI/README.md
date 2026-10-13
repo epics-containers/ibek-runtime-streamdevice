@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `hdi.protocol`
 - `twickenhamHDI.ibek.support.yaml`
+- `twickenhamHDI.pvi.device.yaml`
 - `twickenhamHDI.template`
 
 Everything else in this folder stays in the library and is never vendored:

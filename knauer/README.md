@@ -21,6 +21,9 @@ pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `Azura21S.pvi.device.yaml`
+- `BlueShadow40P.pvi.device.yaml`
+- `ConnectionManagement.pvi.device.yaml`
 - `azuraV2-1S.proto`
 - `azuraV2-1S.template`
 - `blueShadow40P.proto`

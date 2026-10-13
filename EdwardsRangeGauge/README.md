@@ -23,6 +23,7 @@ instance's `config/`:
 - `EdGauge.proto`
 - `EdwardsGauge.template`
 - `EdwardsRangeGauge.ibek.support.yaml`
+- `EdwardsRangeGauge.pvi.device.yaml`
 
 Everything else in this folder stays in the library and is never vendored:
 

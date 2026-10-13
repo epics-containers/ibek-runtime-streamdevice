@@ -62,6 +62,12 @@ entity_models:
       - file: E725.template
         args:
           .*:
+    pvi:
+      yaml_path: E725.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        C:
 
   - name: E871
     description: |-
@@ -102,6 +108,12 @@ entity_models:
       - file: E871.template
         args:
           .*:
+    pvi:
+      yaml_path: E871.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        C:
 
   - name: E816
     description: |-
@@ -131,6 +143,11 @@ entity_models:
       - file: E816.template
         args:
           .*:
+    pvi:
+      yaml_path: E816.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: C877
     description: |-
@@ -166,6 +183,12 @@ entity_models:
       - file: C877.template
         args:
           .*:
+    pvi:
+      yaml_path: C877.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        C:
 
   - name: E871-absGrp
     description: |-
@@ -242,6 +265,12 @@ entity_models:
       - file: E871-absGrp.template
         args:
           .*:
+    pvi:
+      yaml_path: E871-absGrp.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        GRP:
 
   - name: E871-relGrp
     description: |-
@@ -300,6 +329,12 @@ entity_models:
       - file: E871-relGrp.template
         args:
           .*:
+    pvi:
+      yaml_path: E871-relGrp.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        GRP:
 
   - name: PI-E516
     description: |-
@@ -318,6 +353,10 @@ entity_models:
       - file: PI-E516.template
         args:
           .*:
+    pvi:
+      yaml_path: PI-E516.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: actuatorcallback
     description: |-
@@ -363,3 +402,8 @@ entity_models:
       - file: actuatorcallback.template
         args:
           .*:
+    pvi:
+      yaml_path: actuatorcallback.pvi.device.yaml
+      ui_macros:
+        P:
+        M:

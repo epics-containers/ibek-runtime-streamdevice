@@ -38,24 +38,42 @@ instance's `config/`:
 
 - `mks937b.ibek.support.yaml`
 - `mks937b.protocol`
+- `mks937b.pvi.device.yaml`
 - `mks937b.template`
+- `mks937bCap.pvi.device.yaml`
 - `mks937bCap.template`
+- `mks937bFastRelay.pvi.device.yaml`
 - `mks937bFastRelay.template`
+- `mks937bGauge.pvi.device.yaml`
 - `mks937bGauge.template`
+- `mks937bGaugeGroup.pvi.device.yaml`
 - `mks937bGaugeGroup.template`
 - `mks937bGauge_positions.req`
+- `mks937bHcg.pvi.device.yaml`
 - `mks937bHcg.template`
+- `mks937bHcgGroup.pvi.device.yaml`
 - `mks937bHcgGroup.template`
+- `mks937bHy8401.pvi.device.yaml`
 - `mks937bHy8401.template`
+- `mks937bImg.pvi.device.yaml`
 - `mks937bImg.template`
+- `mks937bImgDummy.pvi.device.yaml`
 - `mks937bImgDummy.template`
+- `mks937bImgGroup.pvi.device.yaml`
 - `mks937bImgGroup.template`
+- `mks937bImgMean.pvi.device.yaml`
 - `mks937bImgMean.template`
+- `mks937bInterlock.pvi.device.yaml`
 - `mks937bInterlock.template`
+- `mks937bPirg.pvi.device.yaml`
 - `mks937bPirg.template`
+- `mks937bPirgDummy.pvi.device.yaml`
 - `mks937bPirgDummy.template`
+- `mks937bPirgGroup.pvi.device.yaml`
 - `mks937bPirgGroup.template`
+- `mks937bPlogEGU.pvi.device.yaml`
 - `mks937bPlogEGU.template`
+- `mks937bRelays.pvi.device.yaml`
 - `mks937bRelays.template`
 
 Everything else in this folder stays in the library and is never vendored:

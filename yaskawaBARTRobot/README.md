@@ -32,17 +32,27 @@ uses it.
 instance's `config/`:
 
 - `BARTRobot.db`
+- `BARTRobot.pvi.device.yaml`
 - `BARTRobot_settings.req`
 - `yaskawa.proto`
+- `yaskawa.pvi.device.yaml`
 - `yaskawa.template`
 - `yaskawaBARTRobot.ibek.support.yaml`
+- `yaskawaByte.pvi.device.yaml`
 - `yaskawaByte.template`
+- `yaskawaInput.pvi.device.yaml`
 - `yaskawaInput.template`
+- `yaskawaLong.pvi.device.yaml`
 - `yaskawaLong.template`
+- `yaskawaLongNoSync.pvi.device.yaml`
 - `yaskawaLongNoSync.template`
+- `yaskawaLongReadOnly.pvi.device.yaml`
 - `yaskawaLongReadOnly.template`
+- `yaskawaOutput.pvi.device.yaml`
 - `yaskawaOutput.template`
+- `yaskawaPosition.pvi.device.yaml`
 - `yaskawaPosition.template`
+- `yaskawaReal.pvi.device.yaml`
 - `yaskawaReal.template`
 - `yaskawa_settings.req`
 

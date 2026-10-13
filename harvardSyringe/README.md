@@ -23,6 +23,7 @@ instance's `config/`:
 
 - `harvardSyringe.ibek.support.yaml`
 - `harvardSyringe.proto`
+- `harvardSyringe.pvi.device.yaml`
 - `harvardSyringe.template`
 
 Everything else in this folder stays in the library and is never vendored:

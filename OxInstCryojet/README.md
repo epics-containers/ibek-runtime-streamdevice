@@ -28,8 +28,10 @@ it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `ILM201.pvi.device.yaml`
 - `ILM201.template`
 - `ILM201_settings.req`
+- `ITC4.pvi.device.yaml`
 - `ITC4.template`
 - `ITC4_settings.req`
 - `MercuryiTC-SCPI.proto`
@@ -38,9 +40,16 @@ instance's `config/`:
 - `MercuryiTC-SCPI_loop.template`
 - `MercuryiTC-SCPI_system.template`
 - `MercuryiTC-SCPI_tempSensor.template`
+- `MercuryiTC_SCPI.pvi.device.yaml`
+- `MercuryiTC_SCPI_heater.pvi.device.yaml`
+- `MercuryiTC_SCPI_loop.pvi.device.yaml`
+- `MercuryiTC_SCPI_system.pvi.device.yaml`
+- `MercuryiTC_SCPI_tempSensor.pvi.device.yaml`
 - `OxInstCryojet.ibek.support.yaml`
 - `cjet.proto`
+- `cryojet.pvi.device.yaml`
 - `cryojet.template`
+- `cryojetITC503S.pvi.device.yaml`
 - `cryojetITC503S.template`
 - `cryojetITC503S_settings.req`
 - `cryojet_settings.req`

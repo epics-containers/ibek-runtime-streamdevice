@@ -24,13 +24,16 @@ instance's `config/`:
 
 - `alicatGasFlow.ibek.support.yaml`
 - `alicatGasFlow.proto`
+- `alicatGasFlow.pvi.device.yaml`
 - `alicatGasFlow.template`
 - `alicatGasFlow_settings.req`
 - `alicatMC.proto`
+- `alicatMassCtrl.pvi.device.yaml`
 - `alicatMassCtrl.template`
 - `alicatMassCtrl_detail.template`
 - `alicatMassCtrl_settings.req`
 - `alicatPC.proto`
+- `alicatPressureCtrl.pvi.device.yaml`
 - `alicatPressureCtrl.template`
 - `alicatPressureCtrl_settings.req`
 

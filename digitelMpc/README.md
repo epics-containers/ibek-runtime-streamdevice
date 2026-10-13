@@ -29,17 +29,27 @@ with the pattern, so the provenance travels into every IOC instance that uses it
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `_digitelMpcIonpTemplate.pvi.device.yaml`
+- `_digitelMpcTemplate.pvi.device.yaml`
 - `digitelMpc.ibek.support.yaml`
 - `digitelMpc.proto`
 - `digitelMpc.template`
+- `digitelMpcIonp.pvi.device.yaml`
 - `digitelMpcIonp.template`
+- `digitelMpcIonpGroup.pvi.device.yaml`
 - `digitelMpcIonpGroup.template`
+- `digitelMpcIonpSps.pvi.device.yaml`
 - `digitelMpcIonpSps.template`
+- `digitelMpcTsp.pvi.device.yaml`
 - `digitelMpcTsp.template`
+- `digitelMpcTspDummy.pvi.device.yaml`
 - `digitelMpcTspDummy.template`
+- `digitelMpcTspGroup.pvi.device.yaml`
 - `digitelMpcTspGroup.template`
 - `digitelMpcq.proto`
+- `digitelMpcqTsp.pvi.device.yaml`
 - `digitelMpcqTsp.template`
+- `dummyIonp.pvi.device.yaml`
 - `dummyIonp.template`
 
 Everything else in this folder stays in the library and is never vendored:

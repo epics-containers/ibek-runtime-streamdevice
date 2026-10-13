@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `thorlabsMcls1.ibek.support.yaml`
 - `thorlabsMcls1.proto`
+- `thorlabsMcls1.pvi.device.yaml`
 - `thorlabsMcls1.template`
 
 Everything else in this folder stays in the library and is never vendored:

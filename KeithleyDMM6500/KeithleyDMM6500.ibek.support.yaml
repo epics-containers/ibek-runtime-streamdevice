@@ -29,3 +29,8 @@ entity_models:
       - file: dmm6500.template
         args:
           .*:
+    pvi:
+      yaml_path: dmm6500.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

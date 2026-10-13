@@ -24,6 +24,7 @@ instance's `config/`:
 - `SQC-310.template`
 - `SQC-310_material.template`
 - `SQC-310_sensor.template`
+- `SQC310.pvi.device.yaml`
 
 Everything else in this folder stays in the library and is never vendored:
 

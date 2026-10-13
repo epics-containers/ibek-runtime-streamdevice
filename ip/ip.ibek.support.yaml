@@ -29,3 +29,8 @@ entity_models:
       - file: SR830.db
         args:
           .*:
+    pvi:
+      yaml_path: SR830.pvi.device.yaml
+      ui_macros:
+        P:
+        N:

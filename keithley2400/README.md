@@ -21,6 +21,8 @@ it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `Keithley2400.pvi.device.yaml`
+- `Keithley2461.pvi.device.yaml`
 - `k2400.proto`
 - `k2400.template`
 - `k2400_detail.template`

@@ -21,6 +21,7 @@ it.
 instance's `config/`:
 
 - `explorir.proto`
+- `explorir.pvi.device.yaml`
 - `explorir.template`
 - `gssExplorIR.ibek.support.yaml`
 

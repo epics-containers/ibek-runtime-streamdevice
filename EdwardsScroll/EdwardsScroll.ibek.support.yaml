@@ -25,6 +25,10 @@ entity_models:
       - file: EdwardsScroll.template
         args:
           .*:
+    pvi:
+      yaml_path: EdwardsScroll.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: EdwardsScroll_SerialOnOffExtra
     description: |-
@@ -42,3 +46,7 @@ entity_models:
       - file: EdwardsScroll_SerialOnOffExtra.template
         args:
           .*:
+    pvi:
+      yaml_path: EdwardsScroll_SerialOnOffExtra.pvi.device.yaml
+      ui_macros:
+        P:

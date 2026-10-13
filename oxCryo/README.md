@@ -24,17 +24,22 @@ pattern, so the provenance travels into every IOC instance that uses it.
 instance's `config/`:
 
 - `OXCB700.proto`
+- `OXCB700.pvi.device.yaml`
 - `OXCB700.template`
 - `OXCB700_settings.req`
 - `OXCB800.proto`
+- `OXCB800.pvi.device.yaml`
 - `OXCB800.template`
 - `OXCB800_settings.req`
 - `OXCS700.proto`
+- `OXCS700.pvi.device.yaml`
 - `OXCS700.template`
 - `OXCS700_settings.req`
 - `OXNH700.proto`
+- `OXNH700.pvi.device.yaml`
 - `OXNH700.template`
 - `OXNH700_settings.req`
+- `OXPH700.pvi.device.yaml`
 - `OXPH700.template`
 - `OXcommon.proto`
 - `OXcommon.template`

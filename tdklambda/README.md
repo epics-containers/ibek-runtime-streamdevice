@@ -19,6 +19,7 @@ with the pattern, so the provenance travels into every IOC instance that uses it
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `Gen3300w.pvi.device.yaml`
 - `gen3300w.proto`
 - `gen3300w.template`
 - `tdklambda.ibek.support.yaml`

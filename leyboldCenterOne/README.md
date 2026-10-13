@@ -21,6 +21,7 @@ uses it.
 instance's `config/`:
 
 - `centerOne.proto`
+- `centerOne.pvi.device.yaml`
 - `centerOne.template`
 - `centerOne_settings.req`
 - `leyboldCenterOne.ibek.support.yaml`

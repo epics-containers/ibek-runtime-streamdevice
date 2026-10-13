@@ -49,6 +49,11 @@ entity_models:
       - file: chillax_abs.db
         args:
           .*:
+    pvi:
+      yaml_path: _chillaxSubstituionsTemplate.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
   - name: chillaxController
     description: |-
       Chillax cryocooler controller

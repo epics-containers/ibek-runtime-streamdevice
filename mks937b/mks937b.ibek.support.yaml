@@ -35,6 +35,10 @@ entity_models:
       - file: mks937b.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937b.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bCap
     description: |-
@@ -90,6 +94,10 @@ entity_models:
       - file: mks937bCap.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bCap.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bFastRelay
     description: |-
@@ -150,6 +158,10 @@ entity_models:
       - file: mks937bFastRelay.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bFastRelay.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bGauge
     description: |-
@@ -211,6 +223,11 @@ entity_models:
       - file: mks937bGauge.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bGauge.pvi.device.yaml
+      ui_macros:
+        dom:
+        id:
 
   - name: mks937bGaugeGroup
     description: |-
@@ -266,6 +283,10 @@ entity_models:
       - file: mks937bGaugeGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bGaugeGroup.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bHcg
     description: |-
@@ -416,6 +437,10 @@ entity_models:
       - file: mks937bHcg.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bHcg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bHcgGroup
     description: |-
@@ -485,6 +510,14 @@ entity_models:
       - file: mks937bHcgGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bHcgGroup.pvi.device.yaml
+      ui_macros:
+        device:
+        valveIlRelay:
+        mpsIlRelay1:
+        mpsIlRelay2:
+        rgaIlRelay:
 
   - name: mks937bHy8401
     description: |-
@@ -507,6 +540,10 @@ entity_models:
       - file: mks937bHy8401.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bHy8401.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bImg
     description: |-
@@ -662,6 +699,10 @@ entity_models:
       - file: mks937bImg.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bImg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bImgDummy
     description: |-
@@ -725,6 +766,10 @@ entity_models:
       - file: mks937bImgDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bImgDummy.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bImgGroup
     description: |-
@@ -794,6 +839,14 @@ entity_models:
       - file: mks937bImgGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bImgGroup.pvi.device.yaml
+      ui_macros:
+        device:
+        valveIlRelay:
+        mpsIlRelay1:
+        mpsIlRelay2:
+        rgaIlRelay:
 
   - name: mks937bImgMean
     description: |-
@@ -856,6 +909,10 @@ entity_models:
       - file: mks937bImgMean.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bImgMean.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bInterlock
     description: |-
@@ -885,6 +942,10 @@ entity_models:
       - file: mks937bInterlock.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bInterlock.pvi.device.yaml
+      ui_macros:
+        interlock:
 
   - name: mks937bPirg
     description: |-
@@ -915,6 +976,10 @@ entity_models:
       - file: mks937bPirg.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bPirg.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bPirgDummy
     description: |-
@@ -928,6 +993,10 @@ entity_models:
       - file: mks937bPirgDummy.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bPirgDummy.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bPirgGroup
     description: |-
@@ -978,6 +1047,11 @@ entity_models:
       - file: mks937bPirgGroup.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bPirgGroup.pvi.device.yaml
+      ui_macros:
+        device:
+        ionPumpIlRelay:
 
   - name: mks937bPlogEGU
     description: |-
@@ -995,6 +1069,10 @@ entity_models:
       - file: mks937bPlogEGU.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bPlogEGU.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: mks937bRelays
     description: |-
@@ -1085,3 +1163,7 @@ entity_models:
       - file: mks937bRelays.template
         args:
           .*:
+    pvi:
+      yaml_path: mks937bRelays.pvi.device.yaml
+      ui_macros:
+        device:

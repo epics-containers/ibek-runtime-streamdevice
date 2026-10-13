@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `OxInstIPS.ibek.support.yaml`
 - `OxInstIPS.protocol`
+- `OxInstIPS.pvi.device.yaml`
 - `OxInstIPS.template`
 - `OxInstIPS_settings.req`
 

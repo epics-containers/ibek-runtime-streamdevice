@@ -36,6 +36,10 @@ entity_models:
       - file: VATLeakValve590series.template
         args:
           .*:
+    pvi:
+      yaml_path: _VatLeakValve590seriesTemplate.pvi.device.yaml
+      ui_macros:
+        device:
 
   - name: VatLeakValve590series
     description: |-
@@ -58,3 +62,7 @@ entity_models:
       - file: VATLeakValve590series.template
         args:
           .*:
+    pvi:
+      yaml_path: VatLeakValve590series.pvi.device.yaml
+      ui_macros:
+        device:

@@ -23,6 +23,7 @@ instance's `config/`:
 - `dmc-a2.proto`
 - `dmc-a2.template`
 - `dmc-a2_settings.req`
+- `dmc_a2.pvi.device.yaml`
 - `macroSensors.ibek.support.yaml`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -30,6 +30,10 @@ entity_models:
       - file: M32_system.template
         args:
           .*:
+    pvi:
+      yaml_path: CryoconM32.pvi.device.yaml
+      ui_macros:
+        tctrlr:
 
   - name: CryoconM32_control
     description: |-
@@ -60,6 +64,11 @@ entity_models:
       - file: M32_control.template
         args:
           .*:
+    pvi:
+      yaml_path: CryoconM32_control.pvi.device.yaml
+      ui_macros:
+        tctrlr:
+        loop:
 
   - name: CryoconM32_sensor
     description: |-
@@ -118,3 +127,10 @@ entity_models:
       - file: M32_sensor.template
         args:
           .*:
+    pvi:
+      yaml_path: CryoconM32_sensor.pvi.device.yaml
+      ui_macros:
+        device:
+        record:
+        tctrlr:
+        sensor:

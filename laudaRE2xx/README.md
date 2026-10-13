@@ -24,18 +24,23 @@ with the pattern, so the provenance travels into every IOC instance that uses it
 instance's `config/`:
 
 - `lIntegralT.proto`
+- `lIntegralT.pvi.device.yaml`
 - `lIntegralT.template`
 - `lIntegralT_settings.req`
 - `lMCxxx.proto`
+- `lMCxxx.pvi.device.yaml`
 - `lMCxxx.template`
 - `lMCxxx_settings.req`
 - `lRE2xx.proto`
+- `lRE2xx.pvi.device.yaml`
 - `lRE2xx.template`
 - `lRE2xx_RS485.proto`
+- `lRE2xx_RS485.pvi.device.yaml`
 - `lRE2xx_RS485.template`
 - `lRE2xx_RS485_settings.req`
 - `lRE2xx_settings.req`
 - `lREVariocool.proto`
+- `lVariocool.pvi.device.yaml`
 - `lVariocool.template`
 - `lVariocool_settings.req`
 - `laudaRE2xx.ibek.support.yaml`

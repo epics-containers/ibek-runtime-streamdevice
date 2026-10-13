@@ -32,14 +32,21 @@ instance's `config/`:
 
 - `eurotherm2k.ibek.support.yaml`
 - `eurotherm2k.proto`
+- `eurotherm2k.pvi.device.yaml`
 - `eurotherm2k.template`
 - `eurotherm2k_settings.req`
+- `eurothermConfParam.pvi.device.yaml`
 - `eurothermConfParam.template`
+- `eurothermModbus.pvi.device.yaml`
 - `eurothermModbus.template`
+- `eurothermModbusLoop.pvi.device.yaml`
 - `eurothermModbusLoop.template`
 - `eurothermModbusLoop_settings.req`
+- `eurothermModbusPV.pvi.device.yaml`
 - `eurothermModbusPV.template`
+- `eurothermPV.pvi.device.yaml`
 - `eurothermPV.template`
+- `eurothermParam.pvi.device.yaml`
 - `eurothermParam.template`
 
 Everything else in this folder stays in the library and is never vendored:

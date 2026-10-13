@@ -20,6 +20,7 @@ with the pattern, so the provenance travels into every IOC instance that uses it
 instance's `config/`:
 
 - `WS300.proto`
+- `WS300.pvi.device.yaml`
 - `WS300.template`
 - `WS300scale.ibek.support.yaml`
 

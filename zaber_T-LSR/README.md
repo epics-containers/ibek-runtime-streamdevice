@@ -20,6 +20,7 @@ it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `Zaber_T_LSR.pvi.device.yaml`
 - `zaber_T-LSR.ibek.support.yaml`
 - `zaber_T-LSR.proto`
 - `zaber_T-LSR.template`

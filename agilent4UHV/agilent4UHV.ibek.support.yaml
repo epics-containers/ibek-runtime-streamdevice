@@ -34,6 +34,10 @@ entity_models:
       - file: agilent4UHV.template
         args:
           .*:
+    pvi:
+      yaml_path: _agilent4UHVTemplate.pvi.device.yaml
+      ui_macros:
+        device:
   - name: _agilent4UHVIonpTemplate
     description: |-
       Agilent 4UHV Ion Pump Controller (per-pump template)
@@ -54,6 +58,10 @@ entity_models:
       - file: agilent4UHVIonp.template
         args:
           .*:
+    pvi:
+      yaml_path: _agilent4UHVIonpTemplate.pvi.device.yaml
+      ui_macros:
+        device:
   - name: agilent4UHV
     description: |-
       Agilent 4UHV Ion Pump Controller
@@ -97,3 +105,7 @@ entity_models:
         # ioc.subst block.
         args:
           (?!CTLR$).*:
+    pvi:
+      yaml_path: agilent4UHVIonp.pvi.device.yaml
+      ui_macros:
+        device:

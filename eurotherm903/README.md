@@ -20,6 +20,7 @@ it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `Eurotherm903.pvi.device.yaml`
 - `eurotherm903.ibek.support.yaml`
 - `eurotherm903.proto`
 - `eurotherm903.template`

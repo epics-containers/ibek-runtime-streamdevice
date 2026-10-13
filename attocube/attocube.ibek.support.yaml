@@ -33,3 +33,8 @@ entity_models:
       - file: ANC150.template
         args:
           .*:
+    pvi:
+      yaml_path: ANC150.pvi.device.yaml
+      ui_macros:
+        P:
+        M:

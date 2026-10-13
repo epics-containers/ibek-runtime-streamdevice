@@ -39,3 +39,8 @@ entity_models:
       - file: millik.template
         args:
           .*:
+    pvi:
+      yaml_path: millik.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

@@ -88,6 +88,11 @@ entity_models:
       - file: OXPH700.template
         args:
           .*:
+    pvi:
+      yaml_path: OXPH700.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: OXCS700
     description: |-
@@ -125,6 +130,11 @@ entity_models:
       - file: OXCS700.template
         args:
           .*:
+    pvi:
+      yaml_path: OXCS700.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: OXCB700
     description: |-
@@ -162,6 +172,11 @@ entity_models:
       - file: OXCB700.template
         args:
           .*:
+    pvi:
+      yaml_path: OXCB700.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: OXNH700
     description: |-
@@ -199,6 +214,11 @@ entity_models:
       - file: OXNH700.template
         args:
           .*:
+    pvi:
+      yaml_path: OXNH700.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: OXCB800
     description: |-
@@ -236,3 +256,8 @@ entity_models:
       - file: OXCB800.template
         args:
           .*:
+    pvi:
+      yaml_path: OXCB800.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

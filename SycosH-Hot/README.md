@@ -22,6 +22,7 @@ instance's `config/`:
 - `SycosH-Hot.ibek.support.yaml`
 - `SycosH-Hot.proto`
 - `SycosH-Hot.template`
+- `SycosH_Hot.pvi.device.yaml`
 
 Everything else in this folder stays in the library and is never vendored:
 

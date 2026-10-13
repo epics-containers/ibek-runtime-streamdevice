@@ -21,6 +21,7 @@ that uses it.
 instance's `config/`:
 
 - `axisCameraControl.ibek.support.yaml`
+- `axisCameraControl.pvi.device.yaml`
 - `axisCameraControl.template`
 - `ptz.proto`
 

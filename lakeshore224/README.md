@@ -23,7 +23,9 @@ instance's `config/`:
 
 - `lakeshore224.ibek.support.yaml`
 - `lakeshore224.proto`
+- `lakeshore224.pvi.device.yaml`
 - `lakeshore224.template`
+- `lakeshore224_input_dls.pvi.device.yaml`
 - `lakeshore224_input_dls.template`
 
 Everything else in this folder stays in the library and is never vendored:

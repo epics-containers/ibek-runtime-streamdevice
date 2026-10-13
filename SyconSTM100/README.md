@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `SyconSTM100.ibek.support.yaml`
 - `SyconSTM100.proto`
+- `SyconSTM100.pvi.device.yaml`
 - `SyconSTM100.template`
 
 Everything else in this folder stays in the library and is never vendored:

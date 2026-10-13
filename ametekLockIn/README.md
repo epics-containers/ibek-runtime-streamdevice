@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `ametekLockIn.ibek.support.yaml`
 - `ametekLockIn.proto`
+- `ametekLockIn.pvi.device.yaml`
 - `ametekLockIn.template`
 
 Everything else in this folder stays in the library and is never vendored:

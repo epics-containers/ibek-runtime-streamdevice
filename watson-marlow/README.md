@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `323Du.proto`
 - `323Du.template`
+- `Pump323Du.pvi.device.yaml`
 - `watson-marlow.ibek.support.yaml`
 
 Everything else in this folder stays in the library and is never vendored:

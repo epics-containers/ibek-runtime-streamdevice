@@ -24,14 +24,20 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `YMCS0009.pvi.device.yaml`
 - `YMCS0009.template`
+- `YMCS0012.pvi.device.yaml`
 - `YMCS0012.template`
 - `currAmp.ibek.support.yaml`
+- `currAmpADC.pvi.device.yaml`
 - `currAmpADC.template`
+- `currAmpOffsets.pvi.device.yaml`
 - `currAmpOffsets.template`
 - `currAmpRange.template`
 - `currAmpRangeADC.template`
+- `currAmpSingle.pvi.device.yaml`
 - `currAmpSingle.template`
+- `currAmp_ai.pvi.device.yaml`
 - `currAmp_ai.template`
 - `ymcs.protocol`
 

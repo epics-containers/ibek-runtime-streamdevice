@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `linkam.ibek.support.yaml`
 - `linkam.proto`
+- `linkam.pvi.device.yaml`
 - `linkam.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -20,6 +20,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 instance's `config/`:
 
 - `tenma.proto`
+- `tenma.pvi.device.yaml`
 - `tenma.template`
 - `tenmaPSU.ibek.support.yaml`
 - `tenma_settings.req`

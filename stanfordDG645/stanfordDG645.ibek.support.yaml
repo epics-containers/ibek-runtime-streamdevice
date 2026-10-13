@@ -25,3 +25,7 @@ entity_models:
       - file: stanfordDG645.template
         args:
           .*:
+    pvi:
+      yaml_path: stanfordDG645.pvi.device.yaml
+      ui_macros:
+        P:

@@ -33,3 +33,8 @@ entity_models:
       - file: keithley6514.template
         args:
           .*:
+    pvi:
+      yaml_path: keithley6514.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

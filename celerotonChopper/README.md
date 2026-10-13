@@ -23,6 +23,7 @@ instance's `config/`:
 
 - `celerotonChopper.ibek.support.yaml`
 - `celerotonChopper.proto`
+- `celerotonChopper.pvi.device.yaml`
 - `celerotonChopper.template`
 
 Everything else in this folder stays in the library and is never vendored:

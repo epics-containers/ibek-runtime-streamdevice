@@ -22,11 +22,14 @@ it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `motorInit.pvi.device.yaml`
 - `motorInit.template`
 - `omegaPt.protocol`
 - `strainGauge.ibek.support.yaml`
 - `strainGauge.protocol`
+- `strainGauge.pvi.device.yaml`
 - `strainGauge.template`
+- `strainGaugeOmegaPt.pvi.device.yaml`
 - `strainGaugeOmegaPt.template`
 
 Everything else in this folder stays in the library and is never vendored:

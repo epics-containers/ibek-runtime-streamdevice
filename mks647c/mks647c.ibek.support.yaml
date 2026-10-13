@@ -33,6 +33,12 @@ entity_models:
       - file: mks647cChan.template
         args:
           .*:
+    pvi:
+      yaml_path: mks647cChan.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        CHAN:
 
   - name: mks647c8ChanCtrl
     description: |-
@@ -54,6 +60,11 @@ entity_models:
       - file: mks647c8ChanCtrl.template
         args:
           .*:
+    pvi:
+      yaml_path: mks647c8ChanCtrl.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: mks647c4ChanCtrl
     description: |-
@@ -75,3 +86,8 @@ entity_models:
       - file: mks647c4ChanCtrl.template
         args:
           .*:
+    pvi:
+      yaml_path: mks647c4ChanCtrl.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

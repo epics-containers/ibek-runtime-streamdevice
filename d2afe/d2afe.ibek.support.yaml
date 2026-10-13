@@ -51,6 +51,11 @@ entity_models:
       - file: attenuator_cmd.template
         args:
           .*:
+    pvi:
+      yaml_path: attenuator_cmd.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: attenuators_set_fan
     description: |-
@@ -84,6 +89,11 @@ entity_models:
       - file: attenuators_set_fan.template
         args:
           .*:
+    pvi:
+      yaml_path: attenuators_set_fan.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: cal_table
     description: |-
@@ -109,6 +119,10 @@ entity_models:
       - file: cal_table.template
         args:
           .*:
+    pvi:
+      yaml_path: cal_table.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: d2afeStatus
     description: |-
@@ -134,6 +148,10 @@ entity_models:
       - file: d2afeStatus.template
         args:
           .*:
+    pvi:
+      yaml_path: d2afeStatus.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: d2ptg
     description: |-
@@ -151,6 +169,10 @@ entity_models:
       - file: d2ptg.template
         args:
           .*:
+    pvi:
+      yaml_path: d2ptg.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: d2ptg_cal_scan_list
     description: |-
@@ -168,6 +190,10 @@ entity_models:
       - file: d2ptg_cal_scan_list.template
         args:
           .*:
+    pvi:
+      yaml_path: d2ptg_cal_scan_list.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: d2ptg_mon_scan_list
     description: |-
@@ -185,6 +211,10 @@ entity_models:
       - file: d2ptg_mon_scan_list.template
         args:
           .*:
+    pvi:
+      yaml_path: d2ptg_mon_scan_list.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: d2ptg_scan
     description: |-
@@ -210,6 +240,10 @@ entity_models:
       - file: d2ptg_scan.template
         args:
           .*:
+    pvi:
+      yaml_path: d2ptg_scan.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: fwVersionCheck
     description: |-
@@ -224,6 +258,10 @@ entity_models:
       - file: fwVersionCheck.template
         args:
           .*:
+    pvi:
+      yaml_path: fwVersionCheck.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: generic_cmd
     description: |-
@@ -253,3 +291,8 @@ entity_models:
       - file: generic_cmd.template
         args:
           .*:
+    pvi:
+      yaml_path: generic_cmd.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

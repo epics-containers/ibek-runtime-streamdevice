@@ -25,7 +25,9 @@ instance's `config/`:
 - `leem-PSValue.template`
 - `leem-PSValue_settings.req`
 - `leem.proto`
+- `leem.pvi.device.yaml`
 - `leem.template`
+- `leemPSValue.pvi.device.yaml`
 - `leem_settings.req`
 
 Everything else in this folder stays in the library and is never vendored:

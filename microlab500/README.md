@@ -23,6 +23,7 @@ instance's `config/`:
 
 - `microlab500.ibek.support.yaml`
 - `microlab500.proto`
+- `microlab500.pvi.device.yaml`
 - `microlab500half.template`
 - `microlab500whole.template`
 

@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `agilent33220A.ibek.support.yaml`
 - `agilent33220A.proto`
+- `agilent33220A.pvi.device.yaml`
 - `agilent33220A.template`
 - `agilent33220A_settings.req`
 

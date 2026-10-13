@@ -192,6 +192,37 @@ header and rewrites nothing, and the per-file `sha256` in the instance's
 leaves out. The instance's provenance is the adjacent `runtime-lock.yaml`, which records
 the library, the pinned tag and every vendored file's hash.
 
+## PVI screens
+
+Each entity model has a `<model>.pvi.device.yaml` and a `pvi:` block in its
+`*.ibek.support.yaml` pointing at it, so `ibek runtime generate2` renders
+`<model>.pvi.bob` and links it from the IOC's `index.bob`. The block's `ui_macros`
+pass the entity args that the template's record names use (`device`, `P`, `Q`, ...).
+
+Both are written by [`generate-pvi.py`](generate-pvi.py), which reads the model's
+templates: `pvi convert device` only understands asyn records, which StreamDevice
+templates do not have. Every record appears on the screen: on the main group,
+in `Settings` (autosaved setpoints), in `Comms`, or in an `Internal` sub-screen
+for the calc/fanout/seq plumbing, raw replies and pollers. An output record is shown
+with its readback where the names pair up (`SETX`/`X`, `X`/`X_RBV`, `X:WR`/`X:RD`, ...).
+Where a DLS template carried `# % gui` annotations, they decide what goes on the main
+group, with their labels and group headings. `strip-dls-annotations.py` removes them
+from the templates, so the script reads them from this repo's git history, at the
+commit its `ANNOTATION_REF` names; it needs a full clone for that.
+
+```bash
+uv run generate-pvi.py                    # every pattern
+uv run generate-pvi.py mydevice           # one pattern
+uv run generate-pvi.py --check            # exit 1 if anything would change
+uv run generate-pvi.py --report out.tsv   # where each record went, and why
+```
+
+A pattern can steer the classification with a `pvi-overrides.yaml` (not vendored),
+described in the script's docstring. Each generated file starts with a header holding
+a hash of its body; the script never overwrites a device yaml that lacks the header or
+whose body has been edited, and reports it instead. To hand-maintain a screen, drop
+the header.
+
 ## Versioning
 
 Releases are cut as **repo-wide semantic-version git tags**, unprefixed (`0.1.1`,
@@ -349,6 +380,8 @@ the test used to tell them apart — are listed in
    convert it as described in [Faithful storage](#faithful-storage)
    — scripted, never hand-edited — and record the derivation in the support yaml header.
    Add nothing to the files for the vendoring step: `ibek pattern` copies them verbatim.
+   Then run `uv run generate-pvi.py mydevice` for its PVI screens (see
+   [PVI screens](#pvi-screens)).
 4. Validate locally by vendoring into a scratch IOC instance:
    `ibek pattern add mydevice@work <instance> --source <this repo's checkout>`, run
    `ibek pattern check <instance>`, and confirm `<instance>/config/` holds the runtime
@@ -369,9 +402,11 @@ repo root with [uv](https://docs.astral.sh/uv/):
 | Autosave: each `.req` file holds exactly the PVs its template's `# % autosave` tags give | `uv run --with-requirements ci/requirements.txt ci/check_autosave.py` |
 | Content: no hostnames, IP addresses, internal URLs or credentials | `uv run --with-requirements ci/requirements.txt ci/check_content.py` |
 | Pattern add: a real `ibek pattern add` of every pattern, and of a sample together, into a scratch services repo; checks the lock, the vendored files, the instance schema and `ibek pattern check` | `uv run --with-requirements ci/requirements.txt ci/check_pattern_add.py` |
+| PVI drift: every `*.pvi.device.yaml` and `pvi:` block is what `generate-pvi.py` writes from the templates (needs a full clone, see [PVI screens](#pvi-screens)) | `uv run generate-pvi.py --check` |
+| PVI render: one IOC with an entity of every entity model, all patterns' files flattened into its `config/`, through `ibek runtime generate2` with PVI on; every device yaml loads in pvi and renders a `.bob`, every model with databases has a screen on the index, and every PV on a screen (subscreens included) resolves, with the index button's macros, to a record its model's templates create | `uv run --with-requirements ci/requirements.txt ci/check_pvi.py` |
 | Template load: every vendored template loaded through `iocInit` in the generic `ioc-streamdevice` IOC, with the macros its entity model passes | see below |
 
-Each takes pattern names to check only those patterns. The template load test
+Each takes pattern names to check only those patterns (`ci/check_pvi.py --keep DIR` keeps the generated IOC files). The template load test
 runs inside the published generic IOC image named in `.github/workflows/ci.yml`:
 
 ```bash

@@ -21,6 +21,7 @@ it.
 instance's `config/`:
 
 - `Keithley6487.ibek.support.yaml`
+- `Keithley6487.pvi.device.yaml`
 - `devKeithley6487.db`
 - `devKeithley6487.proto`
 

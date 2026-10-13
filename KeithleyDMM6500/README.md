@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `KeithleyDMM6500.ibek.support.yaml`
 - `dmm6500.proto`
+- `dmm6500.pvi.device.yaml`
 - `dmm6500.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `lakeshore331.ibek.support.yaml`
 - `lakeshore331.protocol`
+- `lakeshore331.pvi.device.yaml`
 - `lakeshore331.template`
 - `lakeshore331_settings.req`
 

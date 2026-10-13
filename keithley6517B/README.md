@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `keithley6517B.ibek.support.yaml`
 - `keithley6517B.proto`
+- `keithley6517B.pvi.device.yaml`
 - `keithley6517B.template`
 
 Everything else in this folder stays in the library and is never vendored:

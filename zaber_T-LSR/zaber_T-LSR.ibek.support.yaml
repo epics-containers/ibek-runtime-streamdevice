@@ -38,3 +38,8 @@ entity_models:
       - file: zaber_T-LSR.template
         args:
           .*:
+    pvi:
+      yaml_path: Zaber_T_LSR.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

@@ -55,3 +55,7 @@ entity_models:
       - file: twickenhamHDI.template
         args:
           .*:
+    pvi:
+      yaml_path: twickenhamHDI.pvi.device.yaml
+      ui_macros:
+        P:

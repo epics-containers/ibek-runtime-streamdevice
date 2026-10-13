@@ -32,6 +32,10 @@ entity_models:
           .*:
           PMP: ""
           SYSTEM: ""
+    pvi:
+      yaml_path: digitelQpc.pvi.device.yaml
+      ui_macros:
+        QPC:
 
   - name: digitelQpcIonp
     description: |-
@@ -88,3 +92,7 @@ entity_models:
           SPLY: "{{ '%02d' | format(SPLY) }}"
           SPT: "{{ '%02d' | format(SPT) }}"
           controller: ""
+    pvi:
+      yaml_path: digitelQpcIonp.pvi.device.yaml
+      ui_macros:
+        device:

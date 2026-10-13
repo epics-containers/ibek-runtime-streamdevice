@@ -54,6 +54,10 @@ entity_models:
       - file: PP612LED.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLED.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: gardasoftLEDChannel
     description: |-
@@ -75,6 +79,11 @@ entity_models:
       - file: PP600SeriesChannel.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLEDChannel.pvi.device.yaml
+      ui_macros:
+        P:
+        N:
 
   - name: gardasoftLED420
     description: |-
@@ -92,6 +101,10 @@ entity_models:
       - file: PP420LED.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLED420.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: gardasoftLED400Channel
     description: |-
@@ -123,6 +136,11 @@ entity_models:
       - file: PP400SeriesChannel.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLED400Channel.pvi.device.yaml
+      ui_macros:
+        P:
+        CHANNEL:
 
   - name: gardasoftLED420Profile
     description: |-
@@ -144,6 +162,11 @@ entity_models:
       - file: PP420Profile.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLED420Profile.pvi.device.yaml
+      ui_macros:
+        P:
+        PROFILE:
 
   - name: gardasoftLED420ProfileChannel
     description: |-
@@ -165,6 +188,12 @@ entity_models:
       - file: PP420ProfileChannel.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLED420ProfileChannel.pvi.device.yaml
+      ui_macros:
+        P:
+        PROFILE:
+        CHANNEL:
 
   - name: gardasoftLED820
     description: |-
@@ -182,6 +211,10 @@ entity_models:
       - file: PP820LED.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLED820.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: gardasoftLED800Channel
     description: |-
@@ -203,6 +236,11 @@ entity_models:
       - file: PP800SeriesChannel.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLED800Channel.pvi.device.yaml
+      ui_macros:
+        P:
+        CHANNEL:
 
   - name: gardasoftLEDRTSeries
     description: |-
@@ -220,6 +258,10 @@ entity_models:
       - file: RTSeriesLED.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLEDRTSeries.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: gardasoftLEDRTSeriesChannel
     description: |-
@@ -253,3 +295,8 @@ entity_models:
       - file: RTSeriesChannel.template
         args:
           .*:
+    pvi:
+      yaml_path: gardasoftLEDRTSeriesChannel.pvi.device.yaml
+      ui_macros:
+        P:
+        N:

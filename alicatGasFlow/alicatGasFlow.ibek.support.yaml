@@ -49,6 +49,11 @@ entity_models:
       - file: alicatGasFlow.template
         args:
           .*:
+    pvi:
+      yaml_path: alicatGasFlow.pvi.device.yaml
+      ui_macros:
+        P:
+        S:
 
   - name: alicatPressureCtrl
     description: |-
@@ -95,6 +100,11 @@ entity_models:
       - file: alicatPressureCtrl.template
         args:
           .*:
+    pvi:
+      yaml_path: alicatPressureCtrl.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: alicatMassCtrl
     description: |-
@@ -517,3 +527,8 @@ entity_models:
       - file: alicatMassCtrl.template
         args:
           .*:
+    pvi:
+      yaml_path: alicatMassCtrl.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

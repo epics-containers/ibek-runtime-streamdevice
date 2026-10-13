@@ -29,3 +29,8 @@ entity_models:
       - file: fusion4000.template
         args:
           .*:
+    pvi:
+      yaml_path: Fusion4000.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

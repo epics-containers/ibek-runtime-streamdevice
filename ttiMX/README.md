@@ -22,8 +22,10 @@ instance's `config/`:
 
 - `ttiMX.ibek.support.yaml`
 - `ttiMX.proto`
+- `ttiMX_channel.pvi.device.yaml`
 - `ttiMX_channel.template`
 - `ttiMX_channel_settings.req`
+- `ttiMX_general.pvi.device.yaml`
 - `ttiMX_general.template`
 
 Everything else in this folder stays in the library and is never vendored:

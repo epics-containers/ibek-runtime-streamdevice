@@ -25,3 +25,7 @@ entity_models:
       - file: kellerPyrometer.template
         args:
           .*:
+    pvi:
+      yaml_path: kellerPyrometer.pvi.device.yaml
+      ui_macros:
+        P:

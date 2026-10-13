@@ -21,6 +21,7 @@ instance's `config/`:
 
 - `polypico.ibek.support.yaml`
 - `polypico.proto`
+- `polypico.pvi.device.yaml`
 - `polypico.template`
 
 Everything else in this folder stays in the library and is never vendored:

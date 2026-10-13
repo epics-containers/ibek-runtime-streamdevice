@@ -19,6 +19,7 @@ pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `_fw102Template.pvi.device.yaml`
 - `fw102.ibek.support.yaml`
 - `fw102.proto`
 - `fw102.template`

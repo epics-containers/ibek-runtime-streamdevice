@@ -24,10 +24,14 @@ instance's `config/`:
 
 - `enzLoCuM4.ibek.support.yaml`
 - `enzLoCuM4.protocol`
+- `enzLoCuM4.pvi.device.yaml`
 - `enzLoCuM4.template`
+- `enzLoCuM4Readback.pvi.device.yaml`
 - `enzLoCuM4Readback.template`
 - `enzLoCuM4Readback_generic_common.template`
+- `enzLoCuM4Readback_generic_diagonal.pvi.device.yaml`
 - `enzLoCuM4Readback_generic_diagonal.template`
+- `enzLoCuM4Readback_generic_vertical.pvi.device.yaml`
 - `enzLoCuM4Readback_generic_vertical.template`
 
 Everything else in this folder stays in the library and is never vendored:

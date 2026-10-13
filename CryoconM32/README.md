@@ -23,6 +23,9 @@ instance's `config/`:
 
 - `CryoconM32.ibek.support.yaml`
 - `CryoconM32.protocol`
+- `CryoconM32.pvi.device.yaml`
+- `CryoconM32_control.pvi.device.yaml`
+- `CryoconM32_sensor.pvi.device.yaml`
 - `M32_control.template`
 - `M32_sensor.template`
 - `M32_system.template`

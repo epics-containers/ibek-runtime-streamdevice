@@ -48,6 +48,10 @@ entity_models:
       - file: k2400.template
         args:
           .*:
+    pvi:
+      yaml_path: Keithley2400.pvi.device.yaml
+      ui_macros:
+        P:
   - name: Keithley2461
     description: |-
       Keithley 2461 SourceMeter
@@ -88,3 +92,7 @@ entity_models:
       - file: k2461.template
         args:
           .*:
+    pvi:
+      yaml_path: Keithley2461.pvi.device.yaml
+      ui_macros:
+        P:

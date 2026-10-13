@@ -34,6 +34,11 @@ entity_models:
       - file: E364xA.template
         args:
           .*:
+    pvi:
+      yaml_path: E364xA.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
 
   - name: caputcallback
     description: |-
@@ -79,3 +84,8 @@ entity_models:
       - file: caputcallback.template
         args:
           .*:
+    pvi:
+      yaml_path: caputcallback.pvi.device.yaml
+      ui_macros:
+        P:
+        M:

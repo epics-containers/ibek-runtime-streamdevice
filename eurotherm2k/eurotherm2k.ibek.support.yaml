@@ -75,6 +75,11 @@ entity_models:
       - file: eurotherm2k.template
         args:
           .*:
+    pvi:
+      yaml_path: eurotherm2k.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: eurothermParam
     description: |-
@@ -137,6 +142,12 @@ entity_models:
       - file: eurothermParam.template
         args:
           .*:
+    pvi:
+      yaml_path: eurothermParam.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        NAME:
 
   - name: eurothermConfParam
     description: |-
@@ -199,6 +210,12 @@ entity_models:
       - file: eurothermConfParam.template
         args:
           .*:
+    pvi:
+      yaml_path: eurothermConfParam.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        NAME:
 
   - name: eurothermPV
     description: |-
@@ -252,6 +269,12 @@ entity_models:
       - file: eurothermPV.template
         args:
           .*:
+    pvi:
+      yaml_path: eurothermPV.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        NAME:
 
   - name: eurothermModbus
     description: |-
@@ -288,6 +311,11 @@ entity_models:
       - file: eurothermModbus.template
         args:
           .*:
+    pvi:
+      yaml_path: eurothermModbus.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: eurothermModbusLoop
     description: |-
@@ -348,6 +376,11 @@ entity_models:
       - file: eurothermModbusLoop.template
         args:
           .*:
+    pvi:
+      yaml_path: eurothermModbusLoop.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: eurothermModbusPV
     description: |-
@@ -386,3 +419,9 @@ entity_models:
       - file: eurothermModbusPV.template
         args:
           .*:
+    pvi:
+      yaml_path: eurothermModbusPV.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        NAME:

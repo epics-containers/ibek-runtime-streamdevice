@@ -26,6 +26,8 @@ instance's `config/`:
 - `VATLeakValve590series.template`
 - `VATLeakValve590series_settings.req`
 - `VatLeakValve590.ibek.support.yaml`
+- `VatLeakValve590series.pvi.device.yaml`
+- `_VatLeakValve590seriesTemplate.pvi.device.yaml`
 
 Everything else in this folder stays in the library and is never vendored:
 

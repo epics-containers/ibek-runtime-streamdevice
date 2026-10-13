@@ -33,3 +33,8 @@ entity_models:
       - file: m10.template
         args:
           .*:
+    pvi:
+      yaml_path: belektronig_btc.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

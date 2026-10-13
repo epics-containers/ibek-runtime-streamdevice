@@ -50,6 +50,10 @@ entity_models:
       - file: strainGaugeOmegaPt.template
         args:
           .*:
+    pvi:
+      yaml_path: strainGaugeOmegaPt.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: strainGauge
     description: |-
@@ -68,6 +72,10 @@ entity_models:
       - file: strainGauge.template
         args:
           .*:
+    pvi:
+      yaml_path: strainGauge.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: motorInit
     description: |-
@@ -89,3 +97,8 @@ entity_models:
       - file: motorInit.template
         args:
           .*:
+    pvi:
+      yaml_path: motorInit.pvi.device.yaml
+      ui_macros:
+        P:
+        M:

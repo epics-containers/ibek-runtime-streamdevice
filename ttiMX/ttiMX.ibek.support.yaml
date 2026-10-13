@@ -50,6 +50,11 @@ entity_models:
       - file: ttiMX_channel.template
         args:
           .*:
+    pvi:
+      yaml_path: ttiMX_channel.pvi.device.yaml
+      ui_macros:
+        P:
+        CHAN:
 
   - name: ttiMX_general
     description: |-
@@ -67,3 +72,7 @@ entity_models:
       - file: ttiMX_general.template
         args:
           .*:
+    pvi:
+      yaml_path: ttiMX_general.pvi.device.yaml
+      ui_macros:
+        P:

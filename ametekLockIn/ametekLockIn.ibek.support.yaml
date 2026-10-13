@@ -29,3 +29,8 @@ entity_models:
       - file: ametekLockIn.template
         args:
           .*:
+    pvi:
+      yaml_path: ametekLockIn.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

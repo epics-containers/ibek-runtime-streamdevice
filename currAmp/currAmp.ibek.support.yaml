@@ -60,6 +60,10 @@ entity_models:
       - file: YMCS0012.template
         args:
           .*:
+    pvi:
+      yaml_path: YMCS0012.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: YMCS0009
     description: |-
@@ -85,6 +89,10 @@ entity_models:
       - file: YMCS0009.template
         args:
           .*:
+    pvi:
+      yaml_path: YMCS0009.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: currAmpOffsets
     description: |-
@@ -108,6 +116,10 @@ entity_models:
       - file: currAmpOffsets.template
         args:
           .*:
+    pvi:
+      yaml_path: currAmpOffsets.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: currAmpADC
     description: |-
@@ -145,6 +157,10 @@ entity_models:
       - file: currAmpADC.template
         args:
           .*:
+    pvi:
+      yaml_path: currAmpADC.pvi.device.yaml
+      ui_macros:
+        P:
 
   - name: currAmpSingle
     description: |-
@@ -175,6 +191,11 @@ entity_models:
       - file: currAmpSingle.template
         args:
           .*:
+    pvi:
+      yaml_path: currAmpSingle.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
 
   - name: currAmp_ai
     description: |-
@@ -233,3 +254,8 @@ entity_models:
       - file: currAmp_ai.template
         args:
           .*:
+    pvi:
+      yaml_path: currAmp_ai.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:

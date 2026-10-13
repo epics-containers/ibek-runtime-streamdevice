@@ -22,6 +22,7 @@ instance's `config/`:
 
 - `daylightQCL.ibek.support.yaml`
 - `daylightQCL.proto`
+- `daylightQCL.pvi.device.yaml`
 - `daylightQCL.template`
 
 Everything else in this folder stays in the library and is never vendored:

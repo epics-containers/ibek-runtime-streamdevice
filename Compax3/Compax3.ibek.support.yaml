@@ -40,3 +40,9 @@ entity_models:
       - file: Compax3.template
         args:
           .*:
+    pvi:
+      yaml_path: Compax3.pvi.device.yaml
+      ui_macros:
+        prefix:
+        suff1:
+        suff2:

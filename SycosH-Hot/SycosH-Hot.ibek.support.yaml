@@ -29,3 +29,8 @@ entity_models:
       - file: SycosH-Hot.template
         args:
           .*:
+    pvi:
+      yaml_path: SycosH_Hot.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
