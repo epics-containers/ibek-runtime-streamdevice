@@ -1,17 +1,325 @@
-# Protocol file for Stanford Digital Delay Generator DG645
+# Protocol file for Stanford Research Systems DG645 Digital Delay Generator
+# This file was generated with the help of Claude (Anthropic).
+# Checked against the DG645 manual rev 1.1 (Remote Programming, pp. 41-59).
+#
+# Usage in a db file, e.g.:
+#   field(DTYP, "stream")
+#   field(INP,  "@DG645.proto getDelay(2) $(PORT)")    # query delay of channel A
+#   field(OUT,  "@DG645.proto setDelay(2,0) $(PORT)")  # set A relative to T0
+#
+# Parameter conventions (manual Tables 30 and 31):
+#   c, d = delay channel: 0=T0 1=T1 2=A 3=B 4=C 5=D 6=E 7=F 8=G 9=H
+#   b    = output BNC:    0=T0 1=AB 2=CD 3=EF 4=GH
+#   i,j,k integer; t seconds; v volts; f Hz
+#   Step commands (SP**): direction 1 = step up, 0 = step down
 
 ReplyTimeout = 1000;
 Terminator = CR LF;
 
+# NB: the DG645 allows only 25 bytes per parameter, so keep float formats
+# at or below %.14e (20 chars). That still covers the 5 ps resolution over
+# the full 2000 s range.
+
+###########################################################################
+# Common IEEE-488.2 commands
+###########################################################################
+
+# *CAL? returns 0 on success, 17 on failure. The manual gives no duration,
+# so the long timeout is a guess; adjust to suit your unit.
+calibrate {
+    out "*CAL?";
+    in "%d";
+    ReplyTimeout = 30000;
+}
+
+clearStatus { out "*CLS"; }
+
+getESE { out "*ESE?"; in "%d"; }
+setESE { out "*ESE %d"; }
+
+# Reading clears the register
+getESR { out "*ESR?"; in "%d"; }
+
+# e.g. "Stanford Research Systems,DG645,s/n004025,ver1.00.00E" (~56 chars,
+# longer than a 40 char stringin; use a waveform/lsi record with CHAR/long string)
+getIDN {
+    out "*IDN?";
+    in "%[^\r\n]";
+}
+
+getOPC { out "*OPC?"; in "%d"; }       # returns 1 when prior commands done
+setOPC { out "*OPC"; }                 # sets the OPC bit in the ESR
+
+getPSC { out "*PSC?"; in "%d"; }
+setPSC { out "*PSC %d"; }
+
+recall { out "*RCL %d"; }              # 0-9 (0 = factory defaults)
+reset  { out "*RST"; }
+save   { out "*SAV %d"; }              # 1-9
+
+getSRE { out "*SRE?"; in "%d"; }
+setSRE { out "*SRE %d"; }
+
+getSTB { out "*STB?"; in "%d"; }
+
+trigger { out "*TRG"; }                # single shot, or arms ext single shot
+
+# *TST? returns 0 on success, 16 on failure. Duration not documented.
+selfTest {
+    out "*TST?";
+    in "%d";
+    ReplyTimeout = 10000;
+}
+
+wait { out "*WAI"; }
+
+###########################################################################
+# Status and display commands
+###########################################################################
+
+# DISP i,c. i = display type:
+#   0 trig rate, 1 trig threshold, 2 trig single shot, 3 trig line,
+#   4 advanced trig enable, 5 trig holdoff, 6 prescale config, 7 burst mode,
+#   8 burst delay, 9 burst count, 10 burst period, 11 channel delay,
+#   12 channel output levels, 13 channel output polarity, 14 burst T0 config
+# c = channel 0-9 (T0..H). The manual does not state the DISP? reply
+# format, so the reply is read as one integer and anything extra ignored.
+getDisplay {
+    out "DISP?";
+    in "%d";
+    ExtraInput = Ignore;
+}
+# record value = display type i, $1 = channel c (0-9)
+setDisplay { out "DISP %d,$1"; }
+
+getINSE { out "INSE?"; in "%d"; }
+setINSE { out "INSE %d"; }
+
+# Reading clears the register
+getINSR { out "INSR?"; in "%d"; }
+
+# Pops one error from the 20-entry buffer; 0 = no error
+getLERR { out "LERR?"; in "%d"; }
+
+# Front panel display on/off: 1 = on, 0 = off
+getShowDisplay { out "SHDP?"; in "%d"; }
+setShowDisplay { out "SHDP %d"; }
+
+# 0 internal, 1 OCXO, 2 rubidium, 3 external
+getTimebase { out "TIMB?"; in "%d"; }
+
+###########################################################################
+# Trigger commands
+###########################################################################
+
+getAdvTrig { out "ADVT?"; in "%d"; }   # 0 off, 1 on
+setAdvTrig { out "ADVT %d"; }
+
+getHoldoff { out "HOLD?"; in "%f"; }
+setHoldoff { out "HOLD %.14e"; }
+
+# 0 off, 1 triggers, 2 AB, 3 AB+CD, 4 AB+CD+EF, 5 AB+CD+EF+GH
+getInhibit { out "INHB?"; in "%d"; }
+setInhibit { out "INHB %d"; }
+
+# $1 = output prescaler: 1=AB 2=CD 3=EF 4=GH
+getPrescalePhase { out "PHAS? $1"; in "%d"; }
+setPrescalePhase { out "PHAS $1,%d"; }
+
+# $1 = prescaler: 0=trigger input 1=AB 2=CD 3=EF 4=GH
+getPrescale { out "PRES? $1"; in "%d"; }
+setPrescale { out "PRES $1,%d"; }
+
+# Step commands (write only), value = direction 1/0
+stepHoldoff       { out "SPHD %d"; }
+stepPrescalePhase { out "SPPH $1,%d"; }    # $1 = prescaler 1-4
+stepPrescale      { out "SPPS $1,%d"; }    # $1 = prescaler 0-4
+stepTriggerLevel  { out "SPTL %d"; }
+stepTriggerRate   { out "SPTR %d"; }
+
+# Step sizes
+getStepHoldoff { out "SSHD?"; in "%f"; }
+setStepHoldoff { out "SSHD %.14e"; }
+
+getStepPrescalePhase { out "SSPH? $1"; in "%d"; }
+setStepPrescalePhase { out "SSPH $1,%d"; }
+
+getStepPrescale { out "SSPS? $1"; in "%d"; }
+setStepPrescale { out "SSPS $1,%d"; }
+
+getStepTriggerLevel { out "SSTL?"; in "%f"; }
+setStepTriggerLevel { out "SSTL %f"; }
+
+getStepTriggerRate { out "SSTR?"; in "%f"; }
+setStepTriggerRate { out "SSTR %f"; }
+
+getTriggerLevel { out "TLVL?"; in "%f"; }
+setTriggerLevel { out "TLVL %f"; }
+
+getTriggerRate { out "TRAT?"; in "%f"; }
+setTriggerRate { out "TRAT %f"; }
+
+# 0 internal, 1 ext rising, 2 ext falling, 3 single shot ext rising,
+# 4 single shot ext falling, 5 single shot, 6 line
+getTriggerSource { out "TSRC?"; in "%d"; }
+setTriggerSource { out "TSRC %d"; }
+
+###########################################################################
+# Burst commands
+###########################################################################
+
+getBurstCount { out "BURC?"; in "%d"; }
+setBurstCount { out "BURC %d"; }
+
+getBurstDelay { out "BURD?"; in "%f"; }
+setBurstDelay { out "BURD %.14e"; }
+
+# 0 disabled, 1 enabled
+getBurstMode { out "BURM?"; in "%d"; }
+setBurstMode { out "BURM %d"; }
+
+# Minimum 100 ns, 10 ns resolution (the manual's stated upper limit is garbled
+# in the command list; the specifications page says 42.9 s)
+getBurstPeriod { out "BURP?"; in "%f"; }
+setBurstPeriod { out "BURP %.14e"; }
+
+# 0 = T0 on all delay cycles of the burst, 1 = first cycle only
+getBurstT0 { out "BURT?"; in "%d"; }
+setBurstT0 { out "BURT %d"; }
+
+# Step commands (write only), value = direction 1/0
+stepBurstCount  { out "SPBC %d"; }
+stepBurstDelay  { out "SPBD %d"; }
+stepBurstPeriod { out "SPBP %d"; }
+
+# Step sizes
+getStepBurstCount { out "SSBC?"; in "%d"; }
+setStepBurstCount { out "SSBC %d"; }
+
+getStepBurstDelay { out "SSBD?"; in "%f"; }
+setStepBurstDelay { out "SSBD %.14e"; }
+
+getStepBurstPeriod { out "SSBP?"; in "%f"; }
+setStepBurstPeriod { out "SSBP %.14e"; }
+
+###########################################################################
+# Delay and output commands
+###########################################################################
+
+# DLAY? c replies "<linked channel>,<delay>", e.g. "2,+0.001000000000"
+# $1 = channel
 getDelay {
-         out "DLAY?\$1";
-         in "%*u,%f";
+    out "DLAY? $1";
+    in "%*u,%f";
 }
 
+# Linked channel part of the same reply
+getDelayLink {
+    out "DLAY? $1";
+    in "%d,%*f";
+}
+
+# $1 = channel, $2 = channel the delay is relative to
 setDelay {
-         out "DLAY \$1,\$2,%e";
-         out "*WAI";
-         out "LERR?";
-         in "0";
+    out "DLAY $1,$2,%.14e";
+    out "*WAI";
+    out "LERR?";
+    in "0";
 }
 
+# $1 = output b
+getLevelAmplitude { out "LAMP? $1"; in "%f"; }
+setLevelAmplitude { out "LAMP $1,%f"; }
+
+# $1 = channel c (not T0, and neither channel may be T1); reply is d
+getLink { out "LINK? $1"; in "%d"; }
+setLink { out "LINK $1,%d"; }
+
+getLevelOffset { out "LOFF? $1"; in "%f"; }
+setLevelOffset { out "LOFF $1,%f"; }
+
+# 1 = positive, 0 = negative
+getLevelPolarity { out "LPOL? $1"; in "%d"; }
+setLevelPolarity { out "LPOL $1,%d"; }
+
+# Step commands (write only): $1 = channel/output, value = direction 1/0
+stepDelay          { out "SPDL $1,%d"; }
+stepLevelAmplitude { out "SPLA $1,%d"; }
+stepLevelOffset    { out "SPLO $1,%d"; }
+
+# Step sizes
+getStepDelay { out "SSDL? $1"; in "%f"; }
+setStepDelay { out "SSDL $1,%.14e"; }
+
+getStepLevelAmplitude { out "SSLA? $1"; in "%f"; }
+setStepLevelAmplitude { out "SSLA $1,%f"; }
+
+getStepLevelOffset { out "SSLO? $1"; in "%f"; }
+setStepLevelOffset { out "SSLO $1,%f"; }
+
+###########################################################################
+# Interface commands
+###########################################################################
+
+# The manual does not give the reply format; this assumes xx:xx:xx:xx:xx:xx
+getMAC {
+    out "EMAC?";
+    in "%[^\r\n]";
+}
+
+# $1 = item: 0 = auto-negotiation enable/disable, 1 = manual link speed
+# (10 Base-T / 100 Base-T). The manual doesn't say which j value is which
+# speed; its example "EPHY 1,1" selects 100 Base-T.
+getEthPhy { out "EPHY? $1"; in "%d"; }
+setEthPhy { out "EPHY $1,%d"; }
+
+# $1 = parameter:
+#   0 RS-232 enable   1 RS-232 baud   2 GPIB enable   3 GPIB address
+#   4 TCP/IP enable   5 DHCP          6 Auto-IP        7 Static IP
+#   8 Bare socket     9 Telnet       10 VXI-11         (enables: 0/1)
+# Numeric parameters 0-10 use these two:
+getIfcf { out "IFCF? $1"; in "%d"; }
+setIfcf { out "IFCF $1,%d"; }
+
+# Parameters 11 (static IP), 12 (netmask), 13 (gateway) take "a.b.c.d"
+getIfcfAddr { out "IFCF? $1"; in "%s"; }
+setIfcfAddr { out "IFCF $1,%s"; }
+
+# 0 RS-232, 1 GPIB, 2 LAN TCP/IP
+ifReset { out "IFRS %d"; }
+
+# LCAL is only active on telnet and RS-232; REMT on raw socket, telnet, RS-232
+goLocal  { out "LCAL"; }
+goRemote { out "REMT"; }
+
+# 1 = granted/released, 0 = not
+requestLock { out "LOCK?"; in "%d"; }
+releaseLock { out "UNLK?"; in "%d"; }
+
+# Interface terminator appended to responses (default 13,10).
+# If you change it, update Terminator at the top of this file to match.
+setTerminator  { out "XTRM %d"; }
+# record value = i, $1 = j
+setTerminator2 { out "XTRM %d,$1"; }
+# record value = i, $1 = j, $2 = k
+setTerminator3 { out "XTRM %d,$1,$2"; }
+
+###########################################################################
+# Calibration commands (manual pp. 73-77)
+# These alter factory calibration data held in non-volatile memory. Don't
+# expose them on operator screens; use only for deliberate recalibration.
+###########################################################################
+
+# CALT(?)0{,i}: timebase calibration byte. The leading 0 is a fixed
+# argument in the manual's syntax.
+getCalTimebase { out "CALT? 0"; in "%d"; }
+setCalTimebase { out "CALT 0,%d"; }
+
+# CALL(?)i{,j}: calibration byte i, value j. $1 = byte index:
+#   Output levels (offset intercept/offset slope/amplitude intercept/amplitude slope):
+#     0-3 T0, 4-7 AB, 8-11 CD, 12-15 EF, 16-19 GH
+#   Trigger threshold:
+#     20 positive trigger intercept, 21 positive trigger slope,
+#     22 negative trigger intercept, 23 negative trigger slope
+getCalLevel { out "CALL? $1"; in "%d"; }
+setCalLevel { out "CALL $1,%d"; }

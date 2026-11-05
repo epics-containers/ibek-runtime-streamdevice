@@ -2,9 +2,11 @@
 
 # Imported from DLS production support module: stanfordDG645 1-3
 # Source: /dls_sw/prod/R3.14.12.7/support/stanfordDG645/1-3
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
-# To check for updates: diff this pattern's files against that path, or against the
-# newest /dls_sw/prod/*/support/stanfordDG645/ release.
+# The template and StreamDevice protocol have since been extended to cover the
+# DG645 command set, with the help of Claude (Anthropic). The per-output records
+# are now in stanfordDG645Channel.template and stanfordDG645Output.template, which
+# are instantiated once per output below; PV names for the original delay/width
+# records are unchanged (e.g. $(P):AB:DELAY).
 
 module: stanfordDG645
 
@@ -22,10 +24,79 @@ entity_models:
         description: |-
           Asyn port for device
     databases:
+      # Instrument-wide: common, status, trigger and burst
       - file: stanfordDG645.template
         args:
-          .*:
+          P:
+          PORT:
+
+      # Delay channel pairs and output prescalers
+      - file: stanfordDG645Channel.template
+        args:
+          P:
+          PORT:
+          CH: AB
+          LEAD: "2"
+          TRAIL: "3"
+          PRESC: "1"
+      - file: stanfordDG645Channel.template
+        args:
+          P:
+          PORT:
+          CH: CD
+          LEAD: "4"
+          TRAIL: "5"
+          PRESC: "2"
+      - file: stanfordDG645Channel.template
+        args:
+          P:
+          PORT:
+          CH: EF
+          LEAD: "6"
+          TRAIL: "7"
+          PRESC: "3"
+      - file: stanfordDG645Channel.template
+        args:
+          P:
+          PORT:
+          CH: GH
+          LEAD: "8"
+          TRAIL: "9"
+          PRESC: "4"
+
+      # Output levels
+      - file: stanfordDG645Output.template
+        args:
+          P:
+          PORT:
+          CH: T0
+          BNC: "0"
+      - file: stanfordDG645Output.template
+        args:
+          P:
+          PORT:
+          CH: AB
+          BNC: "1"
+      - file: stanfordDG645Output.template
+        args:
+          P:
+          PORT:
+          CH: CD
+          BNC: "2"
+      - file: stanfordDG645Output.template
+        args:
+          P:
+          PORT:
+          CH: EF
+          BNC: "3"
+      - file: stanfordDG645Output.template
+        args:
+          P:
+          PORT:
+          CH: GH
+          BNC: "4"
     pvi:
       yaml_path: stanfordDG645.pvi.device.yaml
       ui_macros:
         P:
+        CH: "GH"

@@ -1,0 +1,268 @@
+#! Generated with the help of Claude (Anthropic)
+# DG645 delay channel pair (e.g. AB = delays A and B) plus its output prescaler.
+# Instantiate once per front-panel output:
+#   CH=AB LEAD=2 TRAIL=3 PRESC=1
+#   CH=CD LEAD=4 TRAIL=5 PRESC=2
+#   CH=EF LEAD=6 TRAIL=7 PRESC=3
+#   CH=GH LEAD=8 TRAIL=9 PRESC=4
+#
+# % macro, P, Device name
+# % macro, PORT, Asyn port for device
+# % macro, CH, Output name e.g. AB
+# % macro, LEAD, Delay channel number of the leading edge (A=2 C=4 E=6 G=8)
+# % macro, TRAIL, Delay channel number of the trailing edge (B=3 D=5 F=7 H=9)
+# % macro, PRESC, Output prescaler index (AB=1 CD=2 EF=3 GH=4)
+
+# ---------------------------------------------------------------------------
+# Delay (leading edge relative to T0) and width (trailing edge relative to
+# the leading edge)
+# ---------------------------------------------------------------------------
+
+record(ao, "$(P):$(CH):DELAY") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setDelay($(LEAD),0) $(PORT)")
+  field(PREC, "4")
+  field(EGU, "s")
+}
+
+record(ao, "$(P):$(CH):WIDTH") {
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setDelay($(TRAIL),$(LEAD)) $(PORT)")
+  field(PREC, "4")
+  field(EGU, "s")
+}
+
+record(ai, "$(P):$(CH):DELAY_RBV") {
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getDelay($(LEAD)) $(PORT)")
+  field(PREC, "4")
+  field(EGU, "s")
+}
+
+record(ai, "$(P):$(CH):WIDTH_RBV") {
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getDelay($(TRAIL)) $(PORT)")
+  field(PREC, "4")
+  field(EGU, "s")
+}
+
+# ---------------------------------------------------------------------------
+# Leading edge: link, step, step size
+# ---------------------------------------------------------------------------
+
+record(mbbo, "$(P):$(CH):DELAY:LINK") {
+  field(DESC, "Channel this delay is relative to")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setLink($(LEAD)) $(PORT)")
+  field(ZRST, "T0") field(ZRVL, "0")
+  field(ONST, "A")  field(ONVL, "2")
+  field(TWST, "B")  field(TWVL, "3")
+  field(THST, "C")  field(THVL, "4")
+  field(FRST, "D")  field(FRVL, "5")
+  field(FVST, "E")  field(FVVL, "6")
+  field(SXST, "F")  field(SXVL, "7")
+  field(SVST, "G")  field(SVVL, "8")
+  field(EIST, "H")  field(EIVL, "9")
+  field(FLNK, "$(P):$(CH):DELAY:LINK_RBV")
+}
+
+record(mbbi, "$(P):$(CH):DELAY:LINK_RBV") {
+  field(DESC, "Channel this delay is relative to")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getLink($(LEAD)) $(PORT)")
+  field(ZRST, "T0") field(ZRVL, "0")
+  field(ONST, "A")  field(ONVL, "2")
+  field(TWST, "B")  field(TWVL, "3")
+  field(THST, "C")  field(THVL, "4")
+  field(FRST, "D")  field(FRVL, "5")
+  field(FVST, "E")  field(FVVL, "6")
+  field(SXST, "F")  field(SXVL, "7")
+  field(SVST, "G")  field(SVVL, "8")
+  field(EIST, "H")  field(EIVL, "9")
+}
+
+record(bo, "$(P):$(CH):DELAY:STEP") {
+  field(DESC, "Step delay by step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto stepDelay($(LEAD)) $(PORT)")
+  field(ZNAM, "Down")
+  field(ONAM, "Up")
+}
+
+record(ao, "$(P):$(CH):DELAY:STEPSIZE") {
+  field(DESC, "Delay step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setStepDelay($(LEAD)) $(PORT)")
+  field(PREC, "12")
+  field(EGU, "s")
+  field(FLNK, "$(P):$(CH):DELAY:STEPSIZE_RBV")
+}
+
+record(ai, "$(P):$(CH):DELAY:STEPSIZE_RBV") {
+  field(DESC, "Delay step size")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getStepDelay($(LEAD)) $(PORT)")
+  field(PREC, "12")
+  field(EGU, "s")
+}
+
+# ---------------------------------------------------------------------------
+# Trailing edge: link, step, step size
+# ---------------------------------------------------------------------------
+
+record(mbbo, "$(P):$(CH):WIDTH:LINK") {
+  field(DESC, "Channel this delay is relative to")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setLink($(TRAIL)) $(PORT)")
+  field(ZRST, "T0") field(ZRVL, "0")
+  field(ONST, "A")  field(ONVL, "2")
+  field(TWST, "B")  field(TWVL, "3")
+  field(THST, "C")  field(THVL, "4")
+  field(FRST, "D")  field(FRVL, "5")
+  field(FVST, "E")  field(FVVL, "6")
+  field(SXST, "F")  field(SXVL, "7")
+  field(SVST, "G")  field(SVVL, "8")
+  field(EIST, "H")  field(EIVL, "9")
+  field(FLNK, "$(P):$(CH):WIDTH:LINK_RBV")
+}
+
+record(mbbi, "$(P):$(CH):WIDTH:LINK_RBV") {
+  field(DESC, "Channel this delay is relative to")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getLink($(TRAIL)) $(PORT)")
+  field(ZRST, "T0") field(ZRVL, "0")
+  field(ONST, "A")  field(ONVL, "2")
+  field(TWST, "B")  field(TWVL, "3")
+  field(THST, "C")  field(THVL, "4")
+  field(FRST, "D")  field(FRVL, "5")
+  field(FVST, "E")  field(FVVL, "6")
+  field(SXST, "F")  field(SXVL, "7")
+  field(SVST, "G")  field(SVVL, "8")
+  field(EIST, "H")  field(EIVL, "9")
+}
+
+record(bo, "$(P):$(CH):WIDTH:STEP") {
+  field(DESC, "Step width by step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto stepDelay($(TRAIL)) $(PORT)")
+  field(ZNAM, "Down")
+  field(ONAM, "Up")
+}
+
+record(ao, "$(P):$(CH):WIDTH:STEPSIZE") {
+  field(DESC, "Width step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setStepDelay($(TRAIL)) $(PORT)")
+  field(PREC, "12")
+  field(EGU, "s")
+  field(FLNK, "$(P):$(CH):WIDTH:STEPSIZE_RBV")
+}
+
+record(ai, "$(P):$(CH):WIDTH:STEPSIZE_RBV") {
+  field(DESC, "Width step size")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getStepDelay($(TRAIL)) $(PORT)")
+  field(PREC, "12")
+  field(EGU, "s")
+}
+
+# ---------------------------------------------------------------------------
+# Output prescaler and phase (output runs at trigger rate / PRESCALE, enabled
+# on delay cycle PHASE)
+# ---------------------------------------------------------------------------
+
+record(longout, "$(P):$(CH):PRESCALE") {
+  field(DESC, "Output prescale factor")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setPrescale($(PRESC)) $(PORT)")
+  field(DRVL, "1")
+  field(DRVH, "65535")
+  field(FLNK, "$(P):$(CH):PRESCALE_RBV")
+}
+
+record(longin, "$(P):$(CH):PRESCALE_RBV") {
+  field(DESC, "Output prescale factor")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getPrescale($(PRESC)) $(PORT)")
+}
+
+record(bo, "$(P):$(CH):PRESCALE:STEP") {
+  field(DESC, "Step prescale by step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto stepPrescale($(PRESC)) $(PORT)")
+  field(ZNAM, "Down")
+  field(ONAM, "Up")
+}
+
+record(longout, "$(P):$(CH):PRESCALE:STEPSIZE") {
+  field(DESC, "Prescale step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setStepPrescale($(PRESC)) $(PORT)")
+  field(FLNK, "$(P):$(CH):PRESCALE:STEPSIZE_RBV")
+}
+
+record(longin, "$(P):$(CH):PRESCALE:STEPSIZE_RBV") {
+  field(DESC, "Prescale step size")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getStepPrescale($(PRESC)) $(PORT)")
+}
+
+record(longout, "$(P):$(CH):PHASE") {
+  field(DESC, "Output prescale phase")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setPrescalePhase($(PRESC)) $(PORT)")
+  field(DRVL, "0")
+  field(DRVH, "65534")
+  field(FLNK, "$(P):$(CH):PHASE_RBV")
+}
+
+record(longin, "$(P):$(CH):PHASE_RBV") {
+  field(DESC, "Output prescale phase")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getPrescalePhase($(PRESC)) $(PORT)")
+}
+
+record(bo, "$(P):$(CH):PHASE:STEP") {
+  field(DESC, "Step phase by step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto stepPrescalePhase($(PRESC)) $(PORT)")
+  field(ZNAM, "Down")
+  field(ONAM, "Up")
+}
+
+record(longout, "$(P):$(CH):PHASE:STEPSIZE") {
+  field(DESC, "Prescale phase step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setStepPrescalePhase($(PRESC)) $(PORT)")
+  field(FLNK, "$(P):$(CH):PHASE:STEPSIZE_RBV")
+}
+
+record(longin, "$(P):$(CH):PHASE:STEPSIZE_RBV") {
+  field(DESC, "Prescale phase step size")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getStepPrescalePhase($(PRESC)) $(PORT)")
+}
