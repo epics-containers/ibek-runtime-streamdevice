@@ -16,6 +16,11 @@
 ReplyTimeout = 1000;
 Terminator = CR LF;
 
+# calibrate and selfTest hold the port for up to their ReplyTimeout (30 s and
+# 10 s, both guesses). Without this, every other record waiting for the port
+# gives up after the default 5 s and raises a timeout alarm; with it they queue.
+LockTimeout = 35000;
+
 # NB: the DG645 allows only 25 bytes per parameter, so keep float formats
 # at or below %.14e (20 chars). That still covers the 5 ps resolution over
 # the full 2000 s range.

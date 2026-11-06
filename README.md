@@ -218,7 +218,10 @@ uv run generate-pvi.py --report out.tsv   # where each record went, and why
 ```
 
 A pattern can steer the classification with a `pvi-overrides.yaml` (not vendored),
-described in the script's docstring. Each generated file starts with a header holding
+described in the script's docstring. Controls follow a record's labels too: a `bo`
+labelled `Down`/`Up` becomes a pair of step buttons, one labelled `Idle`/action a
+command button, and an input listed under `proc` in the overrides gets a button that
+writes its `.PROC`. Each generated file starts with a header holding
 a hash of its body; the script never overwrites a device yaml that lacks the header or
 whose body has been edited, and reports it instead. To hand-maintain a screen, drop
 the header.

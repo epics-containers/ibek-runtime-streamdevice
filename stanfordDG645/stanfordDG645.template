@@ -25,7 +25,9 @@ record(waveform, "$(P):IDN") {
   field(NELM, "128")
 }
 
-# Process to run; the value is the result (0 ok, 17 failed)
+# Passive query: the screen's Run button writes .PROC to start it. The value is
+# the result (0 ok, 17 failed). The device is busy for the whole calibration
+# (see LockTimeout in the proto), and its duration is not given in the manual.
 record(longin, "$(P):AUTOCAL") {
   field(DESC, "Run auto-cal (0 ok, 17 fail)")
   field(SCAN, "Passive")
@@ -33,9 +35,11 @@ record(longin, "$(P):AUTOCAL") {
   field(INP, "@stanfordDG645.proto calibrate $(PORT)")
 }
 
-# Process to run; the value is the result (0 ok, 16 failed)
+# Passive query: the screen's Run button writes .PROC to start it. The value is
+# the result (0 ok, 16 failed). The manual says the unit is reset to its default
+# settings after a self test, so this is not harmless on a configured unit.
 record(longin, "$(P):SELFTEST") {
-  field(DESC, "Run self test (0 ok, 16 fail)")
+  field(DESC, "Run self test (resets settings)")
   field(SCAN, "Passive")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto selfTest $(PORT)")
@@ -62,7 +66,8 @@ record(longout, "$(P):ESE") {
 
 record(longin, "$(P):ESE_RBV") {
   field(DESC, "Std event status enable")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getESE $(PORT)")
 }
@@ -103,7 +108,8 @@ record(bo, "$(P):PSC") {
 
 record(bi, "$(P):PSC_RBV") {
   field(DESC, "Power-on status clear")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getPSC $(PORT)")
   field(ZNAM, "Retain SRE/ESE")
@@ -149,7 +155,8 @@ record(longout, "$(P):SRE") {
 
 record(longin, "$(P):SRE_RBV") {
   field(DESC, "Service request enable")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getSRE $(PORT)")
 }
@@ -186,7 +193,8 @@ record(longout, "$(P):INSE") {
 
 record(longin, "$(P):INSE_RBV") {
   field(DESC, "Instrument status enable")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getINSE $(PORT)")
 }
@@ -219,7 +227,7 @@ record(bo, "$(P):DISPLAY") {
 
 record(bi, "$(P):DISPLAY_RBV") {
   field(DESC, "Front panel display on/off")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getShowDisplay $(PORT)")
   field(ZNAM, "Off")
@@ -240,7 +248,7 @@ record(mbbi, "$(P):TIMEBASE") {
 # T1 is the end of the T0 pulse; read only
 record(ai, "$(P):T1:DELAY_RBV") {
   field(DESC, "T1 (end of T0) delay")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getDelay(1) $(PORT)")
   field(PREC, "12")
@@ -268,7 +276,7 @@ record(mbbo, "$(P):TRIG:SOURCE") {
 
 record(mbbi, "$(P):TRIG:SOURCE_RBV") {
   field(DESC, "Trigger source")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getTriggerSource $(PORT)")
   field(ZRST, "Internal")                 field(ZRVL, "0")
@@ -304,7 +312,7 @@ record(ao, "$(P):TRIG:RATE") {
 
 record(ai, "$(P):TRIG:RATE_RBV") {
   field(DESC, "Internal trigger rate")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getTriggerRate $(PORT)")
   field(PREC, "6")
@@ -332,7 +340,8 @@ record(ao, "$(P):TRIG:RATE:STEPSIZE") {
 
 record(ai, "$(P):TRIG:RATE:STEPSIZE_RBV") {
   field(DESC, "Trigger rate step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepTriggerRate $(PORT)")
   field(PREC, "6")
@@ -353,7 +362,7 @@ record(ao, "$(P):TRIG:LEVEL") {
 
 record(ai, "$(P):TRIG:LEVEL_RBV") {
   field(DESC, "External trigger threshold")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getTriggerLevel $(PORT)")
   field(PREC, "2")
@@ -381,7 +390,8 @@ record(ao, "$(P):TRIG:LEVEL:STEPSIZE") {
 
 record(ai, "$(P):TRIG:LEVEL:STEPSIZE_RBV") {
   field(DESC, "Trigger level step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepTriggerLevel $(PORT)")
   field(PREC, "2")
@@ -400,7 +410,7 @@ record(bo, "$(P):TRIG:ADVANCED") {
 
 record(bi, "$(P):TRIG:ADVANCED_RBV") {
   field(DESC, "Advanced triggering")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getAdvTrig $(PORT)")
   field(ZNAM, "Disabled")
@@ -420,7 +430,7 @@ record(ao, "$(P):TRIG:HOLDOFF") {
 
 record(ai, "$(P):TRIG:HOLDOFF_RBV") {
   field(DESC, "Trigger holdoff")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getHoldoff $(PORT)")
   field(PREC, "12")
@@ -448,7 +458,8 @@ record(ao, "$(P):TRIG:HOLDOFF:STEPSIZE") {
 
 record(ai, "$(P):TRIG:HOLDOFF:STEPSIZE_RBV") {
   field(DESC, "Holdoff step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepHoldoff $(PORT)")
   field(PREC, "12")
@@ -471,7 +482,7 @@ record(mbbo, "$(P):TRIG:INHIBIT") {
 
 record(mbbi, "$(P):TRIG:INHIBIT_RBV") {
   field(DESC, "Rear panel inhibit behaviour")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getInhibit $(PORT)")
   field(ZRST, "Off")            field(ZRVL, "0")
@@ -494,7 +505,7 @@ record(longout, "$(P):TRIG:PRESCALE") {
 
 record(longin, "$(P):TRIG:PRESCALE_RBV") {
   field(DESC, "Trigger input prescale factor")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getPrescale(0) $(PORT)")
 }
@@ -518,7 +529,8 @@ record(longout, "$(P):TRIG:PRESCALE:STEPSIZE") {
 
 record(longin, "$(P):TRIG:PRESCALE:STEPSIZE_RBV") {
   field(DESC, "Trig prescale step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepPrescale(0) $(PORT)")
 }
@@ -539,7 +551,7 @@ record(bo, "$(P):BURST:MODE") {
 
 record(bi, "$(P):BURST:MODE_RBV") {
   field(DESC, "Burst mode")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getBurstMode $(PORT)")
   field(ZNAM, "Off")
@@ -558,7 +570,7 @@ record(bo, "$(P):BURST:T0") {
 
 record(bi, "$(P):BURST:T0_RBV") {
   field(DESC, "Burst T0 configuration")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getBurstT0 $(PORT)")
   field(ZNAM, "All cycles")
@@ -576,7 +588,7 @@ record(longout, "$(P):BURST:COUNT") {
 
 record(longin, "$(P):BURST:COUNT_RBV") {
   field(DESC, "Delay cycles per burst")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getBurstCount $(PORT)")
 }
@@ -600,7 +612,8 @@ record(longout, "$(P):BURST:COUNT:STEPSIZE") {
 
 record(longin, "$(P):BURST:COUNT:STEPSIZE_RBV") {
   field(DESC, "Burst count step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepBurstCount $(PORT)")
 }
@@ -618,7 +631,7 @@ record(ao, "$(P):BURST:DELAY") {
 
 record(ai, "$(P):BURST:DELAY_RBV") {
   field(DESC, "Trigger to first burst cycle")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getBurstDelay $(PORT)")
   field(PREC, "12")
@@ -646,7 +659,8 @@ record(ao, "$(P):BURST:DELAY:STEPSIZE") {
 
 record(ai, "$(P):BURST:DELAY:STEPSIZE_RBV") {
   field(DESC, "Burst delay step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepBurstDelay $(PORT)")
   field(PREC, "12")
@@ -666,7 +680,7 @@ record(ao, "$(P):BURST:PERIOD") {
 
 record(ai, "$(P):BURST:PERIOD_RBV") {
   field(DESC, "Period between burst cycles")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getBurstPeriod $(PORT)")
   field(PREC, "9")
@@ -694,7 +708,8 @@ record(ao, "$(P):BURST:PERIOD:STEPSIZE") {
 
 record(ai, "$(P):BURST:PERIOD:STEPSIZE_RBV") {
   field(DESC, "Burst period step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepBurstPeriod $(PORT)")
   field(PREC, "9")

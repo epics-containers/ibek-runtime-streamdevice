@@ -26,7 +26,7 @@ record(ao, "$(P):$(CH):AMP") {
 
 record(ai, "$(P):$(CH):AMP_RBV") {
   field(DESC, "Output amplitude")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getLevelAmplitude($(BNC)) $(PORT)")
   field(PREC, "2")
@@ -54,7 +54,8 @@ record(ao, "$(P):$(CH):AMP:STEPSIZE") {
 
 record(ai, "$(P):$(CH):AMP:STEPSIZE_RBV") {
   field(DESC, "Amplitude step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepLevelAmplitude($(BNC)) $(PORT)")
   field(PREC, "2")
@@ -75,7 +76,7 @@ record(ao, "$(P):$(CH):OFFSET") {
 
 record(ai, "$(P):$(CH):OFFSET_RBV") {
   field(DESC, "Output offset")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getLevelOffset($(BNC)) $(PORT)")
   field(PREC, "2")
@@ -103,7 +104,8 @@ record(ao, "$(P):$(CH):OFFSET:STEPSIZE") {
 
 record(ai, "$(P):$(CH):OFFSET:STEPSIZE_RBV") {
   field(DESC, "Offset step size")
-  field(SCAN, "5 second")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getStepLevelOffset($(BNC)) $(PORT)")
   field(PREC, "2")
@@ -122,7 +124,7 @@ record(bo, "$(P):$(CH):POL") {
 
 record(bi, "$(P):$(CH):POL_RBV") {
   field(DESC, "Output polarity")
-  field(SCAN, "5 second")
+  field(SCAN, "10 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getLevelPolarity($(BNC)) $(PORT)")
   field(ZNAM, "Negative")

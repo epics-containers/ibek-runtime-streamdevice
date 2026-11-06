@@ -41,8 +41,7 @@ entity_models:
     databases:
       - file: stanfordDG645.template
         args:
-          P:
-          PORT:
+          .*:
     pvi:
       yaml_path: stanfordDG645.pvi.device.yaml
       ui_macros:
@@ -73,9 +72,7 @@ entity_models:
     databases:
       - file: stanfordDG645Channel.template
         args:
-          P:
-          PORT:
-          CH:
+          .*:
           # delay channel numbers: A=2 B=3, C=4 D=5, E=6 F=7, G=8 H=9
           LEAD: "{{ 2 * (['AB', 'CD', 'EF', 'GH'].index(CH) + 1) }}"
           TRAIL: "{{ 2 * (['AB', 'CD', 'EF', 'GH'].index(CH) + 1) + 1 }}"
@@ -113,9 +110,7 @@ entity_models:
     databases:
       - file: stanfordDG645Output.template
         args:
-          P:
-          PORT:
-          CH:
+          .*:
           # output index: T0=0 AB=1 CD=2 EF=3 GH=4
           BNC: "{{ ['T0', 'AB', 'CD', 'EF', 'GH'].index(CH) }}"
     pvi:
