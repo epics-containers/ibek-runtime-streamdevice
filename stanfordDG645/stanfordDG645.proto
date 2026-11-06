@@ -82,20 +82,8 @@ wait { out "*WAI"; }
 # Status and display commands
 ###########################################################################
 
-# DISP i,c. i = display type:
-#   0 trig rate, 1 trig threshold, 2 trig single shot, 3 trig line,
-#   4 advanced trig enable, 5 trig holdoff, 6 prescale config, 7 burst mode,
-#   8 burst delay, 9 burst count, 10 burst period, 11 channel delay,
-#   12 channel output levels, 13 channel output polarity, 14 burst T0 config
-# c = channel 0-9 (T0..H). The manual does not state the DISP? reply
-# format, so the reply is read as one integer and anything extra ignored.
-getDisplay {
-    out "DISP?";
-    in "%d";
-    ExtraInput = Ignore;
-}
-# record value = display type i, $1 = channel c (0-9)
-setDisplay { out "DISP %d,$1"; }
+# DISP (front-panel display select) is left out: it only changes what the
+# front panel shows, and the manual does not give the DISP? reply format.
 
 getINSE { out "INSE?"; in "%d"; }
 setINSE { out "INSE %d"; }
@@ -218,11 +206,6 @@ getDelay {
     in "%*u,%f";
 }
 
-# Linked channel part of the same reply
-getDelayLink {
-    out "DLAY? $1";
-    in "%d,%*f";
-}
 
 # $1 = channel, $2 = channel the delay is relative to
 setDelay {
@@ -236,9 +219,9 @@ setDelay {
 getLevelAmplitude { out "LAMP? $1"; in "%f"; }
 setLevelAmplitude { out "LAMP $1,%f"; }
 
-# $1 = channel c (not T0, and neither channel may be T1); reply is d
-getLink { out "LINK? $1"; in "%d"; }
-setLink { out "LINK $1,%d"; }
+# LINK is left out: setDelay sends DLAY c,d,t, which sets the link and the
+# time together, so any LINK setting would be undone by the next delay
+# write. Delays are always relative to T0 and widths to the leading edge.
 
 getLevelOffset { out "LOFF? $1"; in "%f"; }
 setLevelOffset { out "LOFF $1,%f"; }
@@ -263,68 +246,19 @@ getStepLevelOffset { out "SSLO? $1"; in "%f"; }
 setStepLevelOffset { out "SSLO $1,%f"; }
 
 ###########################################################################
-# Interface commands
+# Excluded commands
 ###########################################################################
 
-# The manual does not give the reply format; this assumes xx:xx:xx:xx:xx:xx
-getMAC {
-    out "EMAC?";
-    in "%[^\r\n]";
-}
-
-# $1 = item: 0 = auto-negotiation enable/disable, 1 = manual link speed
-# (10 Base-T / 100 Base-T). The manual doesn't say which j value is which
-# speed; its example "EPHY 1,1" selects 100 Base-T.
-getEthPhy { out "EPHY? $1"; in "%d"; }
-setEthPhy { out "EPHY $1,%d"; }
-
-# $1 = parameter:
-#   0 RS-232 enable   1 RS-232 baud   2 GPIB enable   3 GPIB address
-#   4 TCP/IP enable   5 DHCP          6 Auto-IP        7 Static IP
-#   8 Bare socket     9 Telnet       10 VXI-11         (enables: 0/1)
-# Numeric parameters 0-10 use these two:
-getIfcf { out "IFCF? $1"; in "%d"; }
-setIfcf { out "IFCF $1,%d"; }
-
-# Parameters 11 (static IP), 12 (netmask), 13 (gateway) take "a.b.c.d"
-getIfcfAddr { out "IFCF? $1"; in "%s"; }
-setIfcfAddr { out "IFCF $1,%s"; }
-
-# 0 RS-232, 1 GPIB, 2 LAN TCP/IP
-ifReset { out "IFRS %d"; }
-
-# LCAL is only active on telnet and RS-232; REMT on raw socket, telnet, RS-232
-goLocal  { out "LCAL"; }
-goRemote { out "REMT"; }
-
-# 1 = granted/released, 0 = not
-requestLock { out "LOCK?"; in "%d"; }
-releaseLock { out "UNLK?"; in "%d"; }
-
-# Interface terminator appended to responses (default 13,10).
-# If you change it, update Terminator at the top of this file to match.
-setTerminator  { out "XTRM %d"; }
-# record value = i, $1 = j
-setTerminator2 { out "XTRM %d,$1"; }
-# record value = i, $1 = j, $2 = k
-setTerminator3 { out "XTRM %d,$1,$2"; }
-
-###########################################################################
-# Calibration commands (manual pp. 73-77)
-# These alter factory calibration data held in non-volatile memory. Don't
-# expose them on operator screens; use only for deliberate recalibration.
-###########################################################################
-
-# CALT(?)0{,i}: timebase calibration byte. The leading 0 is a fixed
-# argument in the manual's syntax.
-getCalTimebase { out "CALT? 0"; in "%d"; }
-setCalTimebase { out "CALT 0,%d"; }
-
-# CALL(?)i{,j}: calibration byte i, value j. $1 = byte index:
-#   Output levels (offset intercept/offset slope/amplitude intercept/amplitude slope):
-#     0-3 T0, 4-7 AB, 8-11 CD, 12-15 EF, 16-19 GH
-#   Trigger threshold:
-#     20 positive trigger intercept, 21 positive trigger slope,
-#     22 negative trigger intercept, 23 negative trigger slope
-getCalLevel { out "CALL? $1"; in "%d"; }
-setCalLevel { out "CALL $1,%d"; }
+# The DG645 also has these commands, deliberately left out of this file:
+#
+# Interface: EMAC?, EPHY, IFCF, IFRS, LCAL, REMT,
+# LOCK?/UNLK?, XTRM. These reconfigure or reset the link the IOC talks
+# over, or change the reply terminator, so a mistaken write can cut the
+# IOC off from the instrument until someone fixes it at the front panel.
+#
+# Calibration (manual pp. 73-77): CALT, CALL. These overwrite factory
+# calibration data in non-volatile memory and belong to a deliberate
+# recalibration, not an operator screen.
+#
+# To use any of them, add the protocol here together with a record that
+# uses it.

@@ -5,8 +5,8 @@
 #
 # Not exposed here: display select (DISP), interface configuration (IFCF,
 # EPHY, IFRS, XTRM, LCAL, REMT, LOCK/UNLK) and calibration (CALT, CALL).
-# They can change or break the connection, or alter factory calibration.
-# The protocols for all of them are in stanfordDG645.proto if you need them.
+# They can change or break the connection, or alter factory calibration,
+# so stanfordDG645.proto leaves them out too (see "Excluded commands" there).
 #
 # % macro, P, Device name
 # % macro, PORT, Asyn port for device

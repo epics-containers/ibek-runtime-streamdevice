@@ -55,10 +55,12 @@ now belong to `stanfordDG645.stanfordDG645Channel`, so an `ioc.yaml` that only h
   read at start-up and after each write, so a change made at the front panel shows only
   after the next write or restart. All 4 channels and 5 outputs come to about 13 reads a
   second.
-- **No records for some protocols.** The proto also has protocols for the interface
-  (`IFCF`, `EPHY`, `IFRS`, `XTRM`, `LCAL`, `REMT`, `LOCK?`/`UNLK?`), calibration
-  (`CALT`, `CALL`), the MAC address query (`EMAC?`), display select and link commands
-  that no template uses.
+- **Some commands are left out.** The interface commands (`IFCF`, `EPHY`, `IFRS`,
+  `XTRM`, `LCAL`, `REMT`, `LOCK?`/`UNLK?`, `EMAC?`) can reconfigure or cut off the comms
+  link, and the calibration commands (`CALT`, `CALL`) overwrite factory calibration
+  data, so the proto has no protocols for them. `LINK` is left out because `DLAY` sets
+  the link anyway, and display select (`DISP`) because it only affects the front panel.
+  The "Excluded commands" section at the end of the proto lists them.
 
 ## Files
 
