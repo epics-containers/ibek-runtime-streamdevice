@@ -22,7 +22,7 @@ record(ao, "$(P):$(CH):DELAY") {
   field(SCAN, "Passive")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto setDelay($(LEAD),0) $(PORT)")
-  field(PREC, "4")
+  field(PREC, "12")
   field(EGU, "s")
 }
 
@@ -30,7 +30,7 @@ record(ao, "$(P):$(CH):WIDTH") {
   field(SCAN, "Passive")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto setDelay($(TRAIL),$(LEAD)) $(PORT)")
-  field(PREC, "4")
+  field(PREC, "12")
   field(EGU, "s")
 }
 
@@ -38,7 +38,7 @@ record(ai, "$(P):$(CH):DELAY_RBV") {
   field(SCAN, "1 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getDelay($(LEAD)) $(PORT)")
-  field(PREC, "4")
+  field(PREC, "12")
   field(EGU, "s")
 }
 
@@ -46,7 +46,7 @@ record(ai, "$(P):$(CH):WIDTH_RBV") {
   field(SCAN, "1 second")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getDelay($(TRAIL)) $(PORT)")
-  field(PREC, "4")
+  field(PREC, "12")
   field(EGU, "s")
 }
 
