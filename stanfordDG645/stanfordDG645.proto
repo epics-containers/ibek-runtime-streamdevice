@@ -1,17 +1,265 @@
-# Protocol file for Stanford Digital Delay Generator DG645
+# Protocol file for Stanford Research Systems DG645 Digital Delay Generator
+# This file was generated with the help of Claude (Anthropic).
+# Checked against the DG645 manual rev 1.1 (Remote Programming, pp. 41-59).
+#
+# Usage in a db file, e.g.:
+#   field(DTYP, "stream")
+#   field(INP,  "@DG645.proto getDelay(2) $(PORT)")    # query delay of channel A
+#   field(OUT,  "@DG645.proto setDelay(2,0) $(PORT)")  # set A relative to T0
+#
+# Parameter conventions (manual Tables 30 and 31):
+#   c, d = delay channel: 0=T0 1=T1 2=A 3=B 4=C 5=D 6=E 7=F 8=G 9=H
+#   b    = output BNC:    0=T0 1=AB 2=CD 3=EF 4=GH
+#   i,j,k integer; t seconds; v volts; f Hz
+#   Step commands (SP**): direction 1 = step up, 0 = step down
 
 ReplyTimeout = 1000;
 Terminator = CR LF;
 
+# calibrate and selfTest hold the port for up to their ReplyTimeout (30 s and
+# 10 s, both guesses). Without this, every other record waiting for the port
+# gives up after the default 5 s and raises a timeout alarm; with it they queue.
+LockTimeout = 35000;
+
+# NB: the DG645 allows only 25 bytes per parameter, so keep float formats
+# at or below %.14e (20 chars). That still covers the 5 ps resolution over
+# the full 2000 s range.
+
+###########################################################################
+# Common IEEE-488.2 commands
+###########################################################################
+
+# *CAL? returns 0 on success, 17 on failure. The manual gives no duration,
+# so the long timeout is a guess; adjust to suit your unit.
+calibrate {
+    out "*CAL?";
+    in "%d";
+    ReplyTimeout = 30000;
+}
+
+clearStatus { out "*CLS"; }
+
+getESE { out "*ESE?"; in "%d"; }
+setESE { out "*ESE %d"; @init { out "*ESE?"; in "%d"; } }
+
+# Reading clears the register
+getESR { out "*ESR?"; in "%d"; }
+
+# e.g. "Stanford Research Systems,DG645,s/n004025,ver1.00.00E" (~56 chars,
+# longer than a 40 char stringin; use a waveform/lsi record with CHAR/long string)
+getIDN {
+    out "*IDN?";
+    in "%[^\r\n]";
+}
+
+getOPC { out "*OPC?"; in "%d"; }       # returns 1 when prior commands done
+setOPC { out "*OPC"; }                 # sets the OPC bit in the ESR
+
+getPSC { out "*PSC?"; in "%d"; }
+setPSC { out "*PSC %d"; @init { out "*PSC?"; in "%d"; } }
+
+recall { out "*RCL %d"; }              # 0-9 (0 = factory defaults)
+reset  { out "*RST"; }
+save   { out "*SAV %d"; }              # 1-9
+
+getSRE { out "*SRE?"; in "%d"; }
+setSRE { out "*SRE %d"; @init { out "*SRE?"; in "%d"; } }
+
+getSTB { out "*STB?"; in "%d"; }
+
+trigger { out "*TRG"; }                # single shot, or arms ext single shot
+
+# *TST? returns 0 on success, 16 on failure. Duration not documented.
+selfTest {
+    out "*TST?";
+    in "%d";
+    ReplyTimeout = 10000;
+}
+
+wait { out "*WAI"; }
+
+###########################################################################
+# Status and display commands
+###########################################################################
+
+# DISP (front-panel display select) is left out: it only changes what the
+# front panel shows, and the manual does not give the DISP? reply format.
+
+getINSE { out "INSE?"; in "%d"; }
+setINSE { out "INSE %d"; @init { out "INSE?"; in "%d"; } }
+
+# Reading clears the register
+getINSR { out "INSR?"; in "%d"; }
+
+# Pops one error from the 20-entry buffer; 0 = no error
+getLERR { out "LERR?"; in "%d"; }
+
+# Front panel display on/off: 1 = on, 0 = off
+getShowDisplay { out "SHDP?"; in "%d"; }
+setShowDisplay { out "SHDP %d"; @init { out "SHDP?"; in "%d"; } }
+
+# 0 internal, 1 OCXO, 2 rubidium, 3 external
+getTimebase { out "TIMB?"; in "%d"; }
+
+###########################################################################
+# Trigger commands
+###########################################################################
+
+getAdvTrig { out "ADVT?"; in "%d"; }   # 0 off, 1 on
+setAdvTrig { out "ADVT %d"; @init { out "ADVT?"; in "%d"; } }
+
+getHoldoff { out "HOLD?"; in "%f"; }
+setHoldoff { out "HOLD %.14e"; @init { out "HOLD?"; in "%f"; } }
+
+# 0 off, 1 triggers, 2 AB, 3 AB+CD, 4 AB+CD+EF, 5 AB+CD+EF+GH
+getInhibit { out "INHB?"; in "%d"; }
+setInhibit { out "INHB %d"; @init { out "INHB?"; in "%d"; } }
+
+# $1 = output prescaler: 1=AB 2=CD 3=EF 4=GH
+getPrescalePhase { out "PHAS? \$1"; in "%d"; }
+setPrescalePhase { out "PHAS \$1,%d"; @init { out "PHAS? \$1"; in "%d"; } }
+
+# $1 = prescaler: 0=trigger input 1=AB 2=CD 3=EF 4=GH
+getPrescale { out "PRES? \$1"; in "%d"; }
+setPrescale { out "PRES \$1,%d"; @init { out "PRES? \$1"; in "%d"; } }
+
+# Step commands (write only), value = direction 1/0
+stepHoldoff       { out "SPHD %d"; }
+stepPrescalePhase { out "SPPH \$1,%d"; }    # $1 = prescaler 1-4
+stepPrescale      { out "SPPS \$1,%d"; }    # $1 = prescaler 0-4
+stepTriggerLevel  { out "SPTL %d"; }
+stepTriggerRate   { out "SPTR %d"; }
+
+# Step sizes
+getStepHoldoff { out "SSHD?"; in "%f"; }
+setStepHoldoff { out "SSHD %.14e"; @init { out "SSHD?"; in "%f"; } }
+
+getStepPrescalePhase { out "SSPH? \$1"; in "%d"; }
+setStepPrescalePhase { out "SSPH \$1,%d"; @init { out "SSPH? \$1"; in "%d"; } }
+
+getStepPrescale { out "SSPS? \$1"; in "%d"; }
+setStepPrescale { out "SSPS \$1,%d"; @init { out "SSPS? \$1"; in "%d"; } }
+
+getStepTriggerLevel { out "SSTL?"; in "%f"; }
+setStepTriggerLevel { out "SSTL %f"; @init { out "SSTL?"; in "%f"; } }
+
+getStepTriggerRate { out "SSTR?"; in "%f"; }
+setStepTriggerRate { out "SSTR %f"; @init { out "SSTR?"; in "%f"; } }
+
+getTriggerLevel { out "TLVL?"; in "%f"; }
+setTriggerLevel { out "TLVL %f"; @init { out "TLVL?"; in "%f"; } }
+
+getTriggerRate { out "TRAT?"; in "%f"; }
+setTriggerRate { out "TRAT %f"; @init { out "TRAT?"; in "%f"; } }
+
+# 0 internal, 1 ext rising, 2 ext falling, 3 single shot ext rising,
+# 4 single shot ext falling, 5 single shot, 6 line
+getTriggerSource { out "TSRC?"; in "%d"; }
+setTriggerSource { out "TSRC %d"; @init { out "TSRC?"; in "%d"; } }
+
+###########################################################################
+# Burst commands
+###########################################################################
+
+getBurstCount { out "BURC?"; in "%d"; }
+setBurstCount { out "BURC %d"; @init { out "BURC?"; in "%d"; } }
+
+getBurstDelay { out "BURD?"; in "%f"; }
+setBurstDelay { out "BURD %.14e"; @init { out "BURD?"; in "%f"; } }
+
+# 0 disabled, 1 enabled
+getBurstMode { out "BURM?"; in "%d"; }
+setBurstMode { out "BURM %d"; @init { out "BURM?"; in "%d"; } }
+
+# Minimum 100 ns, 10 ns resolution (the manual's stated upper limit is garbled
+# in the command list; the specifications page says 42.9 s)
+getBurstPeriod { out "BURP?"; in "%f"; }
+setBurstPeriod { out "BURP %.14e"; @init { out "BURP?"; in "%f"; } }
+
+# 0 = T0 on all delay cycles of the burst, 1 = first cycle only
+getBurstT0 { out "BURT?"; in "%d"; }
+setBurstT0 { out "BURT %d"; @init { out "BURT?"; in "%d"; } }
+
+# Step commands (write only), value = direction 1/0
+stepBurstCount  { out "SPBC %d"; }
+stepBurstDelay  { out "SPBD %d"; }
+stepBurstPeriod { out "SPBP %d"; }
+
+# Step sizes
+getStepBurstCount { out "SSBC?"; in "%d"; }
+setStepBurstCount { out "SSBC %d"; @init { out "SSBC?"; in "%d"; } }
+
+getStepBurstDelay { out "SSBD?"; in "%f"; }
+setStepBurstDelay { out "SSBD %.14e"; @init { out "SSBD?"; in "%f"; } }
+
+getStepBurstPeriod { out "SSBP?"; in "%f"; }
+setStepBurstPeriod { out "SSBP %.14e"; @init { out "SSBP?"; in "%f"; } }
+
+###########################################################################
+# Delay and output commands
+###########################################################################
+
+# DLAY? c replies "<linked channel>,<delay>", e.g. "2,+0.001000000000"
+# $1 = channel
 getDelay {
-         out "DLAY?\$1";
-         in "%*u,%f";
+    out "DLAY? \$1";
+    in "%*u,%f";
 }
 
+
+# $1 = channel, $2 = channel the delay is relative to
 setDelay {
-         out "DLAY \$1,\$2,%e";
-         out "*WAI";
-         out "LERR?";
-         in "0";
+    out "DLAY \$1,\$2,%.14e";
+    out "*WAI";
+    out "LERR?";
+    in "0";
+    @init { out "DLAY? \$1"; in "%*u,%f"; }
 }
 
+# $1 = output b
+getLevelAmplitude { out "LAMP? \$1"; in "%f"; }
+setLevelAmplitude { out "LAMP \$1,%f"; @init { out "LAMP? \$1"; in "%f"; } }
+
+# LINK is left out: setDelay sends DLAY c,d,t, which sets the link and the
+# time together, so any LINK setting would be undone by the next delay
+# write. Delays are always relative to T0 and widths to the leading edge.
+
+getLevelOffset { out "LOFF? \$1"; in "%f"; }
+setLevelOffset { out "LOFF \$1,%f"; @init { out "LOFF? \$1"; in "%f"; } }
+
+# 1 = positive, 0 = negative
+getLevelPolarity { out "LPOL? \$1"; in "%d"; }
+setLevelPolarity { out "LPOL \$1,%d"; @init { out "LPOL? \$1"; in "%d"; } }
+
+# Step commands (write only): $1 = channel/output, value = direction 1/0
+stepDelay          { out "SPDL \$1,%d"; }
+stepLevelAmplitude { out "SPLA \$1,%d"; }
+stepLevelOffset    { out "SPLO \$1,%d"; }
+
+# Step sizes
+getStepDelay { out "SSDL? \$1"; in "%f"; }
+setStepDelay { out "SSDL \$1,%.14e"; @init { out "SSDL? \$1"; in "%f"; } }
+
+getStepLevelAmplitude { out "SSLA? \$1"; in "%f"; }
+setStepLevelAmplitude { out "SSLA \$1,%f"; @init { out "SSLA? \$1"; in "%f"; } }
+
+getStepLevelOffset { out "SSLO? \$1"; in "%f"; }
+setStepLevelOffset { out "SSLO \$1,%f"; @init { out "SSLO? \$1"; in "%f"; } }
+
+###########################################################################
+# Excluded commands
+###########################################################################
+
+# The DG645 also has these commands, deliberately left out of this file:
+#
+# Interface: EMAC?, EPHY, IFCF, IFRS, LCAL, REMT,
+# LOCK?/UNLK?, XTRM. These reconfigure or reset the link the IOC talks
+# over, or change the reply terminator, so a mistaken write can cut the
+# IOC off from the instrument until someone fixes it at the front panel.
+#
+# Calibration (manual pp. 73-77): CALT, CALL. These overwrite factory
+# calibration data in non-volatile memory and belong to a deliberate
+# recalibration, not an operator screen.
+#
+# To use any of them, add the protocol here together with a record that
+# uses it.

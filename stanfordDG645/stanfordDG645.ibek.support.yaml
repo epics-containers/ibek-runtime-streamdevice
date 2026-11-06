@@ -2,16 +2,33 @@
 
 # Imported from DLS production support module: stanfordDG645 1-3
 # Source: /dls_sw/prod/R3.14.12.7/support/stanfordDG645/1-3
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
-# To check for updates: diff this pattern's files against that path, or against the
-# newest /dls_sw/prod/*/support/stanfordDG645/ release.
+# The template and StreamDevice protocol have since been extended to cover the
+# DG645 command set, with the help of Claude (Anthropic).
+#
+# Three entities, so that each gets its own screen and the per-output records
+# are only created for the outputs you use:
+#   stanfordDG645          instrument-wide: common, status, trigger, burst
+#   stanfordDG645Channel   delay pair + output prescaler, one per AB/CD/EF/GH
+#   stanfordDG645Output    output levels, one per T0/AB/CD/EF/GH
+# PV names for the original delay/width records are unchanged ($(P):AB:DELAY).
+#
+# Example ioc yaml:
+#   - type: stanfordDG645.stanfordDG645
+#     P: BL19I-EA-DG645-01
+#     PORT: dg645
+#   - type: stanfordDG645.stanfordDG645Channel
+#     P: BL19I-EA-DG645-01
+#     PORT: dg645
+#     CH: AB
 
 module: stanfordDG645
 
 entity_models:
   - name: stanfordDG645
     description: |-
-      Support for Stanford DG645 digital delay generator
+      Support for Stanford DG645 digital delay generator: common IEEE-488.2,
+      status, trigger and burst records. Add stanfordDG645Channel and
+      stanfordDG645Output entities for the delay channels and output levels.
     parameters:
       P:
         type: str
@@ -29,3 +46,75 @@ entity_models:
       yaml_path: stanfordDG645.pvi.device.yaml
       ui_macros:
         P:
+
+  - name: stanfordDG645Channel
+    description: |-
+      One DG645 delay channel pair (AB = delays A and B, and so on) with its
+      output prescaler. Add one per output you use.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name, as for the stanfordDG645 entity
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+      CH:
+        type: enum
+        description: |-
+          Front-panel output (delay channel pair)
+        values:
+          AB:
+          CD:
+          EF:
+          GH:
+    databases:
+      - file: stanfordDG645Channel.template
+        args:
+          .*:
+          # delay channel numbers: A=2 B=3, C=4 D=5, E=6 F=7, G=8 H=9
+          LEAD: "{{ 2 * (['AB', 'CD', 'EF', 'GH'].index(CH) + 1) }}"
+          TRAIL: "{{ 2 * (['AB', 'CD', 'EF', 'GH'].index(CH) + 1) + 1 }}"
+          # output prescaler index: AB=1 CD=2 EF=3 GH=4
+          PRESC: "{{ ['AB', 'CD', 'EF', 'GH'].index(CH) + 1 }}"
+    pvi:
+      yaml_path: stanfordDG645Channel.pvi.device.yaml
+      ui_macros:
+        P:
+        CH:
+
+  - name: stanfordDG645Output
+    description: |-
+      One DG645 front-panel output's level configuration (amplitude, offset,
+      polarity). Add one per output you use.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name, as for the stanfordDG645 entity
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+      CH:
+        type: enum
+        description: |-
+          Front-panel output
+        values:
+          T0:
+          AB:
+          CD:
+          EF:
+          GH:
+    databases:
+      - file: stanfordDG645Output.template
+        args:
+          .*:
+          # output index: T0=0 AB=1 CD=2 EF=3 GH=4
+          BNC: "{{ ['T0', 'AB', 'CD', 'EF', 'GH'].index(CH) }}"
+    pvi:
+      yaml_path: stanfordDG645Output.pvi.device.yaml
+      ui_macros:
+        P:
+        CH:
