@@ -116,17 +116,17 @@ getInhibit { out "INHB?"; in "%d"; }
 setInhibit { out "INHB %d"; }
 
 # $1 = output prescaler: 1=AB 2=CD 3=EF 4=GH
-getPrescalePhase { out "PHAS? $1"; in "%d"; }
-setPrescalePhase { out "PHAS $1,%d"; }
+getPrescalePhase { out "PHAS? \$1"; in "%d"; }
+setPrescalePhase { out "PHAS \$1,%d"; }
 
 # $1 = prescaler: 0=trigger input 1=AB 2=CD 3=EF 4=GH
-getPrescale { out "PRES? $1"; in "%d"; }
-setPrescale { out "PRES $1,%d"; }
+getPrescale { out "PRES? \$1"; in "%d"; }
+setPrescale { out "PRES \$1,%d"; }
 
 # Step commands (write only), value = direction 1/0
 stepHoldoff       { out "SPHD %d"; }
-stepPrescalePhase { out "SPPH $1,%d"; }    # $1 = prescaler 1-4
-stepPrescale      { out "SPPS $1,%d"; }    # $1 = prescaler 0-4
+stepPrescalePhase { out "SPPH \$1,%d"; }    # $1 = prescaler 1-4
+stepPrescale      { out "SPPS \$1,%d"; }    # $1 = prescaler 0-4
 stepTriggerLevel  { out "SPTL %d"; }
 stepTriggerRate   { out "SPTR %d"; }
 
@@ -134,11 +134,11 @@ stepTriggerRate   { out "SPTR %d"; }
 getStepHoldoff { out "SSHD?"; in "%f"; }
 setStepHoldoff { out "SSHD %.14e"; }
 
-getStepPrescalePhase { out "SSPH? $1"; in "%d"; }
-setStepPrescalePhase { out "SSPH $1,%d"; }
+getStepPrescalePhase { out "SSPH? \$1"; in "%d"; }
+setStepPrescalePhase { out "SSPH \$1,%d"; }
 
-getStepPrescale { out "SSPS? $1"; in "%d"; }
-setStepPrescale { out "SSPS $1,%d"; }
+getStepPrescale { out "SSPS? \$1"; in "%d"; }
+setStepPrescale { out "SSPS \$1,%d"; }
 
 getStepTriggerLevel { out "SSTL?"; in "%f"; }
 setStepTriggerLevel { out "SSTL %f"; }
@@ -202,48 +202,48 @@ setStepBurstPeriod { out "SSBP %.14e"; }
 # DLAY? c replies "<linked channel>,<delay>", e.g. "2,+0.001000000000"
 # $1 = channel
 getDelay {
-    out "DLAY? $1";
+    out "DLAY? \$1";
     in "%*u,%f";
 }
 
 
 # $1 = channel, $2 = channel the delay is relative to
 setDelay {
-    out "DLAY $1,$2,%.14e";
+    out "DLAY \$1,\$2,%.14e";
     out "*WAI";
     out "LERR?";
     in "0";
 }
 
 # $1 = output b
-getLevelAmplitude { out "LAMP? $1"; in "%f"; }
-setLevelAmplitude { out "LAMP $1,%f"; }
+getLevelAmplitude { out "LAMP? \$1"; in "%f"; }
+setLevelAmplitude { out "LAMP \$1,%f"; }
 
 # LINK is left out: setDelay sends DLAY c,d,t, which sets the link and the
 # time together, so any LINK setting would be undone by the next delay
 # write. Delays are always relative to T0 and widths to the leading edge.
 
-getLevelOffset { out "LOFF? $1"; in "%f"; }
-setLevelOffset { out "LOFF $1,%f"; }
+getLevelOffset { out "LOFF? \$1"; in "%f"; }
+setLevelOffset { out "LOFF \$1,%f"; }
 
 # 1 = positive, 0 = negative
-getLevelPolarity { out "LPOL? $1"; in "%d"; }
-setLevelPolarity { out "LPOL $1,%d"; }
+getLevelPolarity { out "LPOL? \$1"; in "%d"; }
+setLevelPolarity { out "LPOL \$1,%d"; }
 
 # Step commands (write only): $1 = channel/output, value = direction 1/0
-stepDelay          { out "SPDL $1,%d"; }
-stepLevelAmplitude { out "SPLA $1,%d"; }
-stepLevelOffset    { out "SPLO $1,%d"; }
+stepDelay          { out "SPDL \$1,%d"; }
+stepLevelAmplitude { out "SPLA \$1,%d"; }
+stepLevelOffset    { out "SPLO \$1,%d"; }
 
 # Step sizes
-getStepDelay { out "SSDL? $1"; in "%f"; }
-setStepDelay { out "SSDL $1,%.14e"; }
+getStepDelay { out "SSDL? \$1"; in "%f"; }
+setStepDelay { out "SSDL \$1,%.14e"; }
 
-getStepLevelAmplitude { out "SSLA? $1"; in "%f"; }
-setStepLevelAmplitude { out "SSLA $1,%f"; }
+getStepLevelAmplitude { out "SSLA? \$1"; in "%f"; }
+setStepLevelAmplitude { out "SSLA \$1,%f"; }
 
-getStepLevelOffset { out "SSLO? $1"; in "%f"; }
-setStepLevelOffset { out "SSLO $1,%f"; }
+getStepLevelOffset { out "SSLO? \$1"; in "%f"; }
+setStepLevelOffset { out "SSLO \$1,%f"; }
 
 ###########################################################################
 # Excluded commands
