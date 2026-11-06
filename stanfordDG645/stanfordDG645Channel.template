@@ -57,6 +57,8 @@ record(ai, "$(P):$(CH):WIDTH_RBV") {
 record(bo, "$(P):$(CH):DELAY:STEP") {
   field(DESC, "Step delay by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepDelay($(LEAD)) $(PORT)")
   field(ZNAM, "Down")
@@ -90,6 +92,8 @@ record(ai, "$(P):$(CH):DELAY:STEPSIZE_RBV") {
 record(bo, "$(P):$(CH):WIDTH:STEP") {
   field(DESC, "Step width by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepDelay($(TRAIL)) $(PORT)")
   field(ZNAM, "Down")
@@ -141,6 +145,8 @@ record(longin, "$(P):$(CH):PRESCALE_RBV") {
 record(bo, "$(P):$(CH):PRESCALE:STEP") {
   field(DESC, "Step prescale by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepPrescale($(PRESC)) $(PORT)")
   field(ZNAM, "Down")
@@ -183,6 +189,8 @@ record(longin, "$(P):$(CH):PHASE_RBV") {
 record(bo, "$(P):$(CH):PHASE:STEP") {
   field(DESC, "Step phase by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepPrescalePhase($(PRESC)) $(PORT)")
   field(ZNAM, "Down")

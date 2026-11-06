@@ -31,6 +31,8 @@ record(waveform, "$(P):IDN") {
 record(longin, "$(P):AUTOCAL") {
   field(DESC, "Run auto-cal (0 ok, 17 fail)")
   field(SCAN, "Passive")
+  # read on demand only (processing has side effects): no alarm until first read
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto calibrate $(PORT)")
 }
@@ -41,6 +43,8 @@ record(longin, "$(P):AUTOCAL") {
 record(longin, "$(P):SELFTEST") {
   field(DESC, "Run self test (resets settings)")
   field(SCAN, "Passive")
+  # read on demand only (processing has side effects): no alarm until first read
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto selfTest $(PORT)")
 }
@@ -48,6 +52,8 @@ record(longin, "$(P):SELFTEST") {
 record(bo, "$(P):CLEARSTATUS") {
   field(DESC, "Clear status registers")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   # Clear the error queue at boot so setDelay's LERR? check starts clean
   field(PINI, "YES")
   field(DTYP, "stream")
@@ -78,6 +84,8 @@ record(longin, "$(P):ESE_RBV") {
 record(longin, "$(P):ESR") {
   field(DESC, "Std event status (clears on read)")
   field(SCAN, "Passive")
+  # read on demand only (processing has side effects): no alarm until first read
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getESR $(PORT)")
 }
@@ -85,6 +93,8 @@ record(longin, "$(P):ESR") {
 record(longin, "$(P):OPC") {
   field(DESC, "Operation complete query")
   field(SCAN, "Passive")
+  # read on demand only (processing has side effects): no alarm until first read
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getOPC $(PORT)")
 }
@@ -92,6 +102,8 @@ record(longin, "$(P):OPC") {
 record(bo, "$(P):OPC:SET") {
   field(DESC, "Set OPC flag when done")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto setOPC $(PORT)")
   field(ZNAM, "Idle")
@@ -121,6 +133,8 @@ record(bi, "$(P):PSC_RBV") {
 record(longout, "$(P):RECALL") {
   field(DESC, "Recall settings (0 = defaults)")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto recall $(PORT)")
   field(DRVL, "0")
@@ -130,6 +144,8 @@ record(longout, "$(P):RECALL") {
 record(longout, "$(P):SAVE") {
   field(DESC, "Save settings to location 1-9")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto save $(PORT)")
   field(DRVL, "1")
@@ -139,6 +155,8 @@ record(longout, "$(P):SAVE") {
 record(bo, "$(P):RESET") {
   field(DESC, "Reset to default settings")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto reset $(PORT)")
   field(ZNAM, "Idle")
@@ -173,6 +191,8 @@ record(longin, "$(P):STB") {
 record(bo, "$(P):WAIT") {
   field(DESC, "Wait for commands to complete")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto wait $(PORT)")
   field(ZNAM, "Idle")
@@ -205,6 +225,8 @@ record(longin, "$(P):INSE_RBV") {
 record(longin, "$(P):INSR") {
   field(DESC, "Instrument status (clears on read)")
   field(SCAN, "Passive")
+  # read on demand only (processing has side effects): no alarm until first read
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getINSR $(PORT)")
 }
@@ -213,6 +235,8 @@ record(longin, "$(P):INSR") {
 record(longin, "$(P):LERR") {
   field(DESC, "Pop last error (0 = none)")
   field(SCAN, "Passive")
+  # read on demand only (processing has side effects): no alarm until first read
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(INP, "@stanfordDG645.proto getLERR $(PORT)")
 }
@@ -294,6 +318,8 @@ record(mbbi, "$(P):TRIG:SOURCE_RBV") {
 record(bo, "$(P):TRIG:SINGLESHOT") {
   field(DESC, "Single shot / arm ext single shot")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto trigger $(PORT)")
   field(ZNAM, "Idle")
@@ -324,6 +350,8 @@ record(ai, "$(P):TRIG:RATE_RBV") {
 record(bo, "$(P):TRIG:RATE:STEP") {
   field(DESC, "Step trigger rate by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepTriggerRate $(PORT)")
   field(ZNAM, "Down")
@@ -374,6 +402,8 @@ record(ai, "$(P):TRIG:LEVEL_RBV") {
 record(bo, "$(P):TRIG:LEVEL:STEP") {
   field(DESC, "Step trigger level by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepTriggerLevel $(PORT)")
   field(ZNAM, "Down")
@@ -442,6 +472,8 @@ record(ai, "$(P):TRIG:HOLDOFF_RBV") {
 record(bo, "$(P):TRIG:HOLDOFF:STEP") {
   field(DESC, "Step holdoff by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepHoldoff $(PORT)")
   field(ZNAM, "Down")
@@ -515,6 +547,8 @@ record(longin, "$(P):TRIG:PRESCALE_RBV") {
 record(bo, "$(P):TRIG:PRESCALE:STEP") {
   field(DESC, "Step trig prescale by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepPrescale(0) $(PORT)")
   field(ZNAM, "Down")
@@ -598,6 +632,8 @@ record(longin, "$(P):BURST:COUNT_RBV") {
 record(bo, "$(P):BURST:COUNT:STEP") {
   field(DESC, "Step burst count by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepBurstCount $(PORT)")
   field(ZNAM, "Down")
@@ -643,6 +679,8 @@ record(ai, "$(P):BURST:DELAY_RBV") {
 record(bo, "$(P):BURST:DELAY:STEP") {
   field(DESC, "Step burst delay by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepBurstDelay $(PORT)")
   field(ZNAM, "Down")
@@ -692,6 +730,8 @@ record(ai, "$(P):BURST:PERIOD_RBV") {
 record(bo, "$(P):BURST:PERIOD:STEP") {
   field(DESC, "Step burst period by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepBurstPeriod $(PORT)")
   field(ZNAM, "Down")

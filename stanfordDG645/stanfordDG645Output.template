@@ -36,6 +36,8 @@ record(ai, "$(P):$(CH):AMP_RBV") {
 record(bo, "$(P):$(CH):AMP:STEP") {
   field(DESC, "Step amplitude by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepLevelAmplitude($(BNC)) $(PORT)")
   field(ZNAM, "Down")
@@ -86,6 +88,8 @@ record(ai, "$(P):$(CH):OFFSET_RBV") {
 record(bo, "$(P):$(CH):OFFSET:STEP") {
   field(DESC, "Step offset by step size")
   field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto stepLevelOffset($(BNC)) $(PORT)")
   field(ZNAM, "Down")
