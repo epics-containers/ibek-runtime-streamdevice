@@ -48,6 +48,8 @@ record(longin, "$(P):SELFTEST") {
 record(bo, "$(P):CLEARSTATUS") {
   field(DESC, "Clear status registers")
   field(SCAN, "Passive")
+  # Clear the error queue at boot so setDelay's LERR? check starts clean
+  field(PINI, "YES")
   field(DTYP, "stream")
   field(OUT, "@stanfordDG645.proto clearStatus $(PORT)")
   field(ZNAM, "Idle")
