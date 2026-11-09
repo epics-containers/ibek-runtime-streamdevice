@@ -22,8 +22,8 @@ Terminator = CR LF;
 LockTimeout = 35000;
 
 # NB: the DG645 allows only 25 bytes per parameter, so keep float formats
-# at or below %.14e (20 chars). That still covers the 5 ps resolution over
-# the full 2000 s range.
+# at or below %.15e (22 chars with a sign). That is what covers the 5 ps
+# resolution over the full 2000 s range: %.14e only has 10 ps steps from 1000 s.
 
 ###########################################################################
 # Common IEEE-488.2 commands
@@ -109,7 +109,7 @@ getAdvTrig { out "ADVT?"; in "%d"; }   # 0 off, 1 on
 setAdvTrig { out "ADVT %d"; @init { out "ADVT?"; in "%d"; } }
 
 getHoldoff { out "HOLD?"; in "%f"; }
-setHoldoff { out "HOLD %.14e"; @init { out "HOLD?"; in "%f"; } }
+setHoldoff { out "HOLD %.15e"; @init { out "HOLD?"; in "%f"; } }
 
 # 0 off, 1 triggers, 2 AB, 3 AB+CD, 4 AB+CD+EF, 5 AB+CD+EF+GH
 getInhibit { out "INHB?"; in "%d"; }
@@ -132,7 +132,7 @@ stepTriggerRate   { out "SPTR %d"; }
 
 # Step sizes
 getStepHoldoff { out "SSHD?"; in "%f"; }
-setStepHoldoff { out "SSHD %.14e"; @init { out "SSHD?"; in "%f"; } }
+setStepHoldoff { out "SSHD %.15e"; @init { out "SSHD?"; in "%f"; } }
 
 getStepPrescalePhase { out "SSPH? \$1"; in "%d"; }
 setStepPrescalePhase { out "SSPH \$1,%d"; @init { out "SSPH? \$1"; in "%d"; } }
@@ -165,7 +165,7 @@ getBurstCount { out "BURC?"; in "%d"; }
 setBurstCount { out "BURC %d"; @init { out "BURC?"; in "%d"; } }
 
 getBurstDelay { out "BURD?"; in "%f"; }
-setBurstDelay { out "BURD %.14e"; @init { out "BURD?"; in "%f"; } }
+setBurstDelay { out "BURD %.15e"; @init { out "BURD?"; in "%f"; } }
 
 # 0 disabled, 1 enabled
 getBurstMode { out "BURM?"; in "%d"; }
@@ -174,7 +174,7 @@ setBurstMode { out "BURM %d"; @init { out "BURM?"; in "%d"; } }
 # Minimum 100 ns, 10 ns resolution (the manual's stated upper limit is garbled
 # in the command list; the specifications page says 42.9 s)
 getBurstPeriod { out "BURP?"; in "%f"; }
-setBurstPeriod { out "BURP %.14e"; @init { out "BURP?"; in "%f"; } }
+setBurstPeriod { out "BURP %.15e"; @init { out "BURP?"; in "%f"; } }
 
 # 0 = T0 on all delay cycles of the burst, 1 = first cycle only
 getBurstT0 { out "BURT?"; in "%d"; }
@@ -190,10 +190,10 @@ getStepBurstCount { out "SSBC?"; in "%d"; }
 setStepBurstCount { out "SSBC %d"; @init { out "SSBC?"; in "%d"; } }
 
 getStepBurstDelay { out "SSBD?"; in "%f"; }
-setStepBurstDelay { out "SSBD %.14e"; @init { out "SSBD?"; in "%f"; } }
+setStepBurstDelay { out "SSBD %.15e"; @init { out "SSBD?"; in "%f"; } }
 
 getStepBurstPeriod { out "SSBP?"; in "%f"; }
-setStepBurstPeriod { out "SSBP %.14e"; @init { out "SSBP?"; in "%f"; } }
+setStepBurstPeriod { out "SSBP %.15e"; @init { out "SSBP?"; in "%f"; } }
 
 ###########################################################################
 # Delay and output commands
@@ -209,7 +209,7 @@ getDelay {
 
 # $1 = channel, $2 = channel the delay is relative to
 setDelay {
-    out "DLAY \$1,\$2,%.14e";
+    out "DLAY \$1,\$2,%.15e";
     out "*WAI";
     out "LERR?";
     in "0";
@@ -238,7 +238,7 @@ stepLevelOffset    { out "SPLO \$1,%d"; }
 
 # Step sizes
 getStepDelay { out "SSDL? \$1"; in "%f"; }
-setStepDelay { out "SSDL \$1,%.14e"; @init { out "SSDL? \$1"; in "%f"; } }
+setStepDelay { out "SSDL \$1,%.15e"; @init { out "SSDL? \$1"; in "%f"; } }
 
 getStepLevelAmplitude { out "SSLA? \$1"; in "%f"; }
 setStepLevelAmplitude { out "SSLA \$1,%f"; @init { out "SSLA? \$1"; in "%f"; } }
