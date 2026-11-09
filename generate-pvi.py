@@ -30,6 +30,16 @@ screen.
 An output record is shown together with its readback when a readback is
 found by name (SETX/X, X_SP/X, X:SET/X, X:WR/X:RD, X/X_RBV, ...).
 
+Controls follow the record's labels and links, not just its type:
+
+- a device `bo` with ZNAM/ONAM `Down`/`Up` and no readback is a pair of step
+  buttons (Down writes 0, Up writes 1), not a switch;
+- a device `bo` with ZNAM `Idle` and no readback is a command button labelled
+  with its ONAM;
+- a device input listed under `proc` in the pattern's `pvi-overrides.yaml` is
+  one nothing processes, so its value gets a button that writes its `.PROC`,
+  labelled `Run` when its DESC starts with "Run" and `Read` otherwise.
+
 A pattern may hold `pvi-overrides.yaml` (not vendored) forcing records to a
 place, keyed by entity model, each a list of regexes matched (fullmatch)
 against the record name as written in the template, e.g.
@@ -37,6 +47,7 @@ against the record name as written in the template, e.g.
     enzLoCuM4:
       main: ['\\$\\(device\\):CONF']
       internal: ['.*:RANGEMAX']
+      proc: ['\\$\\(device\\):RUNTEST']   # input shown with a .PROC button
 
 The generated files carry a header with a hash of their body. A device yaml
 without that header, or whose body no longer matches its hash, was edited by
@@ -63,6 +74,7 @@ import yaml
 from pvi.device import (
     LED,
     ArrayTrace,
+    ButtonPanel,
     ComboBox,
     Device,
     Grid,
@@ -459,6 +471,8 @@ class Model:
             for place in PLACES
             for rx in overrides.get(place, [])
         ]
+        # device inputs that only update when written .PROC: see Builder.on_demand
+        self.proc = [re.compile(rx) for rx in overrides.get("proc", [])]
 
     def plumbing(self, r: Record) -> bool:
         return r.rtype in PLUMBING_TYPES
@@ -630,6 +644,8 @@ def pair_readbacks(placed: list[Placed]) -> None:
     for p in placed:
         if p.record.rtype not in OUTPUT_TYPES:
             continue
+        if Builder.is_step(p) or Builder.command_label(p) is not None:
+            continue  # buttons: a query of a similar name is not their readback
         key = pair_key(p.record.name, WRITE_MARKERS | READ_MARKERS)
         candidates = [
             c for c in keys.get(key, []) if not c.paired and c.place != INTERNAL
@@ -743,12 +759,83 @@ class Builder:
             and not r.autosave_val
         )
 
+    @staticmethod
+    def is_step(p: Placed) -> bool:
+        """A device bo labelled Down/Up with no readback: two step buttons.
+
+        A switch would hold its last state, so the same step could not be
+        sent twice running.
+        """
+        r = p.record
+        return (
+            r.rtype == "bo"
+            and r.device
+            and not p.readback
+            and (r.fields.get("ZNAM"), r.fields.get("ONAM")) == ("Down", "Up")
+        )
+
+    @staticmethod
+    def command_label(p: Placed) -> str | None:
+        """Button label for a device bo with no readback and ZNAM "Idle".
+
+        ONAM names the action ("Clear", "Reset", ...), shown on the button.
+        """
+        r = p.record
+        onam = r.fields.get("ONAM", "")
+        if (
+            r.rtype == "bo"
+            and r.device
+            and not p.readback
+            and r.fields.get("ZNAM") == "Idle"
+            and onam
+        ):
+            return pascal(onam)
+        return None
+
+    def on_demand(self, p: Placed) -> bool:
+        """A device input the pattern's overrides list under `proc`.
+
+        Such a record is only read when something processes it, and nothing
+        does, so shown by itself it would never update. It gets a button that
+        writes its .PROC field.
+        """
+        r = p.record
+        return (
+            r.device
+            and r.rtype in INPUT_TYPES - {"event"}
+            and any(
+                rx.fullmatch(r.raw_name) or rx.fullmatch(r.name)
+                for rx in self.model.proc
+            )
+        )
+
+    @staticmethod
+    def proc_label(r: Record) -> str:
+        """"Run" for an input described as running something, else "Read"."""
+        return "Run" if r.desc.lower().startswith("run") else "Read"
+
     def signal(self, p: Placed):
         r = p.record
         name = self.names(record_suffix((p.readback or r).name))
         label = self.label(r)
         desc = r.desc if r.desc and r.desc != label else None
         if r.rtype in OUTPUT_TYPES:
+            if self.is_step(p):
+                return SignalX(
+                    name=name,
+                    label=label,
+                    description=desc,
+                    write_pv=self.pv(r.name),
+                    write_widget=ButtonPanel(actions={"Down": "0", "Up": "1"}),
+                )
+            if (command := self.command_label(p)) is not None:
+                return SignalX(
+                    name=name,
+                    label=label,
+                    description=desc,
+                    write_pv=self.pv(r.name),
+                    write_widget=ButtonPanel(actions={command: "1"}),
+                )
             if self.is_action(p):
                 return SignalX(
                     name=name,
@@ -795,6 +882,16 @@ class Builder:
                 description=desc,
                 write_pv=self.pv(r.name),
                 write_widget=write_widget(r),
+            )
+        if self.on_demand(p):
+            return SignalRW(
+                name=name,
+                label=label,
+                description=desc,
+                write_pv=f"{self.pv(r.name)}.PROC",
+                write_widget=ButtonPanel(actions={self.proc_label(r): "1"}),
+                read_pv=self.pv(r.name),
+                read_widget=read_widget(r),
             )
         return SignalR(
             name=name,

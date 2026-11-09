@@ -1,0 +1,8 @@
+# Not vendored: read only by generate-pvi.py (see its docstring).
+#
+# These device inputs are Passive and nothing processes them, so without help
+# the screen would show a value that never updates. Each gets a button that
+# writes its .PROC field, next to its value.
+stanfordDG645:
+  proc:
+    - '\$\(P\):(AUTOCAL|SELFTEST|OPC|ESR|INSR|LERR)'

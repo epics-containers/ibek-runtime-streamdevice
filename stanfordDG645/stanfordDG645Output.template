@@ -1,0 +1,136 @@
+#! Generated with the help of Claude (Anthropic)
+# DG645 front-panel output level configuration (amplitude, offset, polarity).
+# Instantiate once per output:
+#   CH=T0 BNC=0
+#   CH=AB BNC=1
+#   CH=CD BNC=2
+#   CH=EF BNC=3
+#   CH=GH BNC=4
+#
+# % macro, P, Device name
+# % macro, PORT, Asyn port for device
+# % macro, CH, Output name e.g. AB
+# % macro, BNC, Output index (T0=0 AB=1 CD=2 EF=3 GH=4)
+
+record(ao, "$(P):$(CH):AMP") {
+  field(DESC, "Output amplitude")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setLevelAmplitude($(BNC)) $(PORT)")
+  field(PREC, "2")
+  field(EGU, "V")
+  field(DRVL, "0.5")
+  field(DRVH, "5")
+  field(FLNK, "$(P):$(CH):AMP_RBV")
+}
+
+record(ai, "$(P):$(CH):AMP_RBV") {
+  field(DESC, "Output amplitude")
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getLevelAmplitude($(BNC)) $(PORT)")
+  field(PREC, "2")
+  field(EGU, "V")
+}
+
+record(bo, "$(P):$(CH):AMP:STEP") {
+  field(DESC, "Step amplitude by step size")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto stepLevelAmplitude($(BNC)) $(PORT)")
+  field(ZNAM, "Down")
+  field(ONAM, "Up")
+}
+
+record(ao, "$(P):$(CH):AMP:STEPSIZE") {
+  field(DESC, "Amplitude step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setStepLevelAmplitude($(BNC)) $(PORT)")
+  field(PREC, "2")
+  field(EGU, "V")
+  field(FLNK, "$(P):$(CH):AMP:STEPSIZE_RBV")
+}
+
+record(ai, "$(P):$(CH):AMP:STEPSIZE_RBV") {
+  field(DESC, "Amplitude step size")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getStepLevelAmplitude($(BNC)) $(PORT)")
+  field(PREC, "2")
+  field(EGU, "V")
+}
+
+record(ao, "$(P):$(CH):OFFSET") {
+  field(DESC, "Output offset")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setLevelOffset($(BNC)) $(PORT)")
+  field(PREC, "2")
+  field(EGU, "V")
+  field(DRVL, "-2")
+  field(DRVH, "2")
+  field(FLNK, "$(P):$(CH):OFFSET_RBV")
+}
+
+record(ai, "$(P):$(CH):OFFSET_RBV") {
+  field(DESC, "Output offset")
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getLevelOffset($(BNC)) $(PORT)")
+  field(PREC, "2")
+  field(EGU, "V")
+}
+
+record(bo, "$(P):$(CH):OFFSET:STEP") {
+  field(DESC, "Step offset by step size")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto stepLevelOffset($(BNC)) $(PORT)")
+  field(ZNAM, "Down")
+  field(ONAM, "Up")
+}
+
+record(ao, "$(P):$(CH):OFFSET:STEPSIZE") {
+  field(DESC, "Offset step size")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setStepLevelOffset($(BNC)) $(PORT)")
+  field(PREC, "2")
+  field(EGU, "V")
+  field(FLNK, "$(P):$(CH):OFFSET:STEPSIZE_RBV")
+}
+
+record(ai, "$(P):$(CH):OFFSET:STEPSIZE_RBV") {
+  field(DESC, "Offset step size")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getStepLevelOffset($(BNC)) $(PORT)")
+  field(PREC, "2")
+  field(EGU, "V")
+}
+
+record(bo, "$(P):$(CH):POL") {
+  field(DESC, "Output polarity")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@stanfordDG645.proto setLevelPolarity($(BNC)) $(PORT)")
+  field(ZNAM, "Negative")
+  field(ONAM, "Positive")
+  field(FLNK, "$(P):$(CH):POL_RBV")
+}
+
+record(bi, "$(P):$(CH):POL_RBV") {
+  field(DESC, "Output polarity")
+  field(SCAN, "10 second")
+  field(DTYP, "stream")
+  field(INP, "@stanfordDG645.proto getLevelPolarity($(BNC)) $(PORT)")
+  field(ZNAM, "Negative")
+  field(ONAM, "Positive")
+}
