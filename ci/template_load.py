@@ -9,7 +9,9 @@ Two steps, so that only the second needs the IOC image:
     or the value given in ci/template-load.yaml. Each row of the generated
     ``ioc.subst`` is one test case: one template, with the macros its entity
     model passes. One ``ioc.yaml`` holding an entity of every model of the
-    pattern must generate too.
+    pattern must generate too. Each template in a pattern's ``sim/`` folder is
+    one more case, with each macro it uses without a default set to "1", or
+    to the value given in ci/template-load.yaml.
 
 ``run OUT`` (inside the image; standard library only)
     Expand each case with ``msi -V`` (an undefined macro is an error). Then
@@ -116,6 +118,7 @@ def write_case(
     pvs: list[str],
     xfail: str | None,
     known_errors: list[str],
+    sim: bool = False,
 ) -> None:
     case.mkdir()
     (case / "ioc.subst").write_text(block)
@@ -129,10 +132,61 @@ def write_case(
                 "req_pvs": sorted(set(pvs)),
                 "xfail": xfail,
                 "known_errors": known_errors,
+                "sim": sim,
             },
             indent=2,
         )
     )
+
+
+MACRO_RE = re.compile(r"\$[({]([A-Za-z0-9_]+)([=)}])")
+
+
+def sim_templates(pattern: Path) -> list[Path]:
+    """The loadable templates in a pattern's sim/ folder and its subfolders."""
+    sim = pattern / "sim"
+    if not sim.is_dir():
+        return []
+    return sorted(
+        p for p in sim.rglob("*") if p.is_file() and p.suffix in (".template", ".db")
+    )
+
+
+def sim_block(
+    template: Path, pattern: Path, given: dict[str, str]
+) -> tuple[str, list[str]]:
+    """A substitution block loading a sim template, every macro it needs set.
+
+    Also returns the problems with it: a value given for a macro the template
+    does not use, and a record name the expanded template defines twice (two
+    macros set to the same placeholder make the records of one merge into the
+    other's).
+    """
+    # msi expands macros in comments too
+    text = template.read_text(errors="replace")
+    used = MACRO_RE.findall(text)
+    needed = {name for name, end in used if end != "="}
+    problems = [
+        f"sim_values in {CONFIG_FILE.name} sets {name}, which it does not use"
+        for name in sorted(set(given) - {name for name, _ in used})
+    ]
+    macros = {name: "1" for name in sorted(needed)} | given
+    live = "\n".join(
+        line for line in text.splitlines() if not line.lstrip().startswith("#")
+    )
+    seen: set[str] = set()
+    for name in RECORD_RE.findall(expand(live, macros)):
+        if name[1] in seen:
+            problems.append(
+                f"record {name[1]} is defined twice with the placeholder macro "
+                f"values; give its macros distinct values under sim_values in "
+                f"{CONFIG_FILE.name}"
+            )
+        seen.add(name[1])
+    header = "{ " + ", ".join(f'"{c}"' for c in macros) + " }"
+    row = "{ " + ", ".join(json.dumps(str(v)) for v in macros.values()) + " }"
+    path = template.relative_to(pattern).as_posix()
+    return f'file "{path}" {{\npattern\n{header}\n{row}\n}}\n', problems
 
 
 def prepare(out: Path, names: list[str]) -> int:
@@ -162,6 +216,8 @@ def prepare(out: Path, names: list[str]) -> int:
     failures = 0
     reached: set[str] = set()
     all_templates: set[str] = set()
+    sim_values = config.get("sim_values") or {}
+    sim_seen: set[str] = set()
 
     for pattern in select_patterns(names):
         work = out / "generate" / pattern.name
@@ -228,6 +284,26 @@ def prepare(out: Path, names: list[str]) -> int:
                     xfail.get(key),
                     known.get(key, []),
                 )
+        # sim/ templates are not vendored; each loads on its own in a plain IOC.
+        for number, template in enumerate(sim_templates(pattern)):
+            key = f"{pattern.name}/{template.relative_to(pattern).as_posix()}"
+            sim_seen.add(key)
+            block, problems = sim_block(template, pattern, sim_values.get(key) or {})
+            for problem in problems:
+                print(f"FAIL {key}: {problem}")
+            failures += len(problems)
+            write_case(
+                cases_dir / f"{pattern.name}--sim{number:02d}",
+                pattern,
+                "sim",
+                template.relative_to(pattern).as_posix(),
+                block,
+                [],
+                xfail.get(key),
+                known.get(key, []),
+                sim=True,
+            )
+            reached.add(key)
         # An IOC instance may use every entity model of a pattern at once.
         try:
             generate(cfg, work / "runtime-all", supports, entities)
@@ -268,6 +344,12 @@ def prepare(out: Path, names: list[str]) -> int:
         )
         failures += 1
     selected = {p.name for p in select_patterns(names)}
+    for key in sorted(k for k in sim_values if k.split("/")[0] in selected):
+        if key not in sim_seen:
+            print(
+                f"FAIL stale sim_values entry in {CONFIG_FILE.name}: no sim template {key}"
+            )
+            failures += 1
     stale = {key for key in xfail if key.split("/")[0] in selected} - reached
     for key in sorted(stale):
         print(
@@ -276,7 +358,8 @@ def prepare(out: Path, names: list[str]) -> int:
         )
     cases = len(list(cases_dir.iterdir()))
     print(
-        f"prepare: {cases} cases from {len(reached)} templates "
+        f"prepare: {cases} cases from {len(reached)} templates, "
+        f"{len(sim_seen)} of them sim/ templates "
         f"({len(included & all_templates - reached)} more reached through msi include)"
     )
     return 1 if failures or stale else 0
@@ -466,7 +549,7 @@ def run(out: Path, args: argparse.Namespace) -> int:
     context: dict[str, dict[str, str]] = {}
     for case, errors in zip(cases, msi_errors, strict=True):
         meta = json.loads((case / "case.json").read_text())
-        if not errors and not meta["xfail"]:
+        if not errors and not meta["xfail"] and not meta.get("sim"):
             pattern_records = context.setdefault(meta["pattern"], {})
             for name, rtype in records((case / "ioc.db").read_text()).items():
                 pattern_records.setdefault(name, rtype)

@@ -14,6 +14,18 @@ values:
     read_int_floatE: {FPARAM: F, IPARAM: I}
     read_write_int_floatE: {FPARAM: F, IPARAM: I}
 
+# sim_values: macro values for templates in a pattern's sim/ folder, as
+# {pattern/sim/template: {macro: value}}. Each macro a sim template uses
+# without a default is otherwise set to "1".
+sim_values:
+  currAmp/sim/currAmp_ai_sim.template:
+    SCAN: Passive
+  smc/sim/simulation_magnet.template:
+    # X, Y and Z prefix three different sets of records
+    X: X
+    Y: Y
+    Z: Z
+
 # xfail: templates that need more than the generic ioc-streamdevice image, as
 # listed in _docs/BUILD-TIME-ONLY.md "Runtime patterns with marked templates". They
 # must fail to load; one that loads fails the check until it is removed here.

@@ -78,7 +78,7 @@ record(mbbi, "$(P):PUMP_STATUS_RBV")
 {
    field(DESC, "Read pump status")
    field(DTYP, "Soft Channel")
-   field(INP, "@norhof.proto getIntVal(114) $(PORT)")
+# field(INP, "@norhof.proto getIntVal(114) $(PORT)")
    field(VAL, "2")
    field(PINI, "YES")
    field(ZRVL, "0")
@@ -99,7 +99,7 @@ record(mbbi, "$(P):PUMP_STATUS_RBV")
 record(longin, "$(P):FLOW_PRES_MSB_RBV") {
   field(DESC, "Read flow pres MSB")
   field(DTYP, "Soft Channel")
-  field(INP, "@norhof.proto getHexVal(113) $(PORT)")
+# field(INP, "@norhof.proto getHexVal(113) $(PORT)")
   field(SCAN, "Passive")
   field(SDIS, "$(P):DISABLE")
 }
@@ -110,7 +110,7 @@ record(longin, "$(P):FLOW_PRES_MSB_RBV") {
 record(longin, "$(P):FLOW_PRES_LSB_RBV") {
   field(DESC, "Read flow pres LSB")
   field(DTYP, "Soft Channel")
-  field(INP, "@norhof.proto getHexVal(112) $(PORT)")
+# field(INP, "@norhof.proto getHexVal(112) $(PORT)")
   field(SCAN, "Passive")
   field(SDIS, "$(P):DISABLE")
 }
@@ -121,7 +121,7 @@ record(longin, "$(P):FLOW_PRES_LSB_RBV") {
 record(longin, "$(P):DEWAR_PRES_LBYTE_LOW_RBV") {
   field(DESC, "Read dewar pres lb")
   field(DTYP, "Soft Channel")
-  field(INP, "@norhof.proto getHexVal2LOW(088) $(PORT)")
+# field(INP, "@norhof.proto getHexVal2LOW(088) $(PORT)")
   field(SCAN, "Passive")
   field(SDIS, "$(P):DISABLE")
 }
@@ -132,7 +132,7 @@ record(longin, "$(P):DEWAR_PRES_LBYTE_LOW_RBV") {
 record(longin, "$(P):DEWAR_PRES_HBYTE_LOW_RBV") {
   field(DESC, "Read dewar pres hb")
   field(DTYP, "Soft Channel")
-  field(INP, "@norhof.proto getHexVal2HIGH(088) $(PORT)")
+# field(INP, "@norhof.proto getHexVal2HIGH(088) $(PORT)")
   field(SCAN, "Passive")
   field(SDIS, "$(P):DISABLE")
 }
@@ -144,7 +144,7 @@ record(longin, "$(P):DEWAR_PRES_HBYTE_LOW_RBV") {
 record(longin, "$(P):DEWAR_PRES_ZERO_LBYTE_LOW_RBV") {
   field(DESC, "Read dewar pres zero lb")
   field(DTYP, "Soft Channel")
-  field(INP, "@norhof.proto getHexVal2LOW(0c8) $(PORT)")
+# field(INP, "@norhof.proto getHexVal2LOW(0c8) $(PORT)")
   field(SCAN, "Passive")
   field(SDIS, "$(P):DISABLE")
 }
@@ -155,7 +155,7 @@ record(longin, "$(P):DEWAR_PRES_ZERO_LBYTE_LOW_RBV") {
 record(longin, "$(P):DEWAR_PRES_ZERO_HBYTE_LOW_RBV") {
   field(DESC, "Read dewar pres zero hb")
   field(DTYP, "Soft Channel")
-  field(INP, "@norhof.proto getHexVal2HIGH(0c8) $(PORT)")
+# field(INP, "@norhof.proto getHexVal2HIGH(0c8) $(PORT)")
   field(SCAN, "Passive")
   field(SDIS, "$(P):DISABLE")
 }
@@ -166,7 +166,7 @@ record(longin, "$(P):DEWAR_PRES_ZERO_HBYTE_LOW_RBV") {
 record(longin, "$(P):STATUS_REG_RBV") {
   field(DESC, "Read pump status register")
   field(DTYP, "Soft Channel")
-  field(INP, "@norhof.proto getHexVal(19) $(PORT)")
+# field(INP, "@norhof.proto getHexVal(19) $(PORT)")
   field(SCAN, "1 second")
   field(SDIS, "$(P):DISABLE")
 }
@@ -188,7 +188,7 @@ record(calc, "$(P):5L_WARNING_RBV") {
 record(longin, "$(P):MODE_RBV") {
   field(DESC, "Read pump status mode")
   field(DTYP, "Soft Channel")
-  field(INP, "@norhof.proto getHexVal(61) $(PORT)")
+# field(INP, "@norhof.proto getHexVal(61) $(PORT)")
   field(SCAN, "1 second")
   field(SDIS, "$(P):DISABLE")
 }
@@ -204,7 +204,7 @@ record(longin, "$(P):MODE_RBV") {
 record(longout, "$(P):PUMP_OFF") {
   field(DESC, "Turn pump off")
   field(DTYP, "Soft Channel")
-  field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
+# field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
   field(VAL, "0")
   field(SDIS, "$(P):DISABLE")
 }
@@ -217,7 +217,7 @@ record(longout, "$(P):PUMP_OFF") {
 record(longout, "$(P):PUMP_STANDBY") {
   field(DESC, "Turn pump off")
   field(DTYP, "Soft Channel")
-  field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
+# field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
   field(VAL, "1")
   field(SDIS, "$(P):DISABLE")
 }
@@ -229,7 +229,7 @@ record(longout, "$(P):PUMP_STANDBY") {
 record(longout, "$(P):PUMP_ON") {
   field(DESC, "Turn pump off")
   field(DTYP, "Soft Channel")
-  field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
+# field(OUT, "@norhof.proto setIntVal(114) $(PORT)")
   field(VAL, "3")
   field(SDIS, "$(P):DISABLE")
 }
@@ -240,7 +240,7 @@ record(longout, "$(P):PUMP_ON") {
 record(longout, "$(P):FLOW_PRES_LSB") {
   field(DESC, "Set press LSB")
   field(DTYP, "Soft Channel")
-  field(OUT, "@norhof.proto setHexVal(112) $(PORT)")
+# field(OUT, "@norhof.proto setHexVal(112) $(PORT)")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -250,7 +250,7 @@ record(longout, "$(P):FLOW_PRES_LSB") {
 record(longout, "$(P):FLOW_PRES_MSB") {
   field(DESC, "Set press MSB")
   field(DTYP, "Soft Channel")
-  field(OUT, "@norhof.proto setHexVal(113) $(PORT)")
+# field(OUT, "@norhof.proto setHexVal(113) $(PORT)")
   field(SDIS, "$(P):DISABLE")
 }
 
