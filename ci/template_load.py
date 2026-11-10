@@ -143,25 +143,50 @@ MACRO_RE = re.compile(r"\$[({]([A-Za-z0-9_]+)([=)}])")
 
 
 def sim_templates(pattern: Path) -> list[Path]:
-    """The loadable templates in a pattern's sim/ folder."""
+    """The loadable templates in a pattern's sim/ folder and its subfolders."""
     sim = pattern / "sim"
     if not sim.is_dir():
         return []
     return sorted(
-        p for p in sim.iterdir() if p.is_file() and p.suffix in (".template", ".db")
+        p for p in sim.rglob("*") if p.is_file() and p.suffix in (".template", ".db")
     )
 
 
-def sim_block(template: Path, pattern: Path, given: dict[str, str]) -> str:
-    """A substitution block loading a sim template, every macro it needs set."""
+def sim_block(
+    template: Path, pattern: Path, given: dict[str, str]
+) -> tuple[str, list[str]]:
+    """A substitution block loading a sim template, every macro it needs set.
+
+    Also returns the problems with it: a value given for a macro the template
+    does not use, and a record name the expanded template defines twice (two
+    macros set to the same placeholder make the records of one merge into the
+    other's).
+    """
     # msi expands macros in comments too
     text = template.read_text(errors="replace")
-    needed = {name for name, end in MACRO_RE.findall(text) if end != "="}
+    used = MACRO_RE.findall(text)
+    needed = {name for name, end in used if end != "="}
+    problems = [
+        f"sim_values in {CONFIG_FILE.name} sets {name}, which it does not use"
+        for name in sorted(set(given) - {name for name, _ in used})
+    ]
     macros = {name: "1" for name in sorted(needed)} | given
+    live = "\n".join(
+        line for line in text.splitlines() if not line.lstrip().startswith("#")
+    )
+    seen: set[str] = set()
+    for name in RECORD_RE.findall(expand(live, macros)):
+        if name[1] in seen:
+            problems.append(
+                f"record {name[1]} is defined twice with the placeholder macro "
+                f"values; give its macros distinct values under sim_values in "
+                f"{CONFIG_FILE.name}"
+            )
+        seen.add(name[1])
     header = "{ " + ", ".join(f'"{c}"' for c in macros) + " }"
     row = "{ " + ", ".join(json.dumps(str(v)) for v in macros.values()) + " }"
     path = template.relative_to(pattern).as_posix()
-    return f'file "{path}" {{\npattern\n{header}\n{row}\n}}\n'
+    return f'file "{path}" {{\npattern\n{header}\n{row}\n}}\n', problems
 
 
 def prepare(out: Path, names: list[str]) -> int:
@@ -263,12 +288,16 @@ def prepare(out: Path, names: list[str]) -> int:
         for number, template in enumerate(sim_templates(pattern)):
             key = f"{pattern.name}/{template.relative_to(pattern).as_posix()}"
             sim_seen.add(key)
+            block, problems = sim_block(template, pattern, sim_values.get(key) or {})
+            for problem in problems:
+                print(f"FAIL {key}: {problem}")
+            failures += len(problems)
             write_case(
                 cases_dir / f"{pattern.name}--sim{number:02d}",
                 pattern,
                 "sim",
                 template.relative_to(pattern).as_posix(),
-                sim_block(template, pattern, sim_values.get(key) or {}),
+                block,
                 [],
                 xfail.get(key),
                 known.get(key, []),

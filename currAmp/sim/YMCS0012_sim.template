@@ -13,7 +13,7 @@ record(longin, "$(P):A2") {
 
 record(longout, "$(P):A2_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGL($(addr),A2) $(port) 0")
+# field(OUT, "@ymcs.protocol setGL($(addr),A2) $(port) 0")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -26,7 +26,7 @@ record(longin, "$(P):B2") {
 
 record(longout, "$(P):B2_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGL($(addr),B2) $(port) 0")
+# field(OUT, "@ymcs.protocol setGL($(addr),B2) $(port) 0")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -39,7 +39,7 @@ record(longin, "$(P):C2") {
 
 record(longout, "$(P):C2_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGL($(addr),C2) $(port) 0")
+# field(OUT, "@ymcs.protocol setGL($(addr),C2) $(port) 0")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -52,7 +52,7 @@ record(longin, "$(P):D2") {
 
 record(longout, "$(P):D2_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGL($(addr),D2) $(port) 0")
+# field(OUT, "@ymcs.protocol setGL($(addr),D2) $(port) 0")
   field(SDIS, "$(P):DISABLE")
 }
 
@@ -69,7 +69,7 @@ record(ai, "$(P):GX") {
 record(ao, "$(P):GX_SP") {
   field(DESC, "Set X gain factor")
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGF($(addr),GX) $(port) 0")
+# field(OUT, "@ymcs.protocol setGF($(addr),GX) $(port) 0")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -85,7 +85,7 @@ record(ai, "$(P):GY") {
 #% autosave 2 VAL
 record(ao, "$(P):GY_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGF($(addr),GY) $(port) 0")
+# field(OUT, "@ymcs.protocol setGF($(addr),GY) $(port) 0")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -101,7 +101,7 @@ record(ai, "$(P):A1") {
 #% autosave 2 VAL
 record(ao, "$(P):A1_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGF($(addr),A1) $(port) 0")
+# field(OUT, "@ymcs.protocol setGF($(addr),A1) $(port) 0")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -117,7 +117,7 @@ record(ai, "$(P):C1") {
 #% autosave 2 VAL
 record(ao, "$(P):C1_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGF($(addr),C1) $(port) 0")
+# field(OUT, "@ymcs.protocol setGF($(addr),C1) $(port) 0")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -133,7 +133,7 @@ record(ai, "$(P):B1") {
 #% autosave 2 VAL
 record(ao, "$(P):B1_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGF($(addr),B1) $(port) 0")
+# field(OUT, "@ymcs.protocol setGF($(addr),B1) $(port) 0")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -149,7 +149,7 @@ record(ai, "$(P):D1") {
 #% autosave 2 VAL
 record(ao, "$(P):D1_SP") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setGF($(addr),D1) $(port) 0")
+# field(OUT, "@ymcs.protocol setGF($(addr),D1) $(port) 0")
   field(PREC, "$(prec)")
   field(SDIS, "$(P):DISABLE")
 }
@@ -348,7 +348,7 @@ record(longout, "$(P):RANGE_SP") {
   field(DTYP, "Soft Channel")
   field(DESC, "Set range of device")
   field(FLNK, "$(P):RANGE")
-  # field(OUT, "@ymcs.protocol setRang($(addr)) $(port) 0")
+# field(OUT, "@ymcs.protocol setRang($(addr)) $(port) 0")
   field(HOPR, "6")
   field(LOPR, "1")
   field(PINI, "YES")
@@ -358,7 +358,7 @@ record(longout, "$(P):RANGE_SP") {
 
 record(longout, "$(P):AVGCURR") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setAvg($(addr)) $(port) 0")
+# field(OUT, "@ymcs.protocol setAvg($(addr)) $(port) 0")
   field(HOPR, "100")
   field(LOPR, "1")
   field(SCAN, "Passive")
@@ -367,7 +367,7 @@ record(longout, "$(P):AVGCURR") {
 
 record(longout, "$(P):WDWCURR") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setWdw($(addr)) $(port) 0")
+# field(OUT, "@ymcs.protocol setWdw($(addr)) $(port) 0")
   field(HOPR, "100")
   field(LOPR, "1")
   field(SCAN, "Passive")
@@ -376,7 +376,7 @@ record(longout, "$(P):WDWCURR") {
 
 record(bo, "$(P):SINGLE") {
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol setSingle($(addr)) $(port) 0")
+# field(OUT, "@ymcs.protocol setSingle($(addr)) $(port) 0")
   field(SCAN, "Passive")
   field(SDIS, "$(P):DISABLE")
 }
@@ -384,7 +384,7 @@ record(bo, "$(P):SINGLE") {
 record(bo, "$(P):RESET") {
   field(DESC, "Reset the current amplifier")
   field(DTYP, "Soft Channel")
-  # field(OUT, "@ymcs.protocol reset($(addr)) $(port) 0")
+# field(OUT, "@ymcs.protocol reset($(addr)) $(port) 0")
   field(FLNK, "$(P):RESETFWD NPP MS")
   field(SDIS, "$(P):DISABLE")
 }
