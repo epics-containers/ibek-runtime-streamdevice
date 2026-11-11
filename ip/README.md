@@ -21,8 +21,8 @@ instance's `config/`:
 
 - `SR830.db`
 - `SR830.proto`
-- `stanfordSR830.pvi.device.yaml`
 - `ip.ibek.support.yaml`
+- `stanfordSR830.pvi.device.yaml`
 
 Everything else in this folder stays in the library and is never vendored:
 

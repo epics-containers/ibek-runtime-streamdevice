@@ -144,6 +144,12 @@ entity_models:
         type: str
         description: |-
           Asyn port for I/O with controller
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: E816.template
         args:

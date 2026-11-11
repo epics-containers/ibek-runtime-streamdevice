@@ -42,6 +42,12 @@ entity_models:
         type: str
         description: |-
           asyn port
+      desc:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: thorlabsMcls1.template
         args:

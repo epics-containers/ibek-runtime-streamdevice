@@ -62,6 +62,12 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: lRE2xx.template
         args:
@@ -123,6 +129,12 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: lIntegralT.template
         args:
@@ -178,6 +190,12 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: lVariocool.template
         args:
@@ -223,6 +241,12 @@ entity_models:
         type: float
         description: |-
           LOLO value for input temperature
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: lMCxxx.template
         args:

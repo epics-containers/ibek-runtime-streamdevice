@@ -91,6 +91,24 @@ entity_models:
         description: |-
           Offset axis 3 (default 0)
         default: 0
+      label1:
+        type: str
+        description: |-
+          Axis 1 name to display on GUI.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
+      label2:
+        type: str
+        description: |-
+          Axis 2 name to display on GUI.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
+      label3:
+        type: str
+        description: |-
+          Axis 3 name to display on GUI.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: ids3010.template
         args:

@@ -82,6 +82,12 @@ entity_models:
         type: str
         description: |-
           LOLO
+      desc:
+        type: str
+        description: |-
+          Object description.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: M14_sensor.template
         args:

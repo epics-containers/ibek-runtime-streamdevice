@@ -71,6 +71,12 @@ entity_models:
         description: |-
           Engineering units for ramp rate, default is C/s
         default: C/min
+      desc:
+        type: str
+        description: |-
+          Description for CSS.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: eurotherm2k.template
         args:

@@ -47,6 +47,18 @@ entity_models:
         type: str
         description: |-
           Asyn port name
+      ch1pv:
+        type: str
+        description: |-
+          Channel 1 PV (as device in pr4000chan.template), for the GUI.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
+      ch2pv:
+        type: str
+        description: |-
+          Channel 2 PV (as device in pr4000chan.template), for the GUI.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: pr4000.template
         args:

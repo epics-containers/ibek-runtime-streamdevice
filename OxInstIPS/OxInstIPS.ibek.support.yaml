@@ -26,6 +26,12 @@ entity_models:
         description: |-
           Optional - whether device is polled or not. Defaults to 1 (disabled).
         default: 1
+      desc:
+        type: str
+        description: |-
+          Object description.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: OxInstIPS.template
         args:

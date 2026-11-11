@@ -26,6 +26,12 @@ entity_models:
         type: str
         description: |-
           Asyn port name for connection with device
+      STR:
+        type: str
+        description: |-
+          GUI title bar label.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: SierraInstMassFlowMeters.template
         args:

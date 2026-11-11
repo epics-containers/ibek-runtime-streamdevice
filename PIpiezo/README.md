@@ -38,15 +38,15 @@ instance's `config/`:
 - `E816.pvi.device.yaml`
 - `E816.template`
 - `E816_positions.req`
-- `E871absGrp.pvi.device.yaml`
 - `E871-absGrp.template`
 - `E871-absGrp_positions.req`
 - `E871-absGrp_settings.req`
-- `E871relGrp.pvi.device.yaml`
 - `E871-relGrp.template`
 - `E871.proto`
 - `E871.pvi.device.yaml`
 - `E871.template`
+- `E871absGrp.pvi.device.yaml`
+- `E871relGrp.pvi.device.yaml`
 - `PI-E516.pvi.device.yaml`
 - `PI-E516.template`
 - `PIpiezo.ibek.support.yaml`

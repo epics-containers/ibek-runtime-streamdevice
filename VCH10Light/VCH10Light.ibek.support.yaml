@@ -26,6 +26,12 @@ entity_models:
         description: |-
           Optional.   Defaults to ES Chamber Lights.  Description of the controller for use on GUI - e.g. chambers illuminated.
         default: "ES Chamber Lights"
+      shortdesc:
+        type: str
+        description: |-
+          Short description to appear in GUI text.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: VCH10Light.template
         args:

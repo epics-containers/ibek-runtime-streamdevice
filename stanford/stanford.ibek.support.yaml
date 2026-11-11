@@ -26,6 +26,12 @@ entity_models:
         type: str
         description: |-
           Asyn port for this device
+      DESC:
+        type: str
+        description: |-
+          Description for this device, displayed on the GUI.
+          Documentary: accepted for builder XML compatibility; no record uses it.
+        default: ""
     databases:
       - file: sr570.template
         args:
