@@ -10,7 +10,7 @@
 module: ttiMX
 
 entity_models:
-  - name: ttiMX_channel
+  - name: ttiMXChannel
     description: |-
       Imported from DLS module ttiMX (ttiMX_channel.template)
     parameters:
@@ -19,9 +19,9 @@ entity_models:
         description: |-
           Device prefix
       CHAN:
-        type: str
+        type: int
         description: |-
-          CHAN
+          Output channel number
       PREC:
         type: int
         description: |-
@@ -51,12 +51,12 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: ttiMX_channel.pvi.device.yaml
+      yaml_path: ttiMXChannel.pvi.device.yaml
       ui_macros:
         P:
         CHAN:
 
-  - name: ttiMX_general
+  - name: ttiMX
     description: |-
       Imported from DLS module ttiMX (ttiMX_general.template)
     parameters:
@@ -73,6 +73,6 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: ttiMX_general.pvi.device.yaml
+      yaml_path: ttiMX.pvi.device.yaml
       ui_macros:
         P:

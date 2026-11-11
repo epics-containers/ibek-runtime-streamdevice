@@ -21,6 +21,7 @@ entity_models:
         type: str
         description: |-
           Suffix for PV name
+        default: ""
       PORT:
         type: str
         description: |-
@@ -52,6 +53,7 @@ entity_models:
         type: str
         description: |-
           Suffix for PV name
+        default: ""
       PORT:
         type: str
         description: |-
@@ -78,6 +80,7 @@ entity_models:
         type: str
         description: |-
           Suffix for PV name
+        default: ""
       PORT:
         type: str
         description: |-

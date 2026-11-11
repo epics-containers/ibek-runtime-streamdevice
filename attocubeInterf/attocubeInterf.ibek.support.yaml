@@ -21,6 +21,7 @@ entity_models:
         type: str
         description: |-
           Device prefix 2
+        default: ""
       PORT:
         type: str
         description: |-

@@ -21,6 +21,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       PORT:
         type: str
         description: |-
@@ -55,6 +56,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       PORT:
         type: str
         description: |-
@@ -161,6 +163,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       PORT:
         type: str
         description: |-
@@ -267,6 +270,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       PORT:
         type: str
         description: |-
@@ -369,6 +373,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       VALVE1:
         type: str
         description: |-
@@ -419,6 +424,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       VALVE1:
         type: str
         description: |-
@@ -453,6 +459,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       GAS1:
         type: str
         description: |-
@@ -597,6 +604,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       GAS1:
         type: str
         description: |-
@@ -751,6 +759,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       POS1:
         type: str
         description: |-

@@ -16,8 +16,8 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 | `PIpiezo.E871` | Controls a PI E871 piezo controller |
 | `PIpiezo.E816` | Controls a PI E816 piezo controller |
 | `PIpiezo.C877` | Controls a PI C877 piezo controller |
-| `PIpiezo.E871-absGrp` | Imported from DLS module PIpiezo (E871-absGrp.template) NOTE: needs a generic IOC built with PIpiezo (not the plain generic image). |
-| `PIpiezo.E871-relGrp` | Imported from DLS module PIpiezo (E871-relGrp.template) |
+| `PIpiezo.E871absGrp` | Imported from DLS module PIpiezo (E871-absGrp.template) NOTE: needs a generic IOC built with PIpiezo (not the plain generic image). |
+| `PIpiezo.E871relGrp` | Imported from DLS module PIpiezo (E871-relGrp.template) |
 | `PIpiezo.PI-E516` | Imported from DLS module PIpiezo (PI-E516.template) NOTE: needs a generic IOC built with PIpiezo (not the plain generic image). |
 | `PIpiezo.actuatorcallback` | Imported from DLS module PIpiezo (actuatorcallback.template) |
 
@@ -38,11 +38,11 @@ instance's `config/`:
 - `E816.pvi.device.yaml`
 - `E816.template`
 - `E816_positions.req`
-- `E871-absGrp.pvi.device.yaml`
+- `E871absGrp.pvi.device.yaml`
 - `E871-absGrp.template`
 - `E871-absGrp_positions.req`
 - `E871-absGrp_settings.req`
-- `E871-relGrp.pvi.device.yaml`
+- `E871relGrp.pvi.device.yaml`
 - `E871-relGrp.template`
 - `E871.proto`
 - `E871.pvi.device.yaml`

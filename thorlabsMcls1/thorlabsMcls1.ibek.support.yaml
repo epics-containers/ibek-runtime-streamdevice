@@ -21,6 +21,7 @@ entity_models:
         type: str
         description: |-
           PV name suffix
+        default: ""
       BLUE:
         type: str
         description: |-

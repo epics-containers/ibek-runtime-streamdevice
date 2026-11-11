@@ -27,6 +27,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       CMD:
         type: str
         description: |-
@@ -69,6 +70,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       Q1:
         type: str
         description: |-
@@ -275,6 +277,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       CMD:
         type: str
         description: |-

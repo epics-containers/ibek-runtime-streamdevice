@@ -30,6 +30,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       PORT:
         type: str
         description: |-
@@ -56,6 +57,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       PORT:
         type: str
         description: |-
@@ -82,6 +84,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       CHAN:
         type: int
         description: |-
@@ -117,6 +120,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       PORT:
         type: str
         description: |-
@@ -160,6 +164,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -191,6 +196,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -222,6 +228,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       PORT:
         type: str
         description: |-
@@ -248,6 +255,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       PORT:
         type: str
         description: |-
@@ -274,6 +282,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -318,6 +327,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -358,6 +368,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -398,6 +409,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -438,6 +450,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -478,6 +491,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -518,6 +532,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -558,6 +573,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -598,6 +614,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -634,6 +651,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -670,6 +688,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -706,6 +725,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -742,6 +762,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -778,6 +799,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
       BANK:
         type: int
         description: |-
@@ -814,6 +836,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
     databases:
       - file: ODPsu16DUpdate.template
         args:
@@ -836,6 +859,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
     databases:
       - file: ODPsu22DUpdate.template
         args:
@@ -858,6 +882,7 @@ entity_models:
         type: str
         description: |-
           device name qualifier (name will be $(P)$(Q))
+        default: ""
     databases:
       - file: ODPsu24DUpdate.template
         args:

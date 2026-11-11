@@ -26,6 +26,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       C:
         type: str
         description: |-
@@ -81,10 +82,12 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       C:
         type: str
         description: |-
           Axis Name
+        default: ""
       AXIS:
         type: int
         description: |-
@@ -127,6 +130,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       AXIS:
         type: str
         description: |-
@@ -135,6 +139,7 @@ entity_models:
         type: str
         description: |-
           Engineering units
+        default: ""
       PORT:
         type: str
         description: |-
@@ -161,6 +166,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       C:
         type: str
         description: |-
@@ -190,7 +196,7 @@ entity_models:
         Q:
         C:
 
-  - name: E871-absGrp
+  - name: E871absGrp
     description: |-
       Imported from DLS module PIpiezo (E871-absGrp.template)
       NOTE: needs a generic IOC built with PIpiezo (not the plain generic image).
@@ -203,6 +209,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       GRP:
         type: str
         description: |-
@@ -266,13 +273,13 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: E871-absGrp.pvi.device.yaml
+      yaml_path: E871absGrp.pvi.device.yaml
       ui_macros:
         P:
         Q:
         GRP:
 
-  - name: E871-relGrp
+  - name: E871relGrp
     description: |-
       Imported from DLS module PIpiezo (E871-relGrp.template)
     parameters:
@@ -284,6 +291,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
       GRP:
         type: str
         description: |-
@@ -330,7 +338,7 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: E871-relGrp.pvi.device.yaml
+      yaml_path: E871relGrp.pvi.device.yaml
       ui_macros:
         P:
         Q:

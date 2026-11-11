@@ -9,7 +9,7 @@
 module: ip
 
 entity_models:
-  - name: SR830
+  - name: stanfordSR830
     description: |-
       Imported from DLS module ip (SR830.db)
     parameters:
@@ -30,7 +30,7 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: SR830.pvi.device.yaml
+      yaml_path: stanfordSR830.pvi.device.yaml
       ui_macros:
         P:
         N:
