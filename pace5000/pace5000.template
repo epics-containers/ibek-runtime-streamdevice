@@ -1,0 +1,446 @@
+#! Generated with the help of Claude (Anthropic)
+# Druck PACE5000 / PACE6000 pressure controller, one control module.
+#
+# Nothing is written to the instrument at start-up: each output record reads
+# the instrument's current value (the @init handler in pace5000.proto), and
+# there is no autosave. What the IOC shows is what the instrument has.
+#
+# Polling puts the instrument in remote, which disables its touch screen.
+# To use the front panel, set $(P):POLL to Paused, then press $(P):LOCAL.
+#
+# % macro, P, Device prefix
+# % macro, PORT, Asyn port for device
+# % macro, CH, Control module: 1, or 2 for the second module of a PACE6000
+
+# ===========================================================================
+# Polling and remote/local
+# ===========================================================================
+
+record(bo, "$(P):POLL") {
+  field(DESC, "Pause polling for local use")
+  field(ZNAM, "Running")
+  field(ONAM, "Paused")
+  field(VAL, "0")
+  field(PINI, "YES")
+}
+
+record(bo, "$(P):LOCAL") {
+  field(DESC, "Give the front panel back")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto goLocal $(PORT)")
+  field(ZNAM, "Idle")
+  field(ONAM, "Local")
+}
+
+record(bo, "$(P):REMOTE") {
+  field(DESC, "Lock the front panel")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto goRemote $(PORT)")
+  field(ZNAM, "Idle")
+  field(ONAM, "Remote")
+}
+
+# ===========================================================================
+# Identity and errors
+# ===========================================================================
+
+record(waveform, "$(P):IDN") {
+  field(DESC, "Identification string")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getIDN $(PORT)")
+  field(FTVL, "CHAR")
+  field(NELM, "128")
+}
+
+# Each read pops one error from the instrument's 5-entry queue, so polling
+# shows errors as they happen; "0, No error" when the queue is empty.
+record(waveform, "$(P):ERROR_RBV") {
+  field(DESC, "Last error from the error queue")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getError $(PORT)")
+  field(FTVL, "CHAR")
+  field(NELM, "128")
+}
+
+record(bo, "$(P):CLEARSTATUS") {
+  field(DESC, "Clear status and error queue")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto clearStatus $(PORT)")
+  field(ZNAM, "Idle")
+  field(ONAM, "Clear")
+}
+
+# ===========================================================================
+# Pressure readings, in the units of $(P):UNITS_RBV
+# ===========================================================================
+
+record(ai, "$(P):PRESSURE_RBV") {
+  field(DESC, "Control sensor pressure")
+  field(SCAN, "1 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getPressure($(CH)) $(PORT)")
+  field(PREC, "4")
+}
+
+record(bi, "$(P):INLIMITS_RBV") {
+  field(DESC, "Pressure within limits of set-point")
+  field(SCAN, "1 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getInLimits($(CH)) $(PORT)")
+  field(ZNAM, "Not in limits")
+  field(ONAM, "In limits")
+}
+
+record(ai, "$(P):EFFORT_RBV") {
+  field(DESC, "Controller effort (+supply -vacuum)")
+  field(SCAN, "1 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getEffort($(CH)) $(PORT)")
+  field(PREC, "1")
+  field(EGU, "%")
+}
+
+record(ai, "$(P):SLEWMEASURED_RBV") {
+  field(DESC, "Measured rate of change")
+  field(SCAN, "1 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getSlewMeasured($(CH)) $(PORT)")
+  field(PREC, "4")
+}
+
+record(ai, "$(P):BAROMETRIC_RBV") {
+  field(DESC, "Barometric pressure (0 if none)")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getBarometric($(CH)) $(PORT)")
+  field(PREC, "4")
+}
+
+record(ai, "$(P):SUPPLYPOS_RBV") {
+  field(DESC, "Positive supply pressure")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getSupply($(CH),1) $(PORT)")
+  field(PREC, "4")
+}
+
+record(ai, "$(P):SUPPLYNEG_RBV") {
+  field(DESC, "Negative (vacuum) supply pressure")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getSupply($(CH),2) $(PORT)")
+  field(PREC, "4")
+}
+
+# ===========================================================================
+# Control
+# ===========================================================================
+
+record(ao, "$(P):SETPOINT") {
+  field(DESC, "Pressure set-point")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setSetpoint($(CH)) $(PORT)")
+  field(PREC, "4")
+  field(FLNK, "$(P):SETPOINT_RBV")
+}
+
+record(ai, "$(P):SETPOINT_RBV") {
+  field(DESC, "Pressure set-point")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getSetpoint($(CH)) $(PORT)")
+  field(PREC, "4")
+}
+
+record(bo, "$(P):OUTPUTSTATE") {
+  field(DESC, "Pressure controller on/off")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setOutputState($(CH)) $(PORT)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+  field(FLNK, "$(P):OUTPUTSTATE_RBV")
+}
+
+record(bi, "$(P):OUTPUTSTATE_RBV") {
+  field(DESC, "Pressure controller on/off")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getOutputState($(CH)) $(PORT)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+record(mbbo, "$(P):CONTROLMODE") {
+  field(DESC, "Control mode")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setControlMode($(CH)) $(PORT)")
+  field(ZRST, "Active")
+  field(ONST, "Passive")
+  field(TWST, "Gauge")
+  field(FLNK, "$(P):CONTROLMODE_RBV")
+}
+
+record(mbbi, "$(P):CONTROLMODE_RBV") {
+  field(DESC, "Control mode")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getControlMode($(CH)) $(PORT)")
+  field(ZRST, "Active")
+  field(ONST, "Passive")
+  field(TWST, "Gauge")
+}
+
+# The manual warns that opening the isolation valve with high pressure in
+# the external system can make the PACE malfunction: equalize to zero gauge
+# first.
+record(bo, "$(P):ISOLATIONVALVE") {
+  field(DESC, "Output isolation valve")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setIsolation($(CH)) $(PORT)")
+  field(ZNAM, "Closed")
+  field(ONAM, "Open")
+  field(FLNK, "$(P):ISOLATIONVALVE_RBV")
+}
+
+record(bi, "$(P):ISOLATIONVALVE_RBV") {
+  field(DESC, "Output isolation valve")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getIsolation($(CH)) $(PORT)")
+  field(ZNAM, "Closed")
+  field(ONAM, "Open")
+}
+
+record(mbbo, "$(P):SLEWMODE") {
+  field(DESC, "Slew mode")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setSlewMode($(CH)) $(PORT)")
+  field(ZRST, "Maximum")
+  field(ONST, "Linear")
+  field(FLNK, "$(P):SLEWMODE_RBV")
+}
+
+record(mbbi, "$(P):SLEWMODE_RBV") {
+  field(DESC, "Slew mode")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getSlewMode($(CH)) $(PORT)")
+  field(ZRST, "Maximum")
+  field(ONST, "Linear")
+}
+
+record(ao, "$(P):SLEWRATE") {
+  field(DESC, "Linear slew rate")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setSlewRate($(CH)) $(PORT)")
+  field(PREC, "4")
+  field(FLNK, "$(P):SLEWRATE_RBV")
+}
+
+record(ai, "$(P):SLEWRATE_RBV") {
+  field(DESC, "Linear slew rate")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getSlewRate($(CH)) $(PORT)")
+  field(PREC, "4")
+}
+
+record(bo, "$(P):OVERSHOOT") {
+  field(DESC, "Allow overshoot of set-point")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setOvershoot($(CH)) $(PORT)")
+  field(ZNAM, "Not allowed")
+  field(ONAM, "Allowed")
+  field(FLNK, "$(P):OVERSHOOT_RBV")
+}
+
+record(bi, "$(P):OVERSHOOT_RBV") {
+  field(DESC, "Allow overshoot of set-point")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getOvershoot($(CH)) $(PORT)")
+  field(ZNAM, "Not allowed")
+  field(ONAM, "Allowed")
+}
+
+record(ao, "$(P):INLIMITSBAND") {
+  field(DESC, "In-limits band")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setInLimitsBand($(CH)) $(PORT)")
+  field(PREC, "4")
+  field(EGU, "% FS")
+  field(DRVL, "0.0001")
+  field(DRVH, "10")
+  field(FLNK, "$(P):INLIMITSBAND_RBV")
+}
+
+record(ai, "$(P):INLIMITSBAND_RBV") {
+  field(DESC, "In-limits band")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getInLimitsBand($(CH)) $(PORT)")
+  field(PREC, "4")
+  field(EGU, "% FS")
+}
+
+record(longout, "$(P):INLIMITSTIME") {
+  field(DESC, "Time in limits before flagged")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setInLimitsTime($(CH)) $(PORT)")
+  field(EGU, "s")
+  field(DRVL, "1")
+  field(DRVH, "60")
+  field(FLNK, "$(P):INLIMITSTIME_RBV")
+}
+
+record(longin, "$(P):INLIMITSTIME_RBV") {
+  field(DESC, "Time in limits before flagged")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getInLimitsTime($(CH)) $(PORT)")
+  field(EGU, "s")
+}
+
+# Must match one of the instrument's ranges exactly, e.g. "3.50barg"
+record(stringout, "$(P):CONTROLRANGE") {
+  field(DESC, "Control range")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setControlRange($(CH)) $(PORT)")
+  field(FLNK, "$(P):CONTROLRANGE_RBV")
+}
+
+record(stringin, "$(P):CONTROLRANGE_RBV") {
+  field(DESC, "Control range")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getControlRange($(CH)) $(PORT)")
+}
+
+# e.g. MBAR, BAR, PA, KPA, PSI; every pressure value is in these units
+record(stringout, "$(P):UNITS") {
+  field(DESC, "Pressure units")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto setUnits($(CH)) $(PORT)")
+  field(FLNK, "$(P):UNITS_RBV")
+}
+
+record(stringin, "$(P):UNITS_RBV") {
+  field(DESC, "Pressure units")
+  field(SCAN, "5 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getUnits($(CH)) $(PORT)")
+}
+
+# ===========================================================================
+# Zero and vent
+# ===========================================================================
+
+record(bo, "$(P):ZERO") {
+  field(DESC, "Start an auto-zero")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto startZero($(CH)) $(PORT)")
+  field(ZNAM, "Idle")
+  field(ONAM, "Zero")
+}
+
+record(bo, "$(P):ZERO:ABORT") {
+  field(DESC, "Abort an auto-zero")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto abortZero($(CH)) $(PORT)")
+  field(ZNAM, "Idle")
+  field(ONAM, "Abort")
+}
+
+record(bi, "$(P):ZEROSTATE_RBV") {
+  field(DESC, "Auto-zero state")
+  field(SCAN, "2 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getZeroState($(CH)) $(PORT)")
+  field(ZNAM, "Idle")
+  field(ONAM, "In progress")
+}
+
+record(bo, "$(P):VENT") {
+  field(DESC, "Start a vent")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto startVent($(CH)) $(PORT)")
+  field(ZNAM, "Idle")
+  field(ONAM, "Vent")
+}
+
+record(bo, "$(P):VENT:ABORT") {
+  field(DESC, "Abort a vent")
+  field(SCAN, "Passive")
+  # command only, no readback: do not alarm before first write
+  field(UDFS, "NO_ALARM")
+  field(DTYP, "stream")
+  field(OUT, "@pace5000.proto abortVent($(CH)) $(PORT)")
+  field(ZNAM, "Idle")
+  field(ONAM, "Abort")
+}
+
+record(mbbi, "$(P):VENTSTATE_RBV") {
+  field(DESC, "Vent state")
+  field(SCAN, "2 second")
+  field(SDIS, "$(P):POLL")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getVentState($(CH)) $(PORT)")
+  field(ZRVL, "0")
+  field(ZRST, "OK")
+  field(ONVL, "1")
+  field(ONST, "In progress")
+  field(TWVL, "2")
+  field(TWST, "Completed")
+}
