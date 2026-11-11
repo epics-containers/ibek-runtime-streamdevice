@@ -30,12 +30,12 @@ entity_models:
         type: str
         description: |-
           GUI title bar label.
-          Documentary: accepted for builder XML compatibility; no record uses it.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
         default: ""
     databases:
       - file: SierraInstMassFlowMeters.template
         args:
-          .*:
+          '(?!STR$).*':
     pvi:
       yaml_path: SierraInstMassFlowMeters.pvi.device.yaml
       ui_macros:

@@ -86,12 +86,12 @@ entity_models:
         type: str
         description: |-
           Object description.
-          Documentary: accepted for builder XML compatibility; no record uses it.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
         default: ""
     databases:
       - file: M14_sensor.template
         args:
-          .*:
+          '(?!desc$).*':
     pvi:
       yaml_path: M14_sensor.pvi.device.yaml
       ui_macros:

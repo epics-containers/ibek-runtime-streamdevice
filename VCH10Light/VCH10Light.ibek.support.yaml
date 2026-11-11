@@ -30,12 +30,12 @@ entity_models:
         type: str
         description: |-
           Short description to appear in GUI text.
-          Documentary: accepted for builder XML compatibility; no record uses it.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
         default: ""
     databases:
       - file: VCH10Light.template
         args:
-          .*:
+          '(?!shortdesc$).*':
     pvi:
       yaml_path: VCH10Light.pvi.device.yaml
       ui_macros:

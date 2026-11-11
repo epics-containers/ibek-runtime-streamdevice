@@ -148,12 +148,12 @@ entity_models:
         type: str
         description: |-
           Description.
-          Documentary: accepted for builder XML compatibility; no record uses it.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
         default: ""
     databases:
       - file: E816.template
         args:
-          .*:
+          '(?!DESC$).*':
     pvi:
       yaml_path: E816.pvi.device.yaml
       ui_macros:
