@@ -31,7 +31,9 @@ module, with `CH: 1` and `CH: 2` and a different `P` for each.
 - **Nothing is written at start-up.** Each output record reads the instrument's
   current value when the IOC starts, and there is no autosave. Restarting the IOC
   never changes the instrument's settings. (The DLS `DruckDPI515` driver did the
-  opposite: it wrote every setting back whenever it reconnected.)
+  opposite: it wrote every setting back whenever it reconnected.) These start-up
+  reads time out after 500 ms each, so a PACE that does not answer delays `iocInit`
+  by about 5.5 seconds per entity at most.
 - **Polling locks the front panel.** Most SCPI commands put the PACE in remote and
   disable its touch screen (manual p1), and this pattern polls every second. To use
   the front panel, set `$(P):POLL` to Paused, then press `$(P):LOCAL`. Set `POLL` back

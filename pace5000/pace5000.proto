@@ -29,6 +29,12 @@
 Terminator = LF;
 ReplyTimeout = 2000;
 
+# Each set* protocol has a shorter ReplyTimeout. Its main body only writes,
+# so the timeout only affects its @init read of the current setting, which
+# runs during iocInit. With 11 of them, a port that connects but gets no
+# reply would otherwise hold iocInit for 22 s (2 s each); 500 ms caps it
+# at about 5.5 s per entity.
+
 ###########################################################################
 # Instrument-wide commands
 ###########################################################################
@@ -101,6 +107,7 @@ getEffort {
 # Set-point in current units (p141). The reply header is the long form.
 getSetpoint { out ":SOUR\$1:PRES?"; in "%*s %f"; }
 setSetpoint {
+    ReplyTimeout = 500;
     out ":SOUR\$1:PRES %f";
     @init { out ":SOUR\$1:PRES?"; in "%*s %f"; }
 }
@@ -108,6 +115,7 @@ setSetpoint {
 # Controller on/off (p83): 0 off, 1 on
 getOutputState { out ":OUTP\$1:STAT?"; in "%*s %d"; }
 setOutputState {
+    ReplyTimeout = 500;
     out ":OUTP\$1:STAT %d";
     @init { out ":OUTP\$1:STAT?"; in "%*s %d"; }
 }
@@ -115,6 +123,7 @@ setOutputState {
 # Control mode (p82)
 getControlMode { out ":OUTP\$1:MODE?"; in "%*s %{ACT|PASS|GAUG}"; }
 setControlMode {
+    ReplyTimeout = 500;
     out ":OUTP\$1:MODE %{ACT|PASS|GAUG}";
     @init { out ":OUTP\$1:MODE?"; in "%*s %{ACT|PASS|GAUG}"; }
 }
@@ -122,6 +131,7 @@ setControlMode {
 # Output isolation valve (p77): 0 closed (isolated), 1 open
 getIsolation { out ":OUTP\$1:ISOL:STAT?"; in "%*s %d"; }
 setIsolation {
+    ReplyTimeout = 500;
     out ":OUTP\$1:ISOL:STAT %d";
     @init { out ":OUTP\$1:ISOL:STAT?"; in "%*s %d"; }
 }
@@ -129,6 +139,7 @@ setIsolation {
 # Slew mode (p148): maximum rate, or the linear rate set by setSlewRate
 getSlewMode { out ":SOUR\$1:PRES:SLEW:MODE?"; in "%*s %{MAX|LIN}"; }
 setSlewMode {
+    ReplyTimeout = 500;
     out ":SOUR\$1:PRES:SLEW:MODE %{MAX|LIN}";
     @init { out ":SOUR\$1:PRES:SLEW:MODE?"; in "%*s %{MAX|LIN}"; }
 }
@@ -136,6 +147,7 @@ setSlewMode {
 # Linear slew rate, current units per second or minute (p147)
 getSlewRate { out ":SOUR\$1:PRES:SLEW?"; in "%*s %f"; }
 setSlewRate {
+    ReplyTimeout = 500;
     out ":SOUR\$1:PRES:SLEW %f";
     @init { out ":SOUR\$1:PRES:SLEW?"; in "%*s %f"; }
 }
@@ -143,6 +155,7 @@ setSlewRate {
 # Overshoot (p149): 0 not allowed, 1 allowed. The reply header ends :STAT.
 getOvershoot { out ":SOUR\$1:PRES:SLEW:OVER?"; in "%*s %d"; }
 setOvershoot {
+    ReplyTimeout = 500;
     out ":SOUR\$1:PRES:SLEW:OVER %d";
     @init { out ":SOUR\$1:PRES:SLEW:OVER?"; in "%*s %d"; }
 }
@@ -150,6 +163,7 @@ setOvershoot {
 # In-limits band, % of full scale, 0.0001 to 10 (p139)
 getInLimitsBand { out ":SOUR\$1:PRES:INL?"; in "%*s %f"; }
 setInLimitsBand {
+    ReplyTimeout = 500;
     out ":SOUR\$1:PRES:INL %f";
     @init { out ":SOUR\$1:PRES:INL?"; in "%*s %f"; }
 }
@@ -157,6 +171,7 @@ setInLimitsBand {
 # Time the pressure must stay in limits, 1 to 60 s (p140)
 getInLimitsTime { out ":SOUR\$1:PRES:INL:TIME?"; in "%*s %d"; }
 setInLimitsTime {
+    ReplyTimeout = 500;
     out ":SOUR\$1:PRES:INL:TIME %d";
     @init { out ":SOUR\$1:PRES:INL:TIME?"; in "%*s %d"; }
 }
@@ -165,6 +180,7 @@ setInLimitsTime {
 # instrument's ranges exactly, case included (:INST:CAT:ALL?).
 getControlRange { out ":SOUR\$1:PRES:RANG?"; in "%*s \"%[^\"]\""; }
 setControlRange {
+    ReplyTimeout = 500;
     out ":SOUR\$1:PRES:RANG \"%s\"";
     @init { out ":SOUR\$1:PRES:RANG?"; in "%*s \"%[^\"]\""; }
 }
@@ -173,6 +189,7 @@ setControlRange {
 # quoted string; every pressure value above is in these units.
 getUnits { out ":UNIT\$1:PRES?"; in "%*s %s"; }
 setUnits {
+    ReplyTimeout = 500;
     out ":UNIT\$1:PRES %s";
     @init { out ":UNIT\$1:PRES?"; in "%*s %s"; }
 }

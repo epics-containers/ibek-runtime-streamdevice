@@ -220,7 +220,7 @@ record(mbbi, "$(P):CONTROLMODE_RBV") {
 # the external system can make the PACE malfunction: equalize to zero gauge
 # first.
 record(bo, "$(P):ISOLATIONVALVE") {
-  field(DESC, "Output isolation valve")
+  field(DESC, "Isolation valve: equalize to 0 g first")
   field(SCAN, "Passive")
   field(DTYP, "stream")
   field(OUT, "@pace5000.proto setIsolation($(CH)) $(PORT)")
@@ -230,7 +230,7 @@ record(bo, "$(P):ISOLATIONVALVE") {
 }
 
 record(bi, "$(P):ISOLATIONVALVE_RBV") {
-  field(DESC, "Output isolation valve")
+  field(DESC, "Isolation valve: equalize to 0 g first")
   field(SCAN, "5 second")
   field(SDIS, "$(P):POLL")
   field(DTYP, "stream")
