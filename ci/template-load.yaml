@@ -94,10 +94,10 @@ known_errors:
     error: '1:ERRORSTATUS.SIOL: can''t initialize link type CONSTANT with "@"'
   - pattern: alicatGasFlow
     template: alicatPressureCtrl.template
-    error: '11:DGAIN:WR.DOL: can''t initialize link type CONSTANT with "@"'
+    error: '1:DGAIN:WR.DOL: can''t initialize link type CONSTANT with "@"'
   - pattern: alicatGasFlow
     template: alicatMassCtrl.template
-    error: '11:DGAIN:WR.DOL: can''t initialize link type CONSTANT with "@"'
+    error: '1:DGAIN:WR.DOL: can''t initialize link type CONSTANT with "@"'
   # A StreamDevice INP link on a record with no DTYP "stream": the record
   # never talks to the device.
   - pattern: CryoconM32
@@ -108,13 +108,13 @@ known_errors:
     error: '1:STS:AMBIENTTEMP.INP: can''t initialize link type CONSTANT'
   - pattern: PIpiezo
     template: C877.template
-    error: '111:REF:MODE.INP: can''t initialize link type CONSTANT'
+    error: '11:REF:MODE.INP: can''t initialize link type CONSTANT'
   # Not a fault: getvdformat redirects into the records of all 24 ODPsuChannel
   # entities (CHAN 0 to 23), as ODPsuV2.protocol notes; the test instance
   # has one, with CHAN 1.
   - pattern: ODPsu
     template: ODPsuV2.template
-    error: "ODPsuV2.protocol line 62: Field '11:FMT:V0DR.RVAL' not found"
+    error: "ODPsuV2.protocol line 62: Field '1:FMT:V0DR.RVAL' not found"
   - pattern: ODPsu
     template: ODPsuV2.template
-    error: '11:FMT:GET: Protocol parse error'
+    error: '1:FMT:GET: Protocol parse error'

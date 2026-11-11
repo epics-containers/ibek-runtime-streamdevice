@@ -21,6 +21,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       PORT:
         type: str
         description: |-
@@ -52,6 +53,7 @@ entity_models:
         type: str
         description: |-
           M
+        default: ""
       TWSIZE:
         type: float
         description: |-

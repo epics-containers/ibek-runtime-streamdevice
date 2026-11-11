@@ -25,6 +25,7 @@ entity_models:
         type: str
         description: |-
           device name
+        default: ""
     databases:
       - file: ttiCPX_general.template
         args:
@@ -43,9 +44,9 @@ entity_models:
         description: |-
           Device prefix
       CHAN:
-        type: str
+        type: int
         description: |-
-          CHAN
+          Output channel number
       MAXV:
         type: float
         description: |-

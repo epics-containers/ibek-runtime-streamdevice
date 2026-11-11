@@ -60,10 +60,16 @@ entity_models:
         description: |-
           Optional - Engineering units for temperature sensor 3, defaults to mbar.
         default: mBar
+      STR:
+        type: str
+        description: |-
+          GUI title bar label.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: cryojetITC503S.template
         args:
-          .*:
+          '(?!STR$).*':
     pvi:
       yaml_path: cryojetITC503S.pvi.device.yaml
       ui_macros:

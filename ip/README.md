@@ -12,7 +12,7 @@ pattern, so the provenance travels into every IOC instance that uses it.
 
 | Entity model | Description |
 |---|---|
-| `ip.SR830` | Imported from DLS module ip (SR830.db) |
+| `ip.stanfordSR830` | Imported from DLS module ip (SR830.db) |
 
 ## Files
 
@@ -21,8 +21,8 @@ instance's `config/`:
 
 - `SR830.db`
 - `SR830.proto`
-- `SR830.pvi.device.yaml`
 - `ip.ibek.support.yaml`
+- `stanfordSR830.pvi.device.yaml`
 
 Everything else in this folder stays in the library and is never vendored:
 

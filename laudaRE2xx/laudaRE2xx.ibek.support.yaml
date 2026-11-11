@@ -62,10 +62,16 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: lRE2xx.template
         args:
-          .*:
+          '(?!DESC$).*':
     pvi:
       yaml_path: lRE2xx.pvi.device.yaml
       ui_macros:
@@ -123,10 +129,16 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: lIntegralT.template
         args:
-          .*:
+          '(?!DESC$).*':
     pvi:
       yaml_path: lIntegralT.pvi.device.yaml
       ui_macros:
@@ -178,10 +190,16 @@ entity_models:
         description: |-
           Ramp rate lower clipping point [C/min]
         default: 0.01
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: lVariocool.template
         args:
-          .*:
+          '(?!DESC$).*':
     pvi:
       yaml_path: lVariocool.pvi.device.yaml
       ui_macros:
@@ -223,10 +241,16 @@ entity_models:
         type: float
         description: |-
           LOLO value for input temperature
+      DESC:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: lMCxxx.template
         args:
-          .*:
+          '(?!DESC$).*':
     pvi:
       yaml_path: lMCxxx.pvi.device.yaml
       ui_macros:

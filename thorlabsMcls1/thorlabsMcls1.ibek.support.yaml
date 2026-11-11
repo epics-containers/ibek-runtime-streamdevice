@@ -21,6 +21,7 @@ entity_models:
         type: str
         description: |-
           PV name suffix
+        default: ""
       BLUE:
         type: str
         description: |-
@@ -41,10 +42,16 @@ entity_models:
         type: str
         description: |-
           asyn port
+      desc:
+        type: str
+        description: |-
+          Description.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: thorlabsMcls1.template
         args:
-          .*:
+          '(?!desc$).*':
     pvi:
       yaml_path: thorlabsMcls1.pvi.device.yaml
       ui_macros:

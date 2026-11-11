@@ -12,8 +12,8 @@ pattern, so the provenance travels into every IOC instance that uses it.
 
 | Entity model | Description |
 |---|---|
-| `ttiMX.ttiMX_channel` | Imported from DLS module ttiMX (ttiMX_channel.template) |
-| `ttiMX.ttiMX_general` | Imported from DLS module ttiMX (ttiMX_general.template) |
+| `ttiMX.ttiMXChannel` | Imported from DLS module ttiMX (ttiMX_channel.template) |
+| `ttiMX.ttiMX` | Imported from DLS module ttiMX (ttiMX_general.template) |
 
 ## Files
 
@@ -22,10 +22,10 @@ instance's `config/`:
 
 - `ttiMX.ibek.support.yaml`
 - `ttiMX.proto`
-- `ttiMX_channel.pvi.device.yaml`
+- `ttiMX.pvi.device.yaml`
+- `ttiMXChannel.pvi.device.yaml`
 - `ttiMX_channel.template`
 - `ttiMX_channel_settings.req`
-- `ttiMX_general.pvi.device.yaml`
 - `ttiMX_general.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -21,6 +21,7 @@ entity_models:
         type: str
         description: |-
           Device prefix 2
+        default: ""
       PORT:
         type: str
         description: |-
@@ -90,10 +91,28 @@ entity_models:
         description: |-
           Offset axis 3 (default 0)
         default: 0
+      label1:
+        type: str
+        description: |-
+          Axis 1 name to display on GUI.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
+      label2:
+        type: str
+        description: |-
+          Axis 2 name to display on GUI.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
+      label3:
+        type: str
+        description: |-
+          Axis 3 name to display on GUI.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: ids3010.template
         args:
-          .*:
+          '(?!(label1|label2|label3)$).*':
     pvi:
       yaml_path: ids3010.pvi.device.yaml
       ui_macros:

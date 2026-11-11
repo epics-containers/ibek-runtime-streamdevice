@@ -21,14 +21,21 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       PORT:
         type: str
         description: |-
           Asyn port for this device
+      DESC:
+        type: str
+        description: |-
+          Description for this device, displayed on the GUI.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: sr570.template
         args:
-          .*:
+          '(?!DESC$).*':
     pvi:
       yaml_path: sr570.pvi.device.yaml
       ui_macros:
@@ -47,6 +54,7 @@ entity_models:
         type: str
         description: |-
           Q
+        default: ""
     databases:
       - file: dummy_stanford_ai.template
         args:

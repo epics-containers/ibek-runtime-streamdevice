@@ -21,6 +21,7 @@ entity_models:
         type: str
         description: |-
           Device Suffix
+        default: ""
       PORT:
         type: str
         description: |-

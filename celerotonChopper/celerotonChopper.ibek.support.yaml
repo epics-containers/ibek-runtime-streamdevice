@@ -24,6 +24,7 @@ entity_models:
         type: str
         description: |-
           PV name suffix
+        default: ""
       PORT:
         type: str
         description: |-
