@@ -45,7 +45,10 @@ module, with `CH: 1` and `CH: 2` and a different `P` for each.
   shown by `$(P):UNITS_RBV`. The records carry no `EGU` for them. `$(P):UNITS` takes a
   unit name such as `MBAR`, `BAR`, `KPA` or `PSI`.
 - **Control range.** `$(P):CONTROLRANGE` must match one of the instrument's range
-  names exactly, case included, e.g. `3.50barg`.
+  names exactly, case included, e.g. `3.50barg`. `$(P):RANGES` lists them.
+- **Read once at start-up.** `$(P):IDN`, `SERIAL`, `VERSION`, `SCPIVERSION` and
+  `RANGES` are read when the IOC starts and not polled. If the PACE was off then,
+  write 1 to each record's `.PROC` field to read it again.
 - **Errors.** `$(P):ERROR_RBV` reads the instrument's 5-entry error queue every 5
   seconds; each read removes one error. Write errors only show there, since the PACE
   does not reply to commands that set something.

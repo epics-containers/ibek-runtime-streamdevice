@@ -60,6 +60,43 @@ record(waveform, "$(P):IDN") {
   field(NELM, "128")
 }
 
+# Identity, read once at start-up like IDN; none of it changes while running.
+record(longin, "$(P):SERIAL") {
+  field(DESC, "Instrument serial number")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getSerial $(PORT)")
+}
+
+record(stringin, "$(P):VERSION") {
+  field(DESC, "Instrument main code version")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getVersion $(PORT)")
+}
+
+record(stringin, "$(P):SCPIVERSION") {
+  field(DESC, "SCPI version")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getScpiVersion $(PORT)")
+}
+
+# Every range of this module, as the comma-separated quoted list the
+# instrument returns. The names are what $(P):CONTROLRANGE accepts.
+record(waveform, "$(P):RANGES") {
+  field(DESC, "Ranges fitted to this module")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@pace5000.proto getRangeCatalogue($(CH)) $(PORT)")
+  field(FTVL, "CHAR")
+  field(NELM, "256")
+}
+
 # Each read pops one error from the instrument's 5-entry queue, so polling
 # shows errors as they happen; "0, No error" when the queue is empty.
 record(waveform, "$(P):ERROR_RBV") {
