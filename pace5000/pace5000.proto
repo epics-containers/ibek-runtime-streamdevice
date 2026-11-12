@@ -1,0 +1,252 @@
+# Protocol file for Druck PACE5000 (and PACE6000) pressure controllers
+# This file was written with the help of Claude (Anthropic).
+# Checked against the PACE SCPI Remote Communications Manual K0472, rev J.
+# Page numbers below are the manual's printed page numbers.
+#
+# Usage in a db file, e.g.:
+#   field(DTYP, "stream")
+#   field(INP,  "@pace5000.proto getPressure(1) $(PORT)")
+#
+# $1 is the module: 1, or 2 for the second module of a PACE6000. Commands
+# without a module number go to module 1 (p16), so 1 is always safe.
+#
+# Every query reply starts with a header, a space, then the data (p16):
+#   :SENS2:PRES?      ->  :SENS2:PRES 3617.1921387
+#   :SENS1:PRES?      ->  :SENS:PRES 3616.9282227     (a "1" is dropped)
+#   :SOUR:PRES?       ->  :SOUR:PRES:LEV:IMM:AMPL 0.5000000   (long form)
+# The header is not always the command sent, so every "in" skips it with
+# "%*s" instead of matching it.
+#
+# Commands that set something send no reply (the manual's examples show "None"
+# for them). Errors only show in the 5-entry error queue (p13, getError).
+#
+# Enumerated replies are always upper-case short forms (MAX, LIN, ACT, ...)
+# and booleans are always 0 or 1 (p6).
+
+# The instrument takes commands ending in LF (p3) and ends its replies with
+# CR only. The manual does not say so; it was seen on a real PACE.
+OutTerminator = LF;
+InTerminator = CR;
+ReplyTimeout = 2000;
+
+# Each set* protocol has a shorter ReplyTimeout. Its main body only writes,
+# so the timeout only affects its @init read of the current setting, which
+# runs during iocInit. With 11 of them, a port that connects but gets no
+# reply would otherwise hold iocInit for 22 s (2 s each); 500 ms caps it
+# at about 5.5 s per entity.
+
+###########################################################################
+# Instrument-wide commands
+###########################################################################
+
+# e.g. "*IDN GE Druck,PACE5000 User Interface,58784,01.05.04" (p158)
+getIDN {
+    out "*IDN?";
+    in "%*s %[^\r\n]";
+}
+
+# Pops one entry from the 5-entry error queue (p13, p171). Replies are
+# "0, No error" or -222,"Data out of range; Parameter 1": keep the whole text.
+getError {
+    out ":SYST:ERR?";
+    in "%*s %[^\r\n]";
+}
+
+# Instrument serial number (p63). :INST:SN1 is the instrument itself; 2 and
+# 3 are the control modules, 4-7 the options.
+getSerial {
+    out ":INST:SN1?";
+    in "%*s %d";
+}
+
+# Instrument main code version, e.g. "DK0406 V00.01.09" (p75). The manual's
+# examples show the reply both with and without quotes: keep the whole text.
+getVersion {
+    out ":INST:VERS1?";
+    in "%*s %[^\r\n]";
+}
+
+# SCPI version the instrument follows, e.g. "1995.0" (p177)
+getScpiVersion {
+    out ":SYST:VERS?";
+    in "%*s %[^\r\n]";
+}
+
+# Every range of the module, source sensors included (p38), e.g.
+#   :INST:CAT:ALL "3.50barg","10.00barg","1.00barg","BAROMETER","4.50bara"
+# The gauge and absolute names are what setControlRange accepts (p145).
+getRangeCatalogue {
+    out ":INST:CAT\$1:ALL?";
+    in "%*s %[^\r\n]";
+}
+
+clearStatus { out "*CLS"; }
+
+# Remote and local (p1, p196-197). Most commands put the instrument in remote
+# and disable its touch screen; :LOC gives the front panel back.
+goLocal  { out ":LOC"; }
+goRemote { out ":REM"; }
+
+###########################################################################
+# Pressure readings
+###########################################################################
+
+# Control sensor pressure, in the current units (p102). Unlike :SENS:PRES?
+# it does not depend on which range :SENS:PRES:RANG has selected.
+getPressure {
+    out ":SENS\$1:PRES:CONT?";
+    in "%*s %f";
+}
+
+# In-limits flag (p111): reply is "<pressure>, <0|1>"; keep only the flag
+getInLimits {
+    out ":SENS\$1:PRES:INL?";
+    in "%*s %*f, %d";
+}
+
+# Barometric pressure; zero if no barometer is fitted (p101)
+getBarometric {
+    out ":SENS\$1:PRES:BAR?";
+    in "%*s %f";
+}
+
+# Measured rate of change, current units per second or minute (p126)
+getSlewMeasured {
+    out ":SENS\$1:PRES:SLEW?";
+    in "%*s %f";
+}
+
+# Supply pressures (p137): $2 = 1 for +ve supply, 2 for -ve (vacuum)
+getSupply {
+    out ":SOUR\$1:PRES:COMP\$2?";
+    in "%*s %f";
+}
+
+# Controller effort, -100 to +100 % (p138): + supply valve, - vacuum valve
+getEffort {
+    out ":SOUR\$1:PRES:EFF?";
+    in "%*s %f";
+}
+
+###########################################################################
+# Control
+###########################################################################
+
+# Set-point in current units (p141). The reply header is the long form.
+getSetpoint { out ":SOUR\$1:PRES?"; in "%*s %f"; }
+setSetpoint {
+    ReplyTimeout = 500;
+    out ":SOUR\$1:PRES %f";
+    @init { out ":SOUR\$1:PRES?"; in "%*s %f"; }
+}
+
+# Controller on/off (p83): 0 off, 1 on
+getOutputState { out ":OUTP\$1:STAT?"; in "%*s %d"; }
+setOutputState {
+    ReplyTimeout = 500;
+    out ":OUTP\$1:STAT %d";
+    @init { out ":OUTP\$1:STAT?"; in "%*s %d"; }
+}
+
+# Control mode (p82)
+getControlMode { out ":OUTP\$1:MODE?"; in "%*s %{ACT|PASS|GAUG}"; }
+setControlMode {
+    ReplyTimeout = 500;
+    out ":OUTP\$1:MODE %{ACT|PASS|GAUG}";
+    @init { out ":OUTP\$1:MODE?"; in "%*s %{ACT|PASS|GAUG}"; }
+}
+
+# Output isolation valve (p77): 0 closed (isolated), 1 open
+getIsolation { out ":OUTP\$1:ISOL:STAT?"; in "%*s %d"; }
+setIsolation {
+    ReplyTimeout = 500;
+    out ":OUTP\$1:ISOL:STAT %d";
+    @init { out ":OUTP\$1:ISOL:STAT?"; in "%*s %d"; }
+}
+
+# Slew mode (p148): maximum rate, or the linear rate set by setSlewRate
+getSlewMode { out ":SOUR\$1:PRES:SLEW:MODE?"; in "%*s %{MAX|LIN}"; }
+setSlewMode {
+    ReplyTimeout = 500;
+    out ":SOUR\$1:PRES:SLEW:MODE %{MAX|LIN}";
+    @init { out ":SOUR\$1:PRES:SLEW:MODE?"; in "%*s %{MAX|LIN}"; }
+}
+
+# Linear slew rate, current units per second or minute (p147)
+getSlewRate { out ":SOUR\$1:PRES:SLEW?"; in "%*s %f"; }
+setSlewRate {
+    ReplyTimeout = 500;
+    out ":SOUR\$1:PRES:SLEW %f";
+    @init { out ":SOUR\$1:PRES:SLEW?"; in "%*s %f"; }
+}
+
+# Overshoot (p149): 0 not allowed, 1 allowed. The reply header ends :STAT.
+getOvershoot { out ":SOUR\$1:PRES:SLEW:OVER?"; in "%*s %d"; }
+setOvershoot {
+    ReplyTimeout = 500;
+    out ":SOUR\$1:PRES:SLEW:OVER %d";
+    @init { out ":SOUR\$1:PRES:SLEW:OVER?"; in "%*s %d"; }
+}
+
+# In-limits band, % of full scale, 0.0001 to 10 (p139)
+getInLimitsBand { out ":SOUR\$1:PRES:INL?"; in "%*s %f"; }
+setInLimitsBand {
+    ReplyTimeout = 500;
+    out ":SOUR\$1:PRES:INL %f";
+    @init { out ":SOUR\$1:PRES:INL?"; in "%*s %f"; }
+}
+
+# Time the pressure must stay in limits, 1 to 60 s (p140)
+getInLimitsTime { out ":SOUR\$1:PRES:INL:TIME?"; in "%*s %d"; }
+setInLimitsTime {
+    ReplyTimeout = 500;
+    out ":SOUR\$1:PRES:INL:TIME %d";
+    @init { out ":SOUR\$1:PRES:INL:TIME?"; in "%*s %d"; }
+}
+
+# Control range, e.g. "3.50barg" (p145). The string must match one of the
+# instrument's ranges exactly, case included (:INST:CAT:ALL?).
+getControlRange { out ":SOUR\$1:PRES:RANG?"; in "%*s \"%[^\"]\""; }
+setControlRange {
+    ReplyTimeout = 500;
+    out ":SOUR\$1:PRES:RANG \"%s\"";
+    @init { out ":SOUR\$1:PRES:RANG?"; in "%*s \"%[^\"]\""; }
+}
+
+# Pressure units, e.g. MBAR, BAR, PA, PSI (p180). Units are a name, not a
+# quoted string; every pressure value above is in these units.
+getUnits { out ":UNIT\$1:PRES?"; in "%*s %s"; }
+setUnits {
+    ReplyTimeout = 500;
+    out ":UNIT\$1:PRES %s";
+    @init { out ":UNIT\$1:PRES?"; in "%*s %s"; }
+}
+
+###########################################################################
+# Zero and vent
+###########################################################################
+
+# Auto-zero (p27): 1 starts, 0 aborts; the query is 0 idle, 1 in progress
+startZero  { out ":CAL\$1:PRES:ZERO:AUTO 1"; }
+abortZero  { out ":CAL\$1:PRES:ZERO:AUTO 0"; }
+getZeroState { out ":CAL\$1:PRES:ZERO:AUTO?"; in "%*s %d"; }
+
+# Vent (p142): 1 starts, 0 aborts; the query is 0 OK, 1 in progress,
+# 2 completed
+startVent  { out ":SOUR\$1:PRES:LEV:IMM:AMPL:VENT 1"; }
+abortVent  { out ":SOUR\$1:PRES:LEV:IMM:AMPL:VENT 0"; }
+getVentState { out ":SOUR\$1:PRES:LEV:IMM:AMPL:VENT?"; in "%*s %d"; }
+
+###########################################################################
+# Excluded commands
+###########################################################################
+# Not implemented, on purpose:
+# - :SYST:COMM:SER:* (baud, parity, handshake): changing them cuts the link
+#   (p165-168).
+# - :CAL:PRES:* calibration and :SYST:PASS:* password commands: they alter
+#   the factory calibration.
+# - :LLO: locks the front panel out until :GTL.
+# - *SRE: a non-zero value makes the instrument send unsolicited ":SRQ"
+#   messages over RS 232 (p12), which these protocols do not expect.
+# - :SENS:PRES:RANG and :SENS:PRES?: they read the "sense" range, which only
+#   matters for calibration; getPressure reads the control sensor instead.

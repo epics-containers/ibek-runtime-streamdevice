@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.8.0-beta.2/ibek.support.schema.json
+
+# Not imported from a DLS support module: no DLS module covers the PACE.
+# Written with the help of Claude (Anthropic) from the PACE SCPI Remote
+# Communications Manual K0472, rev J. The command list started from the
+# DLS DruckDPI515 module's (an older Druck controller with a similar SCPI
+# set), changed where the PACE differs.
+#
+# Nothing is written to the instrument at start-up and there is no autosave:
+# output records read the instrument's current settings when the IOC starts.
+#
+# Example ioc yaml (the asyn port comes from an asyn IP or serial entity):
+#   - type: pace5000.pace5000
+#     P: BL19I-EA-PACE-01
+#     PORT: pace
+
+module: pace5000
+
+entity_models:
+  - name: pace5000
+    description: |-
+      Druck PACE5000 pressure controller: pressure readback, set-point,
+      control mode, slew, in-limits, units, zero and vent. For a PACE6000
+      add one entity per control module, with CH 1 and 2 and different P.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+      CH:
+        type: int
+        description: |-
+          Control module: 1, or 2 for the second module of a PACE6000
+        default: 1
+    databases:
+      - file: pace5000.template
+        args:
+          .*:
+    pvi:
+      yaml_path: pace5000.pvi.device.yaml
+      ui_macros:
+        P:
