@@ -23,10 +23,10 @@
 # Enumerated replies are always upper-case short forms (MAX, LIN, ACT, ...)
 # and booleans are always 0 or 1 (p6).
 
-# The manual gives LF as the input terminator (p3) but does not say what the
-# instrument ends its replies with. If replies end in CR LF, the readbacks
-# fail with "surplus input" and InTerminator must be changed to CR LF.
-Terminator = LF;
+# The instrument takes commands ending in LF (p3) and ends its replies with
+# CR only. The manual does not say so; it was seen on a real PACE.
+OutTerminator = LF;
+InTerminator = CR;
 ReplyTimeout = 2000;
 
 # Each set* protocol has a shorter ReplyTimeout. Its main body only writes,

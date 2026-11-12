@@ -57,12 +57,11 @@ module, with `CH: 1` and `CH: 2` and a different `P` for each.
 
 ### Untested on hardware
 
-These protocols were written from the manual and have not yet been run against a
-PACE. Check on a real unit:
+These protocols were written from the manual, and only their terminators have been
+checked against a PACE so far. The manual does not give the reply terminator: a real
+unit ends its replies with CR, while commands to it end in LF. Still to check on a
+real unit:
 
-- **The reply terminator.** The manual does not give it. The protocol expects LF; if
-  replies end in CR LF, readbacks fail with "surplus input" and `InTerminator` in
-  `pace5000.proto` needs to be `CR LF`.
 - **Ethernet.** The manual covers only RS 232 and IEEE 488, so the TCP port and
   whether it is a raw socket are not documented there.
 - **Reply headers.** The protocol skips each reply's header rather than matching it,
