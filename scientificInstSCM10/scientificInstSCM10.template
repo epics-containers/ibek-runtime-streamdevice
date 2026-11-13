@@ -1,0 +1,310 @@
+# Scientific Instruments SCM10 single channel temperature monitor.
+#
+# Nothing is written to the instrument at start-up: each output record reads
+# the instrument's current value (the @init handler in
+# scientificInstSCM10.proto), and there is no autosave. What the IOC shows is
+# what the instrument has.
+#
+# % macro, P, Device prefix
+# % macro, PORT, Asyn port for device
+
+# ===========================================================================
+# Identity
+# ===========================================================================
+
+record(waveform, "$(P):IDN_RBV") {
+  field(DESC, "Identification string")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getIDN $(PORT)")
+  field(FTVL, "CHAR")
+  field(NELM, "128")
+}
+
+# Read once at start-up like IDN; neither changes while running.
+record(stringin, "$(P):VERSION_RBV") {
+  field(DESC, "Firmware version")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getVersion $(PORT)")
+}
+
+record(waveform, "$(P):DOM_RBV") {
+  field(DESC, "Date of manufacture and serial number")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getDOM $(PORT)")
+  field(FTVL, "CHAR")
+  field(NELM, "64")
+}
+
+record(stringin, "$(P):IP_RBV") {
+  field(DESC, "Device static IP address")
+  field(SCAN, "10 second")
+  field(PINI, "YES")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getIP $(PORT)")
+}
+
+# ===========================================================================
+# Readings
+# ===========================================================================
+
+# The instrument measures at up to 5 readings a second.
+record(ai, "$(P):TEMP_RBV") {
+  field(DESC, "Temperature")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getTemperature $(PORT)")
+  field(EGU, "K")
+  field(PREC, "3")
+  info(archive, "monitor 1: VAL")
+}
+
+# Volts for a diode curve, ohms for an RTD curve, so there is no EGU.
+record(ai, "$(P):SENSOR_RBV") {
+  field(DESC, "Sensor reading (V diode, ohm RTD)")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getSensor $(PORT)")
+  field(PREC, "5")
+}
+
+record(mbbi, "$(P):ERROR_RBV") {
+  field(DESC, "Instrument error status")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getError $(PORT)")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(ZRST, "No error")
+  field(ONST, "ADC error")
+  field(TWST, "Open sensor")
+  field(THST, "Sensor input too high")
+  field(FRST, "Sensor input too low")
+  field(FVST, "No active curve")
+  field(SXST, "Outside curve")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "MAJOR")
+  field(TWSV, "MAJOR")
+  field(THSV, "MAJOR")
+  field(FRSV, "MAJOR")
+  field(FVSV, "MAJOR")
+  field(SXSV, "MAJOR")
+}
+
+# ===========================================================================
+# Sensor and filter
+# ===========================================================================
+
+record(mbbo, "$(P):CURVE") {
+  field(DESC, "Sensor curve")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@scientificInstSCM10.proto setCurve $(PORT)")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(NIVL, "9")
+  field(TEVL, "10")
+  field(ZRST, "None")
+  field(ONST, "Si410")
+  field(TWST, "Si430")
+  field(THST, "DT470")
+  field(FRST, "DT670")
+  field(FVST, "PT100")
+  field(SXST, "PT1000")
+  field(SVST, "RO600")
+  field(EIST, "RO105")
+  field(NIST, "CTI")
+  field(TEST, "User")
+  field(FLNK, "$(P):CURVE_RBV")
+}
+
+record(mbbi, "$(P):CURVE_RBV") {
+  field(DESC, "Sensor curve")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getCurve $(PORT)")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  field(SXVL, "6")
+  field(SVVL, "7")
+  field(EIVL, "8")
+  field(NIVL, "9")
+  field(TEVL, "10")
+  field(ZRST, "None")
+  field(ONST, "Si410")
+  field(TWST, "Si430")
+  field(THST, "DT470")
+  field(FRST, "DT670")
+  field(FVST, "PT100")
+  field(SXST, "PT1000")
+  field(SVST, "RO600")
+  field(EIST, "RO105")
+  field(NIST, "CTI")
+  field(TEST, "User")
+}
+
+record(longout, "$(P):FILTER") {
+  field(DESC, "Noise filter, 0 off to 9 most")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@scientificInstSCM10.proto setFilter $(PORT)")
+  field(DRVL, "0")
+  field(DRVH, "9")
+  field(LOPR, "0")
+  field(HOPR, "9")
+  field(FLNK, "$(P):FILTER_RBV")
+}
+
+record(longin, "$(P):FILTER_RBV") {
+  field(DESC, "Noise filter, 0 off to 9 most")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getFilter $(PORT)")
+}
+
+# ===========================================================================
+# Alarms and relays
+# ===========================================================================
+
+record(bi, "$(P):ALARM1_RBV") {
+  field(DESC, "Alarm 1 state")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getAlarmState(1) $(PORT)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(P):ALARM2_RBV") {
+  field(DESC, "Alarm 2 state")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getAlarmState(2) $(PORT)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+  field(OSV, "MAJOR")
+}
+
+record(bi, "$(P):RELAY1_RBV") {
+  field(DESC, "Relay 1 state")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getRelayState(1) $(PORT)")
+  field(ZNAM, "De-energized")
+  field(ONAM, "Energized")
+}
+
+record(bi, "$(P):RELAY2_RBV") {
+  field(DESC, "Relay 2 state")
+  field(SCAN, "1 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getRelayState(2) $(PORT)")
+  field(ZNAM, "De-energized")
+  field(ONAM, "Energized")
+}
+
+record(ao, "$(P):ALARM1:SETPOINT") {
+  field(DESC, "Alarm 1 set-point")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@scientificInstSCM10.proto setAlarmSetpoint(1) $(PORT)")
+  field(EGU, "K")
+  field(PREC, "2")
+  field(DRVL, "0")
+  field(DRVH, "9999.99")
+  field(FLNK, "$(P):ALARM1:SETPOINT_RBV")
+}
+
+record(ai, "$(P):ALARM1:SETPOINT_RBV") {
+  field(DESC, "Alarm 1 set-point")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getAlarmSetpoint(1) $(PORT)")
+  field(EGU, "K")
+  field(PREC, "2")
+}
+
+record(ao, "$(P):ALARM1:DEADBAND") {
+  field(DESC, "Alarm 1 deadband")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@scientificInstSCM10.proto setAlarmDeadband(1) $(PORT)")
+  field(EGU, "K")
+  field(PREC, "2")
+  field(DRVL, "0")
+  field(DRVH, "9.99")
+  field(FLNK, "$(P):ALARM1:DEADBAND_RBV")
+}
+
+record(ai, "$(P):ALARM1:DEADBAND_RBV") {
+  field(DESC, "Alarm 1 deadband")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getAlarmDeadband(1) $(PORT)")
+  field(EGU, "K")
+  field(PREC, "2")
+}
+
+record(ao, "$(P):ALARM2:SETPOINT") {
+  field(DESC, "Alarm 2 set-point")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@scientificInstSCM10.proto setAlarmSetpoint(2) $(PORT)")
+  field(EGU, "K")
+  field(PREC, "2")
+  field(DRVL, "0")
+  field(DRVH, "9999.99")
+  field(FLNK, "$(P):ALARM2:SETPOINT_RBV")
+}
+
+record(ai, "$(P):ALARM2:SETPOINT_RBV") {
+  field(DESC, "Alarm 2 set-point")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getAlarmSetpoint(2) $(PORT)")
+  field(EGU, "K")
+  field(PREC, "2")
+}
+
+record(ao, "$(P):ALARM2:DEADBAND") {
+  field(DESC, "Alarm 2 deadband")
+  field(SCAN, "Passive")
+  field(DTYP, "stream")
+  field(OUT, "@scientificInstSCM10.proto setAlarmDeadband(2) $(PORT)")
+  field(EGU, "K")
+  field(PREC, "2")
+  field(DRVL, "0")
+  field(DRVH, "9.99")
+  field(FLNK, "$(P):ALARM2:DEADBAND_RBV")
+}
+
+record(ai, "$(P):ALARM2:DEADBAND_RBV") {
+  field(DESC, "Alarm 2 deadband")
+  field(SCAN, "5 second")
+  field(DTYP, "stream")
+  field(INP, "@scientificInstSCM10.proto getAlarmDeadband(2) $(PORT)")
+  field(EGU, "K")
+  field(PREC, "2")
+}
