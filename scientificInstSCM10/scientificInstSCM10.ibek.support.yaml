@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.8.0-beta.2/ibek.support.schema.json
+
+# Not imported from a DLS support module: no DLS module covers the SCM10.
+# Basic template and protocol files were initially developed for a beamline at DLS.
+# Support was extended with the help of Claude (Anthropic) from the Scientific
+# Instruments Model SCM10 manual (ASCII command set, printed pages 27-32)
+
+#
+# Nothing is written to the instrument at start-up and there is no autosave:
+# output records read the instrument's current settings when the IOC starts.
+#
+# Example ioc yaml (the asyn port comes from an asyn IP or serial entity):
+#   - type: scientificInstSCM10.scm10
+#     P: BL21I-EA-TMON-01
+#     PORT: scm10
+
+module: scientificInstSCM10
+
+entity_models:
+  - name: scm10
+    description: |-
+      Scientific Instruments SCM10 single channel cryogenic temperature
+      monitor: temperature and sensor readings, error status, alarm and
+      relay state, alarm set-points, sensor curve and noise filter.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          Asyn port for device
+    databases:
+      - file: scientificInstSCM10.template
+        args:
+          .*:
+    pvi:
+      yaml_path: scm10.pvi.device.yaml
+      ui_macros:
+        P:

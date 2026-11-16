@@ -1,0 +1,157 @@
+# Protocol file for the Scientific Instruments SCM10 single channel temperature
+# monitor. This file was initially developed for a beamline at DLS, then
+# extended with the help of Claude (Anthropic).
+# Checked against the Model SCM10 manual, "ASCII message string format" and
+# "Detailed message syntax" (printed pages 27-32).
+#
+# Usage in a db file, e.g.:
+#   field(DTYP, "stream")
+#   field(INP,  "@scientificInstSCM10.proto getTemperature $(PORT)")
+#
+# $1 is the alarm number, 1 or 2.
+#
+# Every reply but *IDN? is a header, a space, then the data, e.g.
+#   T?       ->  T 77.123
+#   ALSP? 1  ->  ALSP 1,100.00
+# so each "in" skips the header with "%*s".
+#
+# The instrument takes commands ending in CR or LF. Over RS232 it ends replies
+# with CR; over the TCP data socket (port 9760) it ends them with CR LF and
+# also sends "OK" after every command that sets something. Neither the LF nor
+# the "OK" is read here: StreamDevice discards input that arrives while no
+# request is waiting for it, so they are gone before the next query.
+OutTerminator = CR;
+InTerminator = CR;
+ReplyTimeout = 2000;
+
+# Each set* protocol has a shorter ReplyTimeout. Its main body only writes,
+# so the timeout only affects its @init read of the current setting, which
+# runs during iocInit: a port that connects but gets no reply would otherwise
+# hold iocInit for 2s per protocol.
+
+###########################################################################
+# Instrument-wide queries
+###########################################################################
+
+# "Scientific Instruments, SCM10,<serial number>, <firmware version>"
+# There is no header on this reply.
+getIDN {
+    out "*IDN?";
+    in "%[^\r\n]";
+}
+
+# e.g. "VER 1.05"
+getVersion {
+    out "VER?";
+    in "%*s %[^\r\n]";
+}
+
+# e.g. "DOM 03/14/2015,1234": date of manufacture (MM/DD/YYYY) and serial number
+getDOM {
+    out "DOM?";
+    in "%*s %[^\r\n]";
+}
+
+# e.g. "IPA 192.168.0.x": static IP address
+getIP {
+    out "IPA?";
+    in "%*s %[^\r\n]";
+}
+
+###########################################################################
+# Readings
+###########################################################################
+
+# Temperature in kelvin
+getTemperature {
+    out "T?";
+    in "%*s %f";
+}
+
+# Sensor reading: volts for a diode curve, ohms for an RTD curve
+getSensor {
+    out "SDAT?";
+    in "%*s %f";
+}
+
+# Error status: 0 none, 1 ADC error, 2 open sensor, 3 sensor input too high,
+# 4 sensor input too low, 5 no active curve loaded, 6 sensor data outside curve
+getError {
+    out "ERSTA?";
+    in "%*s %d";
+}
+
+###########################################################################
+# Alarms and relays
+###########################################################################
+
+# Alarm state, reply "ALAST <n>,<0|1>"
+getAlarmState {
+    out "ALAST? \$1";
+    in "%*s %*d,%d";
+}
+
+# Relay state, reply "RELST <n>,<0|1>": 1 is energized
+getRelayState {
+    out "RELST? \$1";
+    in "%*s %*d,%d";
+}
+
+# Alarm set-point in kelvin, reply "ALSP <n>,<kelvin>"
+getAlarmSetpoint {
+    out "ALSP? \$1";
+    in "%*s %*d,%f";
+}
+setAlarmSetpoint {
+    ReplyTimeout = 500;
+    out "ALSP \$1,%.2f";
+    @init { out "ALSP? \$1"; in "%*s %*d,%f"; }
+}
+
+# Alarm deadband in kelvin, reply "ALDB <n>,<kelvin>"
+getAlarmDeadband {
+    out "ALDB? \$1";
+    in "%*s %*d,%f";
+}
+setAlarmDeadband {
+    ReplyTimeout = 500;
+    out "ALDB \$1,%.2f";
+    @init { out "ALDB? \$1"; in "%*s %*d,%f"; }
+}
+
+###########################################################################
+# Sensor and filter
+###########################################################################
+
+# Active sensor curve: 0 none, 1 Si410, 2 Si430, 3 DT470, 4 DT670, 5 PT100,
+# 6 PT1000, 7 RO600, 8 RO105, 9 CTI, 10 user curve
+getCurve {
+    out "SSEL?";
+    in "%*s %d";
+}
+setCurve {
+    ReplyTimeout = 500;
+    out "SSEL %d";
+    @init { out "SSEL?"; in "%*s %d"; }
+}
+
+# Noise filter, 0 (off) to 9 (most filtering)
+getFilter {
+    out "FILT?";
+    in "%*s %d";
+}
+setFilter {
+    ReplyTimeout = 500;
+    out "FILT %d";
+    @init { out "FILT?"; in "%*s %d"; }
+}
+
+###########################################################################
+# Excluded commands
+###########################################################################
+# ALA   alarm enable, high/low and latching in one command: needs a record
+#       that writes three values at once
+# RELY  relay mode: the manual does not give the values of the mode field
+# ANAST, ANAT, ANAM, AOUT   analog output
+# SHDR, CDAT   user sensor curve upload
+# FDEF  restore factory calibration
