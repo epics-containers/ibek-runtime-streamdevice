@@ -1,10 +1,14 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.8.0-beta.2/ibek.support.schema.json
 
-# Not imported from a DLS support module: no DLS module covers the SCM10.
-# Basic template and protocol files were initially developed for a beamline at DLS.
-# Support was extended with the help of Claude (Anthropic) from the Scientific
-# Instruments Model SCM10 manual (ASCII command set, printed pages 27-32)
-
+# Started from the DLS support module BL21I
+# (/dls_sw/prod/R3.14.12.7/support/BL21I/<version>/BL21ISupportApp):
+#   - protocol/SCM10.proto, in every release from 3-0;
+#   - Db/SCM10.template (3-0 to 3-4-3), renamed
+#     Db/BL21I_SCM10_CryoTemp_Monitor.template from 3-5.
+# The getIDN protocol and the IDN_RBV stringin keep BL21I's form (3-5 on).
+# Everything else was rewritten and extended with the help of Claude
+# (Anthropic) from the Scientific Instruments Model SCM10 manual (ASCII
+# command set, printed pages 27-32), so no file here is a copy of BL21I's.
 #
 # Nothing is written to the instrument at start-up and there is no autosave:
 # output records read the instrument's current settings when the IOC starts.
@@ -13,6 +17,7 @@
 #   - type: scientificInstSCM10.scm10
 #     P: BL21I-EA-TMON-01
 #     PORT: scm10
+#     INTERFACE: RS232
 
 module: scientificInstSCM10
 
@@ -31,6 +36,18 @@ entity_models:
         type: str
         description: |-
           Asyn port for device
+      INTERFACE:
+        type: enum
+        description: |-
+          How the SCM10 is connected. RS232: its serial port, directly or
+          through a terminal server; a set command is taken to get no answer
+          (inferred: the manual mentions OK only for TCP).
+          TCP: its Ethernet data socket (port 9760), which answers each set
+          command with OK; the set protocols read that OK.
+        default: RS232
+        values:
+          RS232:
+          TCP:
     databases:
       - file: scientificInstSCM10.template
         args:

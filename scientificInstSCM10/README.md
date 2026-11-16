@@ -1,11 +1,14 @@
 # scientificInstSCM10
 
 Runtime StreamDevice pattern for the Scientific Instruments SCM10 single channel
-cryogenic temperature monitor. It is **not imported from a DLS support module**: no
-DLS module covers the SCM10, but basic template and protocol files were initially 
-developed to support one of DLS's beamlines.
-Support was extended with the help of Claude (Anthropic) from the Model SCM10 manual
-(ASCII command set, printed pages 27-32).
+cryogenic temperature monitor. It started from the SCM10 files in the DLS support
+module `BL21I`: `SCM10.proto` (every release from 3-0) and the template, named
+`SCM10.template` in 3-0 to 3-4-3 and `BL21I_SCM10_CryoTemp_Monitor.template` from 3-5.
+They read the temperature only (3-0 to 3-4-3), then also the identity, IP address,
+sensor reading and error status (3-5 on). Everything else was written with the help of
+Claude (Anthropic) from the Model SCM10 manual (ASCII command set, printed pages 27-32),
+and the files are rewritten rather than copied: `$(P):IDN_RBV` and its protocol keep
+BL21I's form, so i21 sees the same record type and value.
 
 ## Entity models
 
@@ -17,6 +20,7 @@ Support was extended with the help of Claude (Anthropic) from the Model SCM10 ma
   - type: scientificInstSCM10.scm10
     P: BL21I-EA-TMON-01
     PORT: scm10
+    INTERFACE: RS232
 ```
 
 `PORT` is an asyn port made by an asyn IP or serial entity in the same IOC. The
@@ -26,6 +30,11 @@ instrument has both interfaces:
   1 stop bit, no flow control. The baud rate is set on the front panel.
 - **Ethernet** (RJ45): a raw TCP data socket on port 9760, with the same ASCII
   commands. The address is set on the front panel; the instrument does not use DHCP.
+
+Set `INTERFACE` to how the instrument is connected: `RS232` (the default) for its serial
+port, directly or through a terminal server, and `TCP` for its Ethernet socket. It picks
+the protocols the output records write with, because only the Ethernet socket answers a
+set command (see below).
 
 ## Notes
 
@@ -44,13 +53,23 @@ instrument has both interfaces:
 - **Polling load.** Temperature, sensor, error, alarm and relay state are read every
   second, the rest every 5 seconds. The instrument measures at up to 5 readings a second.
 - **Replies over TCP.** The manual says the TCP socket ends replies with CR LF and sends
-  `OK` after every command that sets something. The protocol ends replies at CR and relies
-  on StreamDevice discarding the stray LF and `OK` before the next request.
+  `OK` after every command that sets something; over RS232 replies end with CR. The manual
+  mentions `OK` only for TCP, so the pattern infers that a set command over RS232 gets no
+  answer; one set command in a hardware smoke test would confirm it. With `INTERFACE: TCP` each output record's protocol reads the
+  `OK` before it gives up the port; otherwise whichever query runs next on the port could
+  take the `OK` as its reply and go INVALID. With `INTERFACE: RS232` the protocol only
+  writes, since waiting for an answer that never comes would time out. A wrong
+  `INTERFACE` shows as exactly those errors: INVALID readings after a write (`RS232` on
+  the TCP socket) or every write timing out (`TCP` on RS232).
+  Replies are read up to the CR; the LF after it is discarded with the rest of any input
+  waiting before the next command.
+- **Identity.** `$(P):IDN_RBV` is a `stringin` holding the `*IDN?` reply less its
+  `Scientific Instruments,` prefix, e.g. `SCM10,1859,1.05`.
 
 ### Unknowns
 
 - **Error replies.** The manual does not say what `T?` returns when the sensor is open or
-  out of range; `$(P):ERROR` shows the reason.
+  out of range; `$(P):ERROR_RBV` shows the reason.
 
 ### Left out on purpose for now
 
@@ -71,7 +90,8 @@ The "Excluded commands" section at the end of the protocol file lists them too.
 - `scientificInstSCM10.ibek.support.yaml`
 - `scientificInstSCM10.proto`
 - `scientificInstSCM10.template`
-- `scm10.pvi.device.yaml`
+- `scm10.pvi.device.yaml`, hand-maintained: `generate-pvi.py` would pair each alarm
+  set-point with the alarm state rather than with its own readback
 
 Everything else in this folder stays in the library and is never vendored:
 
