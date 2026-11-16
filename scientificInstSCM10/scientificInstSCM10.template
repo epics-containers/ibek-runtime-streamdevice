@@ -7,19 +7,20 @@
 #
 # % macro, P, Device prefix
 # % macro, PORT, Asyn port for device
+# % macro, INTERFACE, RS232 (default) or TCP: picks the set protocols (see scientificInstSCM10.proto)
 
 # ===========================================================================
 # Identity
 # ===========================================================================
 
-record(waveform, "$(P):IDN_RBV") {
+# Model, serial number and firmware version, e.g. "SCM10,1859,1.05": the
+# *IDN? reply less its "Scientific Instruments," prefix, as in BL21I.
+record(stringin, "$(P):IDN_RBV") {
   field(DESC, "Identification string")
   field(SCAN, "Passive")
   field(PINI, "YES")
   field(DTYP, "stream")
   field(INP, "@scientificInstSCM10.proto getIDN $(PORT)")
-  field(FTVL, "CHAR")
-  field(NELM, "128")
 }
 
 # Read once at start-up like IDN; neither changes while running.
@@ -109,7 +110,7 @@ record(mbbo, "$(P):CURVE") {
   field(DESC, "Sensor curve")
   field(SCAN, "Passive")
   field(DTYP, "stream")
-  field(OUT, "@scientificInstSCM10.proto setCurve $(PORT)")
+  field(OUT, "@scientificInstSCM10.proto setCurve_$(INTERFACE=RS232) $(PORT)")
   field(ZRVL, "0")
   field(ONVL, "1")
   field(TWVL, "2")
@@ -168,7 +169,7 @@ record(longout, "$(P):FILTER") {
   field(DESC, "Noise filter, 0 off to 9 most")
   field(SCAN, "Passive")
   field(DTYP, "stream")
-  field(OUT, "@scientificInstSCM10.proto setFilter $(PORT)")
+  field(OUT, "@scientificInstSCM10.proto setFilter_$(INTERFACE=RS232) $(PORT)")
   field(DRVL, "0")
   field(DRVH, "9")
   field(LOPR, "0")
@@ -229,7 +230,7 @@ record(ao, "$(P):ALARM1:SETPOINT") {
   field(DESC, "Alarm 1 set-point")
   field(SCAN, "Passive")
   field(DTYP, "stream")
-  field(OUT, "@scientificInstSCM10.proto setAlarmSetpoint(1) $(PORT)")
+  field(OUT, "@scientificInstSCM10.proto setAlarmSetpoint_$(INTERFACE=RS232)(1) $(PORT)")
   field(EGU, "K")
   field(PREC, "2")
   field(DRVL, "0")
@@ -250,7 +251,7 @@ record(ao, "$(P):ALARM1:DEADBAND") {
   field(DESC, "Alarm 1 deadband")
   field(SCAN, "Passive")
   field(DTYP, "stream")
-  field(OUT, "@scientificInstSCM10.proto setAlarmDeadband(1) $(PORT)")
+  field(OUT, "@scientificInstSCM10.proto setAlarmDeadband_$(INTERFACE=RS232)(1) $(PORT)")
   field(EGU, "K")
   field(PREC, "2")
   field(DRVL, "0")
@@ -271,7 +272,7 @@ record(ao, "$(P):ALARM2:SETPOINT") {
   field(DESC, "Alarm 2 set-point")
   field(SCAN, "Passive")
   field(DTYP, "stream")
-  field(OUT, "@scientificInstSCM10.proto setAlarmSetpoint(2) $(PORT)")
+  field(OUT, "@scientificInstSCM10.proto setAlarmSetpoint_$(INTERFACE=RS232)(2) $(PORT)")
   field(EGU, "K")
   field(PREC, "2")
   field(DRVL, "0")
@@ -292,7 +293,7 @@ record(ao, "$(P):ALARM2:DEADBAND") {
   field(DESC, "Alarm 2 deadband")
   field(SCAN, "Passive")
   field(DTYP, "stream")
-  field(OUT, "@scientificInstSCM10.proto setAlarmDeadband(2) $(PORT)")
+  field(OUT, "@scientificInstSCM10.proto setAlarmDeadband_$(INTERFACE=RS232)(2) $(PORT)")
   field(EGU, "K")
   field(PREC, "2")
   field(DRVL, "0")

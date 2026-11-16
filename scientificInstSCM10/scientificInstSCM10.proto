@@ -1,5 +1,5 @@
 # Protocol file for the Scientific Instruments SCM10 single channel temperature
-# monitor. This file was initially developed for a beamline at DLS, then
+# monitor. It started from SCM10.proto in the DLS support module BL21I and was
 # extended with the help of Claude (Anthropic).
 # Checked against the Model SCM10 manual, "ASCII message string format" and
 # "Detailed message syntax" (printed pages 27-32).
@@ -16,28 +16,39 @@
 # so each "in" skips the header with "%*s".
 #
 # The instrument takes commands ending in CR or LF. Over RS232 it ends replies
-# with CR; over the TCP data socket (port 9760) it ends them with CR LF and
-# also sends "OK" after every command that sets something. Neither the LF nor
-# the "OK" is read here: StreamDevice discards input that arrives while no
-# request is waiting for it, so they are gone before the next query.
+# with CR. Over the TCP data socket (port 9760) it ends replies with CR LF and
+# answers each command that sets something with "OK". The manual mentions "OK"
+# only for TCP, so it is inferred that a set command over RS232 gets no answer
+# (not yet confirmed on hardware). So each set* protocol comes in two forms:
+#   set*_RS232 only writes;
+#   set*_TCP   writes, then reads the "OK" while it still holds the port.
+#              Otherwise the next query on the port (any polled record) could
+#              read the "OK" as its reply and go INVALID.
+# The template picks one with the INTERFACE macro. The LF that ends each TCP
+# reply is left unread: StreamDevice discards input waiting on the port before
+# it writes, and "%*s", "%f", "%d" and "\_" skip leading whitespace anyway.
 OutTerminator = CR;
 InTerminator = CR;
 ReplyTimeout = 2000;
+ExtraInput = Ignore;
 
-# Each set* protocol has a shorter ReplyTimeout. Its main body only writes,
-# so the timeout only affects its @init read of the current setting, which
-# runs during iocInit: a port that connects but gets no reply would otherwise
-# hold iocInit for 2s per protocol.
+# Each set* protocol has a shorter ReplyTimeout. It covers the @init read of
+# the current setting, which runs during iocInit (a port that connects but
+# gets no reply would otherwise hold iocInit for 2s per protocol), and the
+# "OK" of a set*_TCP protocol.
 
 ###########################################################################
 # Instrument-wide queries
 ###########################################################################
 
-# "Scientific Instruments, SCM10,<serial number>, <firmware version>"
-# There is no header on this reply.
+# "Scientific Instruments,SCM10,<serial number>,<firmware version>", with no
+# header and no spaces after the commas, e.g.
+#   Scientific Instruments,SCM10,1859,1.05
+# The record gets what follows "Scientific Instruments,": "SCM10,1859,1.05".
+# As in BL21I's SCM10.proto.
 getIDN {
     out "*IDN?";
-    in "%[^\r\n]";
+    in "Scientific Instruments,%s";
 }
 
 # e.g. "VER 1.05"
@@ -102,9 +113,15 @@ getAlarmSetpoint {
     out "ALSP? \$1";
     in "%*s %*d,%f";
 }
-setAlarmSetpoint {
+setAlarmSetpoint_RS232 {
     ReplyTimeout = 500;
     out "ALSP \$1,%.2f";
+    @init { out "ALSP? \$1"; in "%*s %*d,%f"; }
+}
+setAlarmSetpoint_TCP {
+    ReplyTimeout = 500;
+    out "ALSP \$1,%.2f";
+    in "\_OK";
     @init { out "ALSP? \$1"; in "%*s %*d,%f"; }
 }
 
@@ -113,9 +130,15 @@ getAlarmDeadband {
     out "ALDB? \$1";
     in "%*s %*d,%f";
 }
-setAlarmDeadband {
+setAlarmDeadband_RS232 {
     ReplyTimeout = 500;
     out "ALDB \$1,%.2f";
+    @init { out "ALDB? \$1"; in "%*s %*d,%f"; }
+}
+setAlarmDeadband_TCP {
+    ReplyTimeout = 500;
+    out "ALDB \$1,%.2f";
+    in "\_OK";
     @init { out "ALDB? \$1"; in "%*s %*d,%f"; }
 }
 
@@ -129,9 +152,15 @@ getCurve {
     out "SSEL?";
     in "%*s %d";
 }
-setCurve {
+setCurve_RS232 {
     ReplyTimeout = 500;
     out "SSEL %d";
+    @init { out "SSEL?"; in "%*s %d"; }
+}
+setCurve_TCP {
+    ReplyTimeout = 500;
+    out "SSEL %d";
+    in "\_OK";
     @init { out "SSEL?"; in "%*s %d"; }
 }
 
@@ -140,9 +169,15 @@ getFilter {
     out "FILT?";
     in "%*s %d";
 }
-setFilter {
+setFilter_RS232 {
     ReplyTimeout = 500;
     out "FILT %d";
+    @init { out "FILT?"; in "%*s %d"; }
+}
+setFilter_TCP {
+    ReplyTimeout = 500;
+    out "FILT %d";
+    in "\_OK";
     @init { out "FILT?"; in "%*s %d"; }
 }
 
