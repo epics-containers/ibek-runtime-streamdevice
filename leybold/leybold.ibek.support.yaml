@@ -3,6 +3,10 @@
 # Imported from DLS production support module: leybold 2-2
 # Source: /dls_sw/prod/R3.14.12.7/support/leybold/2-2
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# centerOneGui.template is not imported: it holds only the comment lines
+# `# % macro, P, Prefix` and `# % gui, $(name).STAT, edm, centerOne.edl, P=$(P)`,
+# which strip-dls-annotations.py would remove, leaving an empty file. The
+# center_one_gui entity model that loads it at DLS therefore has no databases.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/leybold/ release.
 #
@@ -14,6 +18,19 @@
 module: leybold
 
 entity_models:
+  - name: center_one_gui
+    description: |-
+      The EDM screen link of a Leybold CenterOne gauge controller, which the DLS
+      centerOne component adds alongside its records. It creates no records: the
+      release's centerOneGui.template holds only a `# % gui` annotation, which has
+      no consumer in epics-containers. Accepted so that this entity of a converted
+      builder IOC validates.
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV prefix
+
   - name: centerN
     description: |-
       Imported from DLS module leybold (centerN.template)

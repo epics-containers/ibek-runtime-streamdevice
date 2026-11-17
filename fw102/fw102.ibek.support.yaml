@@ -3,6 +3,9 @@
 # Imported from DLS production support module: fw102 2-1
 # Source: /dls_sw/prod/R3.14.12.7/support/fw102/2-1
 # fw102.template is a pristine copy of that release's db/fw102.template.
+# Two entity models load it: fw102, the name XMLbuilder and the build-time model
+# use, with R and the slot materials optional; and _fw102Template, with every
+# parameter required.
 # fw102.proto deviates from the pristine data/fw102.proto in one line: setPos reads
 # the device's echo of the command (`in "pos=%*d";`), which the DLS protocol leaves
 # unread in the input buffer.
@@ -12,6 +15,66 @@
 module: fw102
 
 entity_models:
+  - name: fw102
+    description: |-
+      Thorlabs FW102 motorised filter wheel: device ID readback, filter position
+      set and readback, and a material description for each of the six slots.
+      This is the name XMLbuilder and the build-time model give the entity;
+      _fw102Template below loads the same template with every parameter required.
+    parameters:
+      PORT:
+        type: str
+        description: |-
+          asyn port name
+      P:
+        type: str
+        description: |-
+          PV name prefix
+      R:
+        type: str
+        description: |-
+          PV name suffix
+        default: ""
+      FILTER1:
+        type: str
+        description: |-
+          Material in filter slot 1
+        default: ""
+      FILTER2:
+        type: str
+        description: |-
+          Material in filter slot 2
+        default: ""
+      FILTER3:
+        type: str
+        description: |-
+          Material in filter slot 3
+        default: ""
+      FILTER4:
+        type: str
+        description: |-
+          Material in filter slot 4
+        default: ""
+      FILTER5:
+        type: str
+        description: |-
+          Material in filter slot 5
+        default: ""
+      FILTER6:
+        type: str
+        description: |-
+          Material in filter slot 6
+        default: ""
+    databases:
+      - file: fw102.template
+        args:
+          .*:
+    pvi:
+      yaml_path: fw102.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+
   - name: _fw102Template
     description: |-
       Thorlabs FW102 motorised filter wheel

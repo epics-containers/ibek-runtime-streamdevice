@@ -12,6 +12,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 
 | Entity model | Description |
 |---|---|
+| `leybold.center_one_gui` | The EDM screen link of a CenterOne gauge controller; creates no records (the DLS `centerOneGui.template` holds only a GUI annotation, so it is not imported) |
 | `leybold.centerN` | Imported from DLS module leybold (centerN.template) NOTE: needs a generic IOC built with leybold (not the plain generic image). |
 | `leybold.coolpak` | Imported from DLS module leybold (coolpak.template) NOTE: needs a generic IOC built with leybold (not the plain generic image). |
 | `leybold.read_floatE` | Imported from DLS module leybold (read_floatE.template) |
@@ -66,6 +67,21 @@ Everything else in this folder stays in the library and is never vendored:
 
 - `README.md` - this file
 - `sim/` - device simulator from the DLS source release (4 files)
+
+## Differences from the build-time model
+
+The entity models have the names and parameters of the build-time `leybold` model in
+ibek-support-dls, but not all of its types and defaults, so an `ioc.yaml` written for
+that model does not always validate here, or gets different values:
+
+- `read_write_floatE_floatE` requires `DRVH` and `DRVL`; the build-time model defaults
+  them to `""`.
+- `DEFAULT_VAL` of `write_raw_int` and `read_write_float` is a float defaulting to
+  `0.0`; the build-time model has the string `"0"`.
+- About 100 more type and default mismatches, all on `read_write_int` and
+  `read_int_floatE`: `*VLI` are integers here and strings there,
+  `*STO`/`*VLO` default to the template's `$(*STI=)`/`$(*VLI=n)` here and to a
+  literal there, and `HIGH`/`LOW`/`HIHI`/`LOLO` are strings here and floats there.
 
 ## Needs more than the generic image
 

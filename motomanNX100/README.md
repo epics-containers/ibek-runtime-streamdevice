@@ -17,12 +17,14 @@ it.
 | `motomanNX100.nx100dvar` | Imported from DLS module motomanNX100 (nx100dvar.template) |
 | `motomanNX100.nx100io` | Imported from DLS module motomanNX100 (nx100io.template) |
 | `motomanNX100.nx100pvar` | Imported from DLS module motomanNX100 (nx100pvar.template) |
+| `motomanNX100.auto_nx100io` | `nx100io` under the name XMLbuilder gives it, for converted builder IOCs |
 
 ## Files
 
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `auto_nx100io.pvi.device.yaml`
 - `motomanNX100.ibek.support.yaml`
 - `nx100.proto`
 - `nx100.pvi.device.yaml`

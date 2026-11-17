@@ -9,6 +9,10 @@ values:
     # CMD names the protocol the record runs
     attenuator_cmd: {CMD: att_set}
     generic_cmd: {CMD: reset}
+  eurotherm2k:
+    # eurothermParam and eurothermConfParam protocols redirect to the
+    # $(P)$(Q):ERR record of eurotherm2k, whose Q otherwise keeps its default ""
+    eurotherm2k: {Q: "1"}
   leybold:
     # FPARAM and IPARAM name two different records
     read_int_floatE: {FPARAM: F, IPARAM: I}
