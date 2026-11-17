@@ -15,6 +15,14 @@
 # model of their own but must ship alongside them. Their macros carry a _ prefix
 # because msi will not apply a default when substituting a macro with its own name.
 #
+# auto_currAmpOffsets, auto_currAmp_ai, auto_currAmpADC and auto_currAmpSingle
+# are the names XMLbuilder gives the AutoSubstitutions of those four templates,
+# and the names builder IOCs use. Each loads the same template as the model
+# without the auto_ prefix; their sources are unchanged in the newest release,
+# 1-46. gda_bpm_name and gda_bpm_desc on YMCS0012 and auto_currAmpOffsets feed
+# only GDA annotations in the DLS release, so they are accepted but not passed to
+# the templates.
+#
 # To check for updates: diff against that path, or the newest
 # /dls_sw/prod/*/support/currAmp/ release.
 
@@ -56,10 +64,22 @@ entity_models:
         description: |-
           SCAN rate for the beam position readbacks
         default: 1 second
+      gda_bpm_name:
+        type: str
+        description: |-
+          GDA name for the BPM, e.g. S4.BPM.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
+      gda_bpm_desc:
+        type: str
+        description: |-
+          GDA description for the BPM.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: YMCS0012.template
         args:
-          .*:
+          '(?!gda_bpm_(name|desc)$).*':
     pvi:
       yaml_path: YMCS0012.pvi.device.yaml
       ui_macros:
@@ -256,6 +276,188 @@ entity_models:
           .*:
     pvi:
       yaml_path: currAmp_ai.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+
+  - name: auto_currAmpOffsets
+    description: |-
+      The currAmpOffsets entity model under the name XMLbuilder gives it
+      (auto_currAmpOffsets, an AutoSubstitution of currAmpOffsets.template), so a
+      converted builder IOC validates against this pattern unchanged.
+      Per-range dark-current offsets for a current amplifier, pushed down to the
+      amplifier whenever the range changes, plus offset-calibrated and
+      ring-current-normalised intensity.
+      Includes currAmpRange.template six times via msi.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name, must match the P used on the YMCS0009/YMCS0012 entity
+      SIGNAL:
+        type: str
+        description: |-
+          Ring current PV, used to normalise the calibrated intensity
+        default: SR-DI-DCCT-01:SIGNAL
+      gda_bpm_name:
+        type: str
+        description: |-
+          GDA name for the BPM, e.g. S4.BPM.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
+    databases:
+      - file: currAmpOffsets.template
+        args:
+          '(?!gda_bpm_name$).*':
+    pvi:
+      yaml_path: auto_currAmpOffsets.pvi.device.yaml
+      ui_macros:
+        P:
+
+  - name: auto_currAmp_ai
+    description: |-
+      The currAmp_ai entity model under the name XMLbuilder gives it
+      (auto_currAmp_ai, an AutoSubstitution of currAmp_ai.template), so a converted
+      builder IOC validates against this pattern unchanged.
+      Simple ai record to use with an ADC input for reading an individual amplifier
+      current.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      Q:
+        type: str
+        description: |-
+          Tail of full PV name
+      DESC:
+        type: str
+        description: |-
+          Description
+      DTYPE:
+        type: str
+        description: |-
+          Device type of the ai record, e.g. Hy8401ip
+      INP:
+        type: str
+        description: |-
+          Input link for the ai record
+      EGUF:
+        type: float
+        description: |-
+          Engineering units full scale, for LINEAR conversion
+      EGUL:
+        type: float
+        description: |-
+          Engineering units low scale, for LINEAR conversion
+      EGU:
+        type: str
+        description: |-
+          Engineering units
+      HOPR:
+        type: float
+        description: |-
+          High operating range
+      LOPR:
+        type: float
+        description: |-
+          Low operating range
+      SCAN:
+        type: str
+        description: |-
+          SCAN rate for the reading
+      PREC:
+        type: int
+        description: |-
+          Precision (number of decimal places)
+    databases:
+      - file: currAmp_ai.template
+        args:
+          .*:
+    pvi:
+      yaml_path: auto_currAmp_ai.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+
+  - name: auto_currAmpADC
+    description: |-
+      The currAmpADC entity model under the name XMLbuilder gives it
+      (auto_currAmpADC, an AutoSubstitution of currAmpADC.template), so a converted
+      builder IOC validates against this pattern unchanged.
+      Calculates calibrated currents (in uA) from ADC channels wired to the voltage
+      outputs of an OD current amplifier, using the range selected over serial by
+      YMCS0009/YMCS0012 plus configurable dark-current offsets.
+      Includes currAmpRangeADC.template six times via msi.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name, must match the P used on the YMCS0009/YMCS0012 entity
+      RANGE:
+        type: float
+        description: |-
+          Range of the voltage output in volts (normally 10)
+        default: 10
+      INP1:
+        type: str
+        description: |-
+          PV name of the ADC channel for signal 1, must update on a periodic scan
+      INP2:
+        type: str
+        description: |-
+          PV name of the ADC channel for signal 2, must update on a periodic scan
+      INP3:
+        type: str
+        description: |-
+          PV name of the ADC channel for signal 3, must update on a periodic scan
+      INP4:
+        type: str
+        description: |-
+          PV name of the ADC channel for signal 4, must update on a periodic scan
+    databases:
+      - file: currAmpADC.template
+        args:
+          .*:
+    pvi:
+      yaml_path: auto_currAmpADC.pvi.device.yaml
+      ui_macros:
+        P:
+
+  - name: auto_currAmpSingle
+    description: |-
+      The currAmpSingle entity model under the name XMLbuilder gives it
+      (auto_currAmpSingle, an AutoSubstitution of currAmpSingle.template), so a converted
+      builder IOC validates against this pattern unchanged.
+      Interface for extracting a single value from a current amplifier, copying the
+      amplifier's high and low limits across to the derived record.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device name
+      Q:
+        type: str
+        description: |-
+          Tail of full PV name
+      DESC:
+        type: str
+        description: |-
+          Description
+      PCURR:
+        type: str
+        description: |-
+          Name of the current amplifier
+      N:
+        type: int
+        description: |-
+          Channel number of the amplifier
+    databases:
+      - file: currAmpSingle.template
+        args:
+          .*:
+    pvi:
+      yaml_path: auto_currAmpSingle.pvi.device.yaml
       ui_macros:
         P:
         Q:

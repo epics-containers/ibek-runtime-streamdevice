@@ -18,6 +18,10 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 | `currAmp.currAmpADC` | Calculates calibrated currents (in uA) from ADC channels wired to the voltage outputs of an OD current amplifier, using the range selected over serial by YMCS0009/YMCS0012 plus configurable dark-current offsets. Includes currAmpRangeADC.template six times via msi. |
 | `currAmp.currAmpSingle` | Interface for extracting a single value from a current amplifier, copying the amplifier's high and low limits across to the derived record. |
 | `currAmp.currAmp_ai` | Simple ai record to use with an ADC input for reading an individual amplifier current. |
+| `currAmp.auto_currAmpOffsets` | `currAmpOffsets` under the name XMLbuilder gives it, for converted builder IOCs. |
+| `currAmp.auto_currAmp_ai` | `currAmp_ai` under the name XMLbuilder gives it, for converted builder IOCs. |
+| `currAmp.auto_currAmpADC` | `currAmpADC` under the name XMLbuilder gives it, for converted builder IOCs. |
+| `currAmp.auto_currAmpSingle` | `currAmpSingle` under the name XMLbuilder gives it, for converted builder IOCs. |
 
 ## Files
 
@@ -28,6 +32,10 @@ instance's `config/`:
 - `YMCS0009.template`
 - `YMCS0012.pvi.device.yaml`
 - `YMCS0012.template`
+- `auto_currAmpADC.pvi.device.yaml`
+- `auto_currAmpOffsets.pvi.device.yaml`
+- `auto_currAmpSingle.pvi.device.yaml`
+- `auto_currAmp_ai.pvi.device.yaml`
 - `currAmp.ibek.support.yaml`
 - `currAmpADC.pvi.device.yaml`
 - `currAmpADC.template`
@@ -54,4 +62,4 @@ need; the others run in the generic `ioc-streamdevice` image. See
 
 | Template(s) | Needs |
 |---|---|
-| `currAmp_ai.template` | `DTYP` is the instance-supplied `$(DTYPE)`, so an instance can name device support the image lacks |
+| `currAmp_ai.template` (`currAmp_ai`, `auto_currAmp_ai`) | `DTYP` is the instance-supplied `$(DTYPE)`, so an instance can name device support the image lacks |

@@ -4,7 +4,9 @@
 # Source: /dls_sw/prod/R3.14.12.7/support/eurotherm2k/2-10
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # The eurotherm2k entity model is hand-written (ibek-runtime-streamdevice#22); the
-# others are imported from the release's db/ templates.
+# others are imported from the release's db/ templates. Its parameter defaults are
+# the template's own macro defaults (SPMAX=1000, SPMIN=0, EGU=C/s), which are also
+# the defaults of the build-time ibek-support-dls model.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/eurotherm2k/ release.
 #
@@ -34,6 +36,7 @@ entity_models:
         type: str
         description: |-
           Device suffix
+        default: ""
       PORT:
         type: str
         description: |-
@@ -50,7 +53,12 @@ entity_models:
         type: float
         description: |-
           Maximum setpoint
-        default: 100
+        default: 1000
+      SPMIN:
+        type: float
+        description: |-
+          Minimum setpoint
+        default: 0
       RRMAX:
         type: float
         description: |-
@@ -70,13 +78,13 @@ entity_models:
         type: str
         description: |-
           Engineering units for ramp rate, default is C/s
-        default: C/min
+        default: C/s
       desc:
         type: str
         description: |-
           Description for CSS.
           Documentary: accepted for builder XML compatibility; not passed to the template.
-        default: ""
+        default: Eurotherm 2K
     databases:
       - file: eurotherm2k.template
         args:

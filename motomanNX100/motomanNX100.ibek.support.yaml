@@ -3,6 +3,10 @@
 # Imported from DLS production support module: motomanNX100 1-17-1
 # Source: /dls_sw/prod/R3.14.12.7/support/motomanNX100/1-17-1
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# auto_nx100io is the name XMLbuilder gives the AutoSubstitution of
+# nx100io.template; it loads the same template as nx100io.
+# The release's BL11I-barcode.db and BL11I-robot-interlocks.db serve one
+# beamline and are not part of this pattern.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/motomanNX100/ release.
 
@@ -20,7 +24,8 @@ entity_models:
       Q:
         type: str
         description: |-
-          Q
+          Device suffix
+        default: ""
       TYPE:
         type: str
         description: |-
@@ -110,10 +115,16 @@ entity_models:
         description: |-
           FFST
         default: ""
+      name:
+        type: str
+        description: |-
+          Object and GUI association name.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: nx100.template
         args:
-          .*:
+          '(?!name$).*':
     pvi:
       yaml_path: nx100.pvi.device.yaml
       ui_macros:
@@ -131,7 +142,8 @@ entity_models:
       Q:
         type: str
         description: |-
-          Q
+          Device suffix
+        default: ""
       VAR:
         type: str
         description: |-
@@ -166,7 +178,8 @@ entity_models:
       Q:
         type: str
         description: |-
-          Q
+          Device suffix
+        default: ""
       VAR:
         type: str
         description: |-
@@ -241,7 +254,8 @@ entity_models:
       Q:
         type: str
         description: |-
-          Q
+          Device suffix
+        default: ""
       VAR:
         type: str
         description: |-
@@ -260,6 +274,84 @@ entity_models:
           .*:
     pvi:
       yaml_path: nx100pvar.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        VAR:
+
+  - name: auto_nx100io
+    description: |-
+      Imported from DLS module motomanNX100 (nx100io.template), under the name
+      XMLbuilder gives its AutoSubstitution: reads the eight bits of a robot I/O
+      variable. The same as nx100io.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      Q:
+        type: str
+        description: |-
+          Device suffix
+        default: ""
+      VAR:
+        type: str
+        description: |-
+          VAR
+      PORT:
+        type: str
+        description: |-
+          Asyn port name
+      SCAN:
+        type: str
+        description: |-
+          Scan rate
+      DESC0:
+        type: str
+        description: |-
+          DESC0
+        default: ""
+      DESC1:
+        type: str
+        description: |-
+          DESC1
+        default: ""
+      DESC2:
+        type: str
+        description: |-
+          DESC2
+        default: ""
+      DESC3:
+        type: str
+        description: |-
+          DESC3
+        default: ""
+      DESC4:
+        type: str
+        description: |-
+          DESC4
+        default: ""
+      DESC5:
+        type: str
+        description: |-
+          DESC5
+        default: ""
+      DESC6:
+        type: str
+        description: |-
+          DESC6
+        default: ""
+      DESC7:
+        type: str
+        description: |-
+          DESC7
+        default: ""
+    databases:
+      - file: nx100io.template
+        args:
+          .*:
+    pvi:
+      yaml_path: auto_nx100io.pvi.device.yaml
       ui_macros:
         P:
         Q:
