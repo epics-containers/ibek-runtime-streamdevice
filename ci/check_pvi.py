@@ -35,7 +35,7 @@ from pathlib import Path
 
 from patterns import ROOT, SUPPORT_SUFFIX, select_patterns, vendored_files
 from ruamel.yaml import YAML
-from template_load import CONFIG_FILE, parse_subst, placeholder
+from template_load import CONFIG_FILE, entity_for, parse_subst
 
 MACRO = re.compile(r"\$[({]([A-Za-z_][A-Za-z0-9_]*)(?:=([^)}]*))?[)}]")
 # The parser the PVI generator reads templates with.
@@ -87,18 +87,6 @@ def flatten(patterns: list[Path], config: Path) -> list[tuple[Path, Path]]:
     return sorted(supports, key=lambda item: item[1].name)
 
 
-def entity_for(module: str, model: dict, given: dict) -> dict:
-    entity = {"type": f"{module}.{model['name']}"}
-    for name, spec in (model.get("parameters") or {}).items():
-        if name in given:
-            entity[name] = given[name]
-        elif "default" not in spec:
-            entity[name] = placeholder(name, spec)
-        if spec.get("type") == "id":
-            entity[name] = f"ci_{model['name']}_{name}"
-    return entity
-
-
 def screen_pvs(opi: Path, bob: str, seen: set[str] | None = None) -> list[str]:
     """Every PV name on a screen and, recursively, on the screens it opens."""
     seen = set() if seen is None else seen
@@ -131,7 +119,9 @@ def model_records(generator, patterns: dict[str, Path], subst: str) -> dict[str,
 
 def run(work: Path, patterns: list[Path]) -> int:
     yaml = YAML(typ="safe")
-    values = (yaml.load(CONFIG_FILE) or {}).get("values") or {}
+    config_file = yaml.load(CONFIG_FILE) or {}
+    values = config_file.get("values") or {}
+    objects = config_file.get("objects") or {}
     generator = load_generator()
     epics = work / "epics"
     config = epics / "ioc" / "config"
@@ -149,6 +139,7 @@ def run(work: Path, patterns: list[Path]) -> int:
     expected: dict[str, str] = {}  # entity type -> screen stem
     for pattern, support in supports:
         data = yaml.load(support)
+        models = {m["name"]: m for m in data["entity_models"]}
         for model in data["entity_models"]:
             if not model.get("databases"):
                 continue
@@ -157,8 +148,15 @@ def run(work: Path, patterns: list[Path]) -> int:
                 expected[etype] = Path(model["pvi"]["yaml_path"]).name.split(".")[0]
             elif not model["name"].startswith("_"):
                 failures.append(f"{etype}: has databases but no pvi: block")
-            given = values.get(pattern.name, {}).get(model["name"], {})
-            entities.append(entity_for(data["module"], model, given))
+            entities.append(
+                entity_for(
+                    data["module"],
+                    model,
+                    values.get(pattern.name, {}),
+                    objects.get(pattern.name, {}),
+                    models,
+                )
+            )
     (config / "ioc.yaml").write_text(
         json.dumps(
             {"ioc_name": "ci", "description": "pvi screens", "entities": entities}

@@ -5,6 +5,10 @@
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/granvillePhillips/ release.
+#
+# As in the builder classes, gp350Hcg, gp350Pirg, gp307Hcg and gp307Pirg take
+# GCTLR, the gp350 or gp307 controller entity (named by its name), and pass
+# its port to their template.
 
 module: granvillePhillips
 
@@ -13,6 +17,10 @@ entity_models:
     description: |-
       Support for a Granville Phillips GP350 gauge controller, typically for Hot Cathode Gauges on End Stations.
     parameters:
+      name:
+        type: id
+        description: |-
+          Object name, the GCTLR of the gauges on this controller
       gctrl:
         type: str
         description: |-
@@ -34,6 +42,10 @@ entity_models:
     description: |-
       Support for a Granville Phillips GP307 gauge controller, typically used on End Stations for Hot Cathode Gauges.
     parameters:
+      name:
+        type: id
+        description: |-
+          Object name, the GCTLR of the gauges on this controller
       gctrl:
         type: str
         description: |-
@@ -85,10 +97,10 @@ entity_models:
         type: str
         description: |-
           channel
-      port:
-        type: str
+      GCTLR:
+        type: object
         description: |-
-          Asyn port name
+          The gp307 controller the gauge is on; its port is the asyn port
       gctrl:
         type: str
         description: |-
@@ -97,6 +109,7 @@ entity_models:
       - file: gp307Hcg.template
         args:
           .*:
+          port: "{{ GCTLR.port }}"
     pvi:
       yaml_path: gp307Hcg.pvi.device.yaml
       ui_macros:
@@ -131,10 +144,10 @@ entity_models:
         type: str
         description: |-
           channel
-      port:
-        type: str
+      GCTLR:
+        type: object
         description: |-
-          Asyn port name
+          The gp307 controller the gauge is on; its port is the asyn port
       gctrl:
         type: str
         description: |-
@@ -193,6 +206,7 @@ entity_models:
       - file: gp307Pirg.template
         args:
           .*:
+          port: "{{ GCTLR.port }}"
     pvi:
       yaml_path: gp307Pirg.pvi.device.yaml
       ui_macros:
@@ -295,10 +309,10 @@ entity_models:
         type: str
         description: |-
           Device name
-      port:
-        type: str
+      GCTLR:
+        type: object
         description: |-
-          Asyn port name
+          The gp350 controller the gauge is on; its port is the asyn port
       gctrl:
         type: str
         description: |-
@@ -307,6 +321,7 @@ entity_models:
       - file: gp350Hcg.template
         args:
           .*:
+          port: "{{ GCTLR.port }}"
     pvi:
       yaml_path: gp350Hcg.pvi.device.yaml
       ui_macros:
@@ -341,10 +356,10 @@ entity_models:
         type: str
         description: |-
           channel
-      port:
-        type: str
+      GCTLR:
+        type: object
         description: |-
-          Asyn port name
+          The gp350 controller the gauge is on; its port is the asyn port
       gctrl:
         type: str
         description: |-
@@ -403,6 +418,7 @@ entity_models:
       - file: gp350Pirg.template
         args:
           .*:
+          port: "{{ GCTLR.port }}"
     pvi:
       yaml_path: gp350Pirg.pvi.device.yaml
       ui_macros:
