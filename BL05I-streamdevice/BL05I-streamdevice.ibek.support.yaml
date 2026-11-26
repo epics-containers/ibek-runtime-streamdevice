@@ -1,0 +1,953 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.8.0-beta.2/ibek.support.schema.json
+
+# Imported from DLS production support module: BL05I 2-95 (its latest tag)
+# Source: /dls_sw/prod/R3.14.12.7/support/BL05I/2-95
+# The builder classes of that beamline module that use StreamDevice; the rest of
+# BL05I is the BL05I pattern of ibek-runtime-support.
+#   - BL05I_changeHexapodMirror.template, BL05I_changeHexapodMirror_withReference.template,
+#     BL05I_waterChiller.template: pristine copies from the release's db/ (they
+#     carry no DLS annotation comments for strip-dls-annotations.py to remove);
+#   - changeHexapod.proto: pristine copy of BL05IApp/protocol/changeHexapod.proto;
+#   - Hostlink.proto: pristine copy of data/Hostlink.proto from HostLink 3-3, the
+#     release BL05I 2-95 builds against
+#     (/dls_sw/prod/R3.14.12.7/support/HostLink/3-3). The HostLink pattern ships
+#     only HostlinkFINS.proto, and a pattern cannot vendor another's files;
+#   - BL05I_waterChiller_settings.req: the PVs of the template's autosave tags.
+# Entity model names are the builder classes in etc/builder.py, and parameter names
+# their builder XML attributes, so builder2ibek converts an XMLbuilder IOC to them.
+# To check for updates: diff this pattern's files against those paths, or against
+# the newest /dls_sw/prod/*/support/BL05I/ release.
+#
+# The hexapod models' PORT is the asyn IP port to the Delta Tau GeoBrick, the one
+# its pmac controller uses, e.g. from pmac.pmacAsynIPPort (pmacAsynIPConfigure).
+# Their IOC image must ship StreamDevice, calc and busy besides pmac.
+#
+# BL05I_waterchiller's port is an asyn IP or serial port to the Omron PLC
+# (HostLink). The template takes WPDESC and UVDESC with two different defaults
+# each; the defaults here are its longer ones, the closer to its macro documentation.
+
+module: BL05I-streamdevice
+
+entity_models:
+  - name: BL05I_changeHexapodMirror
+    description: |-
+      Interfaces to a Delta Tau PLC for changing a hexapod set up from one mirror
+      to another (a new Y value for the Tool Centre Point, then another PLC
+      recalculates everything). Assumes 2 mirrors.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV Prefix
+      R:
+        type: str
+        description: |-
+          Record PV Prefix
+      PLC:
+        type: int
+        description: |-
+          PLC number of Delta Tau PLC to interface with
+      PORT:
+        type: str
+        description: |-
+          Asyn port to the Delta Tau controller
+      YMTR:
+        type: str
+        description: |-
+          Name of the motor record for the Y-translation of the hexapod (not
+          declared in this template)
+      M1NAME:
+        type: str
+        description: |-
+          Name or label string for first mirror
+        default: Mirror1
+      M2NAME:
+        type: str
+        description: |-
+          Name or label string for second mirror
+        default: Mirror2
+      M1HLM:
+        type: float
+        description: |-
+          High soft limit value for Y motor record when using first mirror
+        default: 45.0
+      M2HLM:
+        type: float
+        description: |-
+          High soft limit value for Y motor record when using second mirror
+        default: 107.0
+      M1LLM:
+        type: float
+        description: |-
+          Low soft limit value for Y motor record when using first mirror
+        default: -45.0
+      M2LLM:
+        type: float
+        description: |-
+          Low soft limit value for Y motor record when using second mirror
+        default: 17.0
+    databases:
+      - file: BL05I_changeHexapodMirror.template
+        args:
+          .*:
+    pvi:
+      yaml_path: BL05I_changeHexapodMirror.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+
+  - name: BL05I_changeHexapodMirror_withRef
+    description: |-
+      Interfaces to a Delta Tau PLC for changing a hexapod set up from one mirror
+      to another (a new Y value for the Tool Centre Point, then another PLC
+      recalculates everything). Assumes 2 mirrors and adds a third position for
+      the reference or ideal position; works with the updated mirror change PLC.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device PV Prefix
+      R:
+        type: str
+        description: |-
+          Record PV Prefix
+      PLC:
+        type: int
+        description: |-
+          PLC number of Delta Tau PLC to interface with
+      PORT:
+        type: str
+        description: |-
+          Asyn port to the Delta Tau controller
+      YMTR:
+        type: str
+        description: |-
+          Name of the motor record for the Y-translation of the hexapod (not
+          declared in this template)
+      M1NAME:
+        type: str
+        description: |-
+          Name or label string for first mirror
+        default: Mirror1
+      M2NAME:
+        type: str
+        description: |-
+          Name or label string for second mirror
+        default: Mirror2
+      MREFNAME:
+        type: str
+        description: |-
+          Name or label string for the reference position
+        default: Reference
+      M1HLM:
+        type: float
+        description: |-
+          High soft limit value for Y motor record when using first mirror
+        default: 45.0
+      M2HLM:
+        type: float
+        description: |-
+          High soft limit value for Y motor record when using second mirror
+        default: 107.0
+      MREFHLM:
+        type: float
+        description: |-
+          High soft limit value for Y motor record when using reference position
+        default: 76.0
+      M1LLM:
+        type: float
+        description: |-
+          Low soft limit value for Y motor record when using first mirror
+        default: -45.0
+      M2LLM:
+        type: float
+        description: |-
+          Low soft limit value for Y motor record when using second mirror
+        default: 17.0
+      MREFLLM:
+        type: float
+        description: |-
+          Low soft limit value for Y motor record when using reference position
+        default: -14.0
+    databases:
+      - file: BL05I_changeHexapodMirror_withReference.template
+        args:
+          .*:
+    pvi:
+      yaml_path: BL05I_changeHexapodMirror_withRef.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+
+  - name: BL05I_waterchiller
+    description: |-
+      Monitoring and control of a DLS designed and built water chiller circuit
+      controlled by an Omron PLC over HostLink.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Prefix for the system name as a whole.
+      R:
+        type: str
+        description: |-
+          Record name for the system. PV names constructed as <P><R>:blah
+        default: ""
+      PLCNAME:
+        type: str
+        description: |-
+          Name of the HO PLC.
+      port:
+        type: str
+        description: |-
+          Asyn port to talk to the HO PLC.
+      DISABLED:
+        type: int
+        description: |-
+          Default of whether to poll the device from boot time or not - useful during commissioning or if for some other reason the PLC is not available to the IOC. 0 for Enabled, 1 for Disabled.
+        default: 0
+      PLCDESC:
+        type: str
+        description: |-
+          Description of the water chiller system controlled by the HO PLC.
+        default: "{{ P }}{{ R }}"
+      P1NAME:
+        type: str
+        description: |-
+          Device name of the first pressure sensor in the system.
+        default: "{{ PLCNAME }}:P1"
+      P2NAME:
+        type: str
+        description: |-
+          Device name of the second pressure sensor in the system.
+        default: "{{ PLCNAME }}:P2"
+      F1NAME:
+        type: str
+        description: |-
+          Device name of the first flow sensor in the system.
+        default: "{{ PLCNAME }}:F1"
+      F2NAME:
+        type: str
+        description: |-
+          Device name of the second flow sensor in the system.
+        default: "{{ PLCNAME }}:F2"
+      T1NAME:
+        type: str
+        description: |-
+          Device name of the first temperature sensor in the system.
+        default: "{{ PLCNAME }}:T1"
+      T2NAME:
+        type: str
+        description: |-
+          Device name of the second temperature sensor in the system.
+        default: "{{ PLCNAME }}:T2"
+      T3NAME:
+        type: str
+        description: |-
+          Device name of the third temperature sensor in the system.
+        default: "{{ PLCNAME }}:T3"
+      T4NAME:
+        type: str
+        description: |-
+          Device name of the fourth temperature sensor in the system.
+        default: "{{ PLCNAME }}:T4"
+      T5NAME:
+        type: str
+        description: |-
+          Device name of the fifth temperature sensor in the system.
+        default: "{{ PLCNAME }}:T5"
+      T6NAME:
+        type: str
+        description: |-
+          Device name of the sixth temperature sensor in the system.
+        default: "{{ PLCNAME }}:T6"
+      V1NAME:
+        type: str
+        description: |-
+          Device name of the first valve in the system.
+        default: "{{ PLCNAME }}:V1"
+      V2NAME:
+        type: str
+        description: |-
+          Device name of the second valve in the system.
+        default: "{{ PLCNAME }}:V2"
+      WPNAME:
+        type: str
+        description: |-
+          Device name of the Water pump in the system.
+        default: "{{ PLCNAME }}:TRBNP"
+      UVNAME:
+        type: str
+        description: |-
+          Device name of the UV Steriliser in the system.
+        default: "{{ PLCNAME }}:UVSTL"
+      PEGU:
+        type: str
+        description: |-
+          Engineering units to display pressures in.
+        default: "mbar"
+      FEGU:
+        type: str
+        description: |-
+          Engineering units to display flows in.
+        default: "l/min"
+      TEGU:
+        type: str
+        description: |-
+          Engineering units to display temperatures in.
+        default: "degC"
+      VEGU:
+        type: str
+        description: |-
+          Engineering units to display valve position in.
+        default: "%"
+      SEGU:
+        type: str
+        description: |-
+          Engineering units to display time parameters in.
+        default: "s"
+      P1ESLO:
+        type: float
+        description: |-
+          Linear slope to convert P1NAME raw value to PEGU.
+        default: 1.0
+      P2ESLO:
+        type: float
+        description: |-
+          Linear slope to convert P2NAME raw value to PEGU.
+        default: 1.0
+      F1ESLO:
+        type: float
+        description: |-
+          Linear slope to convert F1NAME raw value to FEGU.
+        default: 1.0
+      F2ESLO:
+        type: float
+        description: |-
+          Linear slope to convert F2NAME raw value to FEGU.
+        default: 1.0
+      T1ESLO:
+        type: float
+        description: |-
+          Linear slope to convert T1NAME raw value to TEGU.
+        default: 0.1
+      T2ESLO:
+        type: float
+        description: |-
+          Linear slope to convert T2NAME raw value to TEGU.
+        default: 0.1
+      T3ESLO:
+        type: float
+        description: |-
+          Linear slope to convert T3NAME raw value to TEGU.
+        default: 0.1
+      T4ESLO:
+        type: float
+        description: |-
+          Linear slope to convert T4NAME raw value to TEGU.
+        default: 0.1
+      T5ESLO:
+        type: float
+        description: |-
+          Linear slope to convert T5NAME raw value to TEGU.
+        default: 0.1
+      T6ESLO:
+        type: float
+        description: |-
+          Linear slope to convert T6NAME raw value to TEGU.
+        default: 0.1
+      V1ESLO:
+        type: float
+        description: |-
+          Linear slope to convert V1NAME raw value to VEGU.
+        default: 0.025
+      V2ESLO:
+        type: float
+        description: |-
+          Linear slope to convert V2NAME raw value to VEGU.
+        default: 0.025
+      SESLO:
+        type: float
+        description: |-
+          Linear slope to convert time parameters to SEGU.
+        default: 0.1
+      P1EOFF:
+        type: float
+        description: |-
+          Linear offset to convert P1NAME raw value to PEGU.
+        default: 0.0
+      P2EOFF:
+        type: float
+        description: |-
+          Linear offset to convert P2NAME raw value to PEGU.
+        default: 0.0
+      F1EOFF:
+        type: float
+        description: |-
+          Linear offset to convert F1NAME raw value to FEGU.
+        default: 0.0
+      F2EOFF:
+        type: float
+        description: |-
+          Linear offset to convert F2NAME raw value to FEGU.
+        default: 0.0
+      T1EOFF:
+        type: float
+        description: |-
+          Linear offset to convert T1NAME raw value to TEGU.
+        default: 0.0
+      T2EOFF:
+        type: float
+        description: |-
+          Linear offset to convert T2NAME raw value to TEGU.
+        default: 0.0
+      T3EOFF:
+        type: float
+        description: |-
+          Linear offset to convert T3NAME raw value to TEGU.
+        default: 0.0
+      T4EOFF:
+        type: float
+        description: |-
+          Linear offset to convert T4NAME raw value to TEGU.
+        default: 0.0
+      T5EOFF:
+        type: float
+        description: |-
+          Linear offset to convert T5NAME raw value to TEGU.
+        default: 0.0
+      T6EOFF:
+        type: float
+        description: |-
+          Linear offset to convert T6NAME raw value to TEGU.
+        default: 0.0
+      V1EOFF:
+        type: float
+        description: |-
+          Linear offset to convert V1NAME raw value to VEGU.
+        default: 0.0
+      V2EOFF:
+        type: float
+        description: |-
+          Linear offset to convert V2NAME raw value to VEGU.
+        default: 0.0
+      P1PRES:
+        type: int
+        description: |-
+          Whether pressure sensor 1 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      P2PRES:
+        type: int
+        description: |-
+          Whether pressure sensor 2 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      F1PRES:
+        type: int
+        description: |-
+          Whether flow meter 1 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      F2PRES:
+        type: int
+        description: |-
+          Whether flow meter 2 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      T1PRES:
+        type: int
+        description: |-
+          Whether temperature sensor 1 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      T2PRES:
+        type: int
+        description: |-
+          Whether temperature sensor 2 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      T3PRES:
+        type: int
+        description: |-
+          Whether temperature sensor 3 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      T4PRES:
+        type: int
+        description: |-
+          Whether temperature sensor 4 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      T5PRES:
+        type: int
+        description: |-
+          Whether temperature sensor 5 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      T6PRES:
+        type: int
+        description: |-
+          Whether temperature sensor 6 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      V1PRES:
+        type: int
+        description: |-
+          Whether valve 1 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      V2PRES:
+        type: int
+        description: |-
+          Whether valve 2 is present in the system. 1 for present, 0 for not present.
+        default: 1
+      P1DESC:
+        type: str
+        description: |-
+          Description of pressure sensor 1 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Pressure Sensor 1"
+      P2DESC:
+        type: str
+        description: |-
+          Description of pressure sensor 2 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Pressure Sensor 2"
+      F1DESC:
+        type: str
+        description: |-
+          Description of flow sensor 1 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Flow Sensor 1"
+      F2DESC:
+        type: str
+        description: |-
+          Description of flow sensor 2 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Flow Sensor 2"
+      T1DESC:
+        type: str
+        description: |-
+          Description of temperature sensor 1 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Temperature Sensor 1"
+      T2DESC:
+        type: str
+        description: |-
+          Description of temperature sensor 2 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Temperature Sensor 2"
+      T3DESC:
+        type: str
+        description: |-
+          Description of temperature sensor 3 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Temperature Sensor 3"
+      T4DESC:
+        type: str
+        description: |-
+          Description of temperature sensor 4 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Temperature Sensor 4"
+      T5DESC:
+        type: str
+        description: |-
+          Description of temperature sensor 5 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Temperature Sensor 5"
+      T6DESC:
+        type: str
+        description: |-
+          Description of temperature sensor 6 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Temperature Sensor 6"
+      V1DESC:
+        type: str
+        description: |-
+          Description of valve 1 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Valve 1"
+      V2DESC:
+        type: str
+        description: |-
+          Description of valve 2 (for use in GUI, etc).
+        default: "{{ PLCNAME }} Valve 2"
+      WPDESC:
+        type: str
+        description: |-
+          Description of Water pump (for use in GUI, etc).
+        default: "{{ PLCNAME }} Water turbine pump"
+      UVDESC:
+        type: str
+        description: |-
+          Description of UV Steriliser (for use in GUI, etc).
+        default: "{{ PLCNAME }} UV Steriliser."
+      P1HIHI:
+        type: str
+        description: |-
+          First pressure sensor record HIHI alarm field value.
+        default: ""
+      P1LOLO:
+        type: str
+        description: |-
+          First pressure sensor record LOLO alarm field value.
+        default: ""
+      P1HIGH:
+        type: str
+        description: |-
+          First pressure sensor record HIGH alarm field value.
+        default: ""
+      P1LOW:
+        type: str
+        description: |-
+          First pressure sensor record LOW alarm field value.
+        default: ""
+      P2HIHI:
+        type: str
+        description: |-
+          Second pressure sensor record HIHI alarm field value.
+        default: ""
+      P2LOLO:
+        type: str
+        description: |-
+          Second pressure sensor record LOLO alarm field value.
+        default: ""
+      P2HIGH:
+        type: str
+        description: |-
+          Second pressure sensor record HIGH alarm field value.
+        default: ""
+      P2LOW:
+        type: str
+        description: |-
+          Second pressure sensor record LOW alarm field value.
+        default: ""
+      F1HIHI:
+        type: str
+        description: |-
+          First flow sensor record HIHI alarm field value.
+        default: ""
+      F1LOLO:
+        type: str
+        description: |-
+          First flow sensor record LOLO alarm field value.
+        default: ""
+      F1HIGH:
+        type: str
+        description: |-
+          First flow sensor record HIGH alarm field value.
+        default: ""
+      F1LOW:
+        type: str
+        description: |-
+          First flow sensor record LOW alarm field value.
+        default: ""
+      F2HIHI:
+        type: str
+        description: |-
+          Second flow sensor record HIHI alarm field value.
+        default: ""
+      F2LOLO:
+        type: str
+        description: |-
+          Second flow sensor record LOLO alarm field value.
+        default: ""
+      F2HIGH:
+        type: str
+        description: |-
+          Second flow sensor record HIGH alarm field value.
+        default: ""
+      F2LOW:
+        type: str
+        description: |-
+          Second flow sensor record LOW alarm field value.
+        default: ""
+      T1HIHI:
+        type: float
+        description: |-
+          First temperature sensor record HIHI alarm field value.
+        default: 35.0
+      T1LOLO:
+        type: float
+        description: |-
+          First temperature sensor record LOLO alarm field value.
+        default: 0.1
+      T1HIGH:
+        type: float
+        description: |-
+          First temperature sensor record HIGH alarm field value.
+        default: 30.0
+      T1LOW:
+        type: float
+        description: |-
+          First temperature sensor record LOW alarm field value.
+        default: 1.0
+      T2HIHI:
+        type: float
+        description: |-
+          Second temperature sensor record HIHI alarm field value.
+        default: 35.0
+      T2LOLO:
+        type: float
+        description: |-
+          Second temperature sensor record LOLO alarm field value.
+        default: 0.1
+      T2HIGH:
+        type: float
+        description: |-
+          Second temperature sensor record HIGH alarm field value.
+        default: 30.0
+      T2LOW:
+        type: float
+        description: |-
+          Second temperature sensor record LOW alarm field value.
+        default: 1.0
+      T3HIHI:
+        type: float
+        description: |-
+          Third temperature sensor record HIHI alarm field value.
+        default: 35.0
+      T3LOLO:
+        type: float
+        description: |-
+          Third temperature sensor record LOLO alarm field value.
+        default: 0.1
+      T3HIGH:
+        type: float
+        description: |-
+          Third temperature sensor record HIGH alarm field value.
+        default: 30.0
+      T3LOW:
+        type: float
+        description: |-
+          Third temperature sensor record LOW alarm field value.
+        default: 1.0
+      T4HIHI:
+        type: float
+        description: |-
+          Fourth temperature sensor record HIHI alarm field value.
+        default: 35.0
+      T4LOLO:
+        type: float
+        description: |-
+          Fourth temperature sensor record LOLO alarm field value.
+        default: 0.1
+      T4HIGH:
+        type: float
+        description: |-
+          Fourth temperature sensor record HIGH alarm field value.
+        default: 30.0
+      T4LOW:
+        type: float
+        description: |-
+          Fourth temperature sensor record LOW alarm field value.
+        default: 1.0
+      T5HIHI:
+        type: float
+        description: |-
+          Fifth temperature sensor record HIHI alarm field value.
+        default: 35.0
+      T5LOLO:
+        type: float
+        description: |-
+          Fifth temperature sensor record LOLO alarm field value.
+        default: 0.1
+      T5HIGH:
+        type: float
+        description: |-
+          Fifth temperature sensor record HIGH alarm field value.
+        default: 30.0
+      T5LOW:
+        type: float
+        description: |-
+          Fifth temperature sensor record LOW alarm field value.
+        default: 1.0
+      T6HIHI:
+        type: float
+        description: |-
+          Sixth temperature sensor record HIHI alarm field value.
+        default: 35.0
+      T6LOLO:
+        type: float
+        description: |-
+          Sixth temperature sensor record LOLO alarm field value.
+        default: 0.1
+      T6HIGH:
+        type: float
+        description: |-
+          Sixth temperature sensor record HIGH alarm field value.
+        default: 30.0
+      T6LOW:
+        type: float
+        description: |-
+          Sixth temperature sensor record LOW alarm field value.
+        default: 1.0
+      V1HIHI:
+        type: str
+        description: |-
+          First valve position record HIHI alarm field values.
+        default: ""
+      V1LOLO:
+        type: str
+        description: |-
+          First valve position record LOLO alarm field values.
+        default: ""
+      V1HIGH:
+        type: str
+        description: |-
+          First valve position record HIGH alarm field values.
+        default: ""
+      V1LOW:
+        type: str
+        description: |-
+          First valve position record LOW alarm field values.
+        default: ""
+      V2HIHI:
+        type: str
+        description: |-
+          Second valve position record HIHI alarm field values.
+        default: ""
+      V2LOLO:
+        type: str
+        description: |-
+          Second valve position record LOLO alarm field values.
+        default: ""
+      V2HIGH:
+        type: str
+        description: |-
+          Second valve position record HIGH alarm field values.
+        default: ""
+      V2LOW:
+        type: str
+        description: |-
+          Second valve position record LOW alarm field values.
+        default: ""
+      PHHSV:
+        type: str
+        description: |-
+          Severity with which to treat HIHI pressure alarms.
+        default: "MAJOR"
+      PLLSV:
+        type: str
+        description: |-
+          Severity with which to treat LOLO pressure alarms.
+        default: "MAJOR"
+      PHSV:
+        type: str
+        description: |-
+          Severity with which to treat HIGH pressure alarms.
+        default: "MINOR"
+      PLSV:
+        type: str
+        description: |-
+          Severity with which to treat LOW pressure alarms.
+        default: "MINOR"
+      FHHSV:
+        type: str
+        description: |-
+          Severity with which to treat HIHI flow alarms.
+        default: "MAJOR"
+      FLLSV:
+        type: str
+        description: |-
+          Severity with which to treat LOLO flow alarms.
+        default: "MAJOR"
+      FHSV:
+        type: str
+        description: |-
+          Severity with which to treat HIGH flow alarms.
+        default: "MINOR"
+      FLSV:
+        type: str
+        description: |-
+          Severity with which to treat LOW flow alarms.
+        default: "MINOR"
+      THHSV:
+        type: str
+        description: |-
+          Severity with which to treat HIHI flow alarms.
+        default: "MAJOR"
+      TLLSV:
+        type: str
+        description: |-
+          Severity with which to treat LOLO flow alarms.
+        default: "MAJOR"
+      THSV:
+        type: str
+        description: |-
+          Severity with which to treat HIGH flow alarms.
+        default: "MINOR"
+      TLSV:
+        type: str
+        description: |-
+          Severity with which to treat LOW flow alarms.
+        default: "MINOR"
+      VHHSV:
+        type: str
+        description: |-
+          Severity with which to treat HIHI valve position alarms.
+        default: "MAJOR"
+      VLLSV:
+        type: str
+        description: |-
+          Severity with which to treat LOLO valve position alarms.
+        default: "MAJOR"
+      VHSV:
+        type: str
+        description: |-
+          Severity with which to treat HIGH valve position alarms.
+        default: "MINOR"
+      VLSV:
+        type: str
+        description: |-
+          Severity with which to treat LOW valve position alarms.
+        default: "MINOR"
+      PHOPR:
+        type: float
+        description: |-
+          High operator field HOPR value for pressure records.
+        default: 4000.0
+      PLOPR:
+        type: float
+        description: |-
+          Low operator field LOPR value for pressure records.
+        default: 0.0
+      FHOPR:
+        type: str
+        description: |-
+          High operator field HOPR value for flow records.
+        default: ""
+      FLOPR:
+        type: str
+        description: |-
+          Low operator field LOPR value for flow records.
+        default: ""
+      THOPR:
+        type: float
+        description: |-
+          High operator field HOPR value for temperature records.
+        default: 50.0
+      TLOPR:
+        type: float
+        description: |-
+          Low operator field LOPR value for temperature records.
+        default: 0.0
+      VHOPR:
+        type: float
+        description: |-
+          High operator field HOPR value for valve position records.
+        default: 100.0
+      VLOPR:
+        type: float
+        description: |-
+          Low operator field LOPR value for valve position records.
+        default: 0.0
+      SEOFF:
+        type: float
+        description: |-
+          Linear offset to convert time parameters to SEGU.
+        default: 0.0
+
+    databases:
+      - file: BL05I_waterChiller.template
+        args:
+          .*:
+    pvi:
+      yaml_path: BL05I_waterchiller.pvi.device.yaml
+      ui_macros:
+        PLCNAME:
+        P:
+        R:
+        P1NAME:
+        P2NAME:
+        F1NAME:
+        F2NAME:
+        T1NAME:
+        T2NAME:
+        T3NAME:
+        T4NAME:
+        T5NAME:
+        T6NAME:
+        V1NAME:
+        V2NAME:
+        WPNAME:
+        UVNAME:
