@@ -22,7 +22,7 @@ The pattern carries both of the release's StreamDevice protocols:
 
 | Entity model | Description |
 |---|---|
-| `HostLink.HostLink` | HostLink FINS protocol module (loads the stream protocol file) |
+| `HostLink.HostLink` | HostLink protocols (no records; Hostlink.proto and HostlinkFINS.proto are vendored with the pattern) |
 | `HostLink.HostLinkTemplate` | Omron PLC HostLink FINS communications status and clock readbacks |
 
 ## Files

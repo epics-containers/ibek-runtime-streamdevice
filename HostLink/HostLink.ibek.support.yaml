@@ -20,7 +20,7 @@ module: HostLink
 entity_models:
   - name: HostLink
     description: |-
-      HostLink FINS protocol module (loads the stream protocol file)
+      HostLink protocols (no records; Hostlink.proto and HostlinkFINS.proto are vendored with the pattern)
   - name: HostLinkTemplate
     description: |-
       Omron PLC HostLink FINS communications status and clock readbacks
