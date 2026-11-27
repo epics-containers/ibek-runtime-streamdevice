@@ -3,128 +3,129 @@
 # Imported from DLS production support module: motomanNX100 1-17-1
 # Source: /dls_sw/prod/R3.14.12.7/support/motomanNX100/1-17-1
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
-# auto_nx100io is the name XMLbuilder gives the AutoSubstitution of
-# nx100io.template; it loads the same template as nx100io.
 # The release's BL11I-barcode.db and BL11I-robot-interlocks.db serve one
-# beamline and are not part of this pattern.
+# beamline and are not part of this pattern: they belong in a BL11I pattern of
+# ibek-runtime-support.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/motomanNX100/ release.
+#
+# Entity models: those of ibek-support-dls's motomanNX100 (ibek-support-dls
+# 52b8a51, motomanNX100/motomanNX100.ibek.support.yaml) but for its two BL11I
+# models. They are builder.py's AutoSubstitution classes nx100, nx100dvar and
+# nx100pvar, and auto_nx100io, the name builder gives the AutoSubstitution of
+# nx100io.template. Their databases point at this pattern's own templates,
+# and their pvi: blocks are generate-pvi.py's.
+#
+# Changed from those models: PORT is str, not object. builder.py's classes are
+# AutoSubstitutions, so PORT is a plain template macro there, not an Ident of
+# an asyn port, and builder2ibek converts it as the port name either way.
+#
+# Added to those models: nx100io, which loads nx100io.template as
+# auto_nx100io does.
 
 module: motomanNX100
 
 entity_models:
   - name: nx100
     description: |-
-      Imported from DLS module motomanNX100 (nx100.template)
+      Setup a motoman NX100 motor controller for use with EPICS.
+      Loads nx100.template which provides robot job selection, status,
+      and control PVs via StreamDevice protocol.
     parameters:
       P:
         type: str
-        description: |-
-          Device prefix
+        description: Device Prefix
       Q:
         type: str
-        description: |-
-          Device suffix
+        description: Device Suffix
         default: ""
-      TYPE:
-        type: str
-        description: |-
-          TYPE
-        default: "NX"
       PORT:
         type: str
-        description: |-
-          Asyn port name
+        description: Asyn Port
       ZRST:
         type: str
-        description: |-
-          ZRST
+        description: Job 1 name
         default: ""
       ONST:
         type: str
-        description: |-
-          ONST
+        description: Job 2 name
         default: ""
       TWST:
         type: str
-        description: |-
-          TWST
+        description: Job 3 name
         default: ""
       THST:
         type: str
-        description: |-
-          THST
+        description: Job 4 name
         default: ""
       FRST:
         type: str
-        description: |-
-          FRST
+        description: Job 5 name
         default: ""
       FVST:
         type: str
-        description: |-
-          FVST
+        description: Job 6 name
         default: ""
       SXST:
         type: str
-        description: |-
-          SXST
+        description: Job 7 name
         default: ""
       SVST:
         type: str
-        description: |-
-          SVST
+        description: Job 8 name
         default: ""
       EIST:
         type: str
-        description: |-
-          EIST
+        description: Job 9 name
         default: ""
       NIST:
         type: str
-        description: |-
-          NIST
+        description: Job 10 name
         default: ""
       TEST:
         type: str
-        description: |-
-          TEST
+        description: Job 11 name
         default: ""
       ELST:
         type: str
-        description: |-
-          ELST
+        description: Job 12 name
         default: ""
       TVST:
         type: str
-        description: |-
-          TVST
+        description: Job 13 name
         default: ""
       TTST:
         type: str
-        description: |-
-          TTST
+        description: Job 14 name
         default: ""
       FTST:
         type: str
-        description: |-
-          FTST
+        description: Job 15 name
         default: ""
       FFST:
         type: str
-        description: |-
-          FFST
+        description: Job 16 name
         default: ""
+      TYPE:
+        type: str
+        description: "Robot type: FS or NX (default)"
+        default: NX
       name:
         type: str
-        description: |-
-          Object and GUI association name.
-          Documentary: accepted for builder XML compatibility; not passed to the template.
+        description: Object and gui association name
+        default: ""
+      gda_name:
+        type: str
+        description: GDA object name
+        default: ""
+      gda_desc:
+        type: str
+        description: GDA object description
         default: ""
     databases:
       - file: nx100.template
         args:
-          '(?!name$).*':
+          .*:
     pvi:
       yaml_path: nx100.pvi.device.yaml
       ui_macros:
@@ -133,35 +134,127 @@ entity_models:
 
   - name: nx100dvar
     description: |-
-      Imported from DLS module motomanNX100 (nx100dvar.template)
+      Set and Read a D (decimal) variable on the robot.
+      Loads nx100dvar.template via StreamDevice protocol.
     parameters:
       P:
         type: str
-        description: |-
-          Device prefix
+        description: Device Prefix
       Q:
         type: str
-        description: |-
-          Device suffix
+        description: Device Suffix
         default: ""
-      VAR:
-        type: str
-        description: |-
-          VAR
       PORT:
         type: str
-        description: |-
-          Asyn port name
+        description: Asyn Port
+      VAR:
+        type: str
+        description: D Variable to read/write
       SCAN:
         type: str
-        description: |-
-          Scan rate
+        description: Scan rate
     databases:
       - file: nx100dvar.template
         args:
           .*:
     pvi:
       yaml_path: nx100dvar.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        VAR:
+
+  - name: nx100pvar
+    description: |-
+      Set and Read a P (position) variable on the robot.
+      Loads nx100pvar.template via StreamDevice protocol.
+    parameters:
+      P:
+        type: str
+        description: Device Prefix
+      Q:
+        type: str
+        description: Device Suffix
+        default: ""
+      PORT:
+        type: str
+        description: Asyn Port
+      VAR:
+        type: str
+        description: P Variable to read/write
+      SCAN:
+        type: str
+        description: Scan rate or readback
+    databases:
+      - file: nx100pvar.template
+        args:
+          .*:
+    pvi:
+      yaml_path: nx100pvar.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+        VAR:
+
+  - name: auto_nx100io
+    description: |-
+      Auto-generated entity for nx100io.template.
+      Reads digital I/O variables from the robot via StreamDevice.
+    parameters:
+      P:
+        type: str
+        description: Device Prefix
+      Q:
+        type: str
+        description: Device Suffix
+        default: ""
+      PORT:
+        type: str
+        description: Asyn Port
+      VAR:
+        type: str
+        description: D Variable to read/write
+      SCAN:
+        type: str
+        description: Scan rate
+      DESC0:
+        type: str
+        description: Description for bit 0
+        default: ""
+      DESC1:
+        type: str
+        description: Description for bit 1
+        default: ""
+      DESC2:
+        type: str
+        description: Description for bit 2
+        default: ""
+      DESC3:
+        type: str
+        description: Description for bit 3
+        default: ""
+      DESC4:
+        type: str
+        description: Description for bit 4
+        default: ""
+      DESC5:
+        type: str
+        description: Description for bit 5
+        default: ""
+      DESC6:
+        type: str
+        description: Description for bit 6
+        default: ""
+      DESC7:
+        type: str
+        description: Description for bit 7
+        default: ""
+    databases:
+      - file: nx100io.template
+        args:
+          .*:
+    pvi:
+      yaml_path: auto_nx100io.pvi.device.yaml
       ui_macros:
         P:
         Q:
@@ -238,120 +331,6 @@ entity_models:
           .*:
     pvi:
       yaml_path: nx100io.pvi.device.yaml
-      ui_macros:
-        P:
-        Q:
-        VAR:
-
-  - name: nx100pvar
-    description: |-
-      Imported from DLS module motomanNX100 (nx100pvar.template)
-    parameters:
-      P:
-        type: str
-        description: |-
-          Device prefix
-      Q:
-        type: str
-        description: |-
-          Device suffix
-        default: ""
-      VAR:
-        type: str
-        description: |-
-          VAR
-      PORT:
-        type: str
-        description: |-
-          Asyn port name
-      SCAN:
-        type: str
-        description: |-
-          Scan rate
-    databases:
-      - file: nx100pvar.template
-        args:
-          .*:
-    pvi:
-      yaml_path: nx100pvar.pvi.device.yaml
-      ui_macros:
-        P:
-        Q:
-        VAR:
-
-  - name: auto_nx100io
-    description: |-
-      Imported from DLS module motomanNX100 (nx100io.template), under the name
-      XMLbuilder gives its AutoSubstitution: reads the eight bits of a robot I/O
-      variable. The same as nx100io.
-    parameters:
-      P:
-        type: str
-        description: |-
-          Device prefix
-      Q:
-        type: str
-        description: |-
-          Device suffix
-        default: ""
-      VAR:
-        type: str
-        description: |-
-          VAR
-      PORT:
-        type: str
-        description: |-
-          Asyn port name
-      SCAN:
-        type: str
-        description: |-
-          Scan rate
-      DESC0:
-        type: str
-        description: |-
-          DESC0
-        default: ""
-      DESC1:
-        type: str
-        description: |-
-          DESC1
-        default: ""
-      DESC2:
-        type: str
-        description: |-
-          DESC2
-        default: ""
-      DESC3:
-        type: str
-        description: |-
-          DESC3
-        default: ""
-      DESC4:
-        type: str
-        description: |-
-          DESC4
-        default: ""
-      DESC5:
-        type: str
-        description: |-
-          DESC5
-        default: ""
-      DESC6:
-        type: str
-        description: |-
-          DESC6
-        default: ""
-      DESC7:
-        type: str
-        description: |-
-          DESC7
-        default: ""
-    databases:
-      - file: nx100io.template
-        args:
-          .*:
-    pvi:
-      yaml_path: auto_nx100io.pvi.device.yaml
       ui_macros:
         P:
         Q:

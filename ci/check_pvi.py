@@ -37,7 +37,15 @@ from pathlib import Path
 
 from patterns import ROOT, SUPPORT_SUFFIX, select_patterns, vendored_files
 from ruamel.yaml import YAML
-from template_load import CONFIG_FILE, entity_for, in_reference_order, parse_subst
+from template_load import (
+    CONFIG_FILE,
+    STUBS,
+    entity_for,
+    in_reference_order,
+    parse_subst,
+    referred,
+    stub_models,
+)
 
 MACRO = re.compile(r"\$[({]([A-Za-z_][A-Za-z0-9_]*)(?:=([^)}]*))?[)}]")
 # The parser the PVI generator reads templates with.
@@ -132,6 +140,8 @@ def run(work: Path, patterns: list[Path]) -> int:
     config = epics / "ioc" / "config"
     config.mkdir(parents=True)
     supports = flatten(patterns, config)
+    for stub in STUBS:
+        shutil.copy2(stub, config / stub.name)
 
     folders: dict[str, Path] = {}
     for pattern in patterns:
@@ -145,7 +155,7 @@ def run(work: Path, patterns: list[Path]) -> int:
     users: dict[str, list[str]] = {}  # template -> entity types loading it
     for pattern, support in supports:
         data = yaml.load(support)
-        models = {m["name"]: m for m in data["entity_models"]}
+        models = {m["name"]: m for m in data["entity_models"]} | stub_models()
         for model in data["entity_models"]:
             if not model.get("databases"):
                 continue
@@ -156,15 +166,15 @@ def run(work: Path, patterns: list[Path]) -> int:
                 expected[etype] = Path(model["pvi"]["yaml_path"]).name.split(".")[0]
             elif not model["name"].startswith("_"):
                 failures.append(f"{etype}: has databases but no pvi: block")
-            entities.append(
-                entity_for(
-                    data["module"],
-                    model,
-                    values.get(pattern.name, {}),
-                    objects.get(pattern.name, {}),
-                    models,
-                )
-            )
+            given = values.get(pattern.name, {})
+            refs = objects.get(pattern.name, {})
+            # the entities of other modules (ci/stubs/) this one refers to
+            for target in referred(refs, model, models):
+                if "module" in target:
+                    stub = entity_for(data["module"], target, given, refs, models)
+                    if stub not in entities:
+                        entities.append(stub)
+            entities.append(entity_for(data["module"], model, given, refs, models))
     (config / "ioc.yaml").write_text(
         json.dumps(
             {
