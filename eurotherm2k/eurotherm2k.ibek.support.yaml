@@ -14,8 +14,10 @@
 #   classes create their Modbus asyn port at startup with compiled commands
 #   (modbusInterposeConfig, eurothermModbusCtrlConfigure,
 #   eurothermModbusLoopConfigure, drvModbusAsynConfigure), which no runtime image
-#   has. They belong in a generic IOC built with Modbus support, modelled at build
-#   time from ibek-support/eurothermModbus.
+#   has. They belong in a generic IOC built with DLS eurotherm2k itself (its
+#   compiled libeurothermModbus, from eurotherm2kApp/src/eurothermModbus.c) plus
+#   modbus. That is not ibek-support/eurothermModbus, which is a different DLS
+#   module (eurothermModbus 3-2-15).
 # - eurothermParam.template, eurothermConfParam.template, eurothermPV.template:
 #   no builder.py class loads them, so no builder XML can use them.
 

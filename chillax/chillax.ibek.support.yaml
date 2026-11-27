@@ -5,6 +5,8 @@
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/chillax/ release.
+# chillaxController's databases and pvi were added by hand: keep them if the pattern
+# is re-imported, or a re-import drops them.
 
 module: chillax
 
