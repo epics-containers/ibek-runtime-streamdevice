@@ -10,10 +10,10 @@
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/leybold/ release.
 #
-# Templates needing a generic IOC built with this module (not the plain
-# generic image):
-# - `centerN.template` needs a generic IOC built with `leybold` (compiled support), not the plain generic image.
-# - `coolpak.template` needs a generic IOC built with `leybold` (compiled support), not the plain generic image.
+# centerN.template and coolpak.template are not imported: the DLS builder.py
+# centerN and coolpak classes create their asyn port at startup with the
+# module's compiled centerNConfig and coolpakConfig commands, which no runtime
+# image has. They belong in a build-time model.
 
 module: leybold
 
@@ -30,50 +30,6 @@ entity_models:
         type: str
         description: |-
           PV prefix
-
-  - name: centerN
-    description: |-
-      Imported from DLS module leybold (centerN.template)
-      NOTE: needs a generic IOC built with leybold (not the plain generic image).
-    parameters:
-      P:
-        type: str
-        description: |-
-          Device prefix
-      PORT:
-        type: str
-        description: |-
-          Asyn port name
-    databases:
-      - file: centerN.template
-        args:
-          .*:
-    pvi:
-      yaml_path: centerN.pvi.device.yaml
-      ui_macros:
-        P:
-
-  - name: coolpak
-    description: |-
-      Imported from DLS module leybold (coolpak.template)
-      NOTE: needs a generic IOC built with leybold (not the plain generic image).
-    parameters:
-      P:
-        type: str
-        description: |-
-          Device prefix
-      PORT:
-        type: str
-        description: |-
-          Asyn port name
-    databases:
-      - file: coolpak.template
-        args:
-          .*:
-    pvi:
-      yaml_path: coolpak.pvi.device.yaml
-      ui_macros:
-        P:
 
   - name: read_floatE
     description: |-

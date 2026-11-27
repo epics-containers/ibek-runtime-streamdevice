@@ -75,3 +75,17 @@ entity_models:
         description: |-
           Device descritpion
         default: Chillax cryocooler
+    databases:
+      # As the DLS builder.py chillaxController does: the records template, and
+      # the CSS screen template (which holds no records)
+      - file: chillax_abs.db
+        args:
+          .*:
+      - file: chillax_opi.template
+        args:
+          .*:
+    pvi:
+      yaml_path: chillaxController.pvi.device.yaml
+      ui_macros:
+        P:
+        R:

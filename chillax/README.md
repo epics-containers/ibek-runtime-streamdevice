@@ -14,7 +14,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 |---|---|
 | `chillax._chillaxOpiTemplate` | Chillax cryocooler CSS screen association template |
 | `chillax._chillaxSubstituionsTemplate` | Chillax cryocooler records template |
-| `chillax.chillaxController` | Chillax cryocooler controller |
+| `chillax.chillaxController` | Chillax cryocooler controller: loads `chillax_abs.db` and `chillax_opi.template`, as the DLS `builder.py` class does |
 
 ## Files
 
@@ -24,6 +24,7 @@ instance's `config/`:
 - `_chillaxSubstituionsTemplate.pvi.device.yaml`
 - `chillax.ibek.support.yaml`
 - `chillax.proto`
+- `chillaxController.pvi.device.yaml`
 - `chillax_abs.db`
 - `chillax_opi.template`
 

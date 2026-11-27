@@ -5,14 +5,6 @@
 # default keep it; other parameters get a placeholder by type (int 1,
 # float 1.0, enum its first value, str "1", which loads as a name or a number).
 values:
-  d2afe:
-    # CMD names the protocol the record runs
-    attenuator_cmd: {CMD: att_set}
-    generic_cmd: {CMD: reset}
-  eurotherm2k:
-    # eurothermParam and eurothermConfParam protocols redirect to the
-    # $(P)$(Q):ERR record of eurotherm2k, whose Q otherwise keeps its default ""
-    eurotherm2k: {Q: "1"}
   leybold:
     # FPARAM and IPARAM name two different records
     read_int_floatE: {FPARAM: F, IPARAM: I}
@@ -50,27 +42,9 @@ xfail:
   - pattern: PIpiezo
     template: PI-E516.template
     reason: 'the motor record'
-  - pattern: d2afe
-    template: fwVersionCheck.template
-    reason: 'compiled aSub routine checkFW'
   - pattern: enzLoCuM4
     template: enzLoCuM4Readback.template
     reason: 'DTYP "Hy8401ip" (Hytec IP ADC)'
-  - pattern: eurotherm2k
-    template: eurothermModbus.template
-    reason: 'compiled Modbus asyn driver'
-  - pattern: eurotherm2k
-    template: eurothermModbusLoop.template
-    reason: 'compiled Modbus asyn driver'
-  - pattern: eurotherm2k
-    template: eurothermModbusPV.template
-    reason: 'compiled Modbus asyn driver'
-  - pattern: leybold
-    template: centerN.template
-    reason: 'compiled asyn driver centerNConfig'
-  - pattern: leybold
-    template: coolpak.template
-    reason: 'compiled asyn driver coolpakConfig'
   - pattern: microlab500
     template: microlab500whole.template
     reason: 'the motor record'
@@ -89,9 +63,6 @@ xfail:
   - pattern: strainGauge
     template: strainGauge.template
     reason: 'compiled aSub routine parseSetpointValue'
-  - pattern: yaskawaBARTRobot
-    template: BARTRobot.db
-    reason: 'compiled aSub routines DecToAsc, GripperState; compiled FINS asyn driver'
   - pattern: leybold
     template: read_floatE.template
     reason: 'protocol get_floatE, which leybold.proto (and leybold 2-2 upstream) lacks'
