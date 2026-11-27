@@ -56,6 +56,57 @@ CONFIG_FILE = Path(__file__).with_name("template-load.yaml")
 PLACEHOLDER = {"int": 1, "float": 1.0, "bool": False}
 
 
+def id_value(model: str, name: str) -> str:
+    """The value given to an ``id`` parameter."""
+    return f"ci_{model}_{name}"
+
+
+def referred(objects: dict, model: dict, models: dict[str, dict]) -> list[dict]:
+    """The models an entity of ``model`` refers to through its ``object``
+    parameters, as ``objects`` (one pattern's entry in ci/template-load.yaml)
+    names them, each with its own referred models first."""
+    out: list[dict] = []
+    for name, spec in (model.get("parameters") or {}).items():
+        if spec.get("type") != "object":
+            continue
+        target = objects.get(model["name"], {}).get(name)
+        if target not in models:
+            raise KeyError(
+                f"{model['name']}.{name}: object parameter with no model under "
+                f"objects in {CONFIG_FILE.name}"
+            )
+        out += referred(objects, models[target], models) + [models[target]]
+    return out
+
+
+def object_value(objects: dict, model: dict, name: str, models: dict) -> str:
+    """The value given to an ``object`` parameter: the id of an entity of the
+    model it refers to."""
+    target = models[objects[model["name"]][name]]
+    ids = [n for n, s in target["parameters"].items() if s.get("type") == "id"]
+    return id_value(target["name"], ids[0])
+
+
+def entity_for(
+    module: str, model: dict, given: dict, objects: dict, models: dict
+) -> dict:
+    """An entity of ``model``, of one pattern, whose ``module`` and ``models``
+    are given. ``given`` holds that pattern's parameter values from
+    ci/template-load.yaml, and ``objects`` the model each ``object`` parameter
+    refers to; the IOC must hold an entity of that model too."""
+    entity = {"type": f"{module}.{model['name']}"}
+    for name, spec in (model.get("parameters") or {}).items():
+        if name in given.get(model["name"], {}):
+            entity[name] = given[model["name"]][name]
+        elif spec.get("type") == "object":
+            entity[name] = object_value(objects, model, name, models)
+        elif "default" not in spec:
+            entity[name] = placeholder(name, spec)
+        if spec.get("type") == "id":
+            entity[name] = id_value(model["name"], name)
+    return entity
+
+
 def placeholder(name: str, spec: dict) -> object:
     kind = spec.get("type")
     if kind == "enum":
@@ -231,25 +282,36 @@ def prepare(out: Path, names: list[str]) -> int:
             src for n, src in files.items() if n.endswith(".ibek.support.yaml")
         )
         entities = []
+        # the entities each one refers to, which its IOC holds too
+        needs: list[list[dict]] = []
+        # the templates each entity's model loads
+        loads: list[set[str]] = []
+        objects = (config.get("objects") or {}).get(pattern.name, {})
         for support in supports:
             data = yaml.load(support)
+            models = {m["name"]: m for m in data["entity_models"]}
+            given = values.get(pattern.name, {})
             for model in data["entity_models"]:
                 if not model.get("databases"):
                     continue
-                given = values.get(pattern.name, {}).get(model["name"], {})
-                entity = {"type": f"{data['module']}.{model['name']}"}
-                for pname, spec in (model.get("parameters") or {}).items():
-                    if pname in given:
-                        entity[pname] = given[pname]
-                    elif "default" not in spec:
-                        entity[pname] = placeholder(pname, spec)
-                    if spec.get("type") == "id":
-                        entity[pname] = f"ci_{model['name']}_{pname}"
-                entities.append(entity)
+                try:
+                    before = [
+                        entity_for(data["module"], m, given, objects, models)
+                        for m in referred(objects, model, models)
+                    ]
+                except KeyError as exc:
+                    print(f"FAIL {pattern.name}: {exc.args[0]}")
+                    failures += 1
+                    continue
+                entities.append(
+                    entity_for(data["module"], model, given, objects, models)
+                )
+                needs.append(before)
+                loads.append({db["file"] for db in model["databases"]})
         for number, entity in enumerate(entities):
             runtime = work / f"runtime-{number:02d}"
             try:
-                generate(cfg, runtime, supports, [entity])
+                generate(cfg, runtime, supports, [*needs[number], entity])
             except Exception as exc:  # ibek raises pydantic and Jinja errors alike
                 print(
                     f"FAIL {pattern.name}: {entity['type']}: ibek runtime generate2: "
@@ -259,6 +321,8 @@ def prepare(out: Path, names: list[str]) -> int:
                 continue
             subst = (runtime / "ioc.subst").read_text()
             for index, (template, columns, row) in enumerate(parse_subst(subst)):
+                if needs[number] and template not in loads[number]:
+                    continue  # a row of an entity this one refers to
                 macros = dict(zip(columns, row, strict=False))
                 key = f"{pattern.name}/{template}"
                 reached.add(key)

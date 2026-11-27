@@ -1,0 +1,124 @@
+# Streams protocol file for Hostlink protocol
+# As used by OMRON CJ1 PLCs
+
+# Example of use:
+# INP="@Hostlink.proto read(0051) ASYNPORT"
+# Where read is the command required, and 0051 is the OMRON address to
+# read from. Note that the protocol parameters (0051 in this case) are
+# literals, and must be 4 digits for the protocol to work
+
+header = "@00";
+locktimeout = 10000;
+term = "%0<xor>*";
+terminator   = "\r";
+ReadTimeout = 500;
+ReplyTimeout = 3000;
+
+# Read a 16bit value
+read		{ out $header,"RD\$10001",$term; 
+		  in  $header,"RD00%4x",$term }
+readDM16	{ out $header,"RD\$10001",$term; 
+		  in  $header,"RD00%4x",$term }
+
+# Read a 32bit value
+readDM32	{ out $header,"RD\$10002",$term;
+		  in  $header,"RD00%8x",$term }
+
+# Write a 16bit value
+write		{ out $header,"WD\$1%04X",$term;
+		  in  $header,"WD00",$term }
+writeDM16	{ out $header,"WD\$1%04X",$term;
+		  in  $header,"WD00",$term }
+
+# Write a 32-bit value
+writeDM32	{ out $header,"WD\$1%08X",$term;
+		  in  $header,"WD00",$term }
+
+# Return the PLC model number
+model		{ out $header,"MM",$term;
+		  in  $header,"MM00%2x", $term }
+
+# Return the current mode
+getmode		{ out $header,"MS",$term;
+		  in  $header,"MS00%2x%*2x", $term }
+
+# Change the current mode
+setmode		{ out $header,"SC%02X",$term;
+		  in  $header,"SC00", $term }
+
+# return and optionally clear the PLC error code
+error		{ out $header,"MF\$1",$term;
+		  in  $header,"MF00%8x",$term }
+
+# read a 16bit IO register
+readIO16	{ out $header,"RR\$10001",$term;
+		  in  $header,"RR00%4x", $term }
+
+# read a 32bit IO register
+readIO32	{ out $header,"RR\$10002",$term;
+		  in  $header,"RR00%8x", $term }
+
+# read a binary counter (would ideally like to add 2048 to $1, but have to do that by hand for now)
+counterhex	{ out $header,"RC\$10001",$term;
+		  in  $header,"RC00%4x", $term }
+
+# read a BCD decimal counter (would ideally like to add 2048 to $1, but have to do that by hand for now)
+counterdec	{ out $header,"RC\$10001",$term;
+		  in  $header,"RC00%4d", $term }
+
+# read a binary timer
+timerhex	{ out $header,"RC\$10001",$term;
+		  in  $header,"RC00%4x", $term }
+
+# read a BCD decimal timer
+timerdec	{ out $header,"RC\$10001",$term;
+		  in  $header,"RC00%4d", $term }
+
+# read 16bit auxilliary register
+readAR16	{ out $header,"RJ\$10001",$term; 
+		  in  $header,"RJ00%4x",$term }
+
+# read 32bit auxilliary register
+readAR32	{ out $header,"RJ\$10002",$term; 
+		  in  $header,"RJ00%8x",$term }
+
+# waveform version of multiple read
+readDMmulti	{ out $header,"RD\$1%(NELM)4.4d",$term;
+		  in  $header,"RD00%4x",$term }
+
+# Read 30 values
+readDM30	{ out $header,"RD\$10030",$term;
+		  in  $header,"RD00%4x",$term }
+
+# read an array of 10 words of data memory (into a string)
+#readDM10	{ out $header,"RD\$10010",$term;
+#		  in  $header,"RD00%39s%*1s",$term }
+
+# Version as calcout
+#readDM3	{ out $header,"RD\$10003",$term;
+#		  in  $header,"RD00%(A)4x%(B)4x%(C)4x",$term }
+# Version as calcout
+#readDM9	{ out $header,"RD\$10009",$term;
+#		  in  $header,"RD00%(A)4x%(B)4x%(C)4x%(D)4x%(E)4x%(F)4x%(G)4x%(H)4x%(I)4x",$term }
+
+# string version
+#readDM9		{ out $header,"RD\$10009",$term;
+#		  in  $header,"RD00%36c",$term }
+
+# Todo: implement as waveform
+# read an array of 10 words of IO memory (into a string)
+readIO10	{ out $header,"RR\$10010",$term;
+		  in  $header,"RR00%39s%*1s",$term }
+
+# Todo: implement as waveform
+# read an array of 10 words of data memory (into a string)
+readAR10	{ out $header,"RJ\$10010",$term;
+		  in  $header,"RJ00%39s%*1s",$term }
+
+# FINS message
+FINS		{ out $header,"FA000000000\$100",$term;
+		  in  $header,"FA00%*20s%38s%*2s",$term }
+
+# Abort a command - no response
+abort		{ out $header,"XZ",$term; }
+

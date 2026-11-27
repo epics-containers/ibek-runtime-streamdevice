@@ -18,6 +18,16 @@ values:
     read_int_floatE: {FPARAM: F, IPARAM: I}
     read_write_int_floatE: {FPARAM: F, IPARAM: I}
 
+# objects: for each `object` parameter, the entity model of the same pattern
+# whose entity it refers to, as {pattern: {entity_model: {parameter: model}}}.
+# An entity of that model is put in the IOC with the one that refers to it.
+objects:
+  granvillePhillips:
+    gp350Hcg: {GCTLR: gp350}
+    gp350Pirg: {GCTLR: gp350}
+    gp307Hcg: {GCTLR: gp307}
+    gp307Pirg: {GCTLR: gp307}
+
 # sim_values: macro values for templates in a pattern's sim/ folder, as
 # {pattern/sim/template: {macro: value}}. Each macro a sim template uses
 # without a default is otherwise set to "1".
