@@ -13,8 +13,6 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 | Entity model | Description |
 |---|---|
 | `leybold.center_one_gui` | The EDM screen link of a CenterOne gauge controller; creates no records (the DLS `centerOneGui.template` holds only a GUI annotation, so it is not imported) |
-| `leybold.centerN` | Imported from DLS module leybold (centerN.template) NOTE: needs a generic IOC built with leybold (not the plain generic image). |
-| `leybold.coolpak` | Imported from DLS module leybold (coolpak.template) NOTE: needs a generic IOC built with leybold (not the plain generic image). |
 | `leybold.read_floatE` | Imported from DLS module leybold (read_floatE.template) |
 | `leybold.read_float_float_float` | Imported from DLS module leybold (read_float_float_float.template) |
 | `leybold.read_int` | Imported from DLS module leybold (read_int.template) |
@@ -31,12 +29,6 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
-- `centerN.pvi.device.yaml`
-- `centerN.template`
-- `centerN_settings.req`
-- `coolpak.pvi.device.yaml`
-- `coolpak.template`
-- `coolpak_settings.req`
 - `leybold.ibek.support.yaml`
 - `leybold.proto`
 - `read_floatE.pvi.device.yaml`
@@ -82,15 +74,12 @@ model does not always validate here, or gets different values:
   output states blank.
 - `read_int_floatE`'s `HIGH`/`LOW`/`HIHI`/`LOLO` are strings here and floats there.
 
-## Needs more than the generic image
+## Not in this pattern
 
-These templates load only in a generic IOC built with the support they
-need; the others run in the generic `ioc-streamdevice` image. See
+The release's `centerN` and `coolpak` classes create their asyn port with the
+module's compiled `centerNConfig` and `coolpakConfig` commands, which no runtime image
+has, so their templates are not imported. See
 [_docs/BUILD-TIME-ONLY.md](../_docs/BUILD-TIME-ONLY.md).
-
-| Template(s) | Needs |
-|---|---|
-| `centerN.template`, `coolpak.template` | compiled asyn drivers (`centerNConfig`, `coolpakConfig`) |
 
 ## Upstream defects carried as-is
 

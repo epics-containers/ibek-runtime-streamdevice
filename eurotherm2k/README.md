@@ -18,12 +18,12 @@ it.
 | Entity model | Description |
 |---|---|
 | `eurotherm2k.eurotherm2k` | Eurotherm 2k temperature controller |
-| `eurotherm2k.eurothermParam` | Set and read back a parameter on a eurotherm 2k series controller |
-| `eurotherm2k.eurothermConfParam` | Generic database for setting a parameter on a eurotherm 2k series controller, works when it is in configure mode. |
-| `eurotherm2k.eurothermPV` | Read back a process value from a eurotherm 2k series controller |
-| `eurotherm2k.eurothermModbus` | Controls the eurotherm 2000 series temp controller via modbus interface NOTE: needs a generic IOC built with eurotherm2k (not the plain generic image). |
-| `eurotherm2k.eurothermModbusLoop` | Controls an individual channel of eurotherm, requires a eurothermModbus entry NOTE: needs a generic IOC built with eurotherm2k (not the plain generic image). |
-| `eurotherm2k.eurothermModbusPV` | Controls an individual channel of eurotherm, requires a eurothermModbus entry NOTE: needs a generic IOC built with eurotherm2k (not the plain generic image). |
+
+Only the StreamDevice `eurotherm2k` device is in this pattern. The release's
+`eurothermModbus`, `eurothermModbusLoop` and `eurothermModbusPV` classes need the
+compiled Modbus driver, and `eurothermParam.template`, `eurothermConfParam.template`
+and `eurothermPV.template` are loaded by no `builder.py` class, so none of them are
+here; see [_docs/BUILD-TIME-ONLY.md](../_docs/BUILD-TIME-ONLY.md).
 
 ## Files
 
@@ -35,19 +35,6 @@ instance's `config/`:
 - `eurotherm2k.pvi.device.yaml`
 - `eurotherm2k.template`
 - `eurotherm2k_settings.req`
-- `eurothermConfParam.pvi.device.yaml`
-- `eurothermConfParam.template`
-- `eurothermModbus.pvi.device.yaml`
-- `eurothermModbus.template`
-- `eurothermModbusLoop.pvi.device.yaml`
-- `eurothermModbusLoop.template`
-- `eurothermModbusLoop_settings.req`
-- `eurothermModbusPV.pvi.device.yaml`
-- `eurothermModbusPV.template`
-- `eurothermPV.pvi.device.yaml`
-- `eurothermPV.template`
-- `eurothermParam.pvi.device.yaml`
-- `eurothermParam.template`
 
 Everything else in this folder stays in the library and is never vendored:
 
@@ -55,13 +42,3 @@ Everything else in this folder stays in the library and is never vendored:
 - `docs/` - documentation from the DLS source release (3 files)
 - `sim/` - device simulator from the DLS source release (1 file)
 - `test/` - device tests from the DLS source release (1 file)
-
-## Needs more than the generic image
-
-These templates load only in a generic IOC built with the support they
-need; the others run in the generic `ioc-streamdevice` image. See
-[_docs/BUILD-TIME-ONLY.md](../_docs/BUILD-TIME-ONLY.md).
-
-| Template(s) | Needs |
-|---|---|
-| `eurothermModbus.template`, `eurothermModbusLoop.template`, `eurothermModbusPV.template` | compiled Modbus asyn driver (`drvModbusAsynConfigure`, `eurothermModbusCtrlConfigure`) |
