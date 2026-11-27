@@ -126,8 +126,8 @@ support yaml header and entity model description.
 | `eurotherm2k` | `eurothermModbus.template`, `eurothermModbusLoop.template`, `eurothermModbusPV.template` | compiled Modbus asyn driver (`drvModbusAsynConfigure`, `eurothermModbusCtrlConfigure`) |
 | `leybold` | `centerN.template`, `coolpak.template` | compiled asyn drivers (`centerNConfig`, `coolpakConfig`) |
 | `microlab500` | `microlab500whole.template` | the motor record |
-| `mks937a` | `mks937aGauge.template`, `mks937aImgMean.template` | `DTYP "$(aitype=Hy8401ip)"`; compiled aSub routines `mks937aMeanInit`, `mks937aMeanCalc` |
-| `mks937b` | `mks937bHy8401.template`, `mks937bImgMean.template` | `DTYP "Hy8401ip"`; compiled aSub routines `mks937bMeanInit`, `mks937bMeanCalc` |
+| `mks937a` | `mks937aGauge.template` | `DTYP "$(aitype=Hy8401ip)"` (Hytec IP ADC, e.g. an RTEMS/VME IOC); runs in the generic image with `aitype` `Soft Channel` |
+| `mks937b` | `mks937bHy8401.template` | `DTYP "Hy8401ip"` (Hytec IP ADC, e.g. an RTEMS/VME IOC) |
 | `strainGauge` | `strainGauge.template` | compiled aSub routine `parseSetpointValue` |
 | `yaskawaBARTRobot` | `BARTRobot.db` | compiled aSub routines `DecToAsc`, `GripperState`; compiled FINS asyn driver |
 | `currAmp` | `currAmp_ai.template` | `DTYP` is the instance-supplied `$(DTYPE)`, so an instance can name device support the image lacks |

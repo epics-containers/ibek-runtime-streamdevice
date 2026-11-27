@@ -107,6 +107,30 @@ def entity_for(
     return entity
 
 
+def in_reference_order(entities: list[dict]) -> list[dict]:
+    """``entities``, each after the entities whose ids it names, as ibek requires."""
+    by_id = {
+        value: e
+        for e in entities
+        for key, value in e.items()
+        if value == id_value(e["type"].split(".", 1)[1], key)
+    }
+    ordered: list[dict] = []
+
+    def visit(entity: dict) -> None:
+        if any(entity is e for e in ordered):
+            return
+        for value in entity.values():
+            target = by_id.get(value) if isinstance(value, str) else None
+            if target is not None and target is not entity:
+                visit(target)
+        ordered.append(entity)
+
+    for entity in entities:
+        visit(entity)
+    return ordered
+
+
 def placeholder(name: str, spec: dict) -> object:
     kind = spec.get("type")
     if kind == "enum":
@@ -247,10 +271,15 @@ def prepare(out: Path, names: list[str]) -> int:
     yaml = YAML(typ="safe")
     config = yaml.load(CONFIG_FILE) or {}
     values = config.get("values") or {}
-    xfail = {
-        f"{entry['pattern']}/{entry['template']}": entry["reason"]
-        for entry in config.get("xfail") or []
-    }
+    # an entry naming an entity model applies to that model's cases only
+    xfail: dict[str, str] = {}
+    xfail_entity: dict[tuple[str, str], str] = {}
+    for entry in config.get("xfail") or []:
+        key = f"{entry['pattern']}/{entry['template']}"
+        if entry.get("entity"):
+            xfail_entity[key, entry["entity"]] = entry["reason"]
+        else:
+            xfail[key] = entry["reason"]
     known: dict[str, list[str]] = {}
     for entry in config.get("known_errors") or []:
         known.setdefault(f"{entry['pattern']}/{entry['template']}", []).append(
@@ -345,7 +374,8 @@ def prepare(out: Path, names: list[str]) -> int:
                     template,
                     block,
                     pvs,
-                    xfail.get(key),
+                    xfail_entity.get((key, entity["type"].split(".", 1)[1]))
+                    or xfail.get(key),
                     known.get(key, []),
                 )
         # sim/ templates are not vendored; each loads on its own in a plain IOC.
@@ -370,7 +400,7 @@ def prepare(out: Path, names: list[str]) -> int:
             reached.add(key)
         # An IOC instance may use every entity model of a pattern at once.
         try:
-            generate(cfg, work / "runtime-all", supports, entities)
+            generate(cfg, work / "runtime-all", supports, in_reference_order(entities))
             if pattern.name in together_xfail:
                 print(
                     f"FAIL {pattern.name}: listed under generate_together_xfail in "
@@ -414,7 +444,11 @@ def prepare(out: Path, names: list[str]) -> int:
                 f"FAIL stale sim_values entry in {CONFIG_FILE.name}: no sim template {key}"
             )
             failures += 1
-    stale = {key for key in xfail if key.split("/")[0] in selected} - reached
+    stale = {
+        key
+        for key in [*xfail, *(key for key, _ in xfail_entity)]
+        if key.split("/")[0] in selected
+    } - reached
     for key in sorted(stale):
         print(
             f"FAIL stale xfail entry in {CONFIG_FILE.name}: "
