@@ -108,3 +108,7 @@ gauges, then write `:STA`, `:P`, `:PMAX` and `:PMIN` every scan, as the aSub did
 results match `mks937bMeanCalc` exactly, including a bit-identical mean. Archived
 `MEAN` remains; its value is 0, as the aSub's was. The aSub's `VALA`-`VALD` fields
 are gone.
+
+One difference from the aSub: if a gauge's input link fails (for example a
+disconnected PV from another IOC), the aSub froze all four outputs, while here only
+that gauge's `MEAN:G<n>` keeps its last value and the outputs carry on updating.

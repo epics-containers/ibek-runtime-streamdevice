@@ -1,6 +1,9 @@
 # mks937bImgMean.template
 # Translated from mks937b 2-98 db/mks937bImgMean.template: aSub mks937bMeanCalc
-# replaced by base calc records; behaviour identical.
+# replaced by base calc records. Same values, written every scan as the aSub did.
+# One difference: if a gauge's input link fails (e.g. a disconnected PV from
+# another IOC), the aSub froze all four outputs; here only that gauge's
+# MEAN:G<n> keeps its last value and the mean carries on.
 #% macro, __doc__, Template database to calculate the mean pressure from a 
 # number of IMGs
 # Pete Owens - 26/6/06

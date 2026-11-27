@@ -95,3 +95,7 @@ them only when no gauge was good, because `mks937aMeanCalc` returns the number o
 good gauges and the aSub record takes a non-zero return as failure; this follows
 `mks937b`, whose routine returns 0. Archived `MEAN` remains, with value 0 (2-97's
 was the number of good gauges). The aSub's `VALA`-`VALD` fields are gone.
+
+One difference from the aSub: if a gauge's input link fails (for example a
+disconnected PV from another IOC), the aSub froze all four outputs, while here only
+that gauge's `MEAN:G<n>` keeps its last value and the outputs carry on updating.

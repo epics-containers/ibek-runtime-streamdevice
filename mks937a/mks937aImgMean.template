@@ -4,6 +4,9 @@
 # written every scan. 2-97's mks937aMeanCalc returns the number of good gauges,
 # which the aSub record takes as failure, so 2-97 wrote its outputs only when no
 # gauge was good. mks937b's mks937bMeanCalc returns 0, and this follows it.
+# One difference: if a gauge's input link fails (e.g. a disconnected PV from
+# another IOC), the aSub froze all four outputs; here only that gauge's
+# MEAN:G<n> keeps its last value and the mean carries on.
 #% macro, __doc__, Template database to calculate the mean pressure from a 
 # number of IMGs
 # Pete Owens - 26/6/06
