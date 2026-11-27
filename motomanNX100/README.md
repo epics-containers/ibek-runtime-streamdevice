@@ -11,13 +11,20 @@ it.
 
 ## Entity models
 
+The models are ibek-support-dls's `motomanNX100` models, but for its two BL11I ones
+(see below), with `PORT` a string as in `builder.py`.
+
 | Entity model | Description |
 |---|---|
-| `motomanNX100.nx100` | Imported from DLS module motomanNX100 (nx100.template) |
-| `motomanNX100.nx100dvar` | Imported from DLS module motomanNX100 (nx100dvar.template) |
-| `motomanNX100.nx100io` | Imported from DLS module motomanNX100 (nx100io.template) |
-| `motomanNX100.nx100pvar` | Imported from DLS module motomanNX100 (nx100pvar.template) |
-| `motomanNX100.auto_nx100io` | `nx100io` under the name XMLbuilder gives it, for converted builder IOCs |
+| `motomanNX100.nx100` | Setup a motoman NX100 motor controller for use with EPICS |
+| `motomanNX100.nx100dvar` | Set and Read a D (decimal) variable on the robot |
+| `motomanNX100.nx100pvar` | Set and Read a P (position) variable on the robot |
+| `motomanNX100.auto_nx100io` | Reads digital I/O variables from the robot (`nx100io.template`, under the name XMLbuilder gives it) |
+| `motomanNX100.nx100io` | The same as `auto_nx100io` |
+
+The release's `BL11I-barcode.db` and `BL11I-robot-interlocks.db` (builder's
+`auto_BL11I_barcode` and `auto_BL11I_robot_interlocks`) serve one beamline. They belong
+in a BL11I pattern of ibek-runtime-support, not here.
 
 ## Files
 

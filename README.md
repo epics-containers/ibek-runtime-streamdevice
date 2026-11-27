@@ -276,12 +276,13 @@ You then reference the entity in `config/ioc.yaml` (the entity type is
 ```yaml
 entities:
   - type: lakeshore340.lakeshore340
+    name: ls340
     P: BL01T-EA-TEST-01
     PORT: p1
     ADDR: 12
     LOOP: 2
-    SCAN: 5
-    TEMPSCAN: 2
+    SCAN: "5"
+    TEMPSCAN: ".5"
 ```
 
 The resulting `runtime-lock.yaml` looks like:

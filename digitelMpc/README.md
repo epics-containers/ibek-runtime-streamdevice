@@ -10,29 +10,31 @@ with the pattern, so the provenance travels into every IOC instance that uses it
 
 ## Entity models
 
+The models are ibek-support's `digitelMpc` models, which mirror the DLS `builder.py`:
+`digitelMpc` has an id (`name`) and takes its asyn `port` as an object, and
+`digitelMpcIonp` takes its controller as `MPC`, from which it reads `port`, `unit` and
+`proto`.
+
 | Entity model | Description |
 |---|---|
-| `digitelMpc._digitelMpcTemplate` | Template database for digitel MPC - Controller |
-| `digitelMpc.digitelMpc` | digitel MPC Controller (multi-drop serial vacuum pump controller). |
+| `digitelMpc.digitelMpc` | digitel MPC controller/head unit |
+| `digitelMpc.digitelMpcIonp` | Template database for digitel MPC - Ion Pump, on the controller `MPC` |
 | `digitelMpc.digitelMpcTsp` | Template database for digitel MPC - Titanium Sublimation Pump |
 | `digitelMpc.digitelMpcqTsp` | Template database for digitel MPCq - Titanium Sublimation Pump |
-| `digitelMpc._digitelMpcIonpTemplate` | Template database for digitel MPC - Ion Pump |
-| `digitelMpc.digitelMpcIonp` | Template database for digitel MPC - Ion Pump |
 | `digitelMpc.digitelMpcIonpGroup` | Template database for a group of up to 8 digitel MPC Ion Pumps |
 | `digitelMpc.digitelMpcTspGroup` | Template database for a group of up to 8 digitel MPC TSPs |
 | `digitelMpc.dummyIonp` | Template database for dummy Ion Pump. |
-| `digitelMpc.digitelMpcIonpSps` | Imported from DLS module digitelMpc (digitelMpcIonpSps.template) |
-| `digitelMpc.digitelMpcTspDummy` | Template dummy records for digitel MPC - Titanium Sublimation Pump |
+| `digitelMpc.digitelMpcIonpSps` | Ion pump setpoint records (`digitelMpcIonpSps.template`; no `builder.py` class) |
+| `digitelMpc.digitelMpcTspDummy` | Template dummy records for digitel MPC - Titanium Sublimation Pump (no `builder.py` class) |
 
 ## Files
 
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
-- `_digitelMpcIonpTemplate.pvi.device.yaml`
-- `_digitelMpcTemplate.pvi.device.yaml`
 - `digitelMpc.ibek.support.yaml`
 - `digitelMpc.proto`
+- `digitelMpc.pvi.device.yaml`
 - `digitelMpc.template`
 - `digitelMpcIonp.pvi.device.yaml`
 - `digitelMpcIonp.template`

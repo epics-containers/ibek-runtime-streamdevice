@@ -12,410 +12,444 @@
 # `simulation_digitelMpc.template` and `simulation_digitelMpcTsp.template` have no
 # such routine and are imported into sim/.
 #
-# `digitelMpcIonp`'s `databases.args` excludes its `MPC` parameter by name (see the
-# comment there): `_digitelMpcIonpTemplate` loads the same digitelMpcIonp.template
-# with `.*`, and an instance holding one of each entity needs both to pass identical
-# args so ibek writes one ioc.subst block for the file.
+# ibek-support builds the compiled module from release 6-23ec1 instead (GitHub).
+# Its templates match these but for the stripped `# % gui` annotations.
+#
+# Entity models: those of ibek-support's digitelMpc (epics-containers/ibek-support
+# ced7c8e, digitelMpc/digitelMpc.ibek.support.yaml), which mirror the DLS
+# builder.py: digitelMpc takes `name` (its id) and its asyn `port` as an object,
+# and digitelMpcIonp takes the controller as `MPC`, reading port, unit and
+# proto from it, as builder.py does. An IOC converted by builder2ibek for the
+# compiled module therefore loads this pattern unchanged. Their databases point
+# at this pattern's own templates, and their pvi: blocks are generate-pvi.py's.
+#
+# Added to those models: digitelMpcIonpSps and digitelMpcTspDummy, for two
+# templates of the release that builder.py has no class for.
 
 module: digitelMpc
 
 entity_models:
-  - name: _digitelMpcTemplate
-    description: |-
-      Template database for digitel MPC - Controller
-    parameters:
-      device:
-        type: str
-        description: |-
-          device name
-      port:
-        type: str
-        description: |-
-          asyn serial port number
-      unit:
-        type: str
-        description: |-
-          unit number for multi-drop serial
-        default: "01"
-      proto:
-        type: str
-        description: |-
-          StreamDevice Protocol definition file. Defaults to digitelMpc.proto
-        default: digitelMpc.proto
-    databases:
-      - file: digitelMpc.template
-        args:
-          .*:
-    pvi:
-      yaml_path: _digitelMpcTemplate.pvi.device.yaml
-      ui_macros:
-        device:
   - name: digitelMpc
     description: |-
-      digitel MPC Controller (multi-drop serial vacuum pump controller).
+      digitel MPC controller/head unit
     parameters:
+      name:
+        type: id
+        description: |-
+          Gui tag
+
       device:
         type: str
         description: |-
           Device name
+
       port:
-        type: str
+        type: object
         description: |-
-          Asyn port
+          Asyn port object
+
       unit:
-        type: str
+        type: enum
         description: |-
           Unit number for multi drop serial
         default: "01"
+        values: &id001
+          "21":
+          "12":
+          "04":
+          "27":
+          "08":
+          "23":
+          "31":
+          "18":
+          "29":
+          "14":
+          "02":
+          "10":
+          "06":
+          "25":
+          "16":
+          "32":
+          "20":
+          "05":
+          "13":
+          "30":
+          "22":
+          "19":
+          "09":
+          "28":
+          "17":
+          "03":
+          "15":
+          "26":
+          "07":
+          "11":
+          "24":
+          "01":
       proto:
+        type: enum
+        description: |-
+          Protocol file to use
+        default: digitelMpc.proto
+        values:
+          digitelMpc.proto:
+          digitelMpcq.proto:
+    databases:
+      - file: digitelMpc.template
+        args: { device: null, port: null, unit: null, proto: null }
+    pvi:
+      yaml_path: digitelMpc.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: digitelMpcIonp
+    description: |-
+      Template database for digitel MPC - Ion Pump
+      Pete Owens - 30/9/03
+    parameters:
+      MPC:
+        type: object
+        description: |-
+          digitelMPC object
+
+      proto:
+        type: enum
+        description: |-
+          Protocol file to use
+        values:
+          digitelMpc.proto:
+          digitelMpcq.proto:
+        default: digitelMpc.proto
+
+      device:
+        type: id
+        description: |-
+          device name
+
+      pump:
+        type: int
+        description: |-
+          ion pump number (1 or 2)
+
+      size:
+        type: int
+        description: |-
+          pump size (l/s)
+
+      # - type: id
+      #   name: name
+      #   description: |-
+      #     Object name and gui association name
+
+      sp1on:
+        type: float
+        description: |-
+          setpoint1 on
+        default: 1e-07
+
+      sp1off:
+        type: float
+        description: |-
+          setpoint1 off
+        default: 2e-07
+
+      sp2on:
+        type: float
+        description: |-
+          setpoint2 on
+        default: 1e-07
+
+      sp2off:
+        type: float
+        description: |-
+          setpoint2 off
+        default: 2e-07
+
+      alh:
         type: str
         description: |-
-          Protocol file to use (digitelMpc.proto or digitelMpcq.proto)
-        default: digitelMpc.proto
+          alarm handler tag (Defaults to None) c.f. mp49's commit 80833
+        default: None
+
+      text:
+        type: str
+        description: |-
+          Text to display in the ion pump controller window.
+        default: $(device)
+
+      disptext:
+        type: str
+        description: |-
+          Template argument
+        default: $(device)
+
+    databases:
+      - file: digitelMpcIonp.template
+        args: { device: null, port: "{{MPC.port}}", unit: "{{MPC.unit}}", pump: null, size: null, sp1on: null, sp1off: null, sp2on: null, sp2off: null, alh: null, text: null, proto: "{{MPC.proto}}", disptext: null }
+    pvi:
+      yaml_path: digitelMpcIonp.pvi.device.yaml
+      ui_macros:
+        device:
+
   - name: digitelMpcTsp
     description: |-
       Template database for digitel MPC - Titanium Sublimation Pump
+      Pete Owens - 13/10/03
     parameters:
       device:
-        type: str
+        type: id
         description: |-
           device name
+
       port:
         type: str
         description: |-
           asyn seral port number (e.g. ty_40_0)
+
       unit:
-        type: str
+        type: enum
         description: |-
-          unit number for multi-drop serial
+          Unit number for multi drop serial
+        default: "01"
+        values: *id001
       ctlsrc:
         type: int
         description: |-
           control source (0 = service, 1 = Ion Pump 1, 2 = Ion Pump 2)
+
+      # - type: id
+      #   name: name
+      #   description: |-
+      #     Object name and gui association name
+
       protocol:
         type: str
         description: |-
           name of protocol file, either digitelMpc.proto or digitelMpcDual.proto
         default: digitelMpc.proto
+
       totmax:
         type: int
         description: |-
           cycle max off time (default 600 mins)
         default: 600
+
       tcmax:
         type: int
         description: |-
-          max number of cycles (default 20)
+          duration- On duration (s)       - new addition May 2010 for dual TSP systems on MPCe - defaults to 10
         default: 20
+
     databases:
       - file: digitelMpcTsp.template
-        args:
-          .*:
+        args: { device: null, port: null, unit: null, ctlsrc: null, protocol: null, totmax: null, tcmax: null }
     pvi:
       yaml_path: digitelMpcTsp.pvi.device.yaml
       ui_macros:
         device:
+
   - name: digitelMpcqTsp
     description: |-
       Template database for digitel MPCq - Titanium Sublimation Pump
+      Pete Owens - January 2020
     parameters:
       device:
-        type: str
+        type: id
         description: |-
           device name
+
       port:
         type: str
         description: |-
           asyn seral port number (e.g. ty_40_0)
+
       unit:
-        type: str
+        type: enum
         description: |-
-          unit number for multi-drop serial
+          Unit number for multi drop serial
+        default: "01"
+        values: *id001
       ctlsrc:
         type: int
         description: |-
           control source (0 = service, 1 = Ion Pump 1, 2 = Ion Pump 2)
+
       protocol:
         type: str
         description: |-
           name of protocol file, either digitelMpcq.proto or digitelMpcDual.proto
         default: digitelMpcq.proto
+
       totmax:
         type: int
         description: |-
           cycle max off time (default 600 mins)
         default: 600
+
       tcmax:
         type: int
         description: |-
-          max number of cycles (default 20)
+          duration- On duration (s) - dual TSP systems on MPCe/q - defaults to 10
         default: 20
+
     databases:
       - file: digitelMpcqTsp.template
         args:
-          .*:
+          totmax:
+          protocol:
+          tcmax:
+          device:
+          ctlsrc:
+          port:
+          unit:
     pvi:
       yaml_path: digitelMpcqTsp.pvi.device.yaml
       ui_macros:
         device:
-  - name: _digitelMpcIonpTemplate
-    description: |-
-      Template database for digitel MPC - Ion Pump
-    parameters:
-      device:
-        type: str
-        description: |-
-          device name
-      port:
-        type: str
-        description: |-
-          asyn serial port number
-      unit:
-        type: str
-        description: |-
-          unit number for multi-drop serial (2 hex digits - 05 by default)
-        default: "05"
-      pump:
-        type: int
-        description: |-
-          ion pump number (1 or 2)
-      size:
-        type: float
-        description: |-
-          pump size (l/s)
-      sp1on:
-        type: float
-        description: |-
-          setpoint1 on
-        default: 1.0e-7
-      sp1off:
-        type: float
-        description: |-
-          setpoint1 off
-        default: 2.0e-7
-      sp2on:
-        type: float
-        description: |-
-          setpoint2 on
-        default: 1.0e-7
-      sp2off:
-        type: float
-        description: |-
-          setpoint2 off
-        default: 2.0e-7
-      alh:
-        type: str
-        description: |-
-          alarm handler tag (Defaults to None)
-        default: None
-      text:
-        type: str
-        description: |-
-          Text to display in the ion pump controller window.
-        default: $(device)
-      proto:
-        type: str
-        description: |-
-          StreamDevice Protocol definition file. Defaults to digitelMpc.proto
-        default: digitelMpc.proto
-    databases:
-      - file: digitelMpcIonp.template
-        args:
-          .*:
-    pvi:
-      yaml_path: _digitelMpcIonpTemplate.pvi.device.yaml
-      ui_macros:
-        device:
-  - name: digitelMpcIonp
-    description: |-
-      Template database for digitel MPC - Ion Pump
-    parameters:
-      MPC:
-        type: str
-        description: |-
-          digitelMPC object
-      port:
-        type: str
-        description: |-
-          asyn serial port number
-      unit:
-        type: str
-        description: |-
-          unit number for multi-drop serial (2 hex digits - 05 by default)
-        default: "05"
-      proto:
-        type: str
-        description: |-
-          StreamDevice Protocol definition file. Defaults to digitelMpc.proto
-        default: digitelMpc.proto
-      device:
-        type: str
-        description: |-
-          device name
-      pump:
-        type: int
-        description: |-
-          ion pump number (1 or 2)
-      size:
-        type: float
-        description: |-
-          pump size (l/s)
-      sp1on:
-        type: float
-        description: |-
-          setpoint1 on
-        default: 1.0e-7
-      sp1off:
-        type: float
-        description: |-
-          setpoint1 off
-        default: 2.0e-7
-      sp2on:
-        type: float
-        description: |-
-          setpoint2 on
-        default: 1.0e-7
-      sp2off:
-        type: float
-        description: |-
-          setpoint2 off
-        default: 2.0e-7
-      alh:
-        type: str
-        description: |-
-          alarm handler tag (Defaults to None)
-        default: None
-      text:
-        type: str
-        description: |-
-          Text to display in the ion pump controller window.
-        default: $(device)
-    databases:
-      - file: digitelMpcIonp.template
-        # MPC is a parameter of this entity (the digitelMpc controller object
-        # reference) but is not a digitelMpcIonp.template macro. Excluding it
-        # by name, rather than matching every parameter with `.*`, keeps this
-        # entity's arg set identical to _digitelMpcIonpTemplate's, which
-        # shares the same template file and does use `.*` - both entities
-        # then land in the same ioc.subst block.
-        args:
-          (?!MPC$).*:
-    pvi:
-      yaml_path: digitelMpcIonp.pvi.device.yaml
-      ui_macros:
-        device:
+
   - name: digitelMpcIonpGroup
     description: |-
       Template database for a group of up to 8 digitel MPC Ion Pumps
+      Pete Owens - 3/5/05
     parameters:
       device:
         type: str
         description: |-
           device name
+
       delay:
         type: int
         description: |-
           delay between starting pumps
+
       ionp1:
         type: str
         description: |-
           Ion pump 1 device name
+
       ionp2:
         type: str
         description: |-
           Ion pump 2 device name
+
       ionp3:
         type: str
         description: |-
           Ion pump 3 device name
+
       ionp4:
         type: str
         description: |-
           Ion pump 4 device name
+
       ionp5:
         type: str
         description: |-
           Ion pump 5 device name
+
       ionp6:
         type: str
         description: |-
           Ion pump 6 device name
+
       ionp7:
         type: str
         description: |-
           Ion pump 7 device name
+
       ionp8:
         type: str
         description: |-
           Ion pump 8 device name
+
     databases:
       - file: digitelMpcIonpGroup.template
-        args:
-          .*:
+        args: { device: null, delay: null, ionp1: null, ionp2: null, ionp3: null, ionp4: null, ionp5: null, ionp6: null, ionp7: null, ionp8: null }
     pvi:
       yaml_path: digitelMpcIonpGroup.pvi.device.yaml
       ui_macros:
         device:
+
   - name: digitelMpcTspGroup
     description: |-
       Template database for a group of up to 8 digitel MPC TSPs
+      Pete Owens - 11/4/05
     parameters:
       device:
         type: str
         description: |-
           device name
+
       tsp1:
         type: str
         description: |-
           TSP 1 device name
+
       tsp2:
         type: str
         description: |-
           TSP 2 device name
+        default: "{{tsp1}}"
+
       tsp3:
         type: str
         description: |-
           TSP 3 device name
+        default: "{{tsp1}}"
+
       tsp4:
         type: str
         description: |-
           TSP 4 device name
+        default: "{{tsp1}}"
+
       tsp5:
         type: str
         description: |-
           TSP 5 device name
+        default: "{{tsp1}}"
+
       tsp6:
         type: str
         description: |-
           TSP 6 device name
+        default: "{{tsp1}}"
+
       tsp7:
         type: str
         description: |-
           TSP 7 device name
+        default: "{{tsp1}}"
+
       tsp8:
         type: str
         description: |-
           TSP 8 device name
+        default: "{{tsp1}}"
+
     databases:
       - file: digitelMpcTspGroup.template
-        args:
-          .*:
+        args: { device: null, tsp1: null, tsp2: null, tsp3: null, tsp4: null, tsp5: null, tsp6: null, tsp7: null, tsp8: null }
     pvi:
       yaml_path: digitelMpcTspGroup.pvi.device.yaml
       ui_macros:
         device:
+
   - name: dummyIonp
     description: |-
       Template database for dummy Ion Pump.
+      Just holds start, starting and status
+      Malcolm Walters - 02/08/2006
     parameters:
       device:
-        type: str
+        type: id
         description: |-
           device name
+
     databases:
       - file: dummyIonp.template
         args:
-          .*:
+          device:
     pvi:
       yaml_path: dummyIonp.pvi.device.yaml
       ui_macros:
