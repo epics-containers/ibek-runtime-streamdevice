@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.8.0-beta.2/ibek.support.schema.json
+
+# Imported from DLS production support module: lakeshore336 2-19-1
+# Source: /dls_sw/prod/R3.14.12.7/support/lakeshore336/2-19-1
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release,
+# except lakeshore336-FirmwareVersion.template (below).
+# To check for updates: diff this pattern's files against that path, or against the
+# newest /dls_sw/prod/*/support/lakeshore336/ release.
+#
+# Derived: lakeshore336-FirmwareVersion.template, which lakeshore336.template
+# includes. Its aSub $(P):FIRMWARE:CALC called the compiled routine
+# extractFirmwareVersion (lakeshore336App/src/ls336AsubFn.c), the module's only
+# compiled code: the text after the last comma of the *IDN? reply in $(P):ID, or
+# "not available" unless the reply holds "MODEL336" and a comma. It is replaced by
+# a calc-module scalcout of the same name that writes the same string to
+# $(P):FIRMWARE:VERSION; the template's comments say how. No template needs the
+# compiled lakeshore336 library.
+#
+# Entity models: that of ibek-support's lakeshore336 (epics-containers/ibek-support
+# 7ec6933, lakeshore336/lakeshore336.ibek.support.yaml), which mirrors the DLS
+# builder.py, so an IOC converted by builder2ibek for the compiled module loads this
+# pattern unchanged. PORT is a str here rather than an object, as in every pattern of
+# this library: the value is the same asyn port name. The databases entry points at
+# this pattern's own template, and the pvi: block is generate-pvi.py's. DESC and
+# lakeshore336Path were used only by the stripped `# % gui` annotations; they are
+# kept as parameters because the builder XML sets them.
+
+module: lakeshore336
+
+entity_models:
+  - name: lakeshore336
+    description: |-
+      Lakeshore 336 temperature controller.
+      Loads lakeshore336.template which provides temperature/voltage readings
+      for 4 input channels (A-D), control for 4 output channels, identification,
+      and disable/enable functionality via StreamDevice protocol.
+    parameters:
+      PORT:
+        type: str
+        description: |-
+          Asyn port for StreamDevice communication.
+          Must match a companion asyn.AsynIP entity.
+      P:
+        type: str
+        description: PV prefix, e.g. "BL01T-EA-LSHORE-01"
+      ADDR:
+        type: int
+        description: Address on the bus.
+      TEMPSCAN:
+        type: str
+        description: SCAN rate for the temperature/voltage readings.
+      SCAN:
+        type: str
+        description: SCAN rate for non-temperature/voltage parameters.
+      DESC:
+        type: str
+        description: Lakeshore336 controller description (GUI only).
+        default: ""
+      DISABLED:
+        type: int
+        description: Disabled by default? 0=enabled, 1=disabled.
+        default: 0
+      lakeshore336Path:
+        type: str
+        description: Path to lakeshore336 documentation directory.
+        default: ""
+      Description:
+        type: str
+        description: Main use of this device.
+        default: Temperature Controller
+      CH0_label:
+        type: str
+        description: Label for channel 0.
+        default: Channel 0
+      CH1_label:
+        type: str
+        description: Label for channel 1.
+        default: Channel 1
+      CH2_label:
+        type: str
+        description: Label for channel 2.
+        default: Channel 2
+      CH3_label:
+        type: str
+        description: Label for channel 3.
+        default: Channel 3
+      OUT1_label:
+        type: str
+        description: Label for output channel 1 control.
+        default: Output 1 Control
+      OUT2_label:
+        type: str
+        description: Label for output channel 2 control.
+        default: Output 2 Control
+      OUT3_label:
+        type: str
+        description: Label for output channel 3 control.
+        default: Output 3 Control
+      OUT4_label:
+        type: str
+        description: Label for output channel 4 control.
+        default: Output 4 Control
+
+    databases:
+      - file: lakeshore336.template
+        args:
+          .*:
+    pvi:
+      yaml_path: lakeshore336.pvi.device.yaml
+      ui_macros:
+        P:
