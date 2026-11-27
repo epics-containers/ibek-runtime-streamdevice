@@ -1,0 +1,17 @@
+# A stand-in for the asyn.AsynIP entity model of the generic image, for the
+# entities of a pattern whose port parameter is an object, as builder.py's
+# Ident of an AsynIP is. It holds only what such a reference needs: the id.
+# The template-load IOC configures an asyn IP port for each port the records
+# name.
+
+module: asyn
+
+entity_models:
+  - name: AsynIP
+    description: |-
+      Asyn IP port (CI stand-in)
+    parameters:
+      name:
+        type: id
+        description: |-
+          Identifying port name
