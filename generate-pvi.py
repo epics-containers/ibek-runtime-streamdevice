@@ -1109,9 +1109,22 @@ def process_pattern(
             parser = Parser(pattern, annotations)
             args: dict = {}
             commands: list = []
+            files = [db["file"] for db in dbs]
             for db in dbs:
-                parser.parse(db["file"])
-                args.update(db.get("args") or {})
+                db_args = db.get("args") or {}
+                if files.count(db["file"]) > 1:
+                    # a template loaded once per channel: its literal args
+                    # (e.g. CHAN: "0") tell the loads' records apart
+                    literal = {
+                        k: str(v)
+                        for k, v in db_args.items()
+                        if v is not None and "{" not in str(v)
+                    }
+                    parser.parse(db["file"], literal)
+                    db_args = {k: v for k, v in db_args.items() if k not in literal}
+                else:
+                    parser.parse(db["file"])
+                args.update(db_args)
                 commands += annotations.get((db["file"], "commands"), [])
             records = parser.records
             if not records:

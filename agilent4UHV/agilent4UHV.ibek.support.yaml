@@ -6,66 +6,21 @@
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/agilent4UHV/ release.
 #
-# `agilent4UHVIonp`'s `databases.args` excludes its `CTLR` parameter by name (see the
-# comment there): `_agilent4UHVIonpTemplate` loads the same agilent4UHVIonp.template
-# with `.*`, and an instance holding one of each entity needs both to pass identical
-# args so ibek writes one ioc.subst block for the file.
+# The entity models mirror that release's etc/builder.py: builder class names,
+# parameters named as the builder XML attributes, Ident arguments as object
+# references, and the arguments builder.py derives done in Jinja.
 
 module: agilent4UHV
 
 entity_models:
-  - name: _agilent4UHVTemplate
-    description: |-
-      Agilent 4UHV Ion Pump Controller (controller-level template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          device name
-      port:
-        type: str
-        description: |-
-          asyn serial port number
-      pump:
-        type: int
-        description: |-
-          Controller pumpnel
-    databases:
-      - file: agilent4UHV.template
-        args:
-          .*:
-    pvi:
-      yaml_path: _agilent4UHVTemplate.pvi.device.yaml
-      ui_macros:
-        device:
-  - name: _agilent4UHVIonpTemplate
-    description: |-
-      Agilent 4UHV Ion Pump Controller (per-pump template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          device name
-      port:
-        type: str
-        description: |-
-          asyn serial port number
-      pump:
-        type: int
-        description: |-
-          Controller pumpnel
-    databases:
-      - file: agilent4UHVIonp.template
-        args:
-          .*:
-    pvi:
-      yaml_path: _agilent4UHVIonpTemplate.pvi.device.yaml
-      ui_macros:
-        device:
   - name: agilent4UHV
     description: |-
       Agilent 4UHV Ion Pump Controller
     parameters:
+      name:
+        type: id
+        description: |-
+          Gui tag; the object name, for the CTLR of each agilent4UHVIonp
       device:
         type: str
         description: |-
@@ -74,18 +29,24 @@ entity_models:
         type: str
         description: |-
           Asyn port
+    databases:
+      - file: agilent4UHV.template
+        args:
+          device:
+          port:
+    pvi:
+      yaml_path: agilent4UHV.pvi.device.yaml
+      ui_macros:
+        device:
+
   - name: agilent4UHVIonp
     description: |-
       Agilent 4UHV Ion Pump Controller (per-pump device)
     parameters:
       CTLR:
-        type: str
+        type: object
         description: |-
           agilent4 object
-      port:
-        type: str
-        description: |-
-          asyn serial port number
       device:
         type: str
         description: |-
@@ -96,15 +57,10 @@ entity_models:
           Controller pumpnel
     databases:
       - file: agilent4UHVIonp.template
-        # CTLR is a parameter of this entity (the agilent4UHV controller
-        # object reference) but is not an agilent4UHVIonp.template macro.
-        # Excluding it by name, rather than matching every parameter with
-        # `.*`, keeps this entity's arg set identical to
-        # _agilent4UHVIonpTemplate's, which shares the same template file
-        # and does use `.*` - both entities then land in the same
-        # ioc.subst block.
         args:
-          (?!CTLR$).*:
+          device:
+          port: "{{ CTLR.port }}"
+          pump:
     pvi:
       yaml_path: agilent4UHVIonp.pvi.device.yaml
       ui_macros:

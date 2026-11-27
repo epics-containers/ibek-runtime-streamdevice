@@ -5,6 +5,9 @@
 # default keep it; other parameters get a placeholder by type (int 1,
 # float 1.0, enum its first value, str "1", which loads as a name or a number).
 values:
+  caenN1470:
+    # load all four channel templates (a placeholder NCHANS of 1 loads one)
+    caenN1470: {NCHANS: 4}
   d2afe:
     # CMD names the protocol the record runs
     attenuator_cmd: {CMD: att_set}
@@ -22,6 +25,13 @@ values:
 # whose entity it refers to, as {pattern: {entity_model: {parameter: model}}}.
 # An entity of that model is put in the IOC with the one that refers to it.
 objects:
+  CryoconM32:
+    CryoconM32_sensor: {tctrlr: CryoconM32}
+    CryoconM32_control: {tctrlr: CryoconM32}
+  QPC:
+    digitelQpcIonp: {QPC: digitelQpc}
+  agilent4UHV:
+    agilent4UHVIonp: {CTLR: agilent4UHV}
   granvillePhillips:
     gp350Hcg: {GCTLR: gp350}
     gp350Pirg: {GCTLR: gp350}

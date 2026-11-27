@@ -5,48 +5,17 @@
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/caenN1470/ release.
+#
+# The entity models mirror that release's etc/builder.py: builder class names,
+# parameters named as the builder XML attributes, Ident arguments as object
+# references, and the arguments builder.py derives done in Jinja.
 
 module: caenN1470
 
 entity_models:
-  - name: _caenN1470chan
+  - name: caenN1470
     description: |-
-      CAEN N1470 HV power supply (per-channel template)
-    parameters:
-      P:
-        type: str
-        description: |-
-          Device prefix
-      Q:
-        type: str
-        description: |-
-          Device suffix
-        default: ""
-      PORT:
-        type: str
-        description: |-
-          Asyn port name
-      ADDR:
-        type: int
-        description: |-
-          Address of unit, normally 0
-      CHAN:
-        type: int
-        description: |-
-          Channel number in range 0..3
-    databases:
-      - file: caenN1470chan.template
-        args:
-          .*:
-    pvi:
-      yaml_path: _caenN1470chan.pvi.device.yaml
-      ui_macros:
-        P:
-        Q:
-        CHAN:
-  - name: _caenN1470
-    description: |-
-      CAEN N1470 HV power supply (board-level template)
+      CAEN N1470 HV power supply: the board, and channels 0 to NCHANS-1
     parameters:
       P:
         type: str
@@ -70,28 +39,72 @@ entity_models:
         description: |-
           Default disable mode for comms
         default: 1
+      NCHANS:
+        type: int
+        description: |-
+          Number of channels (1..4)
       label0:
         type: str
         description: |-
-          Label for channel 0
+          Label for channel 0 (the DLS EDM screen's; no record uses it)
+        default: ""
       label1:
         type: str
         description: |-
-          Label for channel 1
+          Label for channel 1 (the DLS EDM screen's; no record uses it)
+        default: ""
       label2:
         type: str
         description: |-
-          Label for channel 2
+          Label for channel 2 (the DLS EDM screen's; no record uses it)
+        default: ""
       label3:
         type: str
         description: |-
-          Label for channel 3
+          Label for channel 3 (the DLS EDM screen's; no record uses it)
+        default: ""
     databases:
       - file: caenN1470.template
         args:
-          .*:
+          P:
+          Q:
+          PORT:
+          ADDR:
+          DISABLED:
+      - file: caenN1470chan.template
+        enabled: "{{ NCHANS > 0 }}"
+        args:
+          P:
+          Q:
+          PORT:
+          ADDR:
+          CHAN: "0"
+      - file: caenN1470chan.template
+        enabled: "{{ NCHANS > 1 }}"
+        args:
+          P:
+          Q:
+          PORT:
+          ADDR:
+          CHAN: "1"
+      - file: caenN1470chan.template
+        enabled: "{{ NCHANS > 2 }}"
+        args:
+          P:
+          Q:
+          PORT:
+          ADDR:
+          CHAN: "2"
+      - file: caenN1470chan.template
+        enabled: "{{ NCHANS > 3 }}"
+        args:
+          P:
+          Q:
+          PORT:
+          ADDR:
+          CHAN: "3"
     pvi:
-      yaml_path: _caenN1470.pvi.device.yaml
+      yaml_path: caenN1470.pvi.device.yaml
       ui_macros:
         P:
         Q:
