@@ -288,7 +288,7 @@ entity_models:
       ui_macros:
         P:
 
-  - name: ITC4
+  - name: auto_ITC4
     description: |-
       Imported from DLS module OxInstCryojet (ITC4.template)
     parameters:
@@ -314,7 +314,7 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: ITC4.pvi.device.yaml
+      yaml_path: auto_ITC4.pvi.device.yaml
       ui_macros:
         P:
         Q:
