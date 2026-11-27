@@ -6,39 +6,47 @@ of that release, except `mks937aImgMean.template`: its aSub record called the mo
 only compiled routine, `mks937aMeanCalc`, and is replaced by base calc records that
 give the same results. So no template needs the compiled `mks937a` module.
 
+Its entity models are ibek-support's `mks937a` models, which mirror the DLS `builder.py`
+(object references such as `GCTLR` and `GAUGE`, with port, address and device derived
+in Jinja), so an IOC that builder2ibek converts for the compiled module uses this
+pattern unchanged. Their databases load this pattern's templates.
+
 How each file was obtained, and any change made to it, is recorded in the header of
 [`mks937a.ibek.support.yaml`](mks937a.ibek.support.yaml). That header is vendored with
 the pattern, so the provenance travels into every IOC instance that uses it.
 
 ## Entity models
 
-| Entity model | Description |
-|---|---|
-| `mks937a.mks937a` | Template database for an MKS937A Multi-Sensor System (vacuum gauge controller) read over StreamDevice. |
-| `mks937a.mks937aGauge` | Imported from DLS module mks937a (mks937aGauge.template) NOTE: the default aitype needs an image with Hytec Hy8401ip device support (DTYP "Hy8401ip", e.g. an RTEMS/VME IOC), not mks937a; with aitype "Soft Channel" and aiinp it runs in the generic image. |
-| `mks937a.mks937aGaugeGroup` | Imported from DLS module mks937a (mks937aGaugeGroup.template) |
-| `mks937a.mks937aImg` | Imported from DLS module mks937a (mks937aImg.template) |
-| `mks937a.mks937aImgDummy` | Imported from DLS module mks937a (mks937aImgDummy.template) |
-| `mks937a.mks937aImgGroup` | Imported from DLS module mks937a (mks937aImgGroup.template) |
-| `mks937a.mks937aImgMean` | Derived from DLS module mks937a (mks937aImgMean.template): the compiled aSub is replaced by base calc records. |
-| `mks937a.mks937aInterlock` | Imported from DLS module mks937a (mks937aInterlock.template) |
-| `mks937a.mks937aPirg` | Imported from DLS module mks937a (mks937aPirg.template) |
-| `mks937a.mks937aPirgDummy` | Imported from DLS module mks937a (mks937aPirgDummy.template) |
-| `mks937a.mks937aPirgGroup` | Imported from DLS module mks937a (mks937aPirgGroup.template) |
-| `mks937a.mks937aPlogADC` | Imported from DLS module mks937a (mks937aPlogADC.template) |
-| `mks937a.mks937aPlogEGU` | Imported from DLS module mks937a (mks937aPlogEGU.template) |
+| Entity model | Loads | Description |
+|---|---|---|
+| `mks937a.mks937a` | `mks937a.template` | An MKS937A Multi-Sensor System (vacuum gauge controller) read over StreamDevice. |
+| `mks937a.mks937aGauge` | `mks937aGauge.template` | A combination gauge: two channels of an MKS937A. NOTE: the default aitype needs an image with Hytec Hy8401ip device support (DTYP "Hy8401ip", e.g. an RTEMS/VME IOC), not mks937a; with aitype "Soft Channel" and aiinp it runs in the generic image, as mks937aGaugeEGU does. |
+| `mks937a.mks937aGaugeEGU` | `mks937aGauge.template`, `mks937aPlogEGU.template` | A combination gauge whose pressure comes in mbar from `input`, through `mks937aPlogEGU.template`. |
+| `mks937a.mks937aGaugeGroup` | `mks937aGaugeGroup.template` | A group of up to 8 combination gauges. |
+| `mks937a.mks937aImg` | `mks937aImg.template` | An inverted magnetron gauge (IMG) on the controller `GCTLR`. |
+| `mks937a.mks937aImgDummy` | `mks937aImgDummy.template` | A dummy IMG, enough for a combination gauge. |
+| `mks937a.mks937aImgGroup` | `mks937aImgGroup.template` | A group of up to 8 IMGs. |
+| `mks937a.mks937aImgMean` | `mks937aImgMean.template` | The mean pressure of up to 10 IMGs. The compiled aSub is replaced by base calc records (see below). |
+| `mks937a.mks937aPirg` | `mks937aPirg.template` | A Pirani gauge on the controller `GCTLR`. |
+| `mks937a.mks937aPirgDummy` | `mks937aPirgDummy.template` | A dummy Pirani gauge, enough for a combination gauge. |
+| `mks937a.mks937aPirgGroup` | `mks937aPirgGroup.template` | A group of up to 8 Pirani gauges. |
+| `mks937a.auto_mks937aInterlock` | `mks937aInterlock.template` | Overrides gauge interlock values, after the gauge templates load them. |
+| `mks937a.auto_mks937aPlogADC` | `mks937aPlogADC.template` | A virtual calibrated ADC, scaling a raw 0..32767 ADC PV for :PLOG. |
 
 ## Files
 
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
+- `auto_mks937aInterlock.pvi.device.yaml`
+- `auto_mks937aPlogADC.pvi.device.yaml`
 - `mks937a.ibek.support.yaml`
 - `mks937a.protocol`
 - `mks937a.pvi.device.yaml`
 - `mks937a.template`
 - `mks937aGauge.pvi.device.yaml`
 - `mks937aGauge.template`
+- `mks937aGaugeEGU.pvi.device.yaml`
 - `mks937aGaugeGroup.pvi.device.yaml`
 - `mks937aGaugeGroup.template`
 - `mks937aGauge_positions.req`
@@ -50,7 +58,6 @@ instance's `config/`:
 - `mks937aImgGroup.template`
 - `mks937aImgMean.pvi.device.yaml`
 - `mks937aImgMean.template`
-- `mks937aInterlock.pvi.device.yaml`
 - `mks937aInterlock.template`
 - `mks937aPirg.pvi.device.yaml`
 - `mks937aPirg.template`
@@ -58,9 +65,7 @@ instance's `config/`:
 - `mks937aPirgDummy.template`
 - `mks937aPirgGroup.pvi.device.yaml`
 - `mks937aPirgGroup.template`
-- `mks937aPlogADC.pvi.device.yaml`
 - `mks937aPlogADC.template`
-- `mks937aPlogEGU.pvi.device.yaml`
 - `mks937aPlogEGU.template`
 
 Everything else in this folder stays in the library and is never vendored:

@@ -17,6 +17,18 @@ values:
     # FPARAM and IPARAM name two different records
     read_int_floatE: {FPARAM: F, IPARAM: I}
     read_write_int_floatE: {FPARAM: F, IPARAM: I}
+  # An object parameter names the entity of another model by its id,
+  # ci_<model>_<parameter>; that entity is generated with it.
+  mks937a:
+    mks937aImg: {GCTLR: ci_mks937a_name}
+    mks937aPirg: {GCTLR: ci_mks937a_name}
+  mks937b:
+    mks937bCap: {GCTLR: ci_mks937b_name}
+    mks937bImg: {GCTLR: ci_mks937b_name}
+    mks937bPirg: {GCTLR: ci_mks937b_name}
+    mks937bRelays: {GAUGE: ci_mks937bImg_name}
+    # an HCG, which names its port and address itself rather than a GCTLR
+    mks937bFastRelay: {GAUGE: ci_auto_mks937bHcg_name}
 
 # sim_values: macro values for templates in a pattern's sim/ folder, as
 # {pattern/sim/template: {macro: value}}. Each macro a sim template uses
@@ -33,6 +45,7 @@ sim_values:
 # xfail: templates that need more than the generic ioc-streamdevice image, as
 # listed in _docs/BUILD-TIME-ONLY.md "Runtime patterns with marked templates". They
 # must fail to load; one that loads fails the check until it is removed here.
+# An entry with `entity: <model>` applies to that entity model's cases only.
 xfail:
   - pattern: PIpiezo
     template: E871-absGrp.template
@@ -66,6 +79,8 @@ xfail:
     reason: 'the motor record'
   - pattern: mks937a
     template: mks937aGauge.template
+    # mks937aGaugeEGU loads it with aitype "Soft Channel"
+    entity: mks937aGauge
     reason: 'DTYP "$(aitype=Hy8401ip)" (Hytec IP ADC)'
   - pattern: mks937b
     template: mks937bHy8401.template

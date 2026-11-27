@@ -17,288 +17,1371 @@
 # Templates needing more than the plain generic image:
 # - `mks937bHy8401.template` needs an image with Hytec Hy8401ip device support
 #   (DTYP "Hy8401ip", e.g. an RTEMS/VME IOC), not mks937b.
+#
+# ibek-support builds the compiled module from release 3-1-0 instead (GitHub). Its
+# templates match these but for the stripped `# % gui` annotations, and
+# mks937bRelays.template, which here gives :SETMODE PRIO HIGH and :MODE PRIO
+# MEDIUM, so a relay mode write jumps the controller's poll queue.
+#
+# Entity models: those of ibek-support's mks937b (epics-containers/ibek-support
+# e91a17c, mks937b/mks937b.ibek.support.yaml), which mirror the DLS builder.py: the same
+# entity names, parameters, object references and Jinja, so an IOC converted by
+# builder2ibek for the compiled module loads this pattern unchanged. Their
+# databases point at this pattern's own templates, and their pvi: blocks are
+# generate-pvi.py's.
+#
+# Added to those models: auto_mks937bHcg, auto_mks937bHcgGroup and
+# auto_mks937bInterlock, the builder's AutoSubstitution of templates that
+# builder.py has no class for (the XML names them mks937b.auto_<template>), with
+# the template's macros as parameters. auto_mks937bHcg also takes `name`, as the
+# GAUGE of mks937bRelays and mks937bFastRelay, which therefore read port and
+# address from the GAUGE itself when it has no GCTLR. auto_mks937bInterlock has
+# the parameters of ibek-support's auto_mks937aInterlock, plus `name` (default
+# ""), the template's $(name).
 
 module: mks937b
 
 entity_models:
-  - name: mks937b
+  - name: mks937bRelays
     description: |-
-      Template database for an MKS937B Multi-Sensor System (vacuum gauge
-      controller) read over StreamDevice.
+      TODO:ADD DESCRIPTION
     parameters:
-      device:
-        type: str
+      GAUGE:
+        type: object
         description: |-
-          Device name
-      port:
-        type: str
-        description: |-
-          Asyn Port name, e.g. ty_40_0
-      address:
+          TODO: ADD DESCRIPTION
+
+      relay_number:
         type: int
         description: |-
-          Controller address (001 .. 253)
-    databases:
-      - file: mks937b.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937b.pvi.device.yaml
-      ui_macros:
-        device:
+          The relay number (1..12).
 
-  - name: mks937bCap
-    description: |-
-      Imported from DLS module mks937b (mks937bCap.template)
-    parameters:
-      device:
+      relay_desc:
         type: str
         description: |-
-          Device name
-      address:
-        type: str
-        description: |-
-          address
-      channel:
-        type: str
-        description: |-
-          channel
-      port:
-        type: str
-        description: |-
-          Asyn port name
-      ctlsp_hopr:
-        type: float
-        description: |-
-          ctlsp_hopr
-        default: 10000.0
-      ctlsp_lopr:
-        type: float
-        description: |-
-          ctlsp_lopr
-        default: 0.01
-      ctlsp_drvh:
-        type: float
-        description: |-
-          ctlsp_drvh
-        default: 10000.0
-      ctlsp_drvl:
-        type: float
-        description: |-
-          ctlsp_drvl
-        default: 0.01
-      ctlsp_level:
-        type: str
-        description: |-
-          ctlsp_level
-        default: "1.0e-2"
-      offwarn:
-        type: str
-        description: |-
-          offwarn
-        default: "0"
-    databases:
-      - file: mks937bCap.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bCap.pvi.device.yaml
-      ui_macros:
-        device:
+          The DESC field on the relay setpoint record
+        default: Valve Interlock
 
-  - name: mks937bFastRelay
-    description: |-
-      Imported from DLS module mks937b (mks937bFastRelay.template)
-    parameters:
-      device:
+      relay_off_desc:
         type: str
         description: |-
-          Device name
-      frcsp_desc:
-        type: str
-        description: |-
-          frcsp_desc
-        default: "Fast Relay Trigger level"
-      address:
-        type: str
-        description: |-
-          address
-      channel:
-        type: str
-        description: |-
-          channel
-      port:
-        type: str
-        description: |-
-          Asyn port name
-      frcsp_hopr:
+          (appears as a label on the Img EDM screen).
+        default: Relay OFF setpoint
+
+      relay_level:
         type: float
         description: |-
-          frcsp_hopr
-        default: 0.01
-      frcsp_lopr:
+          vv================vv  New feature request May 2012.
+        default: 1e-06
+
+      relay_off_level:
         type: float
         description: |-
-          frcsp_lopr
-        default: 1.3e-05
-      frcsp_drvh:
+          The desired relay off setpoint value.
+        default: 0.0
+
+      relay_drvh:
         type: float
         description: |-
-          frcsp_drvh
+          (limits max value of relay setpoint)
         default: 0.012
-      frcsp_drvl:
+
+      relay_drvl:
         type: float
         description: |-
-          frcsp_drvl
+          (limits min value of relay setpoint)
         default: 2.7e-10
-      frcsp_level:
-        type: str
+
+      relay_hopr:
+        type: float
         description: |-
-          frcsp_level
-        default: "1.0e-6"
+          (high operator value - helps display set correct range).
+        default: 0.012
+
+      relay_lopr:
+        type: float
+        description: |-
+          (low operator value - helps display set correct range).
+        default: 2.7e-10
+
+      relay_hihi:
+        type: float
+        description: |-
+          The HIHI alarm field on the relay setpoint record.
+        default: 0.013
+
+      relay_lolo:
+        type: float
+        description: |-
+          The LOLO alarm field on the relay setpoint record.
+        default: 2.6e-10
+
+      relay_high:
+        type: float
+        description: |-
+          The HIGH alarm field on the relay setpoint record.
+        default: 1.1e-06
+
+      relay_low:
+        type: float
+        description: |-
+          The LOW alarm field on the relay setpoint record.
+        default: 9e-07
+
       ilk_write_access_pv:
         type: str
         description: |-
-          ilk_write_access_pv
-        default: "$(device):FRLY:CONSTZERO"
-    databases:
-      - file: mks937bFastRelay.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bFastRelay.pvi.device.yaml
-      ui_macros:
-        device:
+          Link to the interlocks setpoint global write access record.
+        default: $(device):CONSTZERO
 
-  - name: mks937bGauge
-    description: |-
-      Imported from DLS module mks937b (mks937bGauge.template)
-    parameters:
-      dom:
-        type: str
-        description: |-
-          dom
-      id:
-        type: str
-        description: |-
-          id
-      plog_adc_pv:
-        type: str
-        description: |-
-          plog_adc_pv
-      plog_calc:
-        type: str
-        description: |-
-          plog_calc
-        default: "10.0*A/32767.0/0.6 - 12.0"
-      ctlsp_desc:
-        type: str
-        description: |-
-          ctlsp_desc
-        default: "IMG Enable"
-      ctlsp_hopr:
-        type: float
-        description: |-
-          ctlsp_hopr
-        default: 0.95
-      ctlsp_lopr:
-        type: float
-        description: |-
-          ctlsp_lopr
-        default: 0.0027
-      ctlsp_drvh:
-        type: float
-        description: |-
-          ctlsp_drvh
-        default: 0.95
-      ctlsp_drvl:
-        type: float
-        description: |-
-          ctlsp_drvl
-        default: 0.0027
-      ctlsp_level:
-        type: str
-        description: |-
-          ctlsp_level
-        default: "1.0e-2"
-      ctlspoff_desc:
-        type: str
-        description: |-
-          ctlspoff_desc
-        default: "IMG Enable Off"
+    post_defines:
+      relay_n:
+        description: get the next relay number from the associated gauge
+        type: int
+        value: |-
+          {% set nothing = GAUGE.relay_count.append(0) %}
+          {{ GAUGE.relay_count | length }}
+
     databases:
-      - file: mks937bGauge.template
+      - file: mks937bRelays.template
         args:
-          .*:
+          address: "{{ '%03d' % GAUGE.GCTLR.address if GAUGE.GCTLR is defined else GAUGE.address }}"
+          port: "{{ GAUGE.GCTLR.port if GAUGE.GCTLR is defined else GAUGE.port }}"
+          device: "{{ GAUGE.device ~ ':RLY' ~ relay_n }}"
+          relay_drvh:
+          relay_drvl:
+          relay_off_desc:
+          relay_hopr:
+          relay_desc:
+          relay_lolo:
+          ilk_write_access_pv:
+          relay_low:
+          GAUGE:
+          relay_number:
+          relay_hihi:
+          relay_high:
+          relay_level:
+          relay_off_level:
+          relay_lopr:
     pvi:
-      yaml_path: mks937bGauge.pvi.device.yaml
+      yaml_path: mks937bRelays.pvi.device.yaml
       ui_macros:
-        dom:
-        id:
+        device: "{{ GAUGE.device ~ ':RLY' ~ relay_n }}"
 
   - name: mks937bGaugeGroup
     description: |-
-      Imported from DLS module mks937b (mks937bGaugeGroup.template)
+      Template database for a group of up to 8 MKS937B
+      combination gauges
+      Pete Owens - 5/5/05
     parameters:
       device:
         type: str
         description: |-
-          Device name
+          device name
+
       gauge1:
         type: str
         description: |-
-          gauge1
+          gauge 1 device name
+
       gauge2:
         type: str
         description: |-
-          gauge2
+          gauge 2 device name
+
       gauge3:
         type: str
         description: |-
-          gauge3
+          gauge 3 device name
+
       gauge4:
         type: str
         description: |-
-          gauge4
+          gauge 4 device name
+
       gauge5:
         type: str
         description: |-
-          gauge5
+          gauge 5 device name
+
       gauge6:
         type: str
         description: |-
-          gauge6
+          gauge 6 device name
+
       gauge7:
         type: str
         description: |-
-          gauge7
+          gauge 7 device name
+
       gauge8:
         type: str
         description: |-
-          gauge8
+          gauge 8 device name
+
       SELM:
-        type: str
+        type: int
         description: |-
-          SELM
-        default: "1"
+          the space template
+        default: 1
+
       SELN:
         type: int
         description: |-
-          SELN
+          Use this to select which gauge to look at if you set SELM=0
         default: 0
+
     databases:
       - file: mks937bGaugeGroup.template
         args:
-          .*:
+          gauge5:
+          gauge4:
+          gauge7:
+          gauge6:
+          gauge1:
+          gauge3:
+          gauge2:
+          SELN:
+          SELM:
+          gauge8:
+          device:
     pvi:
       yaml_path: mks937bGaugeGroup.pvi.device.yaml
       ui_macros:
         device:
 
-  - name: mks937bHcg
+  - name: mks937bGauge
     description: |-
-      Imported from DLS module mks937b (mks937bHcg.template)
+      Template database for a combination gauge connected to
+      two channels of an MKS937B Multi-Sensor System
+      A note on the optional macros: they default to an appropriate hard-coded
+      value if no value is passed for expansion.
+      They are provided to allow the default set points to be changed.
+      Once the set point needs to be changed it may be necessary to alter
+      various other fields defining the range of allowed values.
+      For the majority of applications the defaults should be used.  The levels
+      should only be changed at the request of the vacuum group for non-standard
+      vacuum systems.
     parameters:
+      dom:
+        type: str
+        description: |-
+          Domain 5 char string (e.g. BL11I)
+
+      id:
+        type: int
+        description: |-
+          Gauge ID number. Rendered zero-padded to 2 digits in PV
+          substitutions (e.g. 1 -> "01").
+
+      plog_adc_pv:
+        type: str
+        description: |-
+          or (if using Hy8401 VME IP) mks937bHy8401.template
+
+      name:
+        type: id
+        description: |-
+          The device's name for gui purposes
+        default: "GAUGE_{{ dom }}_{{ id }}"
+
+      GCTLR:
+        type: str
+        description: |-
+          The gauge controller PV prefix, for gui purposes
+        default: ""
+
+      ctlsp_level:
+        type: float
+        description: |-
+          The desired control setpoint value (actually for the Pirg).
+        default: 0.01
+
+      ctlsp_drvh:
+        type: float
+        description: |-
+          (limits max value of control setpoint)
+        default: 0.95
+
+      ctlsp_drvl:
+        type: float
+        description: |-
+          (limits min value of control setpoint)
+        default: 0.0027
+
+      ctlsp_hopr:
+        type: float
+        description: |-
+          (high operator value - helps display set correct range).
+        default: 0.95
+
+      ctlsp_lopr:
+        type: float
+        description: |-
+          (low operator value - helps display set correct range).
+        default: 0.0027
+
+      ctlsp_desc:
+        type: str
+        description: |-
+          (appears as a label on the Pirg EDM screen).
+        default: IMG Enable
+
+      ctlspoff_desc:
+        type: str
+        description: |-
+          (appears as a label on the Pirg CSS screen).
+        default: IMG Enable Off
+
+      plog_calc:
+        type: str
+        description: |-
+          Template argument
+        default: 10.0*A/32767.0/0.6 - 12.0
+
+    pre_defines:
+      relay_count:
+        description: next relay number for this guage type
+        type: list
+        # length of a list is used as the count
+        value: "{{ [] | list }}"
+
+    databases:
+      - file: mks937bGauge.template
+        args:
+          plog_adc_pv:
+          ctlsp_drvl:
+          ctlsp_lopr:
+          dom:
+          ctlsp_hopr:
+          ctlsp_drvh:
+          GCTLR:
+          ctlsp_level:
+          ctlspoff_desc:
+          plog_calc:
+          ctlsp_desc:
+          id: "{{ '%02d' % id }}"
+    pvi:
+      yaml_path: mks937bGauge.pvi.device.yaml
+      ui_macros:
+        dom:
+        id: "{{ '%02d' % id }}"
+
+  - name: mks937b
+    description: |-
+      Template database for an MKS937B Multi-Sensor System
+      Ian Gillingham - April 2010
+    parameters:
+      name:
+        type: id
+        description: |-
+          Device identifier (for reference from controlled devices)
+
+      device:
+        type: str
+        description: |-
+          Device name
+
+      port:
+        type: str
+        description: |-
+          Asyn Port name, e.g. ty_40_0
+
+      address:
+        type: int
+        description: |-
+          Controller address (1..253). Rendered zero-padded to 3 digits
+          in PV substitutions (e.g. 1 -> "001").
+
+    databases:
+      - file: mks937b.template
+        args:
+          device:
+          port:
+          address: "{{ '%03d' % address }}"
+    pvi:
+      yaml_path: mks937b.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: mks937bPirgDummy
+    description: |-
+      Template database for a dummy pirani gauge.
+      Just enough to keep the Gauge template happy
+      Linda Pratt 28/09/2009
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+    databases:
+      - file: mks937bPirgDummy.template
+        args:
+          device:
+    pvi:
+      yaml_path: mks937bPirgDummy.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: mks937bFastRelay
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      GAUGE:
+        type: object
+        description: |-
+          TODO: ADD DESCRIPTION
+
+      frcsp_desc:
+        type: str
+        description: |-
+          The DESC field on the relay setpoint record
+        default: Fast Relay Trigger level
+
+      frcsp_level:
+        type: float
+        description: |-
+          The desired relay setpoint value.
+        default: 1e-06
+
+      frcsp_drvh:
+        type: float
+        description: |-
+          (limits max value of relay setpoint)
+        default: 0.012
+
+      frcsp_drvl:
+        type: float
+        description: |-
+          (limits min value of relay setpoint)
+        default: 2.7e-10
+
+      frcsp_hopr:
+        type: float
+        description: |-
+          (high operator value - helps display set correct range).
+        default: 0.01
+
+      frcsp_lopr:
+        type: float
+        description: |-
+          (low operator value - helps display set correct range).
+        default: 1.3e-05
+
+      ilk_write_access_pv:
+        type: str
+        description: |-
+          Link to the interlocks setpoint global write access record.
+        default: $(device):FRLY:CONSTZERO
+
+    databases:
+      - file: mks937bFastRelay.template
+        args:
+          address: "{{ '%03d' % GAUGE.GCTLR.address if GAUGE.GCTLR is defined else GAUGE.address }}"
+          port: "{{ GAUGE.GCTLR.port if GAUGE.GCTLR is defined else GAUGE.port }}"
+          device: "{{ GAUGE.device }}"
+          channel: "{{ GAUGE.channel }}"
+          frcsp_hopr:
+          frcsp_drvl:
+          frcsp_drvh:
+          GAUGE:
+          frcsp_level:
+          frcsp_desc:
+          ilk_write_access_pv:
+          frcsp_lopr:
+    pvi:
+      yaml_path: mks937bFastRelay.pvi.device.yaml
+      ui_macros:
+        device: "{{ GAUGE.device }}"
+
+  - name: mks937bCap
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      GCTLR:
+        type: object
+        description: |-
+          Parent mks937b object
+
+      device:
+        type: str
+        description: |-
+          device name
+
+      channel:
+        type: str
+        description: |-
+          MKS 937A channel number (1-4)
+
+      name:
+        type: id
+        description: |-
+          Object name, and gui association name
+
+      offwarn:
+        type: int
+        description: |-
+          Flag to display a warning that switching off the PIRG could trip the beam#
+        default: 0
+
+      ctlsp_hopr:
+        type: float
+        description: |-
+          Template argument
+        default: 10000.0
+
+      ctlsp_lopr:
+        type: float
+        description: |-
+          Template argument
+        default: 0.01
+
+      ctlsp_drvh:
+        type: float
+        description: |-
+          Template argument
+        default: 10000.0
+
+      ctlsp_drvl:
+        type: float
+        description: |-
+          Template argument
+        default: 0.01
+
+      ctlsp_level:
+        type: float
+        description: |-
+          Template argument
+        default: 0.01
+
+    databases:
+      - file: mks937bCap.template
+        args:
+          address: "{{ '%03d' % GCTLR.address }}"
+          port: "{{ GCTLR.port }}"
+          ctlsp_drvl:
+          name:
+          ctlsp_lopr:
+          ctlsp_drvh:
+          ctlsp_hopr:
+          ctlsp_level:
+          device:
+          offwarn:
+          channel:
+    pvi:
+      yaml_path: mks937bCap.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: mks937bImgGroup
+    description: |-
+      Template database for a group of up to 8 IMGs
+      Pete Owens - 10/5/05
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+      delay:
+        type: int
+        description: |-
+          delay between starting each IMG
+
+      img1:
+        type: str
+        description: |-
+          img 1 device name
+
+      img2:
+        type: str
+        description: |-
+          img 2 device name
+
+      img3:
+        type: str
+        description: |-
+          img 3 device name
+
+      img4:
+        type: str
+        description: |-
+          img 4 device name
+
+      img5:
+        type: str
+        description: |-
+          img 5 device name
+
+      img6:
+        type: str
+        description: |-
+          img 6 device name
+
+      img7:
+        type: str
+        description: |-
+          img 7 device name
+
+      img8:
+        type: str
+        description: |-
+          img 8 device name
+
+      valveIlRelay:
+        type: int
+        description: |-
+          Valve interlock relay
+        default: 1
+
+      mpsIlRelay1:
+        type: int
+        description: |-
+          Machine protection system interlock 1 relay
+        default: 2
+
+      mpsIlRelay2:
+        type: int
+        description: |-
+          Machine protection system interlock 2 relay
+        default: 3
+
+      rgaIlRelay:
+        type: int
+        description: |-
+          RGA interlock relay
+        default: 4
+
+    databases:
+      - file: mks937bImgGroup.template
+        args:
+          rgaIlRelay:
+          img6:
+          delay:
+          img3:
+          img8:
+          device:
+          img5:
+          valveIlRelay:
+          img2:
+          img1:
+          img7:
+          mpsIlRelay2:
+          mpsIlRelay1:
+          img4:
+    pvi:
+      yaml_path: mks937bImgGroup.pvi.device.yaml
+      ui_macros:
+        device:
+        valveIlRelay:
+        mpsIlRelay1:
+        mpsIlRelay2:
+        rgaIlRelay:
+
+  - name: mks937bGaugeEGU
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      name:
+        type: id
+        description: |-
+          Device name, used as the gauge record name in mks937bGauge.template.
+
+      dom:
+        type: str
+        description: |-
+          Domain 5 char string (e.g. BL11I)
+
+      id:
+        type: int
+        description: |-
+          Gauge ID number. Rendered zero-padded to 2 digits in PV
+          substitutions (e.g. 1 -> "01").
+
+      input:
+        type: str
+        description: |-
+          PV providing gauge reading in mbar
+
+      GCTLR:
+        type: str
+        description: |-
+          The gauge controller PV prefix, for gui purposes
+        default: ""
+
+      ctlsp_level:
+        type: float
+        description: |-
+          The desired control setpoint value (actually for the Pirg).
+        default: 0.01
+
+      ctlsp_drvh:
+        type: float
+        description: |-
+          (limits max value of control setpoint)
+        default: 0.95
+
+      ctlsp_drvl:
+        type: float
+        description: |-
+          (limits min value of control setpoint)
+        default: 0.0027
+
+      ctlsp_hopr:
+        type: float
+        description: |-
+          (high operator value - helps display set correct range).
+        default: 0.95
+
+      ctlsp_lopr:
+        type: float
+        description: |-
+          (low operator value - helps display set correct range).
+        default: 0.0027
+
+      ctlsp_desc:
+        type: str
+        description: |-
+          (appears as a label on the Pirg EDM screen).
+        default: IMG Enable
+
+      ctlspoff_desc:
+        type: str
+        description: |-
+          (appears as a label on the Pirg CSS screen).
+        default: IMG Enable Off
+
+      plog_calc:
+        type: str
+        description: |-
+          The EGU variant feeds mks937bGauge from the PLOG_CALC PV that
+          mks937bPlogEGU.template already converted to mbar, so the gauge's
+          own conversion is a straight pass-through.
+        default: A
+
+    post_defines:
+      eguInputPV:
+        type: str
+        description: |-
+          Name of the PV providing the gauge reading in mbar
+        value: |-
+          {{ dom }}-VA-GAUGE-{{ "%02d" | format(id) }}:PLOG_CALC
+
+    databases:
+      - file: mks937bPlogEGU.template
+        args:
+          device: "{{ eguInputPV }}"
+          p_egu_pv: "{{ input }}"
+
+      - file: mks937bGauge.template
+        args:
+          plog_adc_pv: "{{ eguInputPV }}"
+          ctlsp_drvl:
+          name:
+          ctlsp_lopr:
+          dom:
+          ctlsp_hopr:
+          ctlsp_drvh:
+          GCTLR:
+          ctlsp_level:
+          ctlspoff_desc:
+          plog_calc:
+          ctlsp_desc:
+          id: "{{ '%02d' % id }}"
+    pvi:
+      yaml_path: mks937bGaugeEGU.pvi.device.yaml
+      ui_macros:
+        device: "{{ eguInputPV }}"
+        dom:
+        id: "{{ '%02d' % id }}"
+
+  - name: mks937bImg
+    description: |-
+      Template database for an IMG connected to an MKS937B
+    parameters:
+      GCTLR:
+        type: object
+        description: |-
+          Parent mks937b object
+
+      device:
+        type: str
+        description: |-
+          device name
+
+      channel:
+        type: int
+        description: |-
+          MKS 937B channel number (1-4)
+
+      name:
+        type: id
+        description: |-
+          Object name, and gui association name
+
+      ctl_channel:
+        type: int
+        description: |-
+          The desired control channel 0 = C1, 1 = C2, 2 = None, 3 = A1, 4 = B1, 5 = A2, 6 = B2.
+        default: 0
+
+      ctlsp_level:
+        type: float
+        description: |-
+          The desired control setpoint value.
+        default: 0.01
+
+      ctlsp_drvh:
+        type: float
+        description: |-
+          (limits max value of control setpoint)
+        default: 0.95
+
+      ctlsp_drvl:
+        type: float
+        description: |-
+          (limits min value of control setpoint)
+        default: 0.0027
+
+      ctlsp_hopr:
+        type: float
+        description: |-
+          (high operator value - helps display set correct range).
+        default: 0.95
+
+      ctlsp_lopr:
+        type: float
+        description: |-
+          (low operator value - helps display set correct range).
+        default: 0.0027
+
+      ctlsp_hihi:
+        type: float
+        description: |-
+          The HIHI alarm field on the control setpoint record.
+        default: 0.96
+
+      ctlsp_lolo:
+        type: float
+        description: |-
+          The LOLO alarm field on the control setpoint record.
+        default: 0.0026
+
+      ctlsp_high:
+        type: float
+        description: |-
+          The HIGH alarm field on the control setpoint record.
+        default: 0.011
+
+      ctlsp_low:
+        type: float
+        description: |-
+          The LOW alarm field on the control setpoint record.
+        default: 0.009
+
+      ctlsp_desc:
+        type: str
+        description: |-
+          The DESC field on the control setpoint record.
+        default: IMG Enable
+
+      ctlhyst_hopr:
+        type: float
+        description: |-
+          (high operator value - helps display set correct range).
+        default: 0.012
+
+      ctlhyst_lopr:
+        type: float
+        description: |-
+          (low operator value - helps display set correct range).
+        default: 2.7e-10
+
+      prosp_level:
+        type: float
+        description: |-
+          The desired protection setpoint value.
+        default: 0.0005
+
+      prosp_drvh:
+        type: float
+        description: |-
+          (limits max value of protection setpoint)
+        default: 0.01
+
+      prosp_drvl:
+        type: float
+        description: |-
+          (limits min value of protection setpoint)
+        default: 1.3e-05
+
+      prosp_hopr:
+        type: float
+        description: |-
+          (high operator value - helps display set correct range).
+        default: 0.01
+
+      prosp_lopr:
+        type: float
+        description: |-
+          (low operator value - helps display set correct range).
+        default: 1.3e-05
+
+      prosp_hihi:
+        type: float
+        description: |-
+          The HIHI alarm field on the protection setpoint record.
+        default: 0.011
+
+      prosp_lolo:
+        type: float
+        description: |-
+          The LOLO alarm field on the protection setpoint record.
+        default: 1.2e-05
+
+      prosp_high:
+        type: float
+        description: |-
+          The HIGH alarm field on the protection setpoint record.
+        default: 0.00051
+
+      prosp_low:
+        type: float
+        description: |-
+          The LOW alarm field on the protection setpoint record.
+        default: 0.00049
+
+      prosp_desc:
+        type: str
+        description: |-
+          (appears as a label on the Img EDM screen).
+        default: IMG Overpressure
+
+      offwarn:
+        type: int
+        description: |-
+          Flag to display a warning that switching off the IMG could trip the beam
+        default: 0
+
+      ilk_write_access_pv:
+        type: str
+        description: |-
+          Link to the interlocks setpoint global write access record.
+        default: $(device):PRO:CONSTZERO
+
+      img_ctl_setmode:
+        type: int
+        description: |-
+          Default = 1 (I/L Safe), 0 (Force ON), 2 (I/L Operating).
+        default: 1
+
+    pre_defines:
+      relay_count:
+        description: next relay number for this guage type
+        type: list
+        # length of a list is used as the count
+        value: "{{ [] | list }}"
+
+    databases:
+      - file: mks937bImg.template
+        args:
+          address: "{{ '%03d' % GCTLR.address }}"
+          port: "{{ GCTLR.port }}"
+          prosp_lolo:
+          ilk_write_access_pv:
+          prosp_hopr:
+          prosp_drvl:
+          prosp_desc:
+          ctlsp_desc:
+          prosp_drvh:
+          ctlhyst_hopr:
+          ctlsp_drvl:
+          ctlsp_lopr:
+          ctlsp_drvh:
+          prosp_low:
+          prosp_level:
+          prosp_hihi:
+          ctlsp_level:
+          offwarn:
+          GCTLR:
+          channel:
+          ctlsp_hihi:
+          ctlsp_low:
+          ctlsp_hopr:
+          prosp_lopr:
+          ctlsp_high:
+          img_ctl_setmode:
+          prosp_high:
+          device:
+          name:
+          ctlsp_lolo:
+          ctlhyst_lopr:
+          ctl_channel:
+    pvi:
+      yaml_path: mks937bImg.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: mks937bImgDummy
+    description: |-
+      Template database for a dummy inverted magnetron gauge
+      Just enough to keep the Gauge template happy
+      Note on optional macros: these will default to an appropriate hard-coded
+      value if no value is passed for expansion. They are provided to parallel
+      those in the Img template.
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+      ctlsp_level:
+        type: float
+        description: |-
+          The desired control setpoint value.
+        default: 0.01
+
+      ctlsp_drvh:
+        type: float
+        description: |-
+          (limits max value of control setpoint)
+        default: 0.95
+
+      ctlsp_drvl:
+        type: float
+        description: |-
+          (limits min value of control setpoint)
+        default: 0.0027
+
+      ctlsp_hopr:
+        type: float
+        description: |-
+          (high operator value - helps display set correct range).
+        default: 0.95
+
+      ctlsp_lopr:
+        type: float
+        description: |-
+          (low operator value - helps display set correct range).
+        default: 0.0027
+
+      ctlsp_hihi:
+        type: float
+        description: |-
+          The HIHI alarm field on the control setpoint record.
+        default: 0.96
+
+      ctlsp_lolo:
+        type: float
+        description: |-
+          The LOLO alarm field on the control setpoint record.
+        default: 0.0026
+
+      ctlsp_high:
+        type: float
+        description: |-
+          The HIGH alarm field on the control setpoint record.
+        default: 0.011
+
+      ctlsp_low:
+        type: float
+        description: |-
+          The LOW alarm field on the control setpoint record.
+        default: 0.009
+
+      ctlsp_desc:
+        type: str
+        description: |-
+          The DESC field on the control setpoint record.
+        default: IMG Enable
+
+    databases:
+      - file: mks937bImgDummy.template
+        args:
+          ctlsp_drvl:
+          ctlsp_low:
+          ctlsp_lopr:
+          ctlsp_lolo:
+          ctlsp_hopr:
+          ctlsp_drvh:
+          ctlsp_high:
+          ctlsp_level:
+          device:
+          ctlsp_desc:
+          ctlsp_hihi:
+    pvi:
+      yaml_path: mks937bImgDummy.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: mks937bPirgGroup
+    description: |-
+      Template database for a group of up to 8 Pirani Gauges
+      Pete Owens - 9/5/05
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+      pirg1:
+        type: str
+        description: |-
+          pirg 1 device name
+
+      pirg2:
+        type: str
+        description: |-
+          pirg 2 device name
+
+      pirg3:
+        type: str
+        description: |-
+          pirg 3 device name
+
+      pirg4:
+        type: str
+        description: |-
+          pirg 4 device name
+
+      pirg5:
+        type: str
+        description: |-
+          pirg 5 device name
+
+      pirg6:
+        type: str
+        description: |-
+          pirg 6 device name
+
+      pirg7:
+        type: str
+        description: |-
+          pirg 7 device name
+
+      pirg8:
+        type: str
+        description: |-
+          pirg 8 device name
+
+      ionPumpIlRelay:
+        type: int
+        description: |-
+          Ion pump interlock relay
+        default: 1
+
+    databases:
+      - file: mks937bPirgGroup.template
+        args:
+          pirg1:
+          ionPumpIlRelay:
+          pirg3:
+          pirg2:
+          pirg5:
+          pirg4:
+          pirg7:
+          pirg6:
+          device:
+          pirg8:
+    pvi:
+      yaml_path: mks937bPirgGroup.pvi.device.yaml
+      ui_macros:
+        device:
+        ionPumpIlRelay:
+
+  - name: mks937bHy8401
+    description: |-
+      Template database for an Hy8401 VME ADC instance
+      used to provide the 0-10V from the combination gauge log pressure of an MKS937B Multi-Sensor System.
+      This is a change from the previous method, where the Hy8401 ADC interface was hard coded as part of
+      the mks937bGauge.template. To allow the mks937bGauge.template to be generic to any analogue interface (e.g EtherCAT)
+      this new template is simply a helper to users of the old Hy8401 interface.
+      The mks937bGauge.template expects an input to PLOG in the range 0 to +32767, representing 0 to +10V.
+      The record is scan PP and is triggered via the :P record.
+      NOTE: needs an image with Hytec Hy8401ip device support (DTYP "Hy8401ip",
+      e.g. an RTEMS/VME IOC), not mks937b.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Full name of ADC reading PV.
+
+      c:
+        type: int
+        description: |-
+          ADC card number
+
+      s:
+        type: int
+        description: |-
+          ADC signal number
+
+    databases:
+      - file: mks937bHy8401.template
+        args:
+          device:
+          c:
+          s:
+    pvi:
+      yaml_path: mks937bHy8401.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: mks937bPirg
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      GCTLR:
+        type: object
+        description: |-
+          Parent mks937b object
+
+      device:
+        type: str
+        description: |-
+          device name
+
+      channel:
+        type: int
+        description: |-
+          MKS 937A channel number (1-4)
+
+      name:
+        type: id
+        description: |-
+          Object name, and gui association name
+
+      offwarn:
+        type: int
+        description: |-
+          Flag to display a warning that switching off the PIRG could trip the beam#
+        default: 0
+
+    pre_defines:
+      relay_count:
+        description: next relay number for this guage type
+        type: list
+        # length of a list is used as the count
+        value: "{{ [] | list }}"
+
+    databases:
+      - file: mks937bPirg.template
+        args:
+          address: "{{ '%03d' % GCTLR.address }}"
+          port: "{{ GCTLR.port }}"
+          device:
+          offwarn:
+          GCTLR:
+          channel:
+    pvi:
+      yaml_path: mks937bPirg.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: mks937bImgMean
+    description: |-
+      Template database to calculate the mean pressure from a number of IMGs
+      Pete Owens - 26/6/06
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+      current:
+        type: str
+        description: |-
+          beam current
+
+      nimgs:
+        type: int
+        description: |-
+          number of gauges
+
+      img1:
+        type: str
+        description: |-
+          img 1 device name
+
+      img2:
+        type: str
+        description: |-
+          img 2 device name
+
+      img3:
+        type: str
+        description: |-
+          img 3 device name
+
+      img4:
+        type: str
+        description: |-
+          img 4 device name
+
+      img5:
+        type: str
+        description: |-
+          img 5 device name
+
+      img6:
+        type: str
+        description: |-
+          img 6 device name
+
+      img7:
+        type: str
+        description: |-
+          img 7 device name
+
+      img8:
+        type: str
+        description: |-
+          img 8 device name
+
+      img9:
+        type: str
+        description: |-
+          img 9 device name
+
+      img10:
+        type: str
+        description: |-
+          img 10 device name
+
+    databases:
+      - file: mks937bImgMean.template
+        args:
+          device:
+          current:
+          nimgs:
+          img1:
+          img2:
+          img3:
+          img4:
+          img5:
+          img6:
+          img7:
+          img8:
+          img9:
+          img10:
+    pvi:
+      yaml_path: mks937bImgMean.pvi.device.yaml
+      ui_macros:
+        device:
+
+  - name: auto_mks937bHcg
+    description: |-
+      Template database for a hot cathode gauge (HCG) connected to an MKS937B.
+      The builder's AutoSubstitution of mks937bHcg.template: the controller's
+      port and address are given directly, not through a GCTLR.
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name, for reference as the GAUGE of mks937bRelays and
+          mks937bFastRelay
+
       device:
         type: str
         description: |-
@@ -306,15 +1389,15 @@ entity_models:
       address:
         type: str
         description: |-
-          address
+          Controller address, 3 digits (e.g. 001)
       channel:
-        type: str
+        type: int
         description: |-
-          channel
+          MKS 937B channel number (1-6)
       port:
         type: str
         description: |-
-          Asyn port name
+          Asyn port name of the controller
       ctlsp_desc:
         type: str
         description: |-
@@ -341,10 +1424,10 @@ entity_models:
           ctlsp_drvl
         default: 0.0027
       ctlsp_level:
-        type: str
+        type: float
         description: |-
-          ctlsp_level
-        default: "1.0e-2"
+          The desired control setpoint value.
+        default: 0.01
       ctlsp_hihi:
         type: float
         description: |-
@@ -376,10 +1459,10 @@ entity_models:
           ctlhyst_lopr
         default: 2.7e-10
       ctl_channel:
-        type: str
+        type: int
         description: |-
-          ctl_channel
-        default: "0"
+          The desired control channel 0 = C1, 1 = C2, 2 = None, 3 = A1, 4 = B1, 5 = A2, 6 = B2.
+        default: 0
       prosp_desc:
         type: str
         description: |-
@@ -406,10 +1489,10 @@ entity_models:
           prosp_drvl
         default: 1.3e-05
       prosp_level:
-        type: str
+        type: float
         description: |-
-          prosp_level
-        default: "5.0e-4"
+          The desired protection setpoint value.
+        default: 0.0005
       prosp_hihi:
         type: float
         description: |-
@@ -431,25 +1514,32 @@ entity_models:
           prosp_low
         default: 0.00049
       offwarn:
-        type: str
+        type: int
         description: |-
-          offwarn
-        default: "0"
+          Flag to display a warning that switching off the HCG could trip the beam
+        default: 0
       ilk_write_access_pv:
         type: str
         description: |-
           ilk_write_access_pv
         default: "$(device):PRO:CONSTZERO"
+    pre_defines:
+      relay_count:
+        description: next relay number for this guage type
+        type: list
+        # length of a list is used as the count
+        value: "{{ [] | list }}"
+
     databases:
       - file: mks937bHcg.template
         args:
           .*:
     pvi:
-      yaml_path: mks937bHcg.pvi.device.yaml
+      yaml_path: auto_mks937bHcg.pvi.device.yaml
       ui_macros:
         device:
 
-  - name: mks937bHcgGroup
+  - name: auto_mks937bHcgGroup
     description: |-
       Imported from DLS module mks937b (mks937bHcgGroup.template)
     parameters:
@@ -518,7 +1608,7 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: mks937bHcgGroup.pvi.device.yaml
+      yaml_path: auto_mks937bHcgGroup.pvi.device.yaml
       ui_macros:
         device:
         valveIlRelay:
@@ -526,652 +1616,39 @@ entity_models:
         mpsIlRelay2:
         rgaIlRelay:
 
-  - name: mks937bHy8401
+  - name: auto_mks937bInterlock
     description: |-
-      Imported from DLS module mks937b (mks937bHy8401.template)
-      NOTE: needs an image with Hytec Hy8401ip device support (DTYP "Hy8401ip",
-      e.g. an RTEMS/VME IOC), not mks937b.
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      c:
-        type: str
-        description: |-
-          c
-      s:
-        type: str
-        description: |-
-          s
-    databases:
-      - file: mks937bHy8401.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bHy8401.pvi.device.yaml
-      ui_macros:
-        device:
-
-  - name: mks937bImg
-    description: |-
-      Imported from DLS module mks937b (mks937bImg.template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      address:
-        type: str
-        description: |-
-          address
-      channel:
-        type: str
-        description: |-
-          channel
-      port:
-        type: str
-        description: |-
-          Asyn port name
-      ctlsp_desc:
-        type: str
-        description: |-
-          ctlsp_desc
-        default: "IMG Enable"
-      ctlsp_hopr:
-        type: float
-        description: |-
-          ctlsp_hopr
-        default: 0.95
-      ctlsp_lopr:
-        type: float
-        description: |-
-          ctlsp_lopr
-        default: 0.0027
-      ctlsp_drvh:
-        type: float
-        description: |-
-          ctlsp_drvh
-        default: 0.95
-      ctlsp_drvl:
-        type: float
-        description: |-
-          ctlsp_drvl
-        default: 0.0027
-      ctlsp_level:
-        type: str
-        description: |-
-          ctlsp_level
-        default: "1.0e-2"
-      ctlsp_hihi:
-        type: float
-        description: |-
-          ctlsp_hihi
-        default: 0.96
-      ctlsp_lolo:
-        type: float
-        description: |-
-          ctlsp_lolo
-        default: 0.0026
-      ctlsp_high:
-        type: float
-        description: |-
-          ctlsp_high
-        default: 0.011
-      ctlsp_low:
-        type: float
-        description: |-
-          ctlsp_low
-        default: 0.009
-      ctlhyst_hopr:
-        type: float
-        description: |-
-          ctlhyst_hopr
-        default: 0.012
-      ctlhyst_lopr:
-        type: float
-        description: |-
-          ctlhyst_lopr
-        default: 2.7e-10
-      img_ctl_setmode:
-        type: str
-        description: |-
-          img_ctl_setmode
-        default: "1"
-      ctl_channel:
-        type: str
-        description: |-
-          ctl_channel
-        default: "0"
-      prosp_desc:
-        type: str
-        description: |-
-          prosp_desc
-        default: "IMG Overpressure"
-      prosp_hopr:
-        type: float
-        description: |-
-          prosp_hopr
-        default: 0.01
-      prosp_lopr:
-        type: float
-        description: |-
-          prosp_lopr
-        default: 1.3e-05
-      prosp_drvh:
-        type: float
-        description: |-
-          prosp_drvh
-        default: 0.01
-      prosp_drvl:
-        type: float
-        description: |-
-          prosp_drvl
-        default: 1.3e-05
-      prosp_level:
-        type: str
-        description: |-
-          prosp_level
-        default: "5.0e-4"
-      prosp_hihi:
-        type: float
-        description: |-
-          prosp_hihi
-        default: 0.011
-      prosp_lolo:
-        type: float
-        description: |-
-          prosp_lolo
-        default: 1.2e-05
-      prosp_high:
-        type: float
-        description: |-
-          prosp_high
-        default: 0.00051
-      prosp_low:
-        type: float
-        description: |-
-          prosp_low
-        default: 0.00049
-      offwarn:
-        type: str
-        description: |-
-          offwarn
-        default: "0"
-      ilk_write_access_pv:
-        type: str
-        description: |-
-          ilk_write_access_pv
-        default: "$(device):PRO:CONSTZERO"
-    databases:
-      - file: mks937bImg.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bImg.pvi.device.yaml
-      ui_macros:
-        device:
-
-  - name: mks937bImgDummy
-    description: |-
-      Imported from DLS module mks937b (mks937bImgDummy.template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      ctlsp_desc:
-        type: str
-        description: |-
-          ctlsp_desc
-        default: "IMG Enable"
-      ctlsp_hopr:
-        type: float
-        description: |-
-          ctlsp_hopr
-        default: 0.95
-      ctlsp_lopr:
-        type: float
-        description: |-
-          ctlsp_lopr
-        default: 0.0027
-      ctlsp_drvh:
-        type: float
-        description: |-
-          ctlsp_drvh
-        default: 0.95
-      ctlsp_drvl:
-        type: float
-        description: |-
-          ctlsp_drvl
-        default: 0.0027
-      ctlsp_level:
-        type: str
-        description: |-
-          ctlsp_level
-        default: "1.0e-2"
-      ctlsp_hihi:
-        type: float
-        description: |-
-          ctlsp_hihi
-        default: 0.96
-      ctlsp_lolo:
-        type: float
-        description: |-
-          ctlsp_lolo
-        default: 0.0026
-      ctlsp_high:
-        type: float
-        description: |-
-          ctlsp_high
-        default: 0.011
-      ctlsp_low:
-        type: float
-        description: |-
-          ctlsp_low
-        default: 0.009
-    databases:
-      - file: mks937bImgDummy.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bImgDummy.pvi.device.yaml
-      ui_macros:
-        device:
-
-  - name: mks937bImgGroup
-    description: |-
-      Imported from DLS module mks937b (mks937bImgGroup.template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      delay:
-        type: str
-        description: |-
-          delay
-      img1:
-        type: str
-        description: |-
-          img1
-      img2:
-        type: str
-        description: |-
-          img2
-      img3:
-        type: str
-        description: |-
-          img3
-      img4:
-        type: str
-        description: |-
-          img4
-      img5:
-        type: str
-        description: |-
-          img5
-      img6:
-        type: str
-        description: |-
-          img6
-      img7:
-        type: str
-        description: |-
-          img7
-      img8:
-        type: str
-        description: |-
-          img8
-      valveIlRelay:
-        type: str
-        description: |-
-          valveIlRelay
-        default: "1"
-      mpsIlRelay1:
-        type: str
-        description: |-
-          mpsIlRelay1
-        default: "2"
-      mpsIlRelay2:
-        type: str
-        description: |-
-          mpsIlRelay2
-        default: "3"
-      rgaIlRelay:
-        type: str
-        description: |-
-          rgaIlRelay
-        default: "4"
-    databases:
-      - file: mks937bImgGroup.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bImgGroup.pvi.device.yaml
-      ui_macros:
-        device:
-        valveIlRelay:
-        mpsIlRelay1:
-        mpsIlRelay2:
-        rgaIlRelay:
-
-  - name: mks937bImgMean
-    description: |-
-      Derived from DLS module mks937b (mks937bImgMean.template): the compiled
-      aSub is replaced by base calc records.
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      nimgs:
-        type: str
-        description: |-
-          nimgs
-      img1:
-        type: str
-        description: |-
-          img1
-      img2:
-        type: str
-        description: |-
-          img2
-      img3:
-        type: str
-        description: |-
-          img3
-      img4:
-        type: str
-        description: |-
-          img4
-      img5:
-        type: str
-        description: |-
-          img5
-      img6:
-        type: str
-        description: |-
-          img6
-      img7:
-        type: str
-        description: |-
-          img7
-      img8:
-        type: str
-        description: |-
-          img8
-      img9:
-        type: str
-        description: |-
-          img9
-      img10:
-        type: str
-        description: |-
-          img10
-      current:
-        type: str
-        description: |-
-          current
-    databases:
-      - file: mks937bImgMean.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bImgMean.pvi.device.yaml
-      ui_macros:
-        device:
-
-  - name: mks937bInterlock
-    description: |-
-      Imported from DLS module mks937b (mks937bInterlock.template)
+      Override gauge interlock values. This template should be used AFTER the
+      interlock records have been loaded with default values.
     parameters:
       interlock:
         type: str
         description: |-
-          interlock
-      name:
-        type: id
-        description: |-
-          Object name
-      high:
-        type: str
-        description: |-
-          high
-      low:
-        type: str
-        description: |-
-          low
+          Interlock subsystem (device:ILK)
       level:
+        type: float
+        description: |-
+          Level (mbar)
+      high:
+        type: float
+        description: |-
+          High limit
+      low:
+        type: float
+        description: |-
+          Low limit
+      name:
         type: str
         description: |-
-          level
+          Interlock name string: the DESC of the setpoint records (in the
+          builder XML, the object's name).
+        default: ""
+
     databases:
       - file: mks937bInterlock.template
         args:
           .*:
     pvi:
-      yaml_path: mks937bInterlock.pvi.device.yaml
+      yaml_path: auto_mks937bInterlock.pvi.device.yaml
       ui_macros:
         interlock:
-
-  - name: mks937bPirg
-    description: |-
-      Imported from DLS module mks937b (mks937bPirg.template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      address:
-        type: str
-        description: |-
-          address
-      channel:
-        type: str
-        description: |-
-          channel
-      port:
-        type: str
-        description: |-
-          Asyn port name
-      offwarn:
-        type: str
-        description: |-
-          offwarn
-        default: "0"
-    databases:
-      - file: mks937bPirg.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bPirg.pvi.device.yaml
-      ui_macros:
-        device:
-
-  - name: mks937bPirgDummy
-    description: |-
-      Imported from DLS module mks937b (mks937bPirgDummy.template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-    databases:
-      - file: mks937bPirgDummy.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bPirgDummy.pvi.device.yaml
-      ui_macros:
-        device:
-
-  - name: mks937bPirgGroup
-    description: |-
-      Imported from DLS module mks937b (mks937bPirgGroup.template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      pirg1:
-        type: str
-        description: |-
-          pirg1
-      pirg2:
-        type: str
-        description: |-
-          pirg2
-      pirg3:
-        type: str
-        description: |-
-          pirg3
-      pirg4:
-        type: str
-        description: |-
-          pirg4
-      pirg5:
-        type: str
-        description: |-
-          pirg5
-      pirg6:
-        type: str
-        description: |-
-          pirg6
-      pirg7:
-        type: str
-        description: |-
-          pirg7
-      pirg8:
-        type: str
-        description: |-
-          pirg8
-      ionPumpIlRelay:
-        type: str
-        description: |-
-          ionPumpIlRelay
-        default: "1"
-    databases:
-      - file: mks937bPirgGroup.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bPirgGroup.pvi.device.yaml
-      ui_macros:
-        device:
-        ionPumpIlRelay:
-
-  - name: mks937bPlogEGU
-    description: |-
-      Imported from DLS module mks937b (mks937bPlogEGU.template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      p_egu_pv:
-        type: str
-        description: |-
-          p_egu_pv
-    databases:
-      - file: mks937bPlogEGU.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bPlogEGU.pvi.device.yaml
-      ui_macros:
-        device:
-
-  - name: mks937bRelays
-    description: |-
-      Imported from DLS module mks937b (mks937bRelays.template)
-    parameters:
-      device:
-        type: str
-        description: |-
-          Device name
-      address:
-        type: str
-        description: |-
-          address
-      relay_number:
-        type: str
-        description: |-
-          relay_number
-      port:
-        type: str
-        description: |-
-          Asyn port name
-      relay_desc:
-        type: str
-        description: |-
-          relay_desc
-        default: "Valve Interlock"
-      relay_hopr:
-        type: float
-        description: |-
-          relay_hopr
-        default: 0.012
-      relay_lopr:
-        type: float
-        description: |-
-          relay_lopr
-        default: 2.7e-10
-      relay_hihi:
-        type: float
-        description: |-
-          relay_hihi
-        default: 0.013
-      relay_lolo:
-        type: float
-        description: |-
-          relay_lolo
-        default: 2.6e-10
-      relay_high:
-        type: float
-        description: |-
-          relay_high
-        default: 1.1e-06
-      relay_low:
-        type: float
-        description: |-
-          relay_low
-        default: 9.0e-07
-      relay_drvh:
-        type: float
-        description: |-
-          relay_drvh
-        default: 0.012
-      relay_drvl:
-        type: float
-        description: |-
-          relay_drvl
-        default: 2.7e-10
-      relay_level:
-        type: str
-        description: |-
-          relay_level
-        default: "1.0e-6"
-      relay_off_desc:
-        type: str
-        description: |-
-          relay_off_desc
-        default: "Relay OFF setpoint"
-      relay_off_level:
-        type: str
-        description: |-
-          relay_off_level
-        default: "0.0"
-      ilk_write_access_pv:
-        type: str
-        description: |-
-          ilk_write_access_pv
-        default: "$(device):CONSTZERO"
-    databases:
-      - file: mks937bRelays.template
-        args:
-          .*:
-    pvi:
-      yaml_path: mks937bRelays.pvi.device.yaml
-      ui_macros:
-        device:

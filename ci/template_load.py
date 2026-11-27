@@ -6,9 +6,10 @@ Two steps, so that only the second needs the IOC image:
     For each entity model of each pattern, write an ``ioc.yaml`` holding one
     entity of that model and run ``ibek runtime generate2`` on it, as an IOC
     instance does at start-up. Required parameters get a placeholder by type,
-    or the value given in ci/template-load.yaml. Each row of the generated
-    ``ioc.subst`` is one test case: one template, with the macros its entity
-    model passes. One ``ioc.yaml`` holding an entity of every model of the
+    or the value given in ci/template-load.yaml; an ``object`` parameter given
+    another model's id there brings that model's entity into the ``ioc.yaml``.
+    Each row the entity generates in ``ioc.subst`` is one test case: one
+    template, with the macros its entity model passes. One ``ioc.yaml`` holding an entity of every model of the
     pattern must generate too. Each template in a pattern's ``sim/`` folder is
     one more case, with each macro it uses without a default set to "1", or
     to the value given in ci/template-load.yaml.
@@ -65,6 +66,52 @@ def placeholder(name: str, spec: dict) -> object:
     # str parameters are as often numbers (addresses, limits, delays) as names,
     # and "1" is valid as both
     return "1"
+
+
+def entity_for(module: str, model: dict, given: dict) -> dict:
+    """One entity of ``model``: given values, else placeholders for required ones.
+
+    An ``id`` parameter is ``ci_<model>_<parameter>``, so an ``object`` parameter
+    of another model can name it in ci/template-load.yaml.
+    """
+    entity = {"type": f"{module}.{model['name']}"}
+    for name, spec in (model.get("parameters") or {}).items():
+        if name in given:
+            entity[name] = given[name]
+        elif "default" not in spec:
+            entity[name] = placeholder(name, spec)
+        if spec.get("type") == "id":
+            entity[name] = f"ci_{model['name']}_{name}"
+    return entity
+
+
+def with_references(entity: dict, entities: list[dict]) -> list[dict]:
+    """``entity``, preceded by the entities its object parameters name, recursively."""
+    by_id = {
+        value: e
+        for e in entities
+        for key, value in e.items()
+        if value == f"ci_{e['type'].split('.', 1)[1]}_{key}"
+    }
+    needed: list[dict] = []
+
+    def visit(e: dict) -> None:
+        for value in e.values():
+            target = by_id.get(value) if isinstance(value, str) else None
+            if target is not None and target is not e and target not in needed:
+                visit(target)
+                needed.append(target)
+
+    visit(entity)
+    return needed + [entity]
+
+
+def in_reference_order(entities: list[dict]) -> list[dict]:
+    """``entities``, each after the entities it names, as ibek requires."""
+    ordered: list[dict] = []
+    for entity in entities:
+        ordered += [e for e in with_references(entity, entities) if e not in ordered]
+    return ordered
 
 
 def parse_subst(text: str) -> list[tuple[str, list[str], list[str]]]:
@@ -196,10 +243,15 @@ def prepare(out: Path, names: list[str]) -> int:
     yaml = YAML(typ="safe")
     config = yaml.load(CONFIG_FILE) or {}
     values = config.get("values") or {}
-    xfail = {
-        f"{entry['pattern']}/{entry['template']}": entry["reason"]
-        for entry in config.get("xfail") or []
-    }
+    # an entry naming an entity model applies to that model's cases only
+    xfail: dict[str, str] = {}
+    xfail_entity: dict[tuple[str, str], str] = {}
+    for entry in config.get("xfail") or []:
+        key = f"{entry['pattern']}/{entry['template']}"
+        if entry.get("entity"):
+            xfail_entity[key, entry["entity"]] = entry["reason"]
+        else:
+            xfail[key] = entry["reason"]
     known: dict[str, list[str]] = {}
     for entry in config.get("known_errors") or []:
         known.setdefault(f"{entry['pattern']}/{entry['template']}", []).append(
@@ -237,19 +289,20 @@ def prepare(out: Path, names: list[str]) -> int:
                 if not model.get("databases"):
                     continue
                 given = values.get(pattern.name, {}).get(model["name"], {})
-                entity = {"type": f"{data['module']}.{model['name']}"}
-                for pname, spec in (model.get("parameters") or {}).items():
-                    if pname in given:
-                        entity[pname] = given[pname]
-                    elif "default" not in spec:
-                        entity[pname] = placeholder(pname, spec)
-                    if spec.get("type") == "id":
-                        entity[pname] = f"ci_{model['name']}_{pname}"
-                entities.append(entity)
+                entities.append(entity_for(data["module"], model, given))
         for number, entity in enumerate(entities):
             runtime = work / f"runtime-{number:02d}"
+            # an object parameter needs the entity it names; that entity's own
+            # rows are its own cases, so only this entity's rows are kept
+            references = with_references(entity, entities)[:-1]
+            theirs: list = []
             try:
-                generate(cfg, runtime, supports, [entity])
+                if references:
+                    generate(cfg, work / "references", supports, references)
+                    theirs = parse_subst(
+                        (work / "references" / "ioc.subst").read_text()
+                    )
+                generate(cfg, runtime, supports, references + [entity])
             except Exception as exc:  # ibek raises pydantic and Jinja errors alike
                 print(
                     f"FAIL {pattern.name}: {entity['type']}: ibek runtime generate2: "
@@ -258,7 +311,10 @@ def prepare(out: Path, names: list[str]) -> int:
                 failures += 1
                 continue
             subst = (runtime / "ioc.subst").read_text()
-            for index, (template, columns, row) in enumerate(parse_subst(subst)):
+            rows = parse_subst(subst)
+            for theirs_row in theirs:
+                rows.remove(theirs_row)
+            for index, (template, columns, row) in enumerate(rows):
                 macros = dict(zip(columns, row, strict=False))
                 key = f"{pattern.name}/{template}"
                 reached.add(key)
@@ -281,7 +337,8 @@ def prepare(out: Path, names: list[str]) -> int:
                     template,
                     block,
                     pvs,
-                    xfail.get(key),
+                    xfail_entity.get((key, entity["type"].split(".", 1)[1]))
+                    or xfail.get(key),
                     known.get(key, []),
                 )
         # sim/ templates are not vendored; each loads on its own in a plain IOC.
@@ -306,7 +363,7 @@ def prepare(out: Path, names: list[str]) -> int:
             reached.add(key)
         # An IOC instance may use every entity model of a pattern at once.
         try:
-            generate(cfg, work / "runtime-all", supports, entities)
+            generate(cfg, work / "runtime-all", supports, in_reference_order(entities))
             if pattern.name in together_xfail:
                 print(
                     f"FAIL {pattern.name}: listed under generate_together_xfail in "
@@ -350,7 +407,11 @@ def prepare(out: Path, names: list[str]) -> int:
                 f"FAIL stale sim_values entry in {CONFIG_FILE.name}: no sim template {key}"
             )
             failures += 1
-    stale = {key for key in xfail if key.split("/")[0] in selected} - reached
+    stale = {
+        key
+        for key in [*xfail, *(key for key, _ in xfail_entity)]
+        if key.split("/")[0] in selected
+    } - reached
     for key in sorted(stale):
         print(
             f"FAIL stale xfail entry in {CONFIG_FILE.name}: "

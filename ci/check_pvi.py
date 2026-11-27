@@ -14,6 +14,8 @@ enabled, as it does when an IOC starts. This checks that:
   index button passes, to a record (or a field of one) that the model's own
   templates create. The records are the ones in ``ioc.subst``'s rows for the
   model, with the macros of the row, so the check follows what the IOC loads.
+  A model that does not pass its ``type`` (one whose args are not ``.*``)
+  owns every row of the templates its databases name.
 
 usage: uv run --with-requirements ci/requirements.txt ci/check_pvi.py
            [--keep DIR] [PATTERN...]
@@ -35,7 +37,7 @@ from pathlib import Path
 
 from patterns import ROOT, SUPPORT_SUFFIX, select_patterns, vendored_files
 from ruamel.yaml import YAML
-from template_load import CONFIG_FILE, parse_subst, placeholder
+from template_load import CONFIG_FILE, entity_for, in_reference_order, parse_subst
 
 MACRO = re.compile(r"\$[({]([A-Za-z_][A-Za-z0-9_]*)(?:=([^)}]*))?[)}]")
 # The parser the PVI generator reads templates with.
@@ -87,18 +89,6 @@ def flatten(patterns: list[Path], config: Path) -> list[tuple[Path, Path]]:
     return sorted(supports, key=lambda item: item[1].name)
 
 
-def entity_for(module: str, model: dict, given: dict) -> dict:
-    entity = {"type": f"{module}.{model['name']}"}
-    for name, spec in (model.get("parameters") or {}).items():
-        if name in given:
-            entity[name] = given[name]
-        elif "default" not in spec:
-            entity[name] = placeholder(name, spec)
-        if spec.get("type") == "id":
-            entity[name] = f"ci_{model['name']}_{name}"
-    return entity
-
-
 def screen_pvs(opi: Path, bob: str, seen: set[str] | None = None) -> list[str]:
     """Every PV name on a screen and, recursively, on the screens it opens."""
     seen = set() if seen is None else seen
@@ -113,19 +103,22 @@ def screen_pvs(opi: Path, bob: str, seen: set[str] | None = None) -> list[str]:
     return pvs
 
 
-def model_records(generator, patterns: dict[str, Path], subst: str) -> dict[str, set]:
+def model_records(
+    generator, patterns: dict[str, Path], subst: str, users: dict[str, list[str]]
+) -> dict[str, set]:
     """{entity type: {record name}} from the rows of ioc.subst."""
     records: dict[str, set[str]] = {}
     for template, columns, row in parse_subst(subst):
         macros = dict(zip(columns, row, strict=False))
-        etype = macros.get("type", "")
+        etypes = [macros["type"]] if "type" in macros else users.get(template, [])
         folder = patterns.get(template)
-        if not etype or folder is None:
+        if not etypes or folder is None:
             continue
         parser = generator.Parser(folder, {})
         parser.parse(template, macros)
-        names = records.setdefault(etype, set())
-        names |= {expand(record.name, macros) for record in parser.records}
+        for etype in etypes:
+            names = records.setdefault(etype, set())
+            names |= {expand(record.name, macros) for record in parser.records}
     return records
 
 
@@ -147,12 +140,15 @@ def run(work: Path, patterns: list[Path]) -> int:
     failures: list[str] = []
     entities = []
     expected: dict[str, str] = {}  # entity type -> screen stem
+    users: dict[str, list[str]] = {}  # template -> entity types loading it
     for pattern, support in supports:
         data = yaml.load(support)
         for model in data["entity_models"]:
             if not model.get("databases"):
                 continue
             etype = f"{data['module']}.{model['name']}"
+            for db in model["databases"]:
+                users.setdefault(db["file"], []).append(etype)
             if model.get("pvi"):
                 expected[etype] = Path(model["pvi"]["yaml_path"]).name.split(".")[0]
             elif not model["name"].startswith("_"):
@@ -161,7 +157,11 @@ def run(work: Path, patterns: list[Path]) -> int:
             entities.append(entity_for(data["module"], model, given))
     (config / "ioc.yaml").write_text(
         json.dumps(
-            {"ioc_name": "ci", "description": "pvi screens", "entities": entities}
+            {
+                "ioc_name": "ci",
+                "description": "pvi screens",
+                "entities": in_reference_order(entities),
+            }
         )
     )
 
@@ -187,7 +187,7 @@ def run(work: Path, patterns: list[Path]) -> int:
             c.tag: c.text or "" for c in (macros if macros is not None else [])
         }
     subst = (epics / "runtime" / "ioc.subst").read_text()
-    records = model_records(generator, folders, subst)
+    records = model_records(generator, folders, subst, users)
 
     checked = 0
     for etype, stem in sorted(expected.items()):
