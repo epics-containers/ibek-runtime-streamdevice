@@ -1,7 +1,7 @@
 # PIpiezo
 
 Runtime StreamDevice pattern imported from the DLS support module `PIpiezo`, release
-`1-23` (`/dls_sw/prod/R3.14.12.7/support/PIpiezo/1-23`). Its files are pristine copies
+`1-28` (`/dls_sw/prod/R3.14.12.7/support/PIpiezo/1-28`). Its files are pristine copies
 of that release.
 
 How each file was obtained, and any change made to it, is recorded in the header of
@@ -19,7 +19,7 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 | `PIpiezo.E871absGrp` | Imported from DLS module PIpiezo (E871-absGrp.template) NOTE: needs a generic IOC built with PIpiezo (not the plain generic image). |
 | `PIpiezo.E871relGrp` | Imported from DLS module PIpiezo (E871-relGrp.template) |
 | `PIpiezo.PI-E516` | Imported from DLS module PIpiezo (PI-E516.template) NOTE: needs a generic IOC built with PIpiezo (not the plain generic image). |
-| `PIpiezo.actuatorcallback` | Imported from DLS module PIpiezo (actuatorcallback.template) |
+| `PIpiezo.auto_actuatorcallback` | Imported from DLS module PIpiezo (actuatorcallback.template) |
 
 ## Files
 
@@ -50,7 +50,7 @@ instance's `config/`:
 - `PI-E516.pvi.device.yaml`
 - `PI-E516.template`
 - `PIpiezo.ibek.support.yaml`
-- `actuatorcallback.pvi.device.yaml`
+- `auto_actuatorcallback.pvi.device.yaml`
 - `actuatorcallback.template`
 - `e725Z_detail.template`
 

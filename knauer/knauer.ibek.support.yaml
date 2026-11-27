@@ -81,3 +81,20 @@ entity_models:
       ui_macros:
         P:
         R:
+
+  - name: PumpAndValve
+    description: |-
+      The EDM screen of a BlueShadow 40P pump and an Azura V 2.1 S valve drive
+      used together. It creates no records: the release's pumpAndValve.template
+      holds only `# % gui` annotations, which have no consumer in
+      epics-containers. Accepted so that this entity of a converted builder IOC
+      validates.
+    parameters:
+      PUMP:
+        type: str
+        description: |-
+          Pump prefix and suffix
+      VALVE:
+        type: str
+        description: |-
+          Valve prefix and suffix

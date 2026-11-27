@@ -27,15 +27,15 @@ entity_models:
         description: |-
           Address on the bus (optional)
       TEMPSCAN:
-        type: int
+        type: str
         description: |-
           SCAN rate for the temperature/voltage readings
       SCAN:
-        type: int
+        type: str
         description: |-
           SCAN rate for non-temperature/voltage parameters.
       ONOFFDEFAULT:
-        type: int
+        type: str
         description: |-
           Default value for ON/OFF
     databases:

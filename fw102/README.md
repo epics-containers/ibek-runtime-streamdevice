@@ -13,14 +13,12 @@ pattern, so the provenance travels into every IOC instance that uses it.
 | Entity model | Description |
 |---|---|
 | `fw102.fw102` | Thorlabs FW102 motorised filter wheel, under the name XMLbuilder gives it; the slot materials and `R` default to empty |
-| `fw102._fw102Template` | Thorlabs FW102 motorised filter wheel, every parameter required |
 
 ## Files
 
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
-- `_fw102Template.pvi.device.yaml`
 - `fw102.ibek.support.yaml`
 - `fw102.proto`
 - `fw102.pvi.device.yaml`

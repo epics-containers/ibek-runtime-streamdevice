@@ -20,7 +20,7 @@ it.
 | `OxInstCryojet.MercuryiTC_SCPI_system` | Oxford Instruments MercuryiTC SCPI system commands |
 | `OxInstCryojet.MercuryiTC_SCPI_tempSensor` | Oxford Instruments MercuryiTC SCPI temperature sensor commands |
 | `OxInstCryojet.ILM201` | Imported from DLS module OxInstCryojet (ILM201.template) |
-| `OxInstCryojet.ITC4` | Imported from DLS module OxInstCryojet (ITC4.template) |
+| `OxInstCryojet.auto_ITC4` | Imported from DLS module OxInstCryojet (ITC4.template) |
 | `OxInstCryojet.MercuryiTC_SCPI` | Oxford Instruments Mercury iTC: system, one temperature sensor, one heater and one loop (the motherboard configuration) |
 
 ## Files
@@ -31,7 +31,6 @@ instance's `config/`:
 - `ILM201.pvi.device.yaml`
 - `ILM201.template`
 - `ILM201_settings.req`
-- `ITC4.pvi.device.yaml`
 - `ITC4.template`
 - `ITC4_settings.req`
 - `MercuryiTC-SCPI.proto`
@@ -46,6 +45,7 @@ instance's `config/`:
 - `MercuryiTC_SCPI_system.pvi.device.yaml`
 - `MercuryiTC_SCPI_tempSensor.pvi.device.yaml`
 - `OxInstCryojet.ibek.support.yaml`
+- `auto_ITC4.pvi.device.yaml`
 - `cjet.proto`
 - `cryojet.pvi.device.yaml`
 - `cryojet.template`

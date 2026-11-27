@@ -31,7 +31,7 @@ entity_models:
         description: |-
           Address on the bus (optional)
       SCAN:
-        type: int
+        type: str
         description: |-
           SCAN rate for read parameters
     databases:

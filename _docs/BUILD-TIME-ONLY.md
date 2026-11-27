@@ -40,16 +40,17 @@ still has to be linked in.
 | `bronkhorstFlowBus` | 1-5 | `asciiToString10`, `floatToInt`, `intToFloat` |
 | `capaNCDT` | 3-4 | `capaNCDTInit` (`INAM`), `capaNCDTProc` |
 | `cmsIon` | 4-11 | `UpdateWeekEndTime` (`INAM`), `ResetManualDose`, `RunEndReset`, `ResetTime`, `Check4hrReset`; also MRF event-receiver records |
+| `d2afe` | 0-1 | `checkFW`, in `fwVersionCheck.template`, which every `d2afe` device loads; see [Removed from the library](#removed-from-the-library) |
 | `debenOF` | 2-0 | `mySubInit` (`INAM`), `parseStatusString`; also the motor record |
 | `digitelSpc` | 1-13 | `versionCheck` |
 | `huberChiller` | 1-3 | `alarmCommand`, `controlCommand`, `decodeGeneral`, `decodeLimit`, `setpointCommand` |
-| `lakeshore336` | 2-19-1 | `extractFirmwareVersion`, in `lakeshore336-FirmwareVersion.template`, which `lakeshore336.template` always includes |
 | `laserPuckPointer` | 2-16 | `isbWrite`, `sendPuckDemand` |
 | `mecaRobot` | 1-7 | `copyReadbacksToSetPoints`, `jog`, `moveSampleHolder`, `prepareMoveArray`, `robotPositionParser`, `statusParser` |
 | `mitsubishiRobot` | 4-36 | `CmdErrorLookup`, `DecToAsc`, `ErrorLookup`, `LocationLookup`, `LogError`, `Logging`, `PuckLabel`, `Regex`; also a compiled asyn port driver |
 | `pfeifferTC400` | 2-5 | `pfeifferErrorCodeParse`, `pfeifferErrorMessageParse`, `pfeifferParamSetVetolistCheck` |
 | `picotechPT104` | 2-3 | `pt104_resToT`, `pt104_ucharToUInt` |
 | `tecPeltier` | 1-6 | `SNAM` is the `$(CONVERT)` macro, naming a routine from the module's compiled `asubMethods.c` |
+| `yaskawaBARTRobot` | 0-1-I22-ONLY | `DecToAsc`, `GripperState`, in `BARTRobot.db`, plus asyn records on a FINS PLC port; see [Removed from the library](#removed-from-the-library) |
 
 Some of these modules also hold templates that do work in the image. They could be
 admitted as patterns without their failing templates:
@@ -68,8 +69,10 @@ library; the image's IP and serial ports provide only `asynOctet`.
 |---|---|---|
 | `capaNCDT6200` | 1-0 | `capaNCDT6200Config` |
 | `delaygen` | 1-2-1dls3 | `drvAsynDG645`; `DTYP "dg535"` |
+| `eurotherm2k` (Modbus classes) | 2-10 | `modbusInterposeConfig`, `eurothermModbusCtrlConfigure`, `eurothermModbusLoopConfigure`, `drvModbusAsynConfigure`; the `eurotherm2k` pattern keeps the StreamDevice device |
 | `hls` | 2-0 | `HlsDriverCreate`; no template uses `DTYP "stream"` |
 | `linkamMotor` | 1-1 | `linkamMDS600Config`; no template uses `DTYP "stream"` |
+| `leybold` (`centerN`, `coolpak`) | 2-2 | `centerNConfig`, `coolpakConfig`; the `leybold` pattern keeps the StreamDevice CenterOne devices |
 | `PLV1000` | 1-1 | `PLV1000Config` |
 | `queensgate` | 2-2 | compiled asyn motor driver, the motor record, `getPos` |
 | `rga` | 4-26 | `MVPlusInit`; `rgaGroupStatusCalc`, `rgaGroupStatusInit` |
@@ -121,15 +124,11 @@ support yaml header and entity model description.
 | Pattern | Template(s) | Needs |
 |---|---|---|
 | `PIpiezo` | `E871-absGrp.template`, `PI-E516.template` | the motor record |
-| `d2afe` | `fwVersionCheck.template` | compiled aSub routine `checkFW` |
 | `enzLoCuM4` | `enzLoCuM4Readback.template` | `DTYP "Hy8401ip"` (Hytec IP ADC) |
-| `eurotherm2k` | `eurothermModbus.template`, `eurothermModbusLoop.template`, `eurothermModbusPV.template` | compiled Modbus asyn driver (`drvModbusAsynConfigure`, `eurothermModbusCtrlConfigure`) |
-| `leybold` | `centerN.template`, `coolpak.template` | compiled asyn drivers (`centerNConfig`, `coolpakConfig`) |
 | `microlab500` | `microlab500whole.template` | the motor record |
 | `mks937a` | `mks937aGauge.template` | `DTYP "$(aitype=Hy8401ip)"` (Hytec IP ADC, e.g. an RTEMS/VME IOC); runs in the generic image with `aitype` `Soft Channel` |
 | `mks937b` | `mks937bHy8401.template` | `DTYP "Hy8401ip"` (Hytec IP ADC, e.g. an RTEMS/VME IOC) |
 | `strainGauge` | `strainGauge.template` | compiled aSub routine `parseSetpointValue` |
-| `yaskawaBARTRobot` | `BARTRobot.db` | compiled aSub routines `DecToAsc`, `GripperState`; compiled FINS asyn driver |
 | `currAmp` | `currAmp_ai.template` | `DTYP` is the instance-supplied `$(DTYPE)`, so an instance can name device support the image lacks |
 
 `microlab500` stays in the library although its main template is marked, so in the
@@ -140,3 +139,18 @@ confined to a builder class with no template, so its four stream templates are a
 imported. `dlsCAENels` replaces its `wipeStates` genSubs with `sseq` records, and
 `oxCryo` replaces `alarmlookupProcess` with `calcout`/`calc`/`aai`/`subArray` records,
 so both run in the generic image with nothing marked.
+
+## Removed from the library
+
+These were runtime patterns, or parts of one, and are now out of the library. Each
+needed compiled code that no runtime image has, yet builder2ibek routed IOCs to the
+pattern, so the converted IOC started without the code and failed or silently did
+nothing.
+
+| Removed | Was | Why it is build-time only | Build-time home |
+|---|---|---|---|
+| `d2afe` pattern | every model | every `d2afe` device loads `fwVersionCheck.template`, whose aSub calls the module's compiled `checkFW`; the `d2ptg` scan lists alone are no use without the AFE devices | none yet: ibek-support-dls has no `d2afe` folder |
+| `yaskawaBARTRobot` pattern | every model | `BARTRobot.db`, which every IOC of the module loads, needs the compiled routines `DecToAsc` and `GripperState` and reads the gripper over a FINS PLC port; the `yaskawa*` variable templates are no use without the controller | none yet: ibek-support-dls has no `yaskawaBARTRobot` folder; the FINS port is `ibek-support/FINS` |
+| `eurotherm2k` `eurothermModbus`, `eurothermModbusLoop`, `eurothermModbusPV` | models and templates | the builder classes configure a Modbus port with compiled commands (above) at startup, which the models never ran, so the records had no port | a generic IOC built with DLS `eurotherm2k` itself (its compiled `libeurothermModbus`, from `eurotherm2kApp/src/eurothermModbus.c`) plus `modbus`; not `ibek-support/eurothermModbus`, which is a different DLS module (`eurothermModbus` 3-2-15) |
+| `eurotherm2k` `eurothermParam`, `eurothermConfParam`, `eurothermPV` | models and templates | no `builder.py` class loads these templates, so no builder XML uses them | none needed |
+| `leybold` `centerN`, `coolpak` | models and templates | the builder classes create their asyn port with the compiled `centerNConfig` / `coolpakConfig` | `ibek-support-dls/leybold`, which builds the `leybold` library but has no `centerN` or `coolpak` model yet |

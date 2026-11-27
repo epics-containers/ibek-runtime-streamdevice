@@ -48,6 +48,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_FILE = Path(__file__).with_name("template-load.yaml")
+# Support yamls standing in for modules of the generic image whose entities a
+# pattern's object parameters refer to, such as an asyn port. objects: in
+# CONFIG_FILE names one of their models as module.model.
+STUBS = sorted(Path(__file__).with_name("stubs").glob("*.ibek.support.yaml"))
 
 # ---------------------------------------------------------------------------
 # prepare
@@ -59,6 +63,18 @@ PLACEHOLDER = {"int": 1, "float": 1.0, "bool": False}
 def id_value(model: str, name: str) -> str:
     """The value given to an ``id`` parameter."""
     return f"ci_{model}_{name}"
+
+
+def stub_models() -> dict[str, dict]:
+    """The models of STUBS, as {module.model: model with its module}."""
+    from ruamel.yaml import YAML
+
+    out = {}
+    for stub in STUBS:
+        data = YAML(typ="safe").load(stub)
+        for model in data["entity_models"]:
+            out[f"{data['module']}.{model['name']}"] = {**model, "module": data["module"]}
+    return out
 
 
 def referred(objects: dict, model: dict, models: dict[str, dict]) -> list[dict]:
@@ -94,7 +110,7 @@ def entity_for(
     are given. ``given`` holds that pattern's parameter values from
     ci/template-load.yaml, and ``objects`` the model each ``object`` parameter
     refers to; the IOC must hold an entity of that model too."""
-    entity = {"type": f"{module}.{model['name']}"}
+    entity = {"type": f"{model.get('module', module)}.{model['name']}"}
     for name, spec in (model.get("parameters") or {}).items():
         if name in given.get(model["name"], {}):
             entity[name] = given[model["name"]][name]
@@ -167,7 +183,7 @@ def generate(
         )
     )
     runtime.mkdir(parents=True, exist_ok=True)
-    do_generate([ioc_yaml], supports, runtime, False)
+    do_generate([ioc_yaml], [*supports, *STUBS], runtime, False)
 
 
 def expand(text: str, macros: dict[str, str]) -> str:
@@ -318,7 +334,7 @@ def prepare(out: Path, names: list[str]) -> int:
         objects = (config.get("objects") or {}).get(pattern.name, {})
         for support in supports:
             data = yaml.load(support)
-            models = {m["name"]: m for m in data["entity_models"]}
+            models = {m["name"]: m for m in data["entity_models"]} | stub_models()
             given = values.get(pattern.name, {})
             for model in data["entity_models"]:
                 if not model.get("databases"):
@@ -398,9 +414,14 @@ def prepare(out: Path, names: list[str]) -> int:
                 sim=True,
             )
             reached.add(key)
-        # An IOC instance may use every entity model of a pattern at once.
+        # An IOC instance may use every entity model of a pattern at once, with
+        # the entities of other modules (ci/stubs/) that they refer to.
+        together = list(entities)
+        for entity in (e for need in needs for e in need):
+            if entity not in together:
+                together.append(entity)
         try:
-            generate(cfg, work / "runtime-all", supports, in_reference_order(entities))
+            generate(cfg, work / "runtime-all", supports, in_reference_order(together))
             if pattern.name in together_xfail:
                 print(
                     f"FAIL {pattern.name}: listed under generate_together_xfail in "

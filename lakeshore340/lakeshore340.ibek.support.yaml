@@ -5,6 +5,15 @@
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/lakeshore340/ release.
+#
+# Entity model: that of ibek-support's lakeshore340 (epics-containers/ibek-support
+# c1501f0, lakeshore340/lakeshore340.ibek.support.yaml): builder.py's AutoSubstitution
+# of lakeshore340.template, whose macros are its parameters. Its database points
+# at this pattern's own template, and its pvi: block is generate-pvi.py's.
+#
+# Changed from that model: SCAN and TEMPSCAN are str, not int. The template uses
+# them as "$(SCAN) second", builder.py takes any string, and a real IOC
+# (BL11I-CS-IOC-04) sets TEMPSCAN=".5".
 
 module: lakeshore340
 
@@ -18,30 +27,41 @@ entity_models:
         type: str
         description: |-
           Prefix for PV name
+
       PORT:
         type: str
         description: |-
           Bus/Port Address (eg. ASYN Port).
+
       ADDR:
         type: int
         description: |-
           Address on the bus
         default: 0
+
       SCAN:
-        type: int
+        type: str
         description: |-
           SCAN rate for non-temperature/voltage parameters.
-        default: 5
+        default: "5"
+
       TEMPSCAN:
-        type: int
+        type: str
         description: |-
           SCAN rate for the temperature/voltage readings
-        default: 5
+        default: "5"
+
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+
       LOOP:
         type: int
         description: |-
           Which heater PID loop to control (Default = 1)
         default: 1
+
     databases:
       - file: lakeshore340.template
         args:

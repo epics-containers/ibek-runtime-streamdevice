@@ -10,10 +10,21 @@
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/leybold/ release.
 #
-# Templates needing a generic IOC built with this module (not the plain
-# generic image):
-# - `centerN.template` needs a generic IOC built with `leybold` (compiled support), not the plain generic image.
-# - `coolpak.template` needs a generic IOC built with `leybold` (compiled support), not the plain generic image.
+# centerN.template and coolpak.template are not imported: the DLS builder.py
+# centerN and coolpak classes create their asyn port at startup with the
+# module's compiled centerNConfig and coolpakConfig commands, which no runtime
+# image has. They belong in a build-time model.
+#
+# Entity models: builder.py's AutoSubstitution classes, whose parameters are the
+# template's macros, all strings, with the template's own defaults. They match
+# ibek-support-dls's leybold models (52b8a51) where builder.py agrees with those:
+# the *VLI and DEFAULT_VAL parameters are str, and read_write_floatE_floatE's
+# DRVH and DRVL default to "", the value centerOne.xml gives them (builder.py
+# requires both, but takes "", which builder2ibek reads as unset). They keep
+# builder.py's choice where ibek-support-dls differs: read_int_floatE's HIGH,
+# LOW, HIHI and LOLO are str, and the *STO and *VLO defaults of read_write_int
+# and read_write_int_floatE are "$(ZRSTI=)" and the like, the values builder
+# writes, so an output state falls back to its input state.
 
 module: leybold
 
@@ -30,50 +41,6 @@ entity_models:
         type: str
         description: |-
           PV prefix
-
-  - name: centerN
-    description: |-
-      Imported from DLS module leybold (centerN.template)
-      NOTE: needs a generic IOC built with leybold (not the plain generic image).
-    parameters:
-      P:
-        type: str
-        description: |-
-          Device prefix
-      PORT:
-        type: str
-        description: |-
-          Asyn port name
-    databases:
-      - file: centerN.template
-        args:
-          .*:
-    pvi:
-      yaml_path: centerN.pvi.device.yaml
-      ui_macros:
-        P:
-
-  - name: coolpak
-    description: |-
-      Imported from DLS module leybold (coolpak.template)
-      NOTE: needs a generic IOC built with leybold (not the plain generic image).
-    parameters:
-      P:
-        type: str
-        description: |-
-          Device prefix
-      PORT:
-        type: str
-        description: |-
-          Asyn port name
-    databases:
-      - file: coolpak.template
-        args:
-          .*:
-    pvi:
-      yaml_path: coolpak.pvi.device.yaml
-      ui_macros:
-        P:
 
   - name: read_floatE
     description: |-
@@ -302,85 +269,85 @@ entity_models:
           FFSTI
         default: ""
       ZRVLI:
-        type: int
+        type: str
         description: |-
           ZRVLI
-        default: 0
+        default: "0"
       ONVLI:
-        type: int
+        type: str
         description: |-
           ONVLI
-        default: 1
+        default: "1"
       TWVLI:
-        type: int
+        type: str
         description: |-
           TWVLI
-        default: 2
+        default: "2"
       THVLI:
-        type: int
+        type: str
         description: |-
           THVLI
-        default: 3
+        default: "3"
       FRVLI:
-        type: int
+        type: str
         description: |-
           FRVLI
-        default: 4
+        default: "4"
       FVVLI:
-        type: int
+        type: str
         description: |-
           FVVLI
-        default: 5
+        default: "5"
       SXVLI:
-        type: int
+        type: str
         description: |-
           SXVLI
-        default: 6
+        default: "6"
       SVVLI:
-        type: int
+        type: str
         description: |-
           SVVLI
-        default: 7
+        default: "7"
       EIVLI:
-        type: int
+        type: str
         description: |-
           EIVLI
-        default: 8
+        default: "8"
       NIVLI:
-        type: int
+        type: str
         description: |-
           NIVLI
-        default: 9
+        default: "9"
       TEVLI:
-        type: int
+        type: str
         description: |-
           TEVLI
-        default: 10
+        default: "10"
       ELVLI:
-        type: int
+        type: str
         description: |-
           ELVLI
-        default: 11
+        default: "11"
       TVVLI:
-        type: int
+        type: str
         description: |-
           TVVLI
-        default: 12
+        default: "12"
       TTVLI:
-        type: int
+        type: str
         description: |-
           TTVLI
-        default: 13
+        default: "13"
       FTVLI:
-        type: int
+        type: str
         description: |-
           FTVLI
-        default: 14
+        default: "14"
       FFVLI:
-        type: int
+        type: str
         description: |-
           FFVLI
-        default: 15
+        default: "15"
     databases:
       - file: read_int_floatE.template
         args:
@@ -459,10 +426,10 @@ entity_models:
         description: |-
           PINIW
       DEFAULT_VAL:
-        type: float
+        type: str
         description: |-
           DEFAULT_VAL
-        default: 0.0
+        default: "0"
       DRVH:
         type: str
         description: |-
@@ -517,10 +484,12 @@ entity_models:
         type: str
         description: |-
           DRVH
+        default: ""
       DRVL:
         type: str
         description: |-
           DRVL
+        default: ""
     databases:
       - file: read_write_floatE_floatE.template
         args:
@@ -642,85 +611,85 @@ entity_models:
           FFSTI
         default: ""
       ZRVLI:
-        type: int
+        type: str
         description: |-
           ZRVLI
-        default: 0
+        default: "0"
       ONVLI:
-        type: int
+        type: str
         description: |-
           ONVLI
-        default: 1
+        default: "1"
       TWVLI:
-        type: int
+        type: str
         description: |-
           TWVLI
-        default: 2
+        default: "2"
       THVLI:
-        type: int
+        type: str
         description: |-
           THVLI
-        default: 3
+        default: "3"
       FRVLI:
-        type: int
+        type: str
         description: |-
           FRVLI
-        default: 4
+        default: "4"
       FVVLI:
-        type: int
+        type: str
         description: |-
           FVVLI
-        default: 5
+        default: "5"
       SXVLI:
-        type: int
+        type: str
         description: |-
           SXVLI
-        default: 6
+        default: "6"
       SVVLI:
-        type: int
+        type: str
         description: |-
           SVVLI
-        default: 7
+        default: "7"
       EIVLI:
-        type: int
+        type: str
         description: |-
           EIVLI
-        default: 8
+        default: "8"
       NIVLI:
-        type: int
+        type: str
         description: |-
           NIVLI
-        default: 9
+        default: "9"
       TEVLI:
-        type: int
+        type: str
         description: |-
           TEVLI
-        default: 10
+        default: "10"
       ELVLI:
-        type: int
+        type: str
         description: |-
           ELVLI
-        default: 11
+        default: "11"
       TVVLI:
-        type: int
+        type: str
         description: |-
           TVVLI
-        default: 12
+        default: "12"
       TTVLI:
-        type: int
+        type: str
         description: |-
           TTVLI
-        default: 13
+        default: "13"
       FTVLI:
-        type: int
+        type: str
         description: |-
           FTVLI
-        default: 14
+        default: "14"
       FFVLI:
-        type: int
+        type: str
         description: |-
           FFVLI
-        default: 15
+        default: "15"
       ZRSTO:
         type: str
         description: |-
@@ -1026,85 +995,85 @@ entity_models:
           FFSTI
         default: ""
       ZRVLI:
-        type: int
+        type: str
         description: |-
           ZRVLI
-        default: 0
+        default: "0"
       ONVLI:
-        type: int
+        type: str
         description: |-
           ONVLI
-        default: 1
+        default: "1"
       TWVLI:
-        type: int
+        type: str
         description: |-
           TWVLI
-        default: 2
+        default: "2"
       THVLI:
-        type: int
+        type: str
         description: |-
           THVLI
-        default: 3
+        default: "3"
       FRVLI:
-        type: int
+        type: str
         description: |-
           FRVLI
-        default: 4
+        default: "4"
       FVVLI:
-        type: int
+        type: str
         description: |-
           FVVLI
-        default: 5
+        default: "5"
       SXVLI:
-        type: int
+        type: str
         description: |-
           SXVLI
-        default: 6
+        default: "6"
       SVVLI:
-        type: int
+        type: str
         description: |-
           SVVLI
-        default: 7
+        default: "7"
       EIVLI:
-        type: int
+        type: str
         description: |-
           EIVLI
-        default: 8
+        default: "8"
       NIVLI:
-        type: int
+        type: str
         description: |-
           NIVLI
-        default: 9
+        default: "9"
       TEVLI:
-        type: int
+        type: str
         description: |-
           TEVLI
-        default: 10
+        default: "10"
       ELVLI:
-        type: int
+        type: str
         description: |-
           ELVLI
-        default: 11
+        default: "11"
       TVVLI:
-        type: int
+        type: str
         description: |-
           TVVLI
-        default: 12
+        default: "12"
       TTVLI:
-        type: int
+        type: str
         description: |-
           TTVLI
-        default: 13
+        default: "13"
       FTVLI:
-        type: int
+        type: str
         description: |-
           FTVLI
-        default: 14
+        default: "14"
       FFVLI:
-        type: int
+        type: str
         description: |-
           FFVLI
-        default: 15
+        default: "15"
       ZRSTO:
         type: str
         description: |-
@@ -1315,10 +1284,10 @@ entity_models:
         description: |-
           DRVL
       DEFAULT_VAL:
-        type: float
+        type: str
         description: |-
           DEFAULT_VAL
-        default: 0.0
+        default: "0"
     databases:
       - file: write_raw_int.template
         args:
