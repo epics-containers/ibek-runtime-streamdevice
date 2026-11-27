@@ -1,0 +1,465 @@
+# This is included in lakeshore336.template
+
+################################################################
+# Read records
+################################################################
+
+
+## 
+## Read the heater output value.
+##
+#% archiver 10 Monitor
+#
+record(ai, "$(P):HTR$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getHTR($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "1")
+  field(EGU, "%")
+  field(FLNK, "$(P):MOUT:TRACKCLC$(LOOP)")
+}
+
+## 
+## Read the setpoint temperature.
+##
+#% archiver 10 Monitor
+#
+record(ai, "$(P):SETP$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getSETP($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(TEMPSCAN) second")
+  field(PREC, "3")
+  field(EGU, "K")
+}
+
+## 
+## Read the range parameter (the heater output power range).
+##
+record(mbbi, "$(P):RANGE$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(ZRST, "Off")
+  field(ZRVL, "0")
+  field(ONST, "Low")
+  field(ONVL, "1")
+  field(TWST, "Medium")
+  field(TWVL, "2")
+  field(THST, "High")
+  field(THVL, "3")
+  field(SCAN, "$(SCAN) second")
+  field(INP, "@lakeshore336.proto getRANGE($(LOOP)) $(PORT) $(ADDR)")
+}
+
+
+## 
+## Read the ramp paremeter.
+##
+record(ai, "$(P):RAMP$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getRAMP($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "3")
+  field(EGU, "K/min")  
+}
+
+## 
+## Read the ramp status parameter.
+##
+## 0=off
+## 1=on
+##
+record(ai, "$(P):RAMPST$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getRAMPSTATUS($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+}
+
+
+## 
+## Read the control loop 1 manual output parameter.
+##
+record(ai, "$(P):MOUT$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getMOUT($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "2")
+}
+
+## 
+## Read the PID P parameter for control loop 1.
+##
+record(ai, "$(P):P$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getP($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "1")
+}
+
+## 
+## Read the PID I parameter for control loop 1.
+##
+record(ai, "$(P):I$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getI($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "1")
+}
+
+## 
+## Read the PID D parameter for control loop 1.
+##
+record(ai, "$(P):D$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INP, "@lakeshore336.proto getD($(LOOP)) $(PORT) $(ADDR)")
+  field(SCAN, "$(SCAN) second")
+  field(PREC, "1")
+}
+
+
+
+##
+## Read the mode to use for outmode
+##
+record(mbbi, "$(P):OMMODE$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(ZRST, "Off")
+  field(ZRVL, "0")
+  field(ONST, "Closed Loop PID")
+  field(ONVL, "1")
+  field(TWST, "Zone")
+  field(TWVL, "2")
+  field(THST, "Open Loop")
+  field(THVL, "3")
+  field(FRST, "Monitor Out")
+  field(FRVL, "4")
+  field(FVST, "Warmup Supply")
+  field(FVVL, "5")
+  field(SCAN, "$(SCAN) second")
+  field(INP, "@lakeshore336.proto getOUTMODEMODE($(LOOP)) $(PORT) $(ADDR)")
+}
+
+
+##
+## Read the input to use for outmode
+##
+record(mbbi, "$(P):OMINPUT$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(ZRST, "None")
+  field(ZRVL, "0")
+  field(ONST, "Input 1")
+  field(ONVL, "1")
+  field(TWST, "Input 2")
+  field(TWVL, "2")
+  field(THST, "Input 3")
+  field(THVL, "3")
+  field(FRST, "Input 4")
+  field(FRVL, "4")
+  field(SCAN, "$(SCAN) second")
+  field(INP, "@lakeshore336.proto getOUTMODEINPUT($(LOOP)) $(PORT) $(ADDR)")
+}
+
+##
+## Read the power up mode to use for outmode
+##
+record(mbbi, "$(P):OMPE$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(ZRST, "Powerup En Off")
+  field(ZRVL, "0")
+  field(ONST, "Powerup En On")
+  field(ONVL, "1")
+  field(SCAN, "$(SCAN) second")
+  field(INP, "@lakeshore336.proto getOUTMODEPE($(LOOP)) $(PORT) $(ADDR)")
+}
+
+
+
+################################################################
+# Write records
+################################################################
+
+
+## 
+## Set the setpoint temperature.
+##
+record(ao, "$(P):SETP_S$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Setpoint temperature")
+  field(OUT, "@lakeshore336.proto setSETP($(LOOP)) $(PORT) $(ADDR)")
+  field(PREC, "3")
+  field(FLNK, "$(P):SETP$(LOOP).PROC CA")
+  field(EGU, "K")
+}
+
+## 
+## Set the range parameter.
+##
+## Possible values are: 0, 1, 2, 3
+##
+record(mbbo, "$(P):RANGE_S$(LOOP)") {
+  field(DTYP, "stream")
+  field(ZRST, "Off")
+  field(ZRVL, "0")
+  field(ONST, "Low")
+  field(ONVL, "1")
+  field(TWST, "Medium")
+  field(TWVL, "2")
+  field(THST, "High")
+  field(THVL, "3")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@lakeshore336.proto setRANGE($(LOOP)) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):RANGE$(LOOP).PROC CA")  
+}
+
+
+## 
+## Set the ramp rate parameter.
+##
+## This is the desired temperate increase/decrease rate
+## per second when heating/cooling.
+##
+## The ramp and ramp status parameters are actually one command
+## for the lakeshore 340. Therefore one must pass into this
+## record the existing/desired ramp status, as well as the 
+## desired ramp. This is done automatically by reading the 
+## PV which holds the current ramp status.
+##
+record(ao, "$(P):RAMP_S$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@lakeshore336.proto setRAMP($(P):RAMPST$(LOOP),$(LOOP)) $(PORT) $(ADDR)")
+  field(PREC, "3")
+  field(FLNK, "$(P):RAMP$(LOOP).PROC CA")
+  field(EGU, "K/min")
+}
+
+## 
+## Set the ramp status parameter.
+##
+## 0=off
+## 1=on
+##
+## The ramp and ramp status parameters are actually one command
+## for the lakeshore 340. Therefore one must pass into this
+## record the existing/desired ramp, as well as the 
+## desired ramp status. This is done automatically by reading the 
+## PV which holds the current ramp value.
+##
+record(ao, "$(P):RAMPST_S$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@lakeshore336.proto setRAMPSTATUS($(P):RAMP$(LOOP),$(LOOP)) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):RAMPST$(LOOP).PROC CA")
+  field(HOPR, "1")
+  field(LOPR, "0")
+}
+
+## 
+## Set the control loop 1 manual output value.
+##
+record(ao, "$(P):MOUT_S$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@lakeshore336.proto setMOUT($(LOOP)) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):MOUT$(LOOP).PROC CA")
+  field(PREC, "2")
+}
+
+#% autosave 0 VAL
+record(mbbo, "$(P):MOUT:TRACKCL$(LOOP)") {
+  field(DESC, "Enable MOUT to track CL demand")
+  field(ZRST, "Disabled")
+  field(ZRVL, "0")
+  field(ONST, "Enabled")
+  field(ONVL, "1")
+  field(PINI, "YES")
+}
+
+record(calcout, "$(P):MOUT:TRACKCLC$(LOOP)") {
+  field(DESC, "If tracking enabled & closed_loop")
+  field(CALC, "(A=1&&B=1)?1:0")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "C")
+  field(INPA, "$(P):MOUT:TRACKCL$(LOOP)")
+  field(INPB, "$(P):OMMODE$(LOOP)")
+  field(INPC, "$(P):HTR$(LOOP)")
+  field(OUT, "$(P):MOUT_S$(LOOP) PP")
+}
+
+##
+## Set the PID P parameter for control loop 1.
+##
+record(ao, "$(P):P_S$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@lakeshore336.proto setP($(LOOP),$(P):I$(LOOP),$(P):D$(LOOP)) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):P$(LOOP).PROC CA")
+  field(PREC, "1")
+}
+
+##
+## Set the PID I parameter for control loop 1.
+##
+record(ao, "$(P):I_S$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@lakeshore336.proto setI($(P):P$(LOOP),$(LOOP),$(P):D$(LOOP)) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):I$(LOOP).PROC CA")
+  field(PREC, "1")
+}
+
+##
+## Set the PID D parameter for control loop 1.
+##
+record(ao, "$(P):D_S$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@lakeshore336.proto setD($(P):P$(LOOP),$(P):I$(LOOP),$(LOOP)) $(PORT) $(ADDR)")
+  field(FLNK, "$(P):D$(LOOP).PROC CA")
+  field(PREC, "1")
+}
+
+
+##
+## Set the mode to use for outmode
+##
+record(mbbo, "$(P):OMMODE_S$(LOOP)") {
+  field(SDIS, "$(P):DISABLE")
+  field(ZRST, "Off")
+  field(ZRVL, "0")
+  field(ONST, "Closed Loop PID")
+  field(ONVL, "1")
+  field(TWST, "Zone")
+  field(TWVL, "2")
+  field(THST, "Open Loop")
+  field(THVL, "3")
+  field(FRST, "Monitor Out")
+  field(FRVL, "4")
+  field(FVST, "Warmup Supply")
+  field(FVVL, "5")
+  field(FLNK, "$(P):OM$(LOOP).PROC CA")
+}
+
+
+record(seq, "$(P):OMMODE_STARTUP$(LOOP)") {
+  field(SCAN, "Passive")
+  field(DOL1, "1")
+  field(LNK1, "$(P):OMMODE$(LOOP).PROC")
+  field(DLY2, "1.0")
+  field(DOL2, "$(P):OMMODE$(LOOP).VAL")
+  field(LNK2, "$(P):OMMODE_S$(LOOP).VAL")
+  field(PINI, "YES")
+}
+
+
+##
+## Set the input to use for outmode
+##
+record(mbbo, "$(P):OMINPUT_S$(LOOP)") {
+  field(SDIS, "$(P):DISABLE")
+  field(ZRST, "None")
+  field(ZRVL, "0")
+  field(ONST, "Input 1")
+  field(ONVL, "1")
+  field(TWST, "Input 2")
+  field(TWVL, "2")
+  field(THST, "Input 3")
+  field(THVL, "3")
+  field(FRST, "Input 4")
+  field(FRVL, "4")
+  field(FLNK, "$(P):OM$(LOOP).PROC CA")
+}
+
+record(seq, "$(P):OMINPUT_STARTUP$(LOOP)") {
+  field(SCAN, "Passive")
+  field(DOL1, "1")
+  field(LNK1, "$(P):OMINPUT$(LOOP).PROC")
+  field(DLY2, "1.0")
+  field(DOL2, "$(P):OMINPUT$(LOOP).VAL")
+  field(LNK2, "$(P):OMINPUT_S$(LOOP).VAL")
+  field(PINI, "YES")
+}
+
+##
+## Set the power up mode to use for outmode
+##
+record(mbbo, "$(P):OMPE_S$(LOOP)") {
+  field(SDIS, "$(P):DISABLE")
+  field(ZRST, "Powerup En Off")
+  field(ZRVL, "0")
+  field(ONST, "Powerup En On")
+  field(ONVL, "1")
+  field(FLNK, "$(P):OM$(LOOP).PROC CA")
+}
+
+record(seq, "$(P):OMPE_STARTUP$(LOOP)") {
+  field(SCAN, "Passive")
+  field(DOL1, "1")
+  field(LNK1, "$(P):OMPE$(LOOP).PROC")
+  field(DLY2, "1.0")
+  field(DOL2, "$(P):OMPE$(LOOP).VAL")
+  field(LNK2, "$(P):OMPE_S$(LOOP).VAL")
+  field(PINI, "YES")
+}
+
+
+##
+## Set the output mode to use
+##
+record(calcout, "$(P):OM$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(INPA, "$(LOOP)")
+  field(INPB, "$(P):OMMODE_S$(LOOP)")
+  field(INPC, "$(P):OMINPUT_S$(LOOP)")
+  field(INPD, "$(P):OMPE_S$(LOOP)")
+  field(SDIS, "$(P):DISABLE")
+  field(OUT, "@lakeshore336.proto setOUTMODE $(PORT) $(ADDR)")
+  field(FLNK, "$(P):OMREADFAN$(LOOP)")
+}
+
+
+record(fanout, "$(P):OMREADFAN$(LOOP)") {
+  field(LNK1, "$(P):OMMODE$(LOOP).PROC CA")
+  field(LNK2, "$(P):OMINPUT$(LOOP).PROC CA")
+  field(LNK3, "$(P):OMPE$(LOOP).PROC CA")
+}
+
+
+
+##
+## Set the type of tuning mode
+##
+record(mbbo, "$(P):TUNEMODE_S$(LOOP)") {
+  field(SDIS, "$(P):DISABLE")
+  field(ZRST, "P Only")
+  field(ZRVL, "0")
+  field(ONST, "P and I")
+  field(ONVL, "1")
+  field(TWST, "P, I and D")
+  field(TWVL, "2")
+}
+
+
+## 
+## Start the tuning process
+##
+record(ao, "$(P):TUNESTART$(LOOP)") {
+  field(DTYP, "stream")
+  field(SDIS, "$(P):DISABLE")
+  field(DESC, "Start the auto tuning")
+  field(OUT, "@lakeshore336.proto setATUNE($(LOOP),$(P):TUNEMODE_S$(LOOP)) $(PORT) $(ADDR)")
+}
+
