@@ -17,18 +17,26 @@ values:
     # FPARAM and IPARAM name two different records
     read_int_floatE: {FPARAM: F, IPARAM: I}
     read_write_int_floatE: {FPARAM: F, IPARAM: I}
-  # An object parameter names the entity of another model by its id,
-  # ci_<model>_<parameter>; that entity is generated with it.
+
+# objects: for each `object` parameter, the entity model of the same pattern
+# whose entity it refers to, as {pattern: {entity_model: {parameter: model}}}.
+# An entity of that model is put in the IOC with the one that refers to it.
+objects:
+  granvillePhillips:
+    gp350Hcg: {GCTLR: gp350}
+    gp350Pirg: {GCTLR: gp350}
+    gp307Hcg: {GCTLR: gp307}
+    gp307Pirg: {GCTLR: gp307}
   mks937a:
-    mks937aImg: {GCTLR: ci_mks937a_name}
-    mks937aPirg: {GCTLR: ci_mks937a_name}
+    mks937aImg: {GCTLR: mks937a}
+    mks937aPirg: {GCTLR: mks937a}
   mks937b:
-    mks937bCap: {GCTLR: ci_mks937b_name}
-    mks937bImg: {GCTLR: ci_mks937b_name}
-    mks937bPirg: {GCTLR: ci_mks937b_name}
-    mks937bRelays: {GAUGE: ci_mks937bImg_name}
-    # an HCG, which names its port and address itself rather than a GCTLR
-    mks937bFastRelay: {GAUGE: ci_auto_mks937bHcg_name}
+    mks937bCap: {GCTLR: mks937b}
+    mks937bImg: {GCTLR: mks937b}
+    mks937bPirg: {GCTLR: mks937b}
+    mks937bRelays: {GAUGE: mks937bImg}
+    # an HCG names its port and address itself rather than a GCTLR
+    mks937bFastRelay: {GAUGE: auto_mks937bHcg}
 
 # sim_values: macro values for templates in a pattern's sim/ folder, as
 # {pattern/sim/template: {macro: value}}. Each macro a sim template uses

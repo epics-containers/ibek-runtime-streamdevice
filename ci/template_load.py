@@ -6,10 +6,9 @@ Two steps, so that only the second needs the IOC image:
     For each entity model of each pattern, write an ``ioc.yaml`` holding one
     entity of that model and run ``ibek runtime generate2`` on it, as an IOC
     instance does at start-up. Required parameters get a placeholder by type,
-    or the value given in ci/template-load.yaml; an ``object`` parameter given
-    another model's id there brings that model's entity into the ``ioc.yaml``.
-    Each row the entity generates in ``ioc.subst`` is one test case: one
-    template, with the macros its entity model passes. One ``ioc.yaml`` holding an entity of every model of the
+    or the value given in ci/template-load.yaml. Each row of the generated
+    ``ioc.subst`` is one test case: one template, with the macros its entity
+    model passes. One ``ioc.yaml`` holding an entity of every model of the
     pattern must generate too. Each template in a pattern's ``sim/`` folder is
     one more case, with each macro it uses without a default set to "1", or
     to the value given in ci/template-load.yaml.
@@ -57,6 +56,81 @@ CONFIG_FILE = Path(__file__).with_name("template-load.yaml")
 PLACEHOLDER = {"int": 1, "float": 1.0, "bool": False}
 
 
+def id_value(model: str, name: str) -> str:
+    """The value given to an ``id`` parameter."""
+    return f"ci_{model}_{name}"
+
+
+def referred(objects: dict, model: dict, models: dict[str, dict]) -> list[dict]:
+    """The models an entity of ``model`` refers to through its ``object``
+    parameters, as ``objects`` (one pattern's entry in ci/template-load.yaml)
+    names them, each with its own referred models first."""
+    out: list[dict] = []
+    for name, spec in (model.get("parameters") or {}).items():
+        if spec.get("type") != "object":
+            continue
+        target = objects.get(model["name"], {}).get(name)
+        if target not in models:
+            raise KeyError(
+                f"{model['name']}.{name}: object parameter with no model under "
+                f"objects in {CONFIG_FILE.name}"
+            )
+        out += referred(objects, models[target], models) + [models[target]]
+    return out
+
+
+def object_value(objects: dict, model: dict, name: str, models: dict) -> str:
+    """The value given to an ``object`` parameter: the id of an entity of the
+    model it refers to."""
+    target = models[objects[model["name"]][name]]
+    ids = [n for n, s in target["parameters"].items() if s.get("type") == "id"]
+    return id_value(target["name"], ids[0])
+
+
+def entity_for(
+    module: str, model: dict, given: dict, objects: dict, models: dict
+) -> dict:
+    """An entity of ``model``, of one pattern, whose ``module`` and ``models``
+    are given. ``given`` holds that pattern's parameter values from
+    ci/template-load.yaml, and ``objects`` the model each ``object`` parameter
+    refers to; the IOC must hold an entity of that model too."""
+    entity = {"type": f"{module}.{model['name']}"}
+    for name, spec in (model.get("parameters") or {}).items():
+        if name in given.get(model["name"], {}):
+            entity[name] = given[model["name"]][name]
+        elif spec.get("type") == "object":
+            entity[name] = object_value(objects, model, name, models)
+        elif "default" not in spec:
+            entity[name] = placeholder(name, spec)
+        if spec.get("type") == "id":
+            entity[name] = id_value(model["name"], name)
+    return entity
+
+
+def in_reference_order(entities: list[dict]) -> list[dict]:
+    """``entities``, each after the entities whose ids it names, as ibek requires."""
+    by_id = {
+        value: e
+        for e in entities
+        for key, value in e.items()
+        if value == id_value(e["type"].split(".", 1)[1], key)
+    }
+    ordered: list[dict] = []
+
+    def visit(entity: dict) -> None:
+        if any(entity is e for e in ordered):
+            return
+        for value in entity.values():
+            target = by_id.get(value) if isinstance(value, str) else None
+            if target is not None and target is not entity:
+                visit(target)
+        ordered.append(entity)
+
+    for entity in entities:
+        visit(entity)
+    return ordered
+
+
 def placeholder(name: str, spec: dict) -> object:
     kind = spec.get("type")
     if kind == "enum":
@@ -66,52 +140,6 @@ def placeholder(name: str, spec: dict) -> object:
     # str parameters are as often numbers (addresses, limits, delays) as names,
     # and "1" is valid as both
     return "1"
-
-
-def entity_for(module: str, model: dict, given: dict) -> dict:
-    """One entity of ``model``: given values, else placeholders for required ones.
-
-    An ``id`` parameter is ``ci_<model>_<parameter>``, so an ``object`` parameter
-    of another model can name it in ci/template-load.yaml.
-    """
-    entity = {"type": f"{module}.{model['name']}"}
-    for name, spec in (model.get("parameters") or {}).items():
-        if name in given:
-            entity[name] = given[name]
-        elif "default" not in spec:
-            entity[name] = placeholder(name, spec)
-        if spec.get("type") == "id":
-            entity[name] = f"ci_{model['name']}_{name}"
-    return entity
-
-
-def with_references(entity: dict, entities: list[dict]) -> list[dict]:
-    """``entity``, preceded by the entities its object parameters name, recursively."""
-    by_id = {
-        value: e
-        for e in entities
-        for key, value in e.items()
-        if value == f"ci_{e['type'].split('.', 1)[1]}_{key}"
-    }
-    needed: list[dict] = []
-
-    def visit(e: dict) -> None:
-        for value in e.values():
-            target = by_id.get(value) if isinstance(value, str) else None
-            if target is not None and target is not e and target not in needed:
-                visit(target)
-                needed.append(target)
-
-    visit(entity)
-    return needed + [entity]
-
-
-def in_reference_order(entities: list[dict]) -> list[dict]:
-    """``entities``, each after the entities it names, as ibek requires."""
-    ordered: list[dict] = []
-    for entity in entities:
-        ordered += [e for e in with_references(entity, entities) if e not in ordered]
-    return ordered
 
 
 def parse_subst(text: str) -> list[tuple[str, list[str], list[str]]]:
@@ -283,26 +311,36 @@ def prepare(out: Path, names: list[str]) -> int:
             src for n, src in files.items() if n.endswith(".ibek.support.yaml")
         )
         entities = []
+        # the entities each one refers to, which its IOC holds too
+        needs: list[list[dict]] = []
+        # the templates each entity's model loads
+        loads: list[set[str]] = []
+        objects = (config.get("objects") or {}).get(pattern.name, {})
         for support in supports:
             data = yaml.load(support)
+            models = {m["name"]: m for m in data["entity_models"]}
+            given = values.get(pattern.name, {})
             for model in data["entity_models"]:
                 if not model.get("databases"):
                     continue
-                given = values.get(pattern.name, {}).get(model["name"], {})
-                entities.append(entity_for(data["module"], model, given))
+                try:
+                    before = [
+                        entity_for(data["module"], m, given, objects, models)
+                        for m in referred(objects, model, models)
+                    ]
+                except KeyError as exc:
+                    print(f"FAIL {pattern.name}: {exc.args[0]}")
+                    failures += 1
+                    continue
+                entities.append(
+                    entity_for(data["module"], model, given, objects, models)
+                )
+                needs.append(before)
+                loads.append({db["file"] for db in model["databases"]})
         for number, entity in enumerate(entities):
             runtime = work / f"runtime-{number:02d}"
-            # an object parameter needs the entity it names; that entity's own
-            # rows are its own cases, so only this entity's rows are kept
-            references = with_references(entity, entities)[:-1]
-            theirs: list = []
             try:
-                if references:
-                    generate(cfg, work / "references", supports, references)
-                    theirs = parse_subst(
-                        (work / "references" / "ioc.subst").read_text()
-                    )
-                generate(cfg, runtime, supports, references + [entity])
+                generate(cfg, runtime, supports, [*needs[number], entity])
             except Exception as exc:  # ibek raises pydantic and Jinja errors alike
                 print(
                     f"FAIL {pattern.name}: {entity['type']}: ibek runtime generate2: "
@@ -311,10 +349,9 @@ def prepare(out: Path, names: list[str]) -> int:
                 failures += 1
                 continue
             subst = (runtime / "ioc.subst").read_text()
-            rows = parse_subst(subst)
-            for theirs_row in theirs:
-                rows.remove(theirs_row)
-            for index, (template, columns, row) in enumerate(rows):
+            for index, (template, columns, row) in enumerate(parse_subst(subst)):
+                if needs[number] and template not in loads[number]:
+                    continue  # a row of an entity this one refers to
                 macros = dict(zip(columns, row, strict=False))
                 key = f"{pattern.name}/{template}"
                 reached.add(key)

@@ -419,6 +419,10 @@ docker run --rm -v "$PWD:$PWD" -w "$PWD" \
     python ci/template_load.py run build/load
 ```
 
+Where an entity model has an `object` parameter, `objects` in `ci/template-load.yaml`
+names the model of the same pattern it refers to, and the checks that build an IOC put
+an entity of that model in it too.
+
 The ibek version the checks use is pinned in `ci/requirements.txt`; move it
 deliberately when the library adopts a new ibek. Known faults in the library
 content are listed, each with its reason, in `ci/template-load.yaml`,

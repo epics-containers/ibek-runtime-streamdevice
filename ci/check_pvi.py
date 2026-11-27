@@ -124,7 +124,9 @@ def model_records(
 
 def run(work: Path, patterns: list[Path]) -> int:
     yaml = YAML(typ="safe")
-    values = (yaml.load(CONFIG_FILE) or {}).get("values") or {}
+    config_file = yaml.load(CONFIG_FILE) or {}
+    values = config_file.get("values") or {}
+    objects = config_file.get("objects") or {}
     generator = load_generator()
     epics = work / "epics"
     config = epics / "ioc" / "config"
@@ -143,6 +145,7 @@ def run(work: Path, patterns: list[Path]) -> int:
     users: dict[str, list[str]] = {}  # template -> entity types loading it
     for pattern, support in supports:
         data = yaml.load(support)
+        models = {m["name"]: m for m in data["entity_models"]}
         for model in data["entity_models"]:
             if not model.get("databases"):
                 continue
@@ -153,8 +156,15 @@ def run(work: Path, patterns: list[Path]) -> int:
                 expected[etype] = Path(model["pvi"]["yaml_path"]).name.split(".")[0]
             elif not model["name"].startswith("_"):
                 failures.append(f"{etype}: has databases but no pvi: block")
-            given = values.get(pattern.name, {}).get(model["name"], {})
-            entities.append(entity_for(data["module"], model, given))
+            entities.append(
+                entity_for(
+                    data["module"],
+                    model,
+                    values.get(pattern.name, {}),
+                    objects.get(pattern.name, {}),
+                    models,
+                )
+            )
     (config / "ioc.yaml").write_text(
         json.dumps(
             {

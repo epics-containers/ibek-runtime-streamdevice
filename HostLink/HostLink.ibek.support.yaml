@@ -2,7 +2,16 @@
 
 # Imported from DLS production support module: HostLink 3-3
 # Source: /dls_sw/prod/R3.14.12.7/support/HostLink/3-3
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# Pristine copies of the StreamDevice protocols + EPICS db/template from that release:
+#   - HostlinkFINS.proto: data/HostlinkFINS.proto, used by HostLink.template;
+#   - Hostlink.proto: data/Hostlink.proto, the C-mode (RD/WD) protocol. No model
+#     here uses it: it is for templates of other patterns, such as
+#     BL05I_waterChiller.template of ibek-runtime-support's BL05I pattern, which
+#     DLS builds against HostLink 3-3. An IOC instance that vendors this pattern
+#     gets it in config/, and the IOC places it on STREAM_PROTOCOL_PATH;
+#   - HostLink.template: db/HostLink.template.
+# The HostLink model loads nothing: the IOC finds both protocols once this
+# pattern is vendored, with or without an entity of it.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/HostLink/ release.
 
@@ -11,7 +20,7 @@ module: HostLink
 entity_models:
   - name: HostLink
     description: |-
-      HostLink FINS protocol module (loads the stream protocol file)
+      HostLink protocols (no records; Hostlink.proto and HostlinkFINS.proto are vendored with the pattern)
   - name: HostLinkTemplate
     description: |-
       Omron PLC HostLink FINS communications status and clock readbacks
