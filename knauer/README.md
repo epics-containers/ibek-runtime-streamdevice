@@ -15,6 +15,7 @@ pattern, so the provenance travels into every IOC instance that uses it.
 | `knauer.BlueShadow40P` | Controls a Knauer BlueShadow 40P HPLC pump |
 | `knauer.Azura21S` | Controls a Knauer Azuar V2.1S valve drive |
 | `knauer.ConnectionManagement` | Monitors a connection to a Knauer device |
+| `knauer.PumpAndValve` | GUI-only: the pump and valve screen; creates no records |
 
 ## Files
 

@@ -11,14 +11,28 @@ values:
     read_write_int_floatE: {FPARAM: F, IPARAM: I}
 
 # objects: for each `object` parameter, the entity model of the same pattern
-# whose entity it refers to, as {pattern: {entity_model: {parameter: model}}}.
+# whose entity it refers to, as {pattern: {entity_model: {parameter: model}}},
+# or module.model for a model of ci/stubs/ (a module of the generic image).
 # An entity of that model is put in the IOC with the one that refers to it.
 objects:
+  digitelMpc:
+    digitelMpc: {port: asyn.AsynIP}
+    digitelMpcIonp: {MPC: digitelMpc}
   granvillePhillips:
     gp350Hcg: {GCTLR: gp350}
     gp350Pirg: {GCTLR: gp350}
     gp307Hcg: {GCTLR: gp307}
     gp307Pirg: {GCTLR: gp307}
+  mks937a:
+    mks937aImg: {GCTLR: mks937a}
+    mks937aPirg: {GCTLR: mks937a}
+  mks937b:
+    mks937bCap: {GCTLR: mks937b}
+    mks937bImg: {GCTLR: mks937b}
+    mks937bPirg: {GCTLR: mks937b}
+    mks937bRelays: {GAUGE: mks937bImg}
+    # an HCG names its port and address itself rather than a GCTLR
+    mks937bFastRelay: {GAUGE: auto_mks937bHcg}
 
 # sim_values: macro values for templates in a pattern's sim/ folder, as
 # {pattern/sim/template: {macro: value}}. Each macro a sim template uses
@@ -35,6 +49,7 @@ sim_values:
 # xfail: templates that need more than the generic ioc-streamdevice image, as
 # listed in _docs/BUILD-TIME-ONLY.md "Runtime patterns with marked templates". They
 # must fail to load; one that loads fails the check until it is removed here.
+# An entry with `entity: <model>` applies to that entity model's cases only.
 xfail:
   - pattern: PIpiezo
     template: E871-absGrp.template
@@ -50,16 +65,12 @@ xfail:
     reason: 'the motor record'
   - pattern: mks937a
     template: mks937aGauge.template
-    reason: 'DTYP "$(aitype=Hy8401ip)"'
-  - pattern: mks937a
-    template: mks937aImgMean.template
-    reason: 'compiled aSub routines mks937aMeanInit, mks937aMeanCalc'
+    # mks937aGaugeEGU loads it with aitype "Soft Channel"
+    entity: mks937aGauge
+    reason: 'DTYP "$(aitype=Hy8401ip)" (Hytec IP ADC)'
   - pattern: mks937b
     template: mks937bHy8401.template
-    reason: 'DTYP "Hy8401ip"'
-  - pattern: mks937b
-    template: mks937bImgMean.template
-    reason: 'compiled aSub routines mks937bMeanInit, mks937bMeanCalc'
+    reason: 'DTYP "Hy8401ip" (Hytec IP ADC)'
   - pattern: strainGauge
     template: strainGauge.template
     reason: 'compiled aSub routine parseSetpointValue'

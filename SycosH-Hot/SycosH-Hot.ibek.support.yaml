@@ -25,10 +25,16 @@ entity_models:
         type: str
         description: |-
           Asyn port name
+      gda_desc:
+        type: str
+        description: |-
+          GDA description.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: SycosH-Hot.template
         args:
-          .*:
+          '(?!gda_desc$).*':
     pvi:
       yaml_path: SycosH_Hot.pvi.device.yaml
       ui_macros:

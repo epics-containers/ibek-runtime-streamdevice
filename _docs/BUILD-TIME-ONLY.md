@@ -44,7 +44,6 @@ still has to be linked in.
 | `debenOF` | 2-0 | `mySubInit` (`INAM`), `parseStatusString`; also the motor record |
 | `digitelSpc` | 1-13 | `versionCheck` |
 | `huberChiller` | 1-3 | `alarmCommand`, `controlCommand`, `decodeGeneral`, `decodeLimit`, `setpointCommand` |
-| `lakeshore336` | 2-19-1 | `extractFirmwareVersion`, in `lakeshore336-FirmwareVersion.template`, which `lakeshore336.template` always includes |
 | `laserPuckPointer` | 2-16 | `isbWrite`, `sendPuckDemand` |
 | `mecaRobot` | 1-7 | `copyReadbacksToSetPoints`, `jog`, `moveSampleHolder`, `prepareMoveArray`, `robotPositionParser`, `statusParser` |
 | `mitsubishiRobot` | 4-36 | `CmdErrorLookup`, `DecToAsc`, `ErrorLookup`, `LocationLookup`, `LogError`, `Logging`, `PuckLabel`, `Regex`; also a compiled asyn port driver |
@@ -127,8 +126,8 @@ support yaml header and entity model description.
 | `PIpiezo` | `E871-absGrp.template`, `PI-E516.template` | the motor record |
 | `enzLoCuM4` | `enzLoCuM4Readback.template` | `DTYP "Hy8401ip"` (Hytec IP ADC) |
 | `microlab500` | `microlab500whole.template` | the motor record |
-| `mks937a` | `mks937aGauge.template`, `mks937aImgMean.template` | `DTYP "$(aitype=Hy8401ip)"`; compiled aSub routines `mks937aMeanInit`, `mks937aMeanCalc` |
-| `mks937b` | `mks937bHy8401.template`, `mks937bImgMean.template` | `DTYP "Hy8401ip"`; compiled aSub routines `mks937bMeanInit`, `mks937bMeanCalc` |
+| `mks937a` | `mks937aGauge.template` | `DTYP "$(aitype=Hy8401ip)"` (Hytec IP ADC, e.g. an RTEMS/VME IOC); runs in the generic image with `aitype` `Soft Channel` |
+| `mks937b` | `mks937bHy8401.template` | `DTYP "Hy8401ip"` (Hytec IP ADC, e.g. an RTEMS/VME IOC) |
 | `strainGauge` | `strainGauge.template` | compiled aSub routine `parseSetpointValue` |
 | `currAmp` | `currAmp_ai.template` | `DTYP` is the instance-supplied `$(DTYPE)`, so an instance can name device support the image lacks |
 

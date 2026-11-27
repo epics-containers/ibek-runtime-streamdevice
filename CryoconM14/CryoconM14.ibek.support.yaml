@@ -88,10 +88,16 @@ entity_models:
           Object description.
           Documentary: accepted for builder XML compatibility; not passed to the template.
         default: ""
+      gda:
+        type: bool
+        description: |-
+          Whether GDA uses the device.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: true
     databases:
       - file: M14_sensor.template
         args:
-          '(?!desc$).*':
+          '(?!(desc|gda)$).*':
     pvi:
       yaml_path: M14_sensor.pvi.device.yaml
       ui_macros:

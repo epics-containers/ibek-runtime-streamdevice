@@ -15,32 +15,6 @@
 module: VatLeakValve590
 
 entity_models:
-  - name: _VatLeakValve590seriesTemplate
-    description: |-
-      Template database for VAT Variable Leak Valve 590 Series
-    parameters:
-      device:
-        type: str
-        description: |-
-          device name
-      port:
-        type: str
-        description: |-
-          asyn serial port number (e.g. ty_40_0)
-      proto:
-        type: str
-        description: |-
-          name of protocol file, either V590.proto
-        default: V590.proto
-    databases:
-      - file: VATLeakValve590series.template
-        args:
-          .*:
-    pvi:
-      yaml_path: _VatLeakValve590seriesTemplate.pvi.device.yaml
-      ui_macros:
-        device:
-
   - name: VatLeakValve590series
     description: |-
       VAT Variable Leak Valve 590 Series
@@ -54,9 +28,11 @@ entity_models:
         description: |-
           Asyn Port
       proto:
-        type: str
+        type: enum
         description: |-
           Protocol file to use (V590.proto)
+        values:
+          V590.proto:
         default: V590.proto
     databases:
       - file: VATLeakValve590series.template
