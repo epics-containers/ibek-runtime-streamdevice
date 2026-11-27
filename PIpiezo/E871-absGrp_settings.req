@@ -28,3 +28,12 @@ $(P)$(Q)$(GRP).UEIP
 $(P)$(Q)$(GRP).URIP
 $(P)$(Q)$(GRP).VBAS
 $(P)$(Q)$(GRP).VELO
+$(P)$(Q)$(GRP):AUTO:HCOMP
+$(P)$(Q)$(GRP):AUTO:LIMITS
+$(P)$(Q)$(GRP):LASTPOS:C1
+$(P)$(Q)$(GRP):LASTPOS:C2
+$(P)$(Q)$(GRP):LASTPOS:C3
+$(P)$(Q)$(GRP):OFFSET:C1
+$(P)$(Q)$(GRP):OFFSET:C2
+$(P)$(Q)$(GRP):OFFSET:C3
+$(P)$(Q)$(GRP):SCALE

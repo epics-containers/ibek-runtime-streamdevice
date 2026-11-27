@@ -4,6 +4,15 @@
 #! DBDEND
 
 
+# This template instantiates a soft motor to control up to three piezos.
+# C1 piezo demand = softmotor demand * SCALE * SC1
+# C2 piezo demand = softmotor demand * SCALE * SC2
+# C3 piezo demand = softmotor demand * SCALE * SC3
+# Softmotor readback = (C1/SCRBV1 + C2/SCRBV2 + C3/SCRBV3)/SCALE
+# Optionally the template can adjust the soft motor limits when piezos are driven in opposition.
+# If multiple instances of this template are used on the same piezos then ENA_COMP and LNK1..3 can
+# be used to compensate for readback changes cause by a move initiatesd by another instance.
+# NB If setting SC1,SC2 or SC3 to -1 then move the controller motors to mid range then set the compound motor zero position.
 #% macro, P      , Device Prefix
 #% macro, Q      , Device Suffix
 #% macro, GRP, Group PV Name (P)(Q)(GRP):...
@@ -11,14 +20,28 @@
 #% macro, C2, Axis Name (ie C from E871.template). If only 1 axes in group set equal to C1
 #% macro, C3, Axis Name (ie C from E871.template). If only 2 axes in group set equal to C1
 #% macro, AXES, Number of axes in group, set to 2 for C1 and C2 only, 3 for C1,C2 and C3
-#% macro, HILIM, High limit of piezos in EGU. We assume multiple identical stages with same travel. 
-#% macro, LOLIM, Low limit of piezo in EGU (probably 0). We assume multiple identical stages with same travel.
+#% macro, HILIM, High limit of piezos in controller units. We assume multiple identical stages with same travel. 
+#% macro, LOLIM, Low limit of piezo in controller units (probably 0 if SC1..3 are all positive). We assume multiple identical stages with same travel.
 #% macro, DESC   , Description, displayed on EDM screen
-#% macro, MRES   , Motor Step Size (EGU)
-#% macro, RRES   , Readback Step Size (EGU) (default 1)
-#% macro, RDBD   , Retry deadband (EGU)
+#% macro, EGU    , Users Engineering Units
+#% macro, SCALE  , Muliplier for converting compound soft motor EGU to Piezo controller units(mm) (default=1)
+#% macro, SC1, Scale multiplier for C1 demand move usually 1 or -1, set negative to move motor in opposite direction (default=1)
+#% macro, SC2, Scale multiplier for C2 demand move usually 1 or -1, set negative to move motor in opposite direction (default=1)
+#% macro, SC3, Scale multiplier for C3 demand move usually 1 or -1, set negative to move motor in opposite direction (default=1)
+#% macro, SCRBV1, Scale divider for C1 readback usually 1 or -1, set sign as SC1 (defualt=1)
+#% macro, SCRBV2, Scale divider for C2 readback usually 1 or -1, set sign as SC2 (default=1)
+#% macro, SCRBV3, Scale divider for C3 readback usually 1 or -1, set sign as SC3 (default=1)
+#% macro, OFFSET_C1, C1 motor offset for defining zero position in controller units(mm) (default 0)
+#% macro, OFFSET_C2, C2 motor offset for defining zero position in controller units(mm) (default 0)
+#% macro, OFFSET_C3, C3 motor offset for defining zero position in controller units(mm) (default 0)
+#% macro, ENA_COMP, Enable angle compensation, Set to 1 for a compound angle motor (default 0)
+#% macro, LNK1, Link to another angle template instance (P)(Q)(GRP):APPLY:HCOMP PV to auto correct angle readback at end of this templates move
+#% macro, LNK2, Link to another angle template instance (P)(Q)(GRP):APPLY:HCOMP PV to auto correct angle readback at end of this templates move
+#% macro, LNK3, Link to another angle template instance (P)(Q)(GRP):APPLY:HCOMP PV to auto correct angle readback at end of this templates move
+#% macro, MRES   , Motor Step Size
+#% macro, RRES   , Readback Step Size (default 1)
+#% macro, RDBD   , Retry deadband
 #% macro, STARTDLY, Time to allow ONT readback to indicate moving (seconds)
-#% macro, EGU    , Engineering Units
 # AUTOSAVE: level 0 = before record init, level 1 = before AND after record init
 #% autosave 0 DVAL OFF
 #% autosave 1 DIR DHLM DLLM TWV SREV MRES ERES RRES VBAS VELO ACCL BDST BVEL BACC RDBD EGU RTRY UEIP URIP DLY PREC DISA DISP FOFF OFF FRAC OMSL JVEL JAR
@@ -61,20 +84,21 @@ record(ao, "$(P)$(Q)$(GRP):DEMAND:POS") {
 record(calcout, "$(P)$(Q)$(GRP):CALC:REL:MOVE") {
   field(DESC, "relative move required")
   field(FLNK, "$(P)$(Q)$(GRP):STARTMOV")
-  field(CALC, "A-B")
+  field(CALC, "(A-B)*C")
   field(INPA, "$(P)$(Q)$(GRP):DEMAND:POS.VAL")
   field(INPB, "$(P)$(Q)$(GRP):CALC:POS.VAL")
+  field(INPC, "$(P)$(Q)$(GRP):SCALE.VAL")
 }
 
 record(calcout, "$(P)$(Q)$(GRP):CALC:ALL:ONT") {
-  field(DESC, "All on target")
+  field(DESC, "If all on target")
   field(SCAN, ".2 second")
-  field(CALC, "((A+B+C)=3)?1:0")
+  field(CALC, "(((A+B+C)=3)&&(D=0))?1:0")
   field(INPA, "$(P)$(Q)$(C1):ONT:RD")
   field(INPB, "$(P)$(Q)$(C2):ONT:RD")
   field(INPC, "$(P)$(Q)$(C3):ONT:RD")
   field(OUT, "$(P)$(Q)$(GRP):DONE.VAL PP")
-  field(OOPT, "Every Time")
+  field(OOPT, "Transition To Non-zero")
   field(DOPT, "Use CALC")
 }
 
@@ -85,18 +109,19 @@ record(bo, "$(P)$(Q)$(GRP):DONE") {
 }
 
 record(calcout, "$(P)$(Q)$(GRP):CALC:POS") {
-  field(DESC, "Average position")
+  field(DESC, "Average position in EGU")
   field(FLNK, "$(P)$(Q)$(GRP):CALC:LIMITS")
-  field(CALC, "(A>2)?(B+C+D)/3:(A>1)?(B+C)/2:B")
+  field(CALC, "((A>2)?(B+C+D):(A>1)?(B+C):B)/E")
   field(INPA, "$(P)$(Q)$(GRP):AXES")
-  field(INPB, "$(P)$(Q)$(C1):POS:RD CP")
-  field(INPC, "$(P)$(Q)$(C2):POS:RD CP")
-  field(INPD, "$(P)$(Q)$(C3):POS:RD CP")
+  field(INPB, "$(P)$(Q)$(GRP):CALC:POS:C1")
+  field(INPC, "$(P)$(Q)$(GRP):CALC:POS:C2")
+  field(INPD, "$(P)$(Q)$(GRP):CALC:POS:C3")
+  field(INPE, "$(P)$(Q)$(GRP):SCALE CP")
 }
 
 record(seq, "$(P)$(Q)$(GRP):STARTMOV") {
   field(DOL1, "1")
-  field(LNK1, "$(P)$(Q)$(GRP):CALC:ALL:ONT.DISA")
+  field(LNK1, "$(P)$(Q)$(GRP):CALC:ALL:ONT.D")
   field(DOL2, "0")
   field(LNK2, "$(P)$(Q)$(GRP):DONE.VAL PP")
   field(LNK3, "$(P)$(Q)$(GRP):DMD:WR1.PROC PP")
@@ -105,7 +130,7 @@ record(seq, "$(P)$(Q)$(GRP):STARTMOV") {
   field(LNK5, "$(P)$(Q)$(GRP):DMD:WR3.PROC PP")
   field(DLY6, "$(STARTDLY=0.6)")
   field(DOL6, "0")
-  field(LNK6, "$(P)$(Q)$(GRP):CALC:ALL:ONT.DISA")
+  field(LNK6, "$(P)$(Q)$(GRP):CALC:ALL:ONT.D")
 }
 
 record(ao, "$(P)$(Q)$(GRP):AXES") {
@@ -123,7 +148,7 @@ record(calcout, "$(P)$(Q)$(GRP):DMD:WR1") {
   field(OUT, "$(P)$(Q)$(C1):MVR:WR PP")
   field(OOPT, "When Non-zero")
   field(DOPT, "Use OCAL")
-  field(OCAL, "B")
+  field(OCAL, "B*$(SC1=1)")
 }
 
 record(calcout, "$(P)$(Q)$(GRP):DMD:WR2") {
@@ -133,7 +158,7 @@ record(calcout, "$(P)$(Q)$(GRP):DMD:WR2") {
   field(OUT, "$(P)$(Q)$(C2):MVR:WR PP")
   field(OOPT, "When Non-zero")
   field(DOPT, "Use OCAL")
-  field(OCAL, "B")
+  field(OCAL, "B*$(SC2=1)")
 }
 
 record(calcout, "$(P)$(Q)$(GRP):DMD:WR3") {
@@ -143,7 +168,7 @@ record(calcout, "$(P)$(Q)$(GRP):DMD:WR3") {
   field(OUT, "$(P)$(Q)$(C3):MVR:WR PP")
   field(OOPT, "When Non-zero")
   field(DOPT, "Use OCAL")
-  field(OCAL, "B")
+  field(OCAL, "B*$(SC3=1)")
 }
 
 record(calc, "$(P)$(Q)$(GRP):HLT:WR") {
@@ -162,21 +187,19 @@ record(seq, "$(P)$(Q)$(GRP):HLT:WRR") {
 }
 
 record(transform, "$(P)$(Q)$(GRP):CALC:LIMITS") {
-  field(CLCE, "$(HILIM)-B")
-  field(CLCF, "$(HILIM)-C")
-  field(CLCG, "$(HILIM)-D")
-  field(CLCH, "B-$(LOLIM)")
-  field(CLCI, "C-$(LOLIM)")
-  field(CLCJ, "D-$(LOLIM)")
+  field(CLCE, "($(SC1=1)>0)?($(HILIM)-B):(B-$(LOLIM))")
+  field(CLCF, "($(SC2=1)>0)?($(HILIM)-C):(C-$(LOLIM))")
+  field(CLCG, "($(SC3=1)>0)?($(HILIM)-D):(D-$(LOLIM))")
+  field(CLCH, "($(SC1=1)>0)?(B-$(LOLIM)):($(HILIM)-B)")
+  field(CLCI, "($(SC2=1)>0)?(C-$(LOLIM)):($(HILIM)-C)")
+  field(CLCJ, "($(SC3=1)>0)?(D-$(LOLIM)):($(HILIM)-D)")
   field(CLCK, "(A>2)?MIN(E,F,G):(A>1)?MIN(E,F):E")
   field(CLCL, "(A>2)?MIN(H,I,J):(A>1)?MIN(H,I):H")
-  field(CLCN, "M+K")
   field(INPA, "$(P)$(Q)$(GRP):AXES")
-  field(INPB, "$(P)$(Q)$(C1):POS:RD")
-  field(INPC, "$(P)$(Q)$(C2):POS:RD")
-  field(INPD, "$(P)$(Q)$(C3):POS:RD")
+  field(INPB, "$(P)$(Q)$(C1):POS:RD CP")
+  field(INPC, "$(P)$(Q)$(C2):POS:RD CP")
+  field(INPD, "$(P)$(Q)$(C3):POS:RD CP")
   field(INPM, "$(P)$(Q)$(GRP):CALC:POS")
-  field(OUTN, "$(P)$(Q)$(GRP).DHLM")
   field(CMTA, "Number of axes")
   field(CMTB, "C1 Position")
   field(CMTC, "C2 Position")
@@ -189,17 +212,210 @@ record(transform, "$(P)$(Q)$(GRP):CALC:LIMITS") {
   field(CMTJ, "C3 LLIM range")
   field(CMTK, "possible combined HLIM range")
   field(CMTL, "possible combined LLIM range")
-  field(CMTM, "Average Position")
-  field(CMTN, "New HLIM")
+  field(CMTM, "Average Position in EGU")
+  field(CMTN, "Scale EGU conversion")
   field(CMTO, "New LLIM")
   field(IVLA, "Ignore error")
-  field(CLCO, "M-L")
-  field(OUTO, "$(P)$(Q)$(GRP).DLLM")
+  field(CLCO, "M-(L/N)")
+  field(OUTO, "$(P)$(Q)$(GRP).DLLM PP")
+  field(CLCP, "M+(K/N)")
+  field(INPN, "$(P)$(Q)$(GRP):SCALE CP")
+  field(OUTP, "$(P)$(Q)$(GRP).DHLM PP")
+  field(CMTP, "New HLIM")
+  field(SDIS, "$(P)$(Q)$(GRP):AUTO:LIMITS.VAL")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q)$(GRP):SCALE") {
+  field(DESC, "Piezo demand = mtr demand * Scale")
+  field(PINI, "YES")
+  field(VAL, "$(SCALE=1)")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:POS:C1") {
+  field(DESC, "Piezo position divided by SCRBV1")
+  field(FLNK, "$(P)$(Q)$(GRP):CALC:POS")
+  field(CALC, "(A+B)/$(SCRBV1=1)")
+  field(INPA, "$(P)$(Q)$(C1):POS:RD CP")
+  field(INPB, "$(P)$(Q)$(GRP):OFFSET:C1")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:POS:C2") {
+  field(DESC, "Piezo position divided by SCRBV2")
+  field(FLNK, "$(P)$(Q)$(GRP):CALC:POS")
+  field(CALC, "(A+B)/$(SCRBV2=1)")
+  field(INPA, "$(P)$(Q)$(C2):POS:RD CP")
+  field(INPB, "$(P)$(Q)$(GRP):OFFSET:C2")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:POS:C3") {
+  field(DESC, "Piezo position divided by SCRBV3")
+  field(FLNK, "$(P)$(Q)$(GRP):CALC:POS")
+  field(CALC, "(A+B)/$(SCRBV3=1)")
+  field(INPA, "$(P)$(Q)$(C3):POS:RD CP")
+  field(INPB, "$(P)$(Q)$(GRP):OFFSET:C3")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q)$(GRP):OFFSET:C1") {
+  field(DESC, "Piezo offset to zero position")
+  field(PINI, "YES")
+  field(FLNK, "$(P)$(Q)$(GRP):CALC:POS:C1")
+  field(VAL, "$(OFFSET_C1=0)")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q)$(GRP):OFFSET:C2") {
+  field(DESC, "Piezo offset to zero position")
+  field(PINI, "YES")
+  field(FLNK, "$(P)$(Q)$(GRP):CALC:POS:C2")
+  field(VAL, "$(OFFSET_C2=0)")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q)$(GRP):OFFSET:C3") {
+  field(DESC, "Piezo offset to zero position")
+  field(PINI, "YES")
+  field(FLNK, "$(P)$(Q)$(GRP):CALC:POS:C3")
+  field(VAL, "$(OFFSET_C3=0)")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:OFFSET:C1") {
+  field(DESC, "Calc offset for current position")
+  field(FLNK, "$(P)$(Q)$(GRP):OFFSET:C1")
+  field(CALC, "-A")
+  field(INPA, "$(P)$(Q)$(C1):POS:RD")
+  field(OUT, "$(P)$(Q)$(GRP):OFFSET:C1")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:OFFSET:C2") {
+  field(DESC, "Calc offset for current position")
+  field(FLNK, "$(P)$(Q)$(GRP):OFFSET:C2")
+  field(CALC, "-A")
+  field(INPA, "$(P)$(Q)$(C2):POS:RD")
+  field(OUT, "$(P)$(Q)$(GRP):OFFSET:C2")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:OFFSET:C3") {
+  field(DESC, "Calc offset for current pos")
+  field(FLNK, "$(P)$(Q)$(GRP):OFFSET:C3")
+  field(CALC, "-A")
+  field(INPA, "$(P)$(Q)$(C3):POS:RD")
+  field(OUT, "$(P)$(Q)$(GRP):OFFSET:C3")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+record(fanout, "$(P)$(Q)$(GRP):SET:ZERO") {
+  field(DESC, "Set current position as zero")
+  field(SELM, "All")
+  field(LNK1, "$(P)$(Q)$(GRP):CALC:OFFSET:C1")
+  field(LNK2, "$(P)$(Q)$(GRP):CALC:OFFSET:C2")
+  field(LNK3, "$(P)$(Q)$(GRP):CALC:OFFSET:C3")
+  field(FLNK, "$(P)$(Q)$(GRP):LASTPOS:C1")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:HCOMP:C2") {
+  field(DESC, "Compensate for height change")
+  field(CALC, "A-(B-C)")
+  field(INPA, "$(P)$(Q)$(GRP):OFFSET:C2")
+  field(INPB, "$(P)$(Q)$(C2):POS:RD")
+  field(OUT, "$(P)$(Q)$(GRP):OFFSET:C2 PP")
+  field(INPC, "$(P)$(Q)$(GRP):LASTPOS:C2")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:HCOMP:C3") {
+  field(DESC, "Compensate for height change")
+  field(CALC, "A-(B-C)")
+  field(INPA, "$(P)$(Q)$(GRP):OFFSET:C3")
+  field(INPB, "$(P)$(Q)$(C3):POS:RD")
+  field(OUT, "$(P)$(Q)$(GRP):OFFSET:C3 PP")
+  field(INPC, "$(P)$(Q)$(GRP):LASTPOS:C3")
+}
+
+record(fanout, "$(P)$(Q)$(GRP):APPLY:HCOMP") {
+  field(DESC, "Compensate for height change")
+  field(LNK2, "$(P)$(Q)$(GRP):CALC:HCOMP:C1")
+  field(LNK3, "$(P)$(Q)$(GRP):CALC:HCOMP:C2")
+  field(LNK4, "$(P)$(Q)$(GRP):CALC:HCOMP:C3")
+  field(FLNK, "$(P)$(Q)$(GRP):LASTPOS:C1")
+  field(DISV, "0")
+  field(SDIS, "$(P)$(Q)$(GRP):AUTO:HCOMP")
+}
+
+record(fanout, "$(P)$(Q)$(GRP):FAN:DONE") {
+  field(DESC, "FLNK on done to APPLY:HCOMP")
+  field(FLNK, "$(P)$(Q)$(GRP):LASTPOS:C1")
+  field(LNK1, "$(LNK1=)")
+  field(LNK2, "$(LNK2=)")
+  field(LNK3, "$(LNK3=)")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:IFDONE") {
+  field(DESC, "When move done")
+  field(CALC, "E")
+  field(INPA, "$(P)$(Q)$(GRP):AXES")
+  field(OUT, "$(P)$(Q)$(GRP):FAN:DONE.PROC PP")
+  field(OOPT, "Transition To Non-zero")
+  field(DOPT, "Use OCAL")
+  field(INPE, "$(P)$(Q)$(GRP):DONE CP")
+  field(OCAL, "1")
+}
+
+# % autosave 1 VAL
+record(bo, "$(P)$(Q)$(GRP):AUTO:LIMITS") {
+  field(DESC, "Auto update limits")
+  field(ZNAM, "Enabled")
+  field(ONAM, "Disabled")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q)$(GRP):LASTPOS:C1") {
+  field(DESC, "Position after last move or comp")
+  field(FLNK, "$(P)$(Q)$(GRP):LASTPOS:C2")
+  field(DOL, "$(P)$(Q)$(C1):POS:RD")
+  field(OMSL, "closed_loop")
+}
+
+record(calcout, "$(P)$(Q)$(GRP):CALC:HCOMP:C1") {
+  field(DESC, "Compensate for height change")
+  field(CALC, "A-(B-C)")
+  field(INPA, "$(P)$(Q)$(GRP):OFFSET:C1")
+  field(INPB, "$(P)$(Q)$(C1):POS:RD")
+  field(OUT, "$(P)$(Q)$(GRP):OFFSET:C1 PP")
+  field(INPC, "$(P)$(Q)$(GRP):LASTPOS:C1")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q)$(GRP):LASTPOS:C2") {
+  field(DESC, "Position after last move or comp")
+  field(FLNK, "$(P)$(Q)$(GRP):LASTPOS:C3")
+  field(DOL, "$(P)$(Q)$(C2):POS:RD")
+  field(OMSL, "closed_loop")
+}
+
+#% autosave 1 VAL
+record(ao, "$(P)$(Q)$(GRP):LASTPOS:C3") {
+  field(DESC, "Position after last move or comp")
+  field(DOL, "$(P)$(Q)$(C3):POS:RD")
+  field(OMSL, "closed_loop")
+}
+
+# % autosave 1 VAL
+record(bo, "$(P)$(Q)$(GRP):AUTO:HCOMP") {
+  field(DESC, "Auto readback compensation")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(VAL, "$(ENA_COMP=0)")
 }
 
 #! Further lines contain data used by VisualDCT
-#! View(0,0,1.1)
-#! Record("$(P)$(Q)$(GRP)",60,202,0,0,"$(P)$(Q)$(GRP)")
+#! View(848,896,1.1)
+#! Record("$(P)$(Q)$(GRP)",60,222,0,0,"$(P)$(Q)$(GRP)")
 #! Field("$(P)$(Q)$(GRP).DINP",16777215,1,"$(P)$(Q)$(GRP).DINP")
 #! Link("$(P)$(Q)$(GRP).DINP","$(P)$(Q)$(GRP):DONE.VAL")
 #! Field("$(P)$(Q)$(GRP).OUT",16777215,1,"$(P)$(Q)$(GRP).OUT")
@@ -214,7 +430,7 @@ record(transform, "$(P)$(Q)$(GRP):CALC:LIMITS") {
 #! Field("$(P)$(Q)$(GRP):DEMAND:POS.FLNK",16777215,1,"$(P)$(Q)$(GRP):DEMAND:POS.FLNK")
 #! Link("$(P)$(Q)$(GRP):DEMAND:POS.FLNK","$(P)$(Q)$(GRP):CALC:REL:MOVE")
 #! Field("$(P)$(Q)$(GRP):DEMAND:POS.VAL",16777215,1,"$(P)$(Q)$(GRP):DEMAND:POS.VAL")
-#! Record("$(P)$(Q)$(GRP):CALC:REL:MOVE",620,94,0,0,"$(P)$(Q)$(GRP):CALC:REL:MOVE")
+#! Record("$(P)$(Q)$(GRP):CALC:REL:MOVE",620,80,0,0,"$(P)$(Q)$(GRP):CALC:REL:MOVE")
 #! Field("$(P)$(Q)$(GRP):CALC:REL:MOVE.FLNK",16777215,1,"$(P)$(Q)$(GRP):CALC:REL:MOVE.FLNK")
 #! Link("$(P)$(Q)$(GRP):CALC:REL:MOVE.FLNK","$(P)$(Q)$(GRP):STARTMOV")
 #! Field("$(P)$(Q)$(GRP):CALC:REL:MOVE.VAL",16777215,1,"$(P)$(Q)$(GRP):CALC:REL:MOVE.VAL")
@@ -222,27 +438,34 @@ record(transform, "$(P)$(Q)$(GRP):CALC:LIMITS") {
 #! Link("$(P)$(Q)$(GRP):CALC:REL:MOVE.INPA","$(P)$(Q)$(GRP):DEMAND:POS.VAL")
 #! Field("$(P)$(Q)$(GRP):CALC:REL:MOVE.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:REL:MOVE.INPB")
 #! Link("$(P)$(Q)$(GRP):CALC:REL:MOVE.INPB","$(P)$(Q)$(GRP):CALC:POS.VAL")
-#! Record("$(P)$(Q)$(GRP):CALC:ALL:ONT",1340,598,0,1,"$(P)$(Q)$(GRP):CALC:ALL:ONT")
-#! Field("$(P)$(Q)$(GRP):CALC:ALL:ONT.DISA",16777215,0,"$(P)$(Q)$(GRP):CALC:ALL:ONT.DISA")
+#! Field("$(P)$(Q)$(GRP):CALC:REL:MOVE.INPC",16777215,0,"$(P)$(Q)$(GRP):CALC:REL:MOVE.INPC")
+#! Link("$(P)$(Q)$(GRP):CALC:REL:MOVE.INPC","$(P)$(Q)$(GRP):SCALE.VAL")
+#! Record("$(P)$(Q)$(GRP):CALC:ALL:ONT",1320,598,0,1,"$(P)$(Q)$(GRP):CALC:ALL:ONT")
 #! Field("$(P)$(Q)$(GRP):CALC:ALL:ONT.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:ALL:ONT.INPA")
 #! Field("$(P)$(Q)$(GRP):CALC:ALL:ONT.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:ALL:ONT.INPB")
 #! Field("$(P)$(Q)$(GRP):CALC:ALL:ONT.INPC",16777215,1,"$(P)$(Q)$(GRP):CALC:ALL:ONT.INPC")
+#! Field("$(P)$(Q)$(GRP):CALC:ALL:ONT.D",16777215,0,"$(P)$(Q)$(GRP):CALC:ALL:ONT.D")
 #! Field("$(P)$(Q)$(GRP):CALC:ALL:ONT.OUT",16777215,0,"$(P)$(Q)$(GRP):CALC:ALL:ONT.OUT")
 #! Link("$(P)$(Q)$(GRP):CALC:ALL:ONT.OUT","$(P)$(Q)$(GRP):DONE.VAL")
-#! Record("$(P)$(Q)$(GRP):DONE",580,481,0,0,"$(P)$(Q)$(GRP):DONE")
+#! Record("$(P)$(Q)$(GRP):DONE",580,501,0,0,"$(P)$(Q)$(GRP):DONE")
 #! Field("$(P)$(Q)$(GRP):DONE.VAL",16777215,1,"$(P)$(Q)$(GRP):DONE.VAL")
-#! Record("$(P)$(Q)$(GRP):CALC:POS",940,926,0,1,"$(P)$(Q)$(GRP):CALC:POS")
+#! Record("$(P)$(Q)$(GRP):CALC:POS",920,931,0,1,"$(P)$(Q)$(GRP):CALC:POS")
 #! Field("$(P)$(Q)$(GRP):CALC:POS.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:POS.INPA")
 #! Link("$(P)$(Q)$(GRP):CALC:POS.INPA","$(P)$(Q)$(GRP):AXES.VAL")
-#! Field("$(P)$(Q)$(GRP):CALC:POS.INPD",16777215,1,"$(P)$(Q)$(GRP):CALC:POS.INPD")
-#! Field("$(P)$(Q)$(GRP):CALC:POS.INPC",16777215,1,"$(P)$(Q)$(GRP):CALC:POS.INPC")
 #! Field("$(P)$(Q)$(GRP):CALC:POS.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:POS.INPB")
+#! Link("$(P)$(Q)$(GRP):CALC:POS.INPB","$(P)$(Q)$(GRP):CALC:POS:C1.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:POS.INPC",16777215,1,"$(P)$(Q)$(GRP):CALC:POS.INPC")
+#! Link("$(P)$(Q)$(GRP):CALC:POS.INPC","$(P)$(Q)$(GRP):CALC:POS:C2.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:POS.INPD",16777215,1,"$(P)$(Q)$(GRP):CALC:POS.INPD")
+#! Link("$(P)$(Q)$(GRP):CALC:POS.INPD","$(P)$(Q)$(GRP):CALC:POS:C3.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:POS.INPE",16777215,0,"$(P)$(Q)$(GRP):CALC:POS.INPE")
+#! Link("$(P)$(Q)$(GRP):CALC:POS.INPE","$(P)$(Q)$(GRP):SCALE.VAL")
 #! Field("$(P)$(Q)$(GRP):CALC:POS.FLNK",16777215,0,"$(P)$(Q)$(GRP):CALC:POS.FLNK")
 #! Link("$(P)$(Q)$(GRP):CALC:POS.FLNK","$(P)$(Q)$(GRP):CALC:LIMITS")
-#! Field("$(P)$(Q)$(GRP):CALC:POS.VAL",16777215,0,"$(P)$(Q)$(GRP):CALC:POS.VAL")
-#! Record("$(P)$(Q)$(GRP):STARTMOV",980,270,0,0,"$(P)$(Q)$(GRP):STARTMOV")
+#! Field("$(P)$(Q)$(GRP):CALC:POS.VAL",16777215,1,"$(P)$(Q)$(GRP):CALC:POS.VAL")
+#! Record("$(P)$(Q)$(GRP):STARTMOV",980,290,0,0,"$(P)$(Q)$(GRP):STARTMOV")
 #! Field("$(P)$(Q)$(GRP):STARTMOV.LNK1",16777215,1,"$(P)$(Q)$(GRP):STARTMOV.LNK1")
-#! Link("$(P)$(Q)$(GRP):STARTMOV.LNK1","$(P)$(Q)$(GRP):CALC:ALL:ONT.DISA")
+#! Link("$(P)$(Q)$(GRP):STARTMOV.LNK1","$(P)$(Q)$(GRP):CALC:ALL:ONT.D")
 #! Field("$(P)$(Q)$(GRP):STARTMOV.LNK2",16777215,0,"$(P)$(Q)$(GRP):STARTMOV.LNK2")
 #! Link("$(P)$(Q)$(GRP):STARTMOV.LNK2","$(P)$(Q)$(GRP):DONE.VAL")
 #! Field("$(P)$(Q)$(GRP):STARTMOV.LNK3",16777215,1,"$(P)$(Q)$(GRP):STARTMOV.LNK3")
@@ -252,7 +475,7 @@ record(transform, "$(P)$(Q)$(GRP):CALC:LIMITS") {
 #! Field("$(P)$(Q)$(GRP):STARTMOV.LNK5",16777215,1,"$(P)$(Q)$(GRP):STARTMOV.LNK5")
 #! Link("$(P)$(Q)$(GRP):STARTMOV.LNK5","$(P)$(Q)$(GRP):DMD:WR3.PROC")
 #! Field("$(P)$(Q)$(GRP):STARTMOV.LNK6",16777215,1,"$(P)$(Q)$(GRP):STARTMOV.LNK6")
-#! Link("$(P)$(Q)$(GRP):STARTMOV.LNK6","$(P)$(Q)$(GRP):CALC:ALL:ONT.DISA")
+#! Link("$(P)$(Q)$(GRP):STARTMOV.LNK6","$(P)$(Q)$(GRP):CALC:ALL:ONT.D")
 #! Record("$(P)$(Q)$(GRP):AXES",1280,74,0,1,"$(P)$(Q)$(GRP):AXES")
 #! Field("$(P)$(Q)$(GRP):AXES.VAL",16777215,1,"$(P)$(Q)$(GRP):AXES.VAL")
 #! Record("$(P)$(Q)$(GRP):DMD:WR1",1600,66,0,1,"$(P)$(Q)$(GRP):DMD:WR1")
@@ -289,15 +512,148 @@ record(transform, "$(P)$(Q)$(GRP):CALC:LIMITS") {
 #! Field("$(P)$(Q)$(GRP):HLT:WRR.LNK1",16777215,1,"$(P)$(Q)$(GRP):HLT:WRR.LNK1")
 #! Field("$(P)$(Q)$(GRP):HLT:WRR.LNK2",16777215,1,"$(P)$(Q)$(GRP):HLT:WRR.LNK2")
 #! Field("$(P)$(Q)$(GRP):HLT:WRR.LNK3",16777215,1,"$(P)$(Q)$(GRP):HLT:WRR.LNK3")
-#! Record("$(P)$(Q)$(GRP):CALC:LIMITS",540,642,0,1,"$(P)$(Q)$(GRP):CALC:LIMITS")
-#! Field("$(P)$(Q)$(GRP):CALC:LIMITS.INPC",16777215,1,"$(P)$(Q)$(GRP):CALC:LIMITS.INPC")
-#! Field("$(P)$(Q)$(GRP):CALC:LIMITS.INPD",16777215,1,"$(P)$(Q)$(GRP):CALC:LIMITS.INPD")
+#! Record("$(P)$(Q)$(GRP):CALC:LIMITS",540,680,0,1,"$(P)$(Q)$(GRP):CALC:LIMITS")
 #! Field("$(P)$(Q)$(GRP):CALC:LIMITS.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:LIMITS.INPA")
 #! Link("$(P)$(Q)$(GRP):CALC:LIMITS.INPA","$(P)$(Q)$(GRP):AXES.VAL")
 #! Field("$(P)$(Q)$(GRP):CALC:LIMITS.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:LIMITS.INPB")
+#! Field("$(P)$(Q)$(GRP):CALC:LIMITS.INPC",16777215,1,"$(P)$(Q)$(GRP):CALC:LIMITS.INPC")
+#! Field("$(P)$(Q)$(GRP):CALC:LIMITS.INPD",16777215,1,"$(P)$(Q)$(GRP):CALC:LIMITS.INPD")
 #! Field("$(P)$(Q)$(GRP):CALC:LIMITS.INPM",16777215,1,"$(P)$(Q)$(GRP):CALC:LIMITS.INPM")
 #! Link("$(P)$(Q)$(GRP):CALC:LIMITS.INPM","$(P)$(Q)$(GRP):CALC:POS.VAL")
-#! Field("$(P)$(Q)$(GRP):CALC:LIMITS.OUTN",16777215,0,"$(P)$(Q)$(GRP):CALC:LIMITS.OUTN")
-#! Link("$(P)$(Q)$(GRP):CALC:LIMITS.OUTN","$(P)$(Q)$(GRP).DHLM")
 #! Field("$(P)$(Q)$(GRP):CALC:LIMITS.OUTO",16777215,0,"$(P)$(Q)$(GRP):CALC:LIMITS.OUTO")
 #! Link("$(P)$(Q)$(GRP):CALC:LIMITS.OUTO","$(P)$(Q)$(GRP).DLLM")
+#! Field("$(P)$(Q)$(GRP):CALC:LIMITS.INPN",16777215,1,"$(P)$(Q)$(GRP):CALC:LIMITS.INPN")
+#! Link("$(P)$(Q)$(GRP):CALC:LIMITS.INPN","$(P)$(Q)$(GRP):SCALE.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:LIMITS.OUTP",16777215,0,"$(P)$(Q)$(GRP):CALC:LIMITS.OUTP")
+#! Link("$(P)$(Q)$(GRP):CALC:LIMITS.OUTP","$(P)$(Q)$(GRP).DHLM")
+#! Field("$(P)$(Q)$(GRP):CALC:LIMITS.SDIS",16777215,0,"$(P)$(Q)$(GRP):CALC:LIMITS.SDIS")
+#! Link("$(P)$(Q)$(GRP):CALC:LIMITS.SDIS","$(P)$(Q)$(GRP):AUTO:LIMITS.VAL")
+#! Record("$(P)$(Q)$(GRP):SCALE",600,341,0,1,"$(P)$(Q)$(GRP):SCALE")
+#! Field("$(P)$(Q)$(GRP):SCALE.VAL",16777215,1,"$(P)$(Q)$(GRP):SCALE.VAL")
+#! Record("$(P)$(Q)$(GRP):CALC:POS:C1",1580,1074,0,1,"$(P)$(Q)$(GRP):CALC:POS:C1")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C1.FLNK",16777215,0,"$(P)$(Q)$(GRP):CALC:POS:C1.FLNK")
+#! Link("$(P)$(Q)$(GRP):CALC:POS:C1.FLNK","$(P)$(Q)$(GRP):CALC:POS")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C1.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:POS:C1.INPA")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C1.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:POS:C1.INPB")
+#! Link("$(P)$(Q)$(GRP):CALC:POS:C1.INPB","$(P)$(Q)$(GRP):OFFSET:C1.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C1.VAL",16777215,0,"$(P)$(Q)$(GRP):CALC:POS:C1.VAL")
+#! Record("$(P)$(Q)$(GRP):CALC:POS:C2",1620,1354,0,1,"$(P)$(Q)$(GRP):CALC:POS:C2")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C2.FLNK",16777215,0,"$(P)$(Q)$(GRP):CALC:POS:C2.FLNK")
+#! Link("$(P)$(Q)$(GRP):CALC:POS:C2.FLNK","$(P)$(Q)$(GRP):CALC:POS")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C2.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:POS:C2.INPA")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C2.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:POS:C2.INPB")
+#! Link("$(P)$(Q)$(GRP):CALC:POS:C2.INPB","$(P)$(Q)$(GRP):OFFSET:C2.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C2.VAL",16777215,0,"$(P)$(Q)$(GRP):CALC:POS:C2.VAL")
+#! Record("$(P)$(Q)$(GRP):CALC:POS:C3",1600,1634,0,1,"$(P)$(Q)$(GRP):CALC:POS:C3")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C3.FLNK",16777215,0,"$(P)$(Q)$(GRP):CALC:POS:C3.FLNK")
+#! Link("$(P)$(Q)$(GRP):CALC:POS:C3.FLNK","$(P)$(Q)$(GRP):CALC:POS")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C3.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:POS:C3.INPA")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C3.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:POS:C3.INPB")
+#! Link("$(P)$(Q)$(GRP):CALC:POS:C3.INPB","$(P)$(Q)$(GRP):OFFSET:C3.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:POS:C3.VAL",16777215,0,"$(P)$(Q)$(GRP):CALC:POS:C3.VAL")
+#! Record("$(P)$(Q)$(GRP):OFFSET:C1",1940,1128,0,1,"$(P)$(Q)$(GRP):OFFSET:C1")
+#! Field("$(P)$(Q)$(GRP):OFFSET:C1.VAL",16777215,1,"$(P)$(Q)$(GRP):OFFSET:C1.VAL")
+#! Field("$(P)$(Q)$(GRP):OFFSET:C1.FLNK",16777215,0,"$(P)$(Q)$(GRP):OFFSET:C1.FLNK")
+#! Link("$(P)$(Q)$(GRP):OFFSET:C1.FLNK","$(P)$(Q)$(GRP):CALC:POS:C1")
+#! Record("$(P)$(Q)$(GRP):OFFSET:C2",1920,1408,0,1,"$(P)$(Q)$(GRP):OFFSET:C2")
+#! Field("$(P)$(Q)$(GRP):OFFSET:C2.VAL",16777215,1,"$(P)$(Q)$(GRP):OFFSET:C2.VAL")
+#! Field("$(P)$(Q)$(GRP):OFFSET:C2.FLNK",16777215,0,"$(P)$(Q)$(GRP):OFFSET:C2.FLNK")
+#! Link("$(P)$(Q)$(GRP):OFFSET:C2.FLNK","$(P)$(Q)$(GRP):CALC:POS:C2")
+#! Record("$(P)$(Q)$(GRP):OFFSET:C3",1900,1688,0,1,"$(P)$(Q)$(GRP):OFFSET:C3")
+#! Field("$(P)$(Q)$(GRP):OFFSET:C3.VAL",16777215,1,"$(P)$(Q)$(GRP):OFFSET:C3.VAL")
+#! Field("$(P)$(Q)$(GRP):OFFSET:C3.FLNK",16777215,0,"$(P)$(Q)$(GRP):OFFSET:C3.FLNK")
+#! Link("$(P)$(Q)$(GRP):OFFSET:C3.FLNK","$(P)$(Q)$(GRP):CALC:POS:C3")
+#! Record("$(P)$(Q)$(GRP):CALC:OFFSET:C1",2220,1026,0,1,"$(P)$(Q)$(GRP):CALC:OFFSET:C1")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C1.FLNK",16777215,0,"$(P)$(Q)$(GRP):CALC:OFFSET:C1.FLNK")
+#! Link("$(P)$(Q)$(GRP):CALC:OFFSET:C1.FLNK","$(P)$(Q)$(GRP):OFFSET:C1")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C1.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:OFFSET:C1.INPA")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C1.OUT",16777215,0,"$(P)$(Q)$(GRP):CALC:OFFSET:C1.OUT")
+#! Link("$(P)$(Q)$(GRP):CALC:OFFSET:C1.OUT","$(P)$(Q)$(GRP):OFFSET:C1.VAL")
+#! Record("$(P)$(Q)$(GRP):CALC:OFFSET:C2",2200,1306,0,1,"$(P)$(Q)$(GRP):CALC:OFFSET:C2")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C2.FLNK",16777215,0,"$(P)$(Q)$(GRP):CALC:OFFSET:C2.FLNK")
+#! Link("$(P)$(Q)$(GRP):CALC:OFFSET:C2.FLNK","$(P)$(Q)$(GRP):OFFSET:C2")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C2.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:OFFSET:C2.INPA")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C2.OUT",16777215,0,"$(P)$(Q)$(GRP):CALC:OFFSET:C2.OUT")
+#! Link("$(P)$(Q)$(GRP):CALC:OFFSET:C2.OUT","$(P)$(Q)$(GRP):OFFSET:C2.VAL")
+#! Record("$(P)$(Q)$(GRP):CALC:OFFSET:C3",2180,1586,0,1,"$(P)$(Q)$(GRP):CALC:OFFSET:C3")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C3.FLNK",16777215,0,"$(P)$(Q)$(GRP):CALC:OFFSET:C3.FLNK")
+#! Link("$(P)$(Q)$(GRP):CALC:OFFSET:C3.FLNK","$(P)$(Q)$(GRP):OFFSET:C3")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C3.INPA",16777215,1,"$(P)$(Q)$(GRP):CALC:OFFSET:C3.INPA")
+#! Field("$(P)$(Q)$(GRP):CALC:OFFSET:C3.OUT",16777215,0,"$(P)$(Q)$(GRP):CALC:OFFSET:C3.OUT")
+#! Link("$(P)$(Q)$(GRP):CALC:OFFSET:C3.OUT","$(P)$(Q)$(GRP):OFFSET:C3.VAL")
+#! Record("$(P)$(Q)$(GRP):SET:ZERO",3100,1700,0,1,"$(P)$(Q)$(GRP):SET:ZERO")
+#! Field("$(P)$(Q)$(GRP):SET:ZERO.FLNK",16777215,0,"$(P)$(Q)$(GRP):SET:ZERO.FLNK")
+#! Link("$(P)$(Q)$(GRP):SET:ZERO.FLNK","$(P)$(Q)$(GRP):LASTPOS:C1")
+#! Field("$(P)$(Q)$(GRP):SET:ZERO.LNK1",16777215,0,"$(P)$(Q)$(GRP):SET:ZERO.LNK1")
+#! Link("$(P)$(Q)$(GRP):SET:ZERO.LNK1","$(P)$(Q)$(GRP):CALC:OFFSET:C1")
+#! Field("$(P)$(Q)$(GRP):SET:ZERO.LNK2",16777215,0,"$(P)$(Q)$(GRP):SET:ZERO.LNK2")
+#! Link("$(P)$(Q)$(GRP):SET:ZERO.LNK2","$(P)$(Q)$(GRP):CALC:OFFSET:C2")
+#! Field("$(P)$(Q)$(GRP):SET:ZERO.LNK3",16777215,0,"$(P)$(Q)$(GRP):SET:ZERO.LNK3")
+#! Link("$(P)$(Q)$(GRP):SET:ZERO.LNK3","$(P)$(Q)$(GRP):CALC:OFFSET:C3")
+#! Record("$(P)$(Q)$(GRP):CALC:HCOMP:C2",2480,1340,0,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C2")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C2.INPC",16777215,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C2.INPC")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C2.INPC","$(P)$(Q)$(GRP):LASTPOS:C2.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C2.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C2.INPB")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C2.INPA",16777215,0,"$(P)$(Q)$(GRP):CALC:HCOMP:C2.INPA")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C2.INPA","$(P)$(Q)$(GRP):OFFSET:C2.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C2.OUT",16777215,0,"$(P)$(Q)$(GRP):CALC:HCOMP:C2.OUT")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C2.OUT","$(P)$(Q)$(GRP):OFFSET:C2.VAL")
+#! Record("$(P)$(Q)$(GRP):CALC:HCOMP:C3",2500,1620,0,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C3")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C3.INPC",16777215,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C3.INPC")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C3.INPC","$(P)$(Q)$(GRP):LASTPOS:C3.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C3.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C3.INPB")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C3.INPA",16777215,0,"$(P)$(Q)$(GRP):CALC:HCOMP:C3.INPA")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C3.INPA","$(P)$(Q)$(GRP):OFFSET:C3.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C3.OUT",16777215,0,"$(P)$(Q)$(GRP):CALC:HCOMP:C3.OUT")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C3.OUT","$(P)$(Q)$(GRP):OFFSET:C3.VAL")
+#! Record("$(P)$(Q)$(GRP):APPLY:HCOMP",3160,1106,0,1,"$(P)$(Q)$(GRP):APPLY:HCOMP")
+#! Field("$(P)$(Q)$(GRP):APPLY:HCOMP.LNK2",16777215,0,"$(P)$(Q)$(GRP):APPLY:HCOMP.LNK2")
+#! Link("$(P)$(Q)$(GRP):APPLY:HCOMP.LNK2","$(P)$(Q)$(GRP):CALC:HCOMP:C1")
+#! Field("$(P)$(Q)$(GRP):APPLY:HCOMP.LNK3",16777215,0,"$(P)$(Q)$(GRP):APPLY:HCOMP.LNK3")
+#! Link("$(P)$(Q)$(GRP):APPLY:HCOMP.LNK3","$(P)$(Q)$(GRP):CALC:HCOMP:C2")
+#! Field("$(P)$(Q)$(GRP):APPLY:HCOMP.LNK4",16777215,0,"$(P)$(Q)$(GRP):APPLY:HCOMP.LNK4")
+#! Link("$(P)$(Q)$(GRP):APPLY:HCOMP.LNK4","$(P)$(Q)$(GRP):CALC:HCOMP:C3")
+#! Field("$(P)$(Q)$(GRP):APPLY:HCOMP.FLNK",16777215,0,"$(P)$(Q)$(GRP):APPLY:HCOMP.FLNK")
+#! Link("$(P)$(Q)$(GRP):APPLY:HCOMP.FLNK","$(P)$(Q)$(GRP):LASTPOS:C1")
+#! Field("$(P)$(Q)$(GRP):APPLY:HCOMP.SDIS",16777215,0,"$(P)$(Q)$(GRP):APPLY:HCOMP.SDIS")
+#! Link("$(P)$(Q)$(GRP):APPLY:HCOMP.SDIS","$(P)$(Q)$(GRP):AUTO:HCOMP.VAL")
+#! Record("$(P)$(Q)$(GRP):FAN:DONE",2720,694,0,1,"$(P)$(Q)$(GRP):FAN:DONE")
+#! Field("$(P)$(Q)$(GRP):FAN:DONE.LNK1",16777215,1,"$(P)$(Q)$(GRP):FAN:DONE.LNK1")
+#! Field("$(P)$(Q)$(GRP):FAN:DONE.LNK2",16777215,1,"$(P)$(Q)$(GRP):FAN:DONE.LNK2")
+#! Field("$(P)$(Q)$(GRP):FAN:DONE.LNK3",16777215,1,"$(P)$(Q)$(GRP):FAN:DONE.LNK3")
+#! Field("$(P)$(Q)$(GRP):FAN:DONE.PROC",16777215,1,"$(P)$(Q)$(GRP):FAN:DONE.PROC")
+#! Field("$(P)$(Q)$(GRP):FAN:DONE.FLNK",16777215,1,"$(P)$(Q)$(GRP):FAN:DONE.FLNK")
+#! Link("$(P)$(Q)$(GRP):FAN:DONE.FLNK","$(P)$(Q)$(GRP):LASTPOS:C1")
+#! Record("$(P)$(Q)$(GRP):CALC:IFDONE",2460,671,0,1,"$(P)$(Q)$(GRP):CALC:IFDONE")
+#! Field("$(P)$(Q)$(GRP):CALC:IFDONE.INPA",16777215,0,"$(P)$(Q)$(GRP):CALC:IFDONE.INPA")
+#! Link("$(P)$(Q)$(GRP):CALC:IFDONE.INPA","$(P)$(Q)$(GRP):AXES.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:IFDONE.INPE",16777215,0,"$(P)$(Q)$(GRP):CALC:IFDONE.INPE")
+#! Link("$(P)$(Q)$(GRP):CALC:IFDONE.INPE","$(P)$(Q)$(GRP):DONE.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:IFDONE.OUT",16777215,1,"$(P)$(Q)$(GRP):CALC:IFDONE.OUT")
+#! Link("$(P)$(Q)$(GRP):CALC:IFDONE.OUT","$(P)$(Q)$(GRP):FAN:DONE.PROC")
+#! Record("$(P)$(Q)$(GRP):AUTO:LIMITS",220,1421,0,1,"$(P)$(Q)$(GRP):AUTO:LIMITS")
+#! Field("$(P)$(Q)$(GRP):AUTO:LIMITS.VAL",16777215,1,"$(P)$(Q)$(GRP):AUTO:LIMITS.VAL")
+#! Record("$(P)$(Q)$(GRP):LASTPOS:C1",2840,1068,0,1,"$(P)$(Q)$(GRP):LASTPOS:C1")
+#! Field("$(P)$(Q)$(GRP):LASTPOS:C1.DOL",16777215,1,"$(P)$(Q)$(GRP):LASTPOS:C1.DOL")
+#! Field("$(P)$(Q)$(GRP):LASTPOS:C1.VAL",16777215,0,"$(P)$(Q)$(GRP):LASTPOS:C1.VAL")
+#! Field("$(P)$(Q)$(GRP):LASTPOS:C1.FLNK",16777215,0,"$(P)$(Q)$(GRP):LASTPOS:C1.FLNK")
+#! Link("$(P)$(Q)$(GRP):LASTPOS:C1.FLNK","$(P)$(Q)$(GRP):LASTPOS:C2")
+#! Record("$(P)$(Q)$(GRP):CALC:HCOMP:C1",2460,1060,0,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C1")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C1.INPC",16777215,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C1.INPC")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C1.INPC","$(P)$(Q)$(GRP):LASTPOS:C1.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C1.INPB",16777215,1,"$(P)$(Q)$(GRP):CALC:HCOMP:C1.INPB")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C1.INPA",16777215,0,"$(P)$(Q)$(GRP):CALC:HCOMP:C1.INPA")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C1.INPA","$(P)$(Q)$(GRP):OFFSET:C1.VAL")
+#! Field("$(P)$(Q)$(GRP):CALC:HCOMP:C1.OUT",16777215,0,"$(P)$(Q)$(GRP):CALC:HCOMP:C1.OUT")
+#! Link("$(P)$(Q)$(GRP):CALC:HCOMP:C1.OUT","$(P)$(Q)$(GRP):OFFSET:C1.VAL")
+#! Record("$(P)$(Q)$(GRP):LASTPOS:C2",2800,1348,0,0,"$(P)$(Q)$(GRP):LASTPOS:C2")
+#! Field("$(P)$(Q)$(GRP):LASTPOS:C2.DOL",16777215,1,"$(P)$(Q)$(GRP):LASTPOS:C2.DOL")
+#! Field("$(P)$(Q)$(GRP):LASTPOS:C2.VAL",16777215,0,"$(P)$(Q)$(GRP):LASTPOS:C2.VAL")
+#! Field("$(P)$(Q)$(GRP):LASTPOS:C2.FLNK",16777215,0,"$(P)$(Q)$(GRP):LASTPOS:C2.FLNK")
+#! Link("$(P)$(Q)$(GRP):LASTPOS:C2.FLNK","$(P)$(Q)$(GRP):LASTPOS:C3")
+#! Record("$(P)$(Q)$(GRP):LASTPOS:C3",2760,1641,0,0,"$(P)$(Q)$(GRP):LASTPOS:C3")
+#! Field("$(P)$(Q)$(GRP):LASTPOS:C3.DOL",16777215,1,"$(P)$(Q)$(GRP):LASTPOS:C3.DOL")
+#! Field("$(P)$(Q)$(GRP):LASTPOS:C3.VAL",16777215,1,"$(P)$(Q)$(GRP):LASTPOS:C3.VAL")
+#! TextBox(TB0,3120,940,3720,1080,0,"Dialog",12,1,16777215,"If multiple instances of this template are defined for combined move in X and \nfor a change in angle (motors driven in opposition) then its necessary to\ncompensate the angle motor offsets dependent on the size of the move\ninitiated on the other instances of this template. These records calculate \nthe height change between this templates last move and the current motor\npositions which is used to compensate the angle offsets. The compensation\nshould be applied at the end of the other templates move when motor \nare stationary.\n",null)
+#! Record("$(P)$(Q)$(GRP):AUTO:HCOMP",3140,1388,0,1,"$(P)$(Q)$(GRP):AUTO:HCOMP")
+#! Field("$(P)$(Q)$(GRP):AUTO:HCOMP.VAL",16777215,0,"$(P)$(Q)$(GRP):AUTO:HCOMP.VAL")
