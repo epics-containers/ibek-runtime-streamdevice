@@ -70,18 +70,17 @@ Everything else in this folder stays in the library and is never vendored:
 
 ## Differences from the build-time model
 
-The entity models have the names and parameters of the build-time `leybold` model in
-ibek-support-dls, but not all of its types and defaults, so an `ioc.yaml` written for
-that model does not always validate here, or gets different values:
+The entity models are `builder.py`'s AutoSubstitution classes: every parameter is a
+string, with the template's own default. They have the names and parameters of the
+build-time `leybold` model in ibek-support-dls, and its types and defaults where
+`builder.py` agrees, but differ where it does not, so an `ioc.yaml` written for that
+model does not always validate here, or gets different values:
 
-- `read_write_floatE_floatE` requires `DRVH` and `DRVL`; the build-time model defaults
-  them to `""`.
-- `DEFAULT_VAL` of `write_raw_int` and `read_write_float` is a float defaulting to
-  `0.0`; the build-time model has the string `"0"`.
-- About 100 more type and default mismatches, all on `read_write_int` and
-  `read_int_floatE`: `*VLI` are integers here and strings there,
-  `*STO`/`*VLO` default to the template's `$(*STI=)`/`$(*VLI=n)` here and to a
-  literal there, and `HIGH`/`LOW`/`HIHI`/`LOLO` are strings here and floats there.
+- `read_write_int` and `read_write_int_floatE`'s `*STO`/`*VLO` default to the
+  template's `$(*STI=)`/`$(*VLI=n)` here, as builder writes them, so an output state
+  falls back to its input state; the build-time model's literal defaults leave the
+  output states blank.
+- `read_int_floatE`'s `HIGH`/`LOW`/`HIHI`/`LOLO` are strings here and floats there.
 
 ## Needs more than the generic image
 
