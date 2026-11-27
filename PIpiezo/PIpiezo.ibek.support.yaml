@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/4.8.0-beta.2/ibek.support.schema.json
 
-# Imported from DLS production support module: PIpiezo 1-23
-# Source: /dls_sw/prod/R3.14.12.7/support/PIpiezo/1-23
+# Imported from DLS production support module: PIpiezo 1-28
+# Source: /dls_sw/prod/R3.14.12.7/support/PIpiezo/1-28
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/PIpiezo/ release.
@@ -274,6 +274,76 @@ entity_models:
         type: str
         description: |-
           LOLIM
+      SCALE:
+        type: str
+        description: |-
+          Multiplier converting compound soft motor EGU to piezo controller units (mm)
+        default: "1"
+      SC1:
+        type: str
+        description: |-
+          Scale multiplier for C1 demand, usually 1 or -1
+        default: "1"
+      SC2:
+        type: str
+        description: |-
+          Scale multiplier for C2 demand, usually 1 or -1
+        default: "1"
+      SC3:
+        type: str
+        description: |-
+          Scale multiplier for C3 demand, usually 1 or -1
+        default: "1"
+      SCRBV1:
+        type: str
+        description: |-
+          Scale divider for C1 readback, usually 1 or -1 (same sign as SC1)
+        default: "1"
+      SCRBV2:
+        type: str
+        description: |-
+          Scale divider for C2 readback, usually 1 or -1 (same sign as SC2)
+        default: "1"
+      SCRBV3:
+        type: str
+        description: |-
+          Scale divider for C3 readback, usually 1 or -1 (same sign as SC3)
+        default: "1"
+      OFFSET_C1:
+        type: str
+        description: |-
+          C1 motor offset defining the zero position, in controller units (mm)
+        default: "0"
+      OFFSET_C2:
+        type: str
+        description: |-
+          C2 motor offset defining the zero position, in controller units (mm)
+        default: "0"
+      OFFSET_C3:
+        type: str
+        description: |-
+          C3 motor offset defining the zero position, in controller units (mm)
+        default: "0"
+      ENA_COMP:
+        type: str
+        description: |-
+          Enable angle compensation: 1 for a compound angle motor
+        default: "0"
+      LNK1:
+        type: str
+        description: |-
+          Link to another instance's $(P)$(Q)$(GRP):APPLY:HCOMP PV, to correct the angle readback at the end of this move
+        default: ""
+      LNK2:
+        type: str
+        description: |-
+          Link to another instance's $(P)$(Q)$(GRP):APPLY:HCOMP PV, to correct the angle readback at the end of this move
+        default: ""
+      LNK3:
+        type: str
+        description: |-
+          Link to another instance's $(P)$(Q)$(GRP):APPLY:HCOMP PV, to correct the angle readback at the end of this move
+        default: ""
     databases:
       - file: E871-absGrp.template
         args:
@@ -372,7 +442,7 @@ entity_models:
       ui_macros:
         P:
 
-  - name: actuatorcallback
+  - name: auto_actuatorcallback
     description: |-
       Imported from DLS module PIpiezo (actuatorcallback.template)
     parameters:
@@ -417,7 +487,7 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: actuatorcallback.pvi.device.yaml
+      yaml_path: auto_actuatorcallback.pvi.device.yaml
       ui_macros:
         P:
         M:

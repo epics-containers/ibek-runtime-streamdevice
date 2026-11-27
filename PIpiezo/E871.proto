@@ -17,8 +17,9 @@ ExtraInput = Ignore;
 separator = "";
 
 
+
 ####################################################################### 
-#Controller Status 
+#Controller Status / Control
  
 get_version{
   out "*IDN?"; 
@@ -35,6 +36,11 @@ get_last_error{
 get_status_register{
   out "SRG? \$1 1";
   in "\$1 1=%X";
+}
+
+# Stop all piezos on the controller
+stop_all{
+  out "STP";
 }
 
 freeCommand { out "%s" ; in "%(\$1:CMD_RESPONSE)255c" ; }
@@ -110,4 +116,13 @@ get_current_pos{
 get_servo_on_target{
   out "ONT? \$1";
   in "\$1=%{0|1}";
+}
+
+get_velocity{
+  out "VEL? \$1";
+  in "\$1=%f";
+}
+
+set_velocity{
+  out "VEL \$1 %f";
 }

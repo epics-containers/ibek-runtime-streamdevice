@@ -273,16 +273,22 @@ entity_models:
         description: |-
           Optional macro for the label string for the level.  Used in EDM screens.
         default: "Cryo fill level"
+      alh:
+        type: str
+        description: |-
+          Alarm handler command.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: "alh"
     databases:
       - file: ILM201.template
         args:
-          .*:
+          '(?!alh$).*':
     pvi:
       yaml_path: ILM201.pvi.device.yaml
       ui_macros:
         P:
 
-  - name: ITC4
+  - name: auto_ITC4
     description: |-
       Imported from DLS module OxInstCryojet (ITC4.template)
     parameters:
@@ -308,7 +314,7 @@ entity_models:
         args:
           .*:
     pvi:
-      yaml_path: ITC4.pvi.device.yaml
+      yaml_path: auto_ITC4.pvi.device.yaml
       ui_macros:
         P:
         Q:

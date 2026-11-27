@@ -25,10 +25,16 @@ entity_models:
         type: str
         description: |-
           Asyn port name
+      gda_desc:
+        type: str
+        description: |-
+          GDA description.
+          Documentary: accepted for builder XML compatibility; not passed to the template.
+        default: ""
     databases:
       - file: agilent33220A.template
         args:
-          .*:
+          '(?!gda_desc$).*':
     pvi:
       yaml_path: agilent33220A.pvi.device.yaml
       ui_macros:
