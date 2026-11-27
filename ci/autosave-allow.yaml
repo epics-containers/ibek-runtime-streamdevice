@@ -12,3 +12,14 @@ currAmp:
   - problem: "currAmpADC_settings.req: missing; currAmpADC.template tags 4 PV(s)"
   - problem: "currAmpRange_settings.req: missing; currAmpRange.template tags 4 PV(s)"
   - problem: "currAmpRangeADC_settings.req: missing; currAmpRangeADC.template tags 4 PV(s)"
+
+lakeshore336:
+  # lakeshore336.template includes lakeshore336loop.template once per loop, with
+  # substitute "LOOP=<n>", and ibek loads only lakeshore336.template, so its
+  # lakeshore336_positions.req names the tagged record of each loop. This check
+  # reads each template on its own, without its includes.
+  - problem: "lakeshore336loop_positions.req: missing; lakeshore336loop.template tags 1 PV(s)"
+  - problem: "lakeshore336_positions.req: $(P):MOUT:TRACKCL1 is not a record of lakeshore336.template"
+  - problem: "lakeshore336_positions.req: $(P):MOUT:TRACKCL2 is not a record of lakeshore336.template"
+  - problem: "lakeshore336_positions.req: $(P):MOUT:TRACKCL3 is not a record of lakeshore336.template"
+  - problem: "lakeshore336_positions.req: $(P):MOUT:TRACKCL4 is not a record of lakeshore336.template"

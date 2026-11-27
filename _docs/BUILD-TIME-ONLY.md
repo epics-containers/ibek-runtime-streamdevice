@@ -43,7 +43,6 @@ still has to be linked in.
 | `debenOF` | 2-0 | `mySubInit` (`INAM`), `parseStatusString`; also the motor record |
 | `digitelSpc` | 1-13 | `versionCheck` |
 | `huberChiller` | 1-3 | `alarmCommand`, `controlCommand`, `decodeGeneral`, `decodeLimit`, `setpointCommand` |
-| `lakeshore336` | 2-19-1 | `extractFirmwareVersion`, in `lakeshore336-FirmwareVersion.template`, which `lakeshore336.template` always includes |
 | `laserPuckPointer` | 2-16 | `isbWrite`, `sendPuckDemand` |
 | `mecaRobot` | 1-7 | `copyReadbacksToSetPoints`, `jog`, `moveSampleHolder`, `prepareMoveArray`, `robotPositionParser`, `statusParser` |
 | `mitsubishiRobot` | 4-36 | `CmdErrorLookup`, `DecToAsc`, `ErrorLookup`, `LocationLookup`, `LogError`, `Logging`, `PuckLabel`, `Regex`; also a compiled asyn port driver |

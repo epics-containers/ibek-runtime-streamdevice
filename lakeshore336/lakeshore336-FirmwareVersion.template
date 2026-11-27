@@ -1,0 +1,38 @@
+# lakeshore336-FirmwareVersion.template
+# Translated from lakeshore336 2-19-1 db/lakeshore336-FirmwareVersion.template:
+# aSub extractFirmwareVersion (lakeshore336App/src/ls336AsubFn.c, the module's
+# only compiled code) replaced by a calc-module scalcout giving the same string.
+# A template that extracts the firmware version from the device
+# identification string in the $(P):ID record
+# parameters are:
+#   P     - the device name (same as in lakeshore336.template)
+
+# was: record(aSub, ...) FIRMWARE:CALC, SNAM extractFirmwareVersion,
+#   INPA ":ID CP", FTA STRING; OUTB ":FIRMWARE:VERSION PP", FTVB STRING.
+# extractFirmwareVersion wrote VALB as the text after the last comma of the
+# *IDN? reply when the reply holds both "MODEL336" and a comma, otherwise
+# "not available", e.g. LSCI,MODEL336,336A0D7/#######,2.4 gives 2.4.
+# Here, on each new :ID:
+#   CALC - BB is :ID with its text up to the first comma removed until no
+#          comma is left (X[CC,-1] is the text after the first CC of X, or
+#          all of X if it has none): the text after the last comma. The comma
+#          is held in CC because sCalcPerform's scan for UNTIL loops misreads
+#          a postfix expression with a string literal inside the loop.
+#   OCAL - BB if :ID holds a comma (BB differs from it) and "MODEL336",
+#          otherwise "not available"; the record writes it to the output.
+# The aSub (EFLG "ON CHANGE") wrote :FIRMWARE:VERSION only when the text
+# changed; this writes it on every new :ID. Its value, and so its monitors,
+# change only when the text does.
+record(scalcout, "$(P):FIRMWARE:CALC")
+{
+        field(INAA, "$(P):ID CP")
+        field(CALC, "CC:=',';BB:=AA;UNTIL(BB:=BB[CC,-1];BB[CC,-1]==BB)")
+        field(OCAL, "BB!=AA&&AA['MODEL336',-1]!=AA?BB:'not available'")
+        field(DOPT, "Use OCAL")
+        field(OOPT, "Every Time")
+        field(OUT,  "$(P):FIRMWARE:VERSION PP")
+}
+
+record(stringout, "$(P):FIRMWARE:VERSION")
+{
+}

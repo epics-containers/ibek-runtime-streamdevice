@@ -22,7 +22,7 @@ entity_models:
         description: |-
           Asyn Port name
       SCAN:
-        type: int
+        type: str
         description: |-
           Poll rate
     databases:

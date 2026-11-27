@@ -29,6 +29,7 @@ entity_models:
         type: int
         description: |-
           Asyn port address
+        default: 0
       NELM:
         type: int
         description: |-
