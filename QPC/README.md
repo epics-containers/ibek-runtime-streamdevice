@@ -8,12 +8,17 @@ How each file was obtained, and any change made to it, is recorded in the header
 [`QPC.ibek.support.yaml`](QPC.ibek.support.yaml). That header is vendored with the
 pattern, so the provenance travels into every IOC instance that uses it.
 
+Its entity models mirror the DLS `etc/builder.py`: builder class names, parameters named
+as the builder XML attributes, `Ident` arguments as `object` references, and the
+arguments builder.py derives done in Jinja. So builder2ibek converts a builder XML to
+this pattern without redoing builder.py's work.
+
 ## Entity models
 
-| Entity model | Description |
-|---|---|
-| `QPC.digitelQpc` | Digitel QPC ion pump controller (single QPC controller) |
-| `QPC.digitelQpcIonp` | Template database for digitel QPC - Ion Pump |
+| Entity model | Loads | Description |
+|---|---|---|
+| `QPC.digitelQpc` | `digitelQPCController.template` | A Digitel QPC ion pump controller. `name` is the id its ion pumps' `QPC` names; `unit` is rendered as 2 upper-case hex digits, as builder.py does. |
+| `QPC.digitelQpcIonp` | `digitelQpcIonp.template` | An ion pump on the controller `QPC`, whose port and unit it takes. `SPLY`/`SPT` are rendered `%02d` and `spon`/`spoff` `%1.2G`, as builder.py does. |
 
 ## Files
 

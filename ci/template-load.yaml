@@ -5,6 +5,9 @@
 # default keep it; other parameters get a placeholder by type (int 1,
 # float 1.0, enum its first value, str "1", which loads as a name or a number).
 values:
+  caenN1470:
+    # load all four channel templates (a placeholder NCHANS of 1 loads one)
+    caenN1470: {NCHANS: 4}
   leybold:
     # FPARAM and IPARAM name two different records
     read_int_floatE: {FPARAM: F, IPARAM: I}
@@ -15,6 +18,13 @@ values:
 # or module.model for a model of ci/stubs/ (a module of the generic image).
 # An entity of that model is put in the IOC with the one that refers to it.
 objects:
+  CryoconM32:
+    CryoconM32_sensor: {tctrlr: CryoconM32}
+    CryoconM32_control: {tctrlr: CryoconM32}
+  QPC:
+    digitelQpcIonp: {QPC: digitelQpc}
+  agilent4UHV:
+    agilent4UHVIonp: {CTLR: agilent4UHV}
   digitelMpc:
     digitelMpc: {port: asyn.AsynIP}
     digitelMpcIonp: {MPC: digitelMpc}

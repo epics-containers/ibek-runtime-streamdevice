@@ -9,24 +9,26 @@ How each file was obtained, and any change made to it, is recorded in the header
 vendored with the pattern, so the provenance travels into every IOC instance that uses
 it.
 
+Its entity models mirror the DLS `etc/builder.py`: builder class names, parameters named
+as the builder XML attributes, `Ident` arguments as `object` references, and the
+arguments builder.py derives done in Jinja. So builder2ibek converts a builder XML to
+this pattern without redoing builder.py's work.
+
 ## Entity models
 
-| Entity model | Description |
-|---|---|
-| `agilent4UHV._agilent4UHVTemplate` | Agilent 4UHV Ion Pump Controller (controller-level template) |
-| `agilent4UHV._agilent4UHVIonpTemplate` | Agilent 4UHV Ion Pump Controller (per-pump template) |
-| `agilent4UHV.agilent4UHV` | Agilent 4UHV Ion Pump Controller |
-| `agilent4UHV.agilent4UHVIonp` | Agilent 4UHV Ion Pump Controller (per-pump device) |
+| Entity model | Loads | Description |
+|---|---|---|
+| `agilent4UHV.agilent4UHV` | `agilent4UHV.template` | An Agilent 4UHV Ion Pump Controller. `name` is the id its pumps' `CTLR` names. |
+| `agilent4UHV.agilent4UHVIonp` | `agilent4UHVIonp.template` | A pump of the controller `CTLR`, whose port it takes. |
 
 ## Files
 
 [`ibek.manifest.yaml`](ibek.manifest.yaml) vendors these files into an IOC
 instance's `config/`:
 
-- `_agilent4UHVIonpTemplate.pvi.device.yaml`
-- `_agilent4UHVTemplate.pvi.device.yaml`
 - `agilent4UHV.ibek.support.yaml`
 - `agilent4UHV.proto`
+- `agilent4UHV.pvi.device.yaml`
 - `agilent4UHV.template`
 - `agilent4UHVIonp.pvi.device.yaml`
 - `agilent4UHVIonp.template`

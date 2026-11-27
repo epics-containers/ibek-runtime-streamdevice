@@ -5,6 +5,10 @@
 # Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/QPC/ release.
+#
+# The entity models mirror that release's etc/builder.py: builder class names,
+# parameters named as the builder XML attributes, Ident arguments as object
+# references, and the arguments builder.py derives done in Jinja.
 
 module: QPC
 
@@ -13,6 +17,10 @@ entity_models:
     description: |-
       Digitel QPC ion pump controller (single QPC controller)
     parameters:
+      name:
+        type: id
+        description: |-
+          Object name, for the QPC of each digitelQpcIonp on this controller
       QPC:
         type: str
         description: |-
@@ -24,12 +32,21 @@ entity_models:
       unit:
         type: str
         description: |-
-          unit number for multi-drop serial (2 hex digits - 01 by default)
+          unit number for multi-drop serial (hex, rendered as 2 upper-case digits -
+          01 by default)
         default: "01"
+    post_defines:
+      hex_unit:
+        description: |-
+          unit as builder.py passes it: 2 upper-case hex digits
+        type: str
+        value: "{{ ('%02X' % (unit | string | int(base=16)))[-2:] }}"
     databases:
       - file: digitelQPCController.template
         args:
-          .*:
+          QPC:
+          port:
+          unit: "{{ hex_unit }}"
           PMP: ""
           SYSTEM: ""
     pvi:
@@ -41,56 +58,64 @@ entity_models:
     description: |-
       Template database for digitel QPC - Ion Pump
     parameters:
+      QPC:
+        type: object
+        description: |-
+          digitelQPC object
       device:
         type: str
         description: |-
           device name
-      text:
-        type: str
-        description: |-
-          Text to display in the ion pump controller window (max 15 chars).
-        default: "$(device)"
-      unit:
-        type: str
-        description: |-
-          unit number for multi-drop serial (2 hex digits - 01 by default)
-        default: "01"
       SPLY:
         type: int
         description: |-
-          pump supply number (rendered as 2 digits, e.g. 1 -> 01)
-      port:
-        type: str
+          Pump supply number (rendered as 2 digits, e.g. 1 -> 01)
+      SPT:
+        type: int
         description: |-
-          asyn serial port number
+          Set point number for this pump (rendered as 2 digits, e.g. 1 -> 01)
+      SIZE:
+        type: int
+        description: |-
+          Pump Size (L/S)
+        default: 500
       HV:
         type: int
         description: |-
           Target voltage
         default: 3000
-      SIZE:
-        type: int
+      text:
+        type: str
         description: |-
-          pump size (l/s)
-        default: 500
-      SPT:
-        type: int
+          Text to display in the ion pump controller window (max 15 chars)
+        default: "$(device)"
+      alh:
+        type: str
         description: |-
-          set point number for this pump (rendered as 2 digits, e.g. 1 -> 01)
+          alarm handler tag (Defaults to None)
+        default: "None"
       spon:
-        type: str
+        type: float
         description: |-
-          setpoint on
+          setpoint on (rendered as %1.2G, e.g. 2.0E-8 -> 2E-08)
       spoff:
-        type: str
+        type: float
         description: |-
-          setpoint off
+          setpoint off (rendered as %1.2G, e.g. 2.0E-8 -> 2E-08)
     databases:
       - file: digitelQpcIonp.template
         args:
-          .*:
+          device:
+          port: "{{ QPC.port }}"
+          unit: "{{ QPC.hex_unit }}"
           SPLY: "{{ '%02d' | format(SPLY) }}"
           SPT: "{{ '%02d' | format(SPT) }}"
+          SIZE:
+          HV:
+          text:
+          alh:
+          spon: "{{ '%1.2G' | format(spon) }}"
+          spoff: "{{ '%1.2G' | format(spoff) }}"
           controller: ""
     pvi:
       yaml_path: digitelQpcIonp.pvi.device.yaml
