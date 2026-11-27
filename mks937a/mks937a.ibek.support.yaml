@@ -2,14 +2,25 @@
 
 # Imported from DLS production support module: mks937a 2-97
 # Source: /dls_sw/prod/R3.14.12.7/support/mks937a/2-97
-# Pristine copy of the StreamDevice protocol + EPICS db/template from that release.
+# Pristine copy of the StreamDevice protocol + EPICS db/template from that release,
+# except mks937aImgMean.template (below).
 # To check for updates: diff this pattern's files against that path, or against the
 # newest /dls_sw/prod/*/support/mks937a/ release.
 #
-# Templates needing a generic IOC built with this module (not the plain
-# generic image):
-# - `mks937aGauge.template` needs a generic IOC built with `mks937a` (compiled support), not the plain generic image.
-# - `mks937aImgMean.template` needs a generic IOC built with `mks937a` (compiled support), not the plain generic image.
+# Derived: mks937aImgMean.template. Its aSub $(device):MEAN called the compiled
+# routine mks937aMeanCalc (mks937aApp/src/mks937aMean.c), the module's only compiled
+# code. It is replaced by base calc/calcout records that compute the same values,
+# bit for bit, and write them every scan; MEAN stays as a fanout with the same scan.
+# 2-97 wrote them only when no gauge was good, because mks937aMeanCalc returns the
+# number of good gauges and the aSub record takes a non-zero return as failure; the
+# translation writes them every scan, as mks937b's aSub does. The template's header
+# and the replaced record's comment say how. No template needs the compiled mks937a
+# library.
+#
+# Templates needing more than the plain generic image:
+# - `mks937aGauge.template`: its default aitype needs an image with Hytec Hy8401ip
+#   device support (DTYP "Hy8401ip", e.g. an RTEMS/VME IOC), not mks937a. With
+#   aitype "Soft Channel" and aiinp it runs in the generic image.
 #
 # `simulation_mks937aImg.template` and `simulation_mks937aPirg.template` are NOT
 # imported into sim/: they call sub $(device):SIM:P SNAM=pressRanProcess and
@@ -45,7 +56,9 @@ entity_models:
   - name: mks937aGauge
     description: |-
       Imported from DLS module mks937a (mks937aGauge.template)
-      NOTE: needs a generic IOC built with mks937a (not the plain generic image).
+      NOTE: the default aitype needs an image with Hytec Hy8401ip device support
+      (DTYP "Hy8401ip", e.g. an RTEMS/VME IOC), not mks937a; with aitype
+      "Soft Channel" and aiinp it runs in the generic image.
     parameters:
       dom:
         type: str
@@ -522,8 +535,8 @@ entity_models:
 
   - name: mks937aImgMean
     description: |-
-      Imported from DLS module mks937a (mks937aImgMean.template)
-      NOTE: needs a generic IOC built with mks937a (not the plain generic image).
+      Derived from DLS module mks937a (mks937aImgMean.template): the compiled
+      aSub is replaced by base calc records.
     parameters:
       device:
         type: str

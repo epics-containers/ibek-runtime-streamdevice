@@ -66,16 +66,10 @@ xfail:
     reason: 'the motor record'
   - pattern: mks937a
     template: mks937aGauge.template
-    reason: 'DTYP "$(aitype=Hy8401ip)"'
-  - pattern: mks937a
-    template: mks937aImgMean.template
-    reason: 'compiled aSub routines mks937aMeanInit, mks937aMeanCalc'
+    reason: 'DTYP "$(aitype=Hy8401ip)" (Hytec IP ADC)'
   - pattern: mks937b
     template: mks937bHy8401.template
-    reason: 'DTYP "Hy8401ip"'
-  - pattern: mks937b
-    template: mks937bImgMean.template
-    reason: 'compiled aSub routines mks937bMeanInit, mks937bMeanCalc'
+    reason: 'DTYP "Hy8401ip" (Hytec IP ADC)'
   - pattern: strainGauge
     template: strainGauge.template
     reason: 'compiled aSub routine parseSetpointValue'

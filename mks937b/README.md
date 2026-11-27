@@ -2,7 +2,9 @@
 
 Runtime StreamDevice pattern imported from the DLS support module `mks937b`, release
 `2-98` (`/dls_sw/prod/R3.14.12.7/support/mks937b/2-98`). Its files are pristine copies
-of that release.
+of that release, except `mks937bImgMean.template`: its aSub record called the module's
+only compiled routine, `mks937bMeanCalc`, and is replaced by base calc records that
+give the same results. So no template needs the compiled `mks937b` module.
 
 How each file was obtained, and any change made to it, is recorded in the header of
 [`mks937b.ibek.support.yaml`](mks937b.ibek.support.yaml). That header is vendored with
@@ -19,11 +21,11 @@ the pattern, so the provenance travels into every IOC instance that uses it.
 | `mks937b.mks937bGaugeGroup` | Imported from DLS module mks937b (mks937bGaugeGroup.template) |
 | `mks937b.mks937bHcg` | Imported from DLS module mks937b (mks937bHcg.template) |
 | `mks937b.mks937bHcgGroup` | Imported from DLS module mks937b (mks937bHcgGroup.template) |
-| `mks937b.mks937bHy8401` | Imported from DLS module mks937b (mks937bHy8401.template) NOTE: needs a generic IOC built with mks937b (not the plain generic image). |
+| `mks937b.mks937bHy8401` | Imported from DLS module mks937b (mks937bHy8401.template) NOTE: needs an image with Hytec Hy8401ip device support (DTYP "Hy8401ip", e.g. an RTEMS/VME IOC), not mks937b. |
 | `mks937b.mks937bImg` | Imported from DLS module mks937b (mks937bImg.template) |
 | `mks937b.mks937bImgDummy` | Imported from DLS module mks937b (mks937bImgDummy.template) |
 | `mks937b.mks937bImgGroup` | Imported from DLS module mks937b (mks937bImgGroup.template) |
-| `mks937b.mks937bImgMean` | Imported from DLS module mks937b (mks937bImgMean.template) NOTE: needs a generic IOC built with mks937b (not the plain generic image). |
+| `mks937b.mks937bImgMean` | Derived from DLS module mks937b (mks937bImgMean.template): the compiled aSub is replaced by base calc records. |
 | `mks937b.mks937bInterlock` | Imported from DLS module mks937b (mks937bInterlock.template) |
 | `mks937b.mks937bPirg` | Imported from DLS module mks937b (mks937bPirg.template) |
 | `mks937b.mks937bPirgDummy` | Imported from DLS module mks937b (mks937bPirgDummy.template) |
@@ -85,10 +87,19 @@ Everything else in this folder stays in the library and is never vendored:
 
 ## Needs more than the generic image
 
-These templates load only in a generic IOC built with the support they
-need; the others run in the generic `ioc-streamdevice` image. See
+This template loads only in an image with the device support it needs; the
+others run in the generic `ioc-streamdevice` image. See
 [_docs/BUILD-TIME-ONLY.md](../_docs/BUILD-TIME-ONLY.md).
 
 | Template(s) | Needs |
 |---|---|
-| `mks937bHy8401.template`, `mks937bImgMean.template` | `DTYP "Hy8401ip"`; compiled aSub routines `mks937bMeanInit`, `mks937bMeanCalc` |
+| `mks937bHy8401.template` | `DTYP "Hy8401ip"`: Hytec IP ADC device support, as in an RTEMS/VME IOC; not `mks937b` |
+
+## `mks937bImgMean.template`
+
+The DLS template's aSub `$(device):MEAN` called `mks937bMeanCalc`. Here `MEAN` is a
+fanout on the same scan that drives base `calc`/`calcout` records: they find the good
+gauges, then write `:STA`, `:P`, `:PMAX` and `:PMIN` every scan, as the aSub did. The
+results match `mks937bMeanCalc` exactly, including a bit-identical mean. Archived
+`MEAN` remains; its value is 0, as the aSub's was. The aSub's `VALA`-`VALD` fields
+are gone.

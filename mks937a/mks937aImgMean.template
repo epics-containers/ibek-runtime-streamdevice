@@ -1,4 +1,9 @@
 # mks937aImgMean.template
+# Translated from mks937a 2-97 db/mks937aImgMean.template: aSub mks937aMeanCalc
+# replaced by base calc records. The values are identical; unlike 2-97, they are
+# written every scan. 2-97's mks937aMeanCalc returns the number of good gauges,
+# which the aSub record takes as failure, so 2-97 wrote its outputs only when no
+# gauge was good. mks937b's mks937bMeanCalc returns 0, and this follows it.
 #% macro, __doc__, Template database to calculate the mean pressure from a 
 # number of IMGs
 # Pete Owens - 26/6/06
@@ -21,66 +26,234 @@
 ################################################################################
 # Mean Pressure
 #
+# was: record(aSub ...) MEAN, INAM mks937aMeanInit, SNAM mks937aMeanCalc,
+#   EFLG "ON CHANGE", SCAN "1 second", PHAS 2; INPA nimgs, INPB-K img1-10 :P,
+#   INPL-U img1-10 :STA; OUTA-D :STA, :P, :PMAX, :PMIN, each PP.
+# The fanout keeps the record's name, scan and archiver tag, and drives this
+# chain once per scan, in this order:
+#   MEAN:G1..G10 - gauge n's pressure if n <= nimgs, its status is 0 or 1 and
+#                  1.99e-11 <= P <= 1.01e-3, otherwise 0. A good pressure is
+#                  never 0, so G<n> # 0 marks a good gauge.
+#   MEAN:N       - the number of good gauges.
+#   MEAN:STA     - writes :STA: 11 if no gauge is good, 0 if all
+#                  nimgs are, otherwise 1.
+#   MEAN:P       - writes :P: the good pressures summed left to right,
+#                  as mks937aMeanCalc does, over N; 0 if N is 0.
+#   MEAN:PMAX    - writes :PMAX: the largest good pressure, or
+#                  1.99e-11 if there is none.
+#   MEAN:PMIN    - writes :PMIN: the smallest good pressure, or
+#                  1.01e-3 if there is none.
+# Like the aSub, every scan writes all four outputs (EFLG governed only the
+# aSub's own VALA-VALD monitors), so OOPT is "Every Time".
 #% archiver 1 Monitor
 #
-record(aSub, "$(device):MEAN")
+record(fanout, "$(device):MEAN")
 {
     field(DESC, "Mean Pressure")
-    field(INAM, "mks937aMeanInit")
-    field(SNAM, "mks937aMeanCalc")
-    field(EFLG, "ON CHANGE")
     field(SCAN, "1 second")
     field(PHAS, "2")
-    field(OUTA, "$(device):STA PP")
-    field(OUTB, "$(device):P PP")
-    field(OUTC, "$(device):PMAX PP")
-    field(OUTD, "$(device):PMIN PP")
-    field(INPA, "$(nimgs)")
-    field(INPB, "$(img1):P")
-    field(INPC, "$(img2):P")
-    field(INPD, "$(img3):P")
-    field(INPE, "$(img4):P")
-    field(INPF, "$(img5):P")
-    field(INPG, "$(img6):P")
-    field(INPH, "$(img7):P")
-    field(INPI, "$(img8):P")
-    field(INPJ, "$(img9):P")
-    field(INPK, "$(img10):P")
-    field(INPL, "$(img1):STA")
-    field(INPM, "$(img2):STA")
-    field(INPN, "$(img3):STA")
-    field(INPO, "$(img4):STA")
-    field(INPP, "$(img5):STA")
-    field(INPQ, "$(img6):STA")
-    field(INPR, "$(img7):STA")
-    field(INPS, "$(img8):STA")
-    field(INPT, "$(img9):STA")
-    field(INPU, "$(img10):STA")
-    field(FTVA, "LONG")
-    field(FTVB, "DOUBLE")
-    field(FTVC, "DOUBLE")
-    field(FTVD, "DOUBLE")
-    field(FTA,  "LONG")
-    field(FTB,  "DOUBLE")
-    field(FTC,  "DOUBLE")
-    field(FTD,  "DOUBLE")
-    field(FTE,  "DOUBLE")
-    field(FTF,  "DOUBLE")
-    field(FTG,  "DOUBLE")
-    field(FTH,  "DOUBLE")
-    field(FTI,  "DOUBLE")
-    field(FTJ,  "DOUBLE")
-    field(FTK,  "DOUBLE")
-    field(FTL,  "LONG")
-    field(FTM,  "LONG")
-    field(FTN,  "LONG")
-    field(FTO,  "LONG")
-    field(FTP,  "LONG")
-    field(FTQ,  "LONG")
-    field(FTR,  "LONG")
-    field(FTS,  "LONG")
-    field(FTT,  "LONG")
-    field(FTU,  "LONG")
+    field(SELM, "All")
+    field(LNK1, "$(device):MEAN:G1")
+}
+
+record(calc, "$(device):MEAN:G1")
+{
+    field(DESC, "IMG 1 pressure if good, else 0")
+    field(INPA, "$(img1):P")
+    field(INPB, "$(img1):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=1&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G2")
+}
+
+record(calc, "$(device):MEAN:G2")
+{
+    field(DESC, "IMG 2 pressure if good, else 0")
+    field(INPA, "$(img2):P")
+    field(INPB, "$(img2):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=2&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G3")
+}
+
+record(calc, "$(device):MEAN:G3")
+{
+    field(DESC, "IMG 3 pressure if good, else 0")
+    field(INPA, "$(img3):P")
+    field(INPB, "$(img3):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=3&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G4")
+}
+
+record(calc, "$(device):MEAN:G4")
+{
+    field(DESC, "IMG 4 pressure if good, else 0")
+    field(INPA, "$(img4):P")
+    field(INPB, "$(img4):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=4&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G5")
+}
+
+record(calc, "$(device):MEAN:G5")
+{
+    field(DESC, "IMG 5 pressure if good, else 0")
+    field(INPA, "$(img5):P")
+    field(INPB, "$(img5):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=5&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G6")
+}
+
+record(calc, "$(device):MEAN:G6")
+{
+    field(DESC, "IMG 6 pressure if good, else 0")
+    field(INPA, "$(img6):P")
+    field(INPB, "$(img6):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=6&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G7")
+}
+
+record(calc, "$(device):MEAN:G7")
+{
+    field(DESC, "IMG 7 pressure if good, else 0")
+    field(INPA, "$(img7):P")
+    field(INPB, "$(img7):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=7&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G8")
+}
+
+record(calc, "$(device):MEAN:G8")
+{
+    field(DESC, "IMG 8 pressure if good, else 0")
+    field(INPA, "$(img8):P")
+    field(INPB, "$(img8):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=8&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G9")
+}
+
+record(calc, "$(device):MEAN:G9")
+{
+    field(DESC, "IMG 9 pressure if good, else 0")
+    field(INPA, "$(img9):P")
+    field(INPB, "$(img9):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=9&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:G10")
+}
+
+record(calc, "$(device):MEAN:G10")
+{
+    field(DESC, "IMG 10 pressure if good, else 0")
+    field(INPA, "$(img10):P")
+    field(INPB, "$(img10):STA")
+    field(INPC, "$(nimgs)")
+    field(CALC, "(C>=10&&(B=0||B=1)&&A>=1.99e-11&&A<=1.01e-3)?A:0")
+    field(PREC, "11")
+    field(FLNK, "$(device):MEAN:N")
+}
+
+record(calc, "$(device):MEAN:N")
+{
+    field(DESC, "Number of good IMGs")
+    field(INPA, "$(device):MEAN:G1")
+    field(INPB, "$(device):MEAN:G2")
+    field(INPC, "$(device):MEAN:G3")
+    field(INPD, "$(device):MEAN:G4")
+    field(INPE, "$(device):MEAN:G5")
+    field(INPF, "$(device):MEAN:G6")
+    field(INPG, "$(device):MEAN:G7")
+    field(INPH, "$(device):MEAN:G8")
+    field(INPI, "$(device):MEAN:G9")
+    field(INPJ, "$(device):MEAN:G10")
+    field(CALC, "(A#0)+(B#0)+(C#0)+(D#0)+(E#0)+(F#0)+(G#0)+(H#0)+(I#0)+(J#0)")
+    field(FLNK, "$(device):MEAN:STA")
+}
+
+record(calcout, "$(device):MEAN:STA")
+{
+    field(DESC, "Mean status")
+    field(INPA, "$(device):MEAN:N")
+    field(INPB, "$(nimgs)")
+    field(CALC, "A=0?11:(A=B?0:1)")
+    field(OOPT, "Every Time")
+    field(OUT,  "$(device):STA PP")
+    field(FLNK, "$(device):MEAN:P")
+}
+
+record(calcout, "$(device):MEAN:P")
+{
+    field(DESC, "Mean pressure")
+    field(INPA, "$(device):MEAN:G1")
+    field(INPB, "$(device):MEAN:G2")
+    field(INPC, "$(device):MEAN:G3")
+    field(INPD, "$(device):MEAN:G4")
+    field(INPE, "$(device):MEAN:G5")
+    field(INPF, "$(device):MEAN:G6")
+    field(INPG, "$(device):MEAN:G7")
+    field(INPH, "$(device):MEAN:G8")
+    field(INPI, "$(device):MEAN:G9")
+    field(INPJ, "$(device):MEAN:G10")
+    field(INPL, "$(device):MEAN:N")
+    field(CALC, "L>0?(A+B+C+D+E+F+G+H+I+J)/L:0")
+    field(PREC, "11")
+    field(OOPT, "Every Time")
+    field(OUT,  "$(device):P PP")
+    field(FLNK, "$(device):MEAN:PMAX")
+}
+
+record(calcout, "$(device):MEAN:PMAX")
+{
+    field(DESC, "Max good pressure")
+    field(INPA, "$(device):MEAN:G1")
+    field(INPB, "$(device):MEAN:G2")
+    field(INPC, "$(device):MEAN:G3")
+    field(INPD, "$(device):MEAN:G4")
+    field(INPE, "$(device):MEAN:G5")
+    field(INPF, "$(device):MEAN:G6")
+    field(INPG, "$(device):MEAN:G7")
+    field(INPH, "$(device):MEAN:G8")
+    field(INPI, "$(device):MEAN:G9")
+    field(INPJ, "$(device):MEAN:G10")
+    field(INPK, "1.99e-11")
+    field(CALC, "MAX(A,B,C,D,E,F,G,H,I,J,K)")
+    field(PREC, "11")
+    field(OOPT, "Every Time")
+    field(OUT,  "$(device):PMAX PP")
+    field(FLNK, "$(device):MEAN:PMIN")
+}
+
+record(calcout, "$(device):MEAN:PMIN")
+{
+    field(DESC, "Min good pressure")
+    field(INPA, "$(device):MEAN:G1")
+    field(INPB, "$(device):MEAN:G2")
+    field(INPC, "$(device):MEAN:G3")
+    field(INPD, "$(device):MEAN:G4")
+    field(INPE, "$(device):MEAN:G5")
+    field(INPF, "$(device):MEAN:G6")
+    field(INPG, "$(device):MEAN:G7")
+    field(INPH, "$(device):MEAN:G8")
+    field(INPI, "$(device):MEAN:G9")
+    field(INPJ, "$(device):MEAN:G10")
+    field(INPK, "1.01e-3")
+    field(CALC, "MIN(A?A:K,B?B:K,C?C:K,D?D:K,E?E:K,F?F:K,G?G:K,H?H:K,I?I:K,J?J:K)")
+    field(PREC, "11")
+    field(OOPT, "Every Time")
+    field(OUT,  "$(device):PMIN PP")
 }
 
 ################################################################################
